@@ -24,15 +24,17 @@ const Map<String, Map<String, String>> uiText = {
         'Hello. I am OrthoSync AI. How is your recovery progressing today?',
     'botAuthReply': 'I am analyzing your specific recovery protocols.',
     'botVoiceReply': 'I received your voice note. How is your pain level?',
+    'newCheckinPrompt': 'Starting a new check-in session. To begin, how would you rate your pain today on a scale of 1 to 10?',
+    'patientRecords': 'Patient Records',
+    'close': 'Close',
     'you': 'You',
     'darkTheme': 'Dark Theme',
     'language': 'Language',
     'help': 'Help',
     'logout': 'Log out',
-    'uploadFiles': 'Upload file',
-    'takePhoto': 'Take photo',
-    'addDrive': 'Add from Google Drive',
-    'createImage': 'Create image',
+    'uploadFiles': 'Select files',
+    'takePhoto': 'Take a photo',
+    'addDrive': 'Google Drive',
     'stopRecording': 'Stop Recording',
   },
   'Spanish': {
@@ -47,15 +49,17 @@ const Map<String, Map<String, String>> uiText = {
     'botGreeting': 'Hola. Soy OrthoSync AI. ¿Cómo progresa su recuperación?',
     'botAuthReply': 'Estoy analizando sus protocolos.',
     'botVoiceReply': 'He recibido su nota de voz. ¿Cómo es su dolor?',
+    'newCheckinPrompt': 'Iniciando un nuevo control. Para empezar, ¿cómo calificaría su dolor hoy del 1 al 10?',
+    'patientRecords': 'Registros del Paciente',
+    'close': 'Cerrar',
     'you': 'Tú',
     'darkTheme': 'Tema Oscuro',
     'language': 'Idioma',
     'help': 'Ayuda',
     'logout': 'Cerrar sesión',
-    'uploadFiles': 'Subir archivos',
+    'uploadFiles': 'Seleccionar archivos',
     'takePhoto': 'Tomar foto',
-    'addDrive': 'Añadir desde Google Drive',
-    'createImage': 'Crear imagen',
+    'addDrive': 'Google Drive',
     'stopRecording': 'Detener grabación',
   },
   'Hindi': {
@@ -70,15 +74,17 @@ const Map<String, Map<String, String>> uiText = {
     'botGreeting': 'नमस्ते। मैं OrthoSync AI हूँ। रिकवरी कैसी है?',
     'botAuthReply': 'मैं आपके प्रोटोकॉल का विश्लेषण कर रहा हूँ।',
     'botVoiceReply': 'मुझे आपका वॉयस नोट मिला। दर्द कैसा है?',
+    'newCheckinPrompt': 'नया चेक-इन सत्र शुरू हो रहा है। आज आपका दर्द 1 से 10 के पैमाने पर कैसा है?',
+    'patientRecords': 'रोगी के रिकॉर्ड',
+    'close': 'बंद करें',
     'you': 'आप',
     'darkTheme': 'डार्क थीम',
     'language': 'भाषा',
     'help': 'सहायता',
     'logout': 'लॉग आउट',
-    'uploadFiles': 'फाइलें अपलोड करें',
+    'uploadFiles': 'फ़ाइलें चुनें',
     'takePhoto': 'फोटो लें',
-    'addDrive': 'Google Drive से जोड़ें',
-    'createImage': 'छवि बनाएं',
+    'addDrive': 'Google Drive',
     'stopRecording': 'रिकॉर्डिंग बंद करें',
   },
 };
@@ -183,7 +189,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     _playStartupSound();
 
-    // Smooth splash screen timer (vanishes automatically after 2.5 seconds)
+    // Smooth splash screen timer
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) setState(() => showSplash = false);
     });
@@ -246,6 +252,92 @@ class _MainScreenState extends State<MainScreen> {
   void _handleGoogleDrive() {
     setState(() => isPlusMenuOpen = false);
     showModal("Google Drive", "Connecting to Google Drive file picker...");
+  }
+
+  void _selectAgent(String agentName) {
+    setState(() => isPlusMenuOpen = false);
+    showModal(
+      "Agent Activated",
+      "Successfully switched to the $agentName. Backend execution pool ready.",
+    );
+  }
+
+  // --- FUNCTIONAL PATIENT RECORDS DISPLAY ---
+  void _showPatientRecords() {
+    _closeMenus();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.folder_shared, color: Theme.of(context).primaryColor),
+            const SizedBox(width: 10),
+            Text(
+              t['patientRecords'] ?? 'Patient Records',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildRecordRow("Patient ID", "B7-9921"),
+              _buildRecordRow("Name", "John Doe (Mock Patient)"),
+              _buildRecordRow("Procedure", "Total Knee Arthroplasty (Right)"),
+              _buildRecordRow("Date of Surgery", "August 15, 2026"),
+              _buildRecordRow("Primary Surgeon", "Dr. Sarah Jenkins"),
+              _buildRecordRow("Allergies", "Penicillin, Latex"),
+              const Divider(),
+              _buildRecordRow(
+                "Current Status",
+                "Post-op Week 3. Recovering as expected. Mild swelling reported.",
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              t['close'] ?? 'Close',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecordRow(String label, String val) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyMedium?.color,
+            fontSize: 14,
+          ),
+          children: [
+            TextSpan(
+              text: "$label: ",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(text: val),
+          ],
+        ),
+      ),
+    );
   }
 
   void handleSend() {
@@ -359,6 +451,20 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  Widget _buildAgentTile(IconData icon, String title, {Color? color}) {
+    final theme = Theme.of(context);
+    return ListTile(
+      leading: Icon(icon, color: color ?? theme.iconTheme.color, size: 22),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+      ),
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      onTap: () => _selectAgent(title),
+    );
+  }
+
   BoxDecoration _getBackgroundGradient() {
     if (widget.isDarkMode) {
       return const BoxDecoration(
@@ -410,8 +516,18 @@ class _MainScreenState extends State<MainScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ElevatedButton.icon(
+                // --- FUNCTIONAL NEW CHECK-IN ---
                 onPressed: () {
-                  setState(() => messages.clear());
+                  setState(() {
+                    messages.clear();
+                    messages.add(
+                      Message(
+                        sender: 'bot',
+                        text: 'newCheckinPrompt',
+                        isKey: true,
+                      ),
+                    );
+                  });
                   if (!isDesktop) Navigator.pop(context);
                 },
                 icon: const Icon(Icons.add),
@@ -445,6 +561,12 @@ class _MainScreenState extends State<MainScreen> {
                           title: const Text("Post-op Day 3"),
                           selectedTileColor: theme.dividerColor,
                           selected: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        ListTile(
+                          title: const Text("Post-op Day 2"),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -494,7 +616,7 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                               ),
                               Text(
-                                "Total Knee Arthroplasty",
+                                "View Profile Menu",
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,
@@ -502,6 +624,11 @@ class _MainScreenState extends State<MainScreen> {
                               ),
                             ],
                           ),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_up,
+                          color: Colors.grey.shade600,
+                          size: 20,
                         ),
                       ],
                     ),
@@ -817,6 +944,7 @@ class _MainScreenState extends State<MainScreen> {
                 ],
               ),
 
+            // --- MAIN PROFILE MENU (Added Patient Records Here) ---
             if (isMenuOpen && isLoggedIn)
               Positioned(
                 left: isDesktop ? 20 : null,
@@ -834,12 +962,11 @@ class _MainScreenState extends State<MainScreen> {
                       children: [
                         ListTile(
                           leading: Icon(
-                            Icons.person,
+                            Icons.folder_shared,
                             color: theme.primaryColor,
                           ),
-                          title: const Text('Avatar'),
-                          onTap: () =>
-                              showModal('Avatar', 'Current Patient Avatar.'),
+                          title: Text(t['patientRecords'] ?? 'Patient Records'),
+                          onTap: _showPatientRecords, // Triggers the new functional modal
                         ),
                         const Divider(),
                         SwitchListTile(
@@ -886,7 +1013,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
 
-            // --- PLUS ATTACHMENT MENU (Camera, Files, Google Drive) ---
+            // --- EXPANDED SCROLLABLE PLUS MENU ---
             if (isPlusMenuOpen)
               Positioned(
                 left: isDesktop ? 300 : 20,
@@ -896,17 +1023,19 @@ class _MainScreenState extends State<MainScreen> {
                   borderRadius: BorderRadius.circular(20),
                   color: theme.cardColor,
                   child: Container(
-                    width: 230,
+                    width: 270,
+                    height: 400,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ListTile(
                           leading: Icon(
                             Icons.camera_alt,
                             color: theme.primaryColor,
                           ),
-                          title: Text(t['takePhoto'] ?? 'Take photo'),
+                          title: Text(t['takePhoto'] ?? 'Take a photo'),
+                          visualDensity: VisualDensity.compact,
                           onTap: () => _pickImage(ImageSource.camera),
                         ),
                         ListTile(
@@ -914,16 +1043,85 @@ class _MainScreenState extends State<MainScreen> {
                             Icons.photo_library,
                             color: theme.primaryColor,
                           ),
-                          title: Text(t['uploadFiles'] ?? 'Upload file'),
+                          title: Text(t['uploadFiles'] ?? 'Select files'),
+                          visualDensity: VisualDensity.compact,
                           onTap: () => _pickImage(ImageSource.gallery),
                         ),
                         ListTile(
-                          leading: Icon(
+                          leading: const Icon(
                             Icons.add_to_drive,
                             color: Colors.green,
                           ),
                           title: Text(t['addDrive'] ?? 'Google Drive'),
+                          visualDensity: VisualDensity.compact,
                           onTap: _handleGoogleDrive,
+                        ),
+                        const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            "Specialized Multi-Agent Pool",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: [
+                              _buildAgentTile(
+                                Icons.assignment,
+                                "Intake & Context Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.trending_up,
+                                "Recovery Progress Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.sick,
+                                "Symptom Assessment Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.fitness_center,
+                                "Rehabilitation & Exercise Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.medication,
+                                "Medication Adherence Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.healing,
+                                "Wound Care & Imaging Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.directions_run,
+                                "Daily Activity & ADL Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.restaurant,
+                                "Nutrition & Recovery Diet Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.psychology,
+                                "Mental Wellbeing Agent",
+                              ),
+                              _buildAgentTile(
+                                Icons.warning,
+                                "Emergency Escalation Agent",
+                                color: Colors.redAccent,
+                              ),
+                              _buildAgentTile(
+                                Icons.summarize,
+                                "Report Generation Agent",
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
