@@ -5,6 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'models/patient_user.dart';
+import 'services/auth_service.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/db_viewer_screen.dart';
+import 'services/database_helper.dart';
+
 void main() {
   runApp(const OrthoSyncApp());
 }
@@ -172,6 +179,7 @@ class _MainScreenState extends State<MainScreen> {
   bool isPlusMenuOpen = false;
   bool isRecording = false;
   bool isTyping = false;
+  PatientUser? currentPatient;
 
   List<Message> messages = [];
   List<int> audioLevels = [10, 15, 20, 12, 18, 25, 15, 10];
@@ -394,21 +402,53 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void handleLogin() {
-    setState(() {
-      isLoggedIn = true;
-      messages.clear();
-      widget.toggleTheme(false);
-      isMenuOpen = false;
-    });
+  Future<void> handleLogin() async {
+    _closeMenus();
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => LoginScreen(isDarkMode: widget.isDarkMode),
+      ),
+    );
+
+    if (result == true && mounted) {
+      final user = AuthService().currentUser;
+      setState(() {
+        isLoggedIn = true;
+        currentPatient = user;
+        messages.clear();
+        isMenuOpen = false;
+      });
+    }
+  }
+
+  Future<void> handleRegister() async {
+    _closeMenus();
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RegisterScreen(isDarkMode: widget.isDarkMode),
+      ),
+    );
+
+    if (result == true && mounted) {
+      final user = AuthService().currentUser;
+      setState(() {
+        isLoggedIn = true;
+        currentPatient = user;
+        messages.clear();
+        isMenuOpen = false;
+      });
+    }
   }
 
   void handleLogout() {
+    AuthService().logout();
     setState(() {
       isLoggedIn = false;
+      currentPatient = null;
       isMenuOpen = false;
       messages.clear();
-      widget.toggleTheme(false);
     });
   }
 
@@ -439,6 +479,14 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.storage_rounded, color: Color(0xFF38BDF8)),
+            tooltip: 'View SQLite DB',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DbViewerScreen()),
+            ),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
@@ -598,22 +646,28 @@ class _MainScreenState extends State<MainScreen> {
                       children: [
                         CircleAvatar(
                           backgroundColor: theme.primaryColor,
-                          child: const Text(
-                            "P",
-                            style: TextStyle(color: Colors.white),
+                          child: Text(
+                            (currentPatient?.fullName.isNotEmpty == true)
+                                ? currentPatient!.fullName[0].toUpperCase()
+                                : "P",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Patient ID: B7",
-                                style: TextStyle(
+                                "Patient ID: ${currentPatient?.patientId ?? 'B7'}",
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  fontSize: 13,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 "View Profile Menu",
@@ -621,6 +675,7 @@ class _MainScreenState extends State<MainScreen> {
                                   fontSize: 12,
                                   color: Colors.grey,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -638,22 +693,46 @@ class _MainScreenState extends State<MainScreen> {
             else
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: ElevatedButton(
-                  onPressed: handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 45),
-                    backgroundColor: theme.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 45),
+                        backgroundColor: theme.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        t['login'] ?? 'Log in',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    t['login'] ?? 'Log in',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      onPressed: handleRegister,
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 42),
+                        side: BorderSide(
+                          color: theme.primaryColor.withOpacity(0.5),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        t['signup'] ?? 'Sign up',
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
           ],
