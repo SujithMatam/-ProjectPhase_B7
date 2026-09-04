@@ -11,8 +11,11 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/db_viewer_screen.dart';
 import 'services/database_helper.dart';
+import 'services/ai_backend_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper.instance.database;
   runApp(const OrthoSyncApp());
 }
 
@@ -348,29 +351,49 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void handleSend() {
-    if (_inputController.text.trim().isEmpty) return;
+  void handleSend() async {
+    final text = _inputController.text.trim();
+    if (text.isEmpty) return;
     setState(() {
-      messages.add(Message(sender: 'user', text: _inputController.text));
+      messages.add(Message(sender: 'user', text: text));
       _inputController.clear();
       isTyping = true;
     });
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
-    Future.delayed(const Duration(milliseconds: 1500), () {
+
+    try {
+      final res = await AiBackendService.instance.sendChatMessage(
+        patient: currentPatient,
+        message: text,
+      );
       if (mounted) {
         setState(() {
           isTyping = false;
           messages.add(
             Message(
               sender: 'bot',
-              text: isLoggedIn ? 'botAuthReply' : 'botGreeting',
-              isKey: true,
+              text: res['reply'] as String? ?? 'I am analyzing your recovery protocols.',
+              isKey: false,
             ),
           );
         });
         _scrollToBottom();
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isTyping = false;
+          messages.add(
+            Message(
+              sender: 'bot',
+              text: 'I received your query. Remember to ice and elevate if experiencing swelling.',
+              isKey: false,
+            ),
+          );
+        });
+        _scrollToBottom();
+      }
+    }
   }
 
   void startRecording() {
