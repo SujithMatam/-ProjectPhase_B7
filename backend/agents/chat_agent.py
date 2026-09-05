@@ -10,6 +10,7 @@ import urllib.error
 from typing import Dict, Any, List
 from triage.safety_triage import SafetyTriageEngine
 from rag.knowledge_base import ClinicalKnowledgeBase
+from lam.schemas import resolve_procedure_code
 
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
 DEFAULT_MODEL = "llama3.2"
@@ -23,7 +24,8 @@ class ChatAgent:
         affected_limb: str,
         postop_day: int,
         user_message: str,
-        chat_history: List[Dict[str, str]] = None
+        chat_history: List[Dict[str, str]] = None,
+        procedure: str = None
     ) -> Dict[str, Any]:
         
         # Step 1: Emergency Safety Triage Check (Hard rule filter)
@@ -49,7 +51,7 @@ class ChatAgent:
             }
 
         # Step 2: Retrieve Relevant Orthopedic RAG Protocols
-        procedure = "THA" if "hip" in surgery_type.lower() else "TKA"
+        procedure = procedure or resolve_procedure_code(surgery_type)
         rag_docs = ClinicalKnowledgeBase.query(user_message, procedure=procedure, limit=2)
         rag_context = "\n".join([f"- {d['topic']}: {d['content']}" for d in rag_docs])
 

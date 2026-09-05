@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 
 from agents.symptom_agent import SymptomAssessmentAgent
 from agents.chat_agent import ChatAgent
+from lam.orchestrator import LAMOrchestrator
 from triage.safety_triage import SafetyTriageEngine
 
 app = FastAPI(
@@ -78,7 +79,7 @@ def assess_symptoms(payload: SymptomAssessmentRequest):
 @app.post("/api/chat")
 def chat(payload: ChatRequest):
     try:
-        result = ChatAgent.answer_question(
+        result = LAMOrchestrator.process(
             patient_id=payload.patient_id,
             surgery_type=payload.surgery_type,
             affected_limb=payload.affected_limb,
