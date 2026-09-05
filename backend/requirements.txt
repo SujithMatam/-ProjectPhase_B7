@@ -3,3 +3,4 @@ uvicorn[standard]>=0.28.0
 pydantic>=2.6.0
 requests>=2.31.0
 sentence-transformers>=2.7.0
+chromadb>=0.5.0
