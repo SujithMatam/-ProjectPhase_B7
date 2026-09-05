@@ -6,7 +6,11 @@ Execution order (safety-first):
   2. ScopeValidator.validate()       OUT_OF_SCOPE -> deterministic deflection
   3. IntentClassifier.classify()     -> IntentLabel
   4. _route()                        -> TargetAgent + ActionType
-  5. ChatAgent.answer_question()     -> LLM-generated reply
+  5. AgentRouter.dispatch()          -> executes the specialized clinical
+                                         agent (Phase 4) mapped to the
+                                         classified intent, which shares the
+                                         existing RAG + local LLM + fallback
+                                         pipeline (agents/chat_agent.py)
 
 Backward compatibility:
   process() returns a plain dict that is a SUPERSET of the existing /api/chat
@@ -19,7 +23,7 @@ from __future__ import annotations
 from typing import Optional
 
 from triage.safety_triage import SafetyTriageEngine
-from agents.chat_agent import ChatAgent
+from agents.agent_router import AgentRouter
 from lam.schemas import (
     IntentLabel, ScopeStatus, TargetAgent, ActionType,
     LAMContext, LAMResult, resolve_procedure_code,
@@ -30,8 +34,10 @@ from lam.intent_classifier import IntentClassifier
 
 # ---------------------------------------------------------------------------
 # Intent -> (TargetAgent, ActionType) routing table
-# Phase 1: all non-emergency in-scope queries are served by ChatAgent.
-# Phase 2: swap TargetAgent values to real specialist agent instances.
+# This drives BOTH the response metadata below (target_agent/action) AND,
+# via AgentRouter (agents/agent_router.py), which specialized clinical agent
+# actually executes -- the two stay in lockstep because both are keyed by
+# the same IntentLabel classified in Step 3.
 # ---------------------------------------------------------------------------
 
 _ROUTING_TABLE: dict[IntentLabel, tuple[TargetAgent, ActionType]] = {
@@ -156,24 +162,36 @@ class LAMOrchestrator:
         target_agent, action_type = cls._route(intent_label)
 
         # ------------------------------------------------------------------
-        # STEP 5 -- Generative Response via ChatAgent
-        # Resolve the correct procedure code BEFORE calling ChatAgent so that
-        # the RAG knowledge base receives accurate procedure routing.
-        # The resolved code is passed as the optional 'procedure' parameter
-        # added to ChatAgent.answer_question() in this phase.
+        # STEP 5 -- Specialized Agent Execution (Phase 4)
+        # Resolve the correct procedure code BEFORE dispatching so that the
+        # RAG knowledge base receives accurate procedure routing. The
+        # classified intent_label selects which specialized clinical agent
+        # (agents/specialized_agents.py, via agents/agent_router.py)
+        # actually generates the response -- each agent shares the same
+        # Phase 3 RAG + local LLM + deterministic fallback pipeline
+        # (agents/chat_agent.py) and only contributes a concise domain
+        # focus instruction. EMERGENCY and OUT_OF_SCOPE never reach this
+        # step; both already short-circuited in Steps 1-2 above.
+        #
+        # `triage` was already computed once in Step 1 (and is GREEN/YELLOW
+        # here, since RED returned earlier) -- it is passed straight through
+        # so ChatAgent does not evaluate SafetyTriageEngine a second time for
+        # the same request.
         # ------------------------------------------------------------------
         resolved_procedure = resolve_procedure_code(surgery_type)
 
-        chat_result = ChatAgent.answer_question(
+        chat_result = AgentRouter.dispatch(
+            intent_label=intent_label,
             patient_id=patient_id,
             surgery_type=surgery_type,
             affected_limb=affected_limb,
             postop_day=postop_day,
             user_message=user_message,
             procedure=resolved_procedure,
+            precomputed_triage=triage,
         )
 
-        # Merge ChatAgent response with LAM metadata
+        # Merge specialized-agent response with LAM metadata
         return LAMResult(
             reply=chat_result["reply"],
             triage_level=chat_result["triage_level"],

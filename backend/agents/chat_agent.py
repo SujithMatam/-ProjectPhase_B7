@@ -7,7 +7,7 @@ Generates unique, context-aware, medically grounded answers for every question.
 import json
 import urllib.request
 import urllib.error
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from triage.safety_triage import SafetyTriageEngine
 from rag.knowledge_base import ClinicalKnowledgeBase
 from lam.schemas import resolve_procedure_code
@@ -25,11 +25,34 @@ class ChatAgent:
         postop_day: int,
         user_message: str,
         chat_history: List[Dict[str, str]] = None,
-        procedure: str = None
+        procedure: str = None,
+        domain_instruction: Optional[str] = None,
+        precomputed_triage: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        
-        # Step 1: Emergency Safety Triage Check (Hard rule filter)
-        triage = SafetyTriageEngine.evaluate(
+        """
+        Phase 4 notes (both optional, backward-compatible additions --
+        existing callers that omit them get byte-identical behavior to
+        before):
+
+        `domain_instruction` -- when a specialized agent (agents/agent_
+        router.py) supplies it, it steers the LLM prompt's framing (see
+        _query_llama) without adding a second RAG implementation or a
+        second LLM call.
+
+        `precomputed_triage` -- the LAM orchestrator already runs
+        SafetyTriageEngine.evaluate() once, upstream, before a specialized
+        agent is ever dispatched (RED short-circuits there and never
+        reaches this method at all). Passing that already-computed result
+        through here avoids evaluating safety triage a second time for the
+        same request. If omitted (direct/legacy ChatAgent callers not going
+        through the LAM), this method still runs its own triage exactly as
+        before -- callers outside the LAM have no other safety net.
+        """
+
+        # Step 1: Emergency Safety Triage Check (Hard rule filter).
+        # Reuse the LAM's already-computed result when supplied instead of
+        # evaluating it again -- see precomputed_triage note above.
+        triage = precomputed_triage if precomputed_triage is not None else SafetyTriageEngine.evaluate(
             symptoms=user_message,
             post_op_day=postop_day
         )
@@ -63,7 +86,8 @@ class ChatAgent:
             affected_limb=affected_limb,
             postop_day=postop_day,
             rag_context=rag_context,
-            triage=triage
+            triage=triage,
+            domain_instruction=domain_instruction
         )
 
         # Ensure we filter out Meta's generic refusal if it triggers
@@ -103,9 +127,23 @@ class ChatAgent:
         affected_limb: str,
         postop_day: int,
         rag_context: str,
-        triage: Dict[str, Any]
+        triage: Dict[str, Any],
+        domain_instruction: Optional[str] = None
     ) -> str:
-        prompt = f"""Read the provided physical therapy discharge reference for Day {postop_day} after {surgery_type} ({affected_limb}):
+        # Byte-identical to the original prompt when no domain_instruction is
+        # supplied, so existing callers (direct ChatAgent use without the
+        # Phase 4 specialized-agent layer) see no behavior change.
+        if domain_instruction:
+            prompt = f"""Read the provided physical therapy discharge reference for Day {postop_day} after {surgery_type} ({affected_limb}):
+{rag_context}
+
+Specialist focus for this answer: {domain_instruction}
+
+User's Question: "{user_message}"
+
+Write a friendly, 2-3 sentence answer directly answering the user's question based on the discharge notes. Mention Day {postop_day} goals, icing, and limb elevation:"""
+        else:
+            prompt = f"""Read the provided physical therapy discharge reference for Day {postop_day} after {surgery_type} ({affected_limb}):
 {rag_context}
 
 User's Question: "{user_message}"
