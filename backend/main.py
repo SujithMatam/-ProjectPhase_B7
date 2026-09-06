@@ -28,6 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class SymptomAssessmentRequest(BaseModel):
     patient_id: str = Field(..., example="PT-B7-8921")
     surgery_type: str = Field(default="Total Knee Arthroplasty (TKA)", example="Total Knee Arthroplasty (TKA)")
@@ -37,12 +38,16 @@ class SymptomAssessmentRequest(BaseModel):
     pain_score: int = Field(default=5, ge=0, le=10, example=6)
     temperature_c: Optional[float] = Field(default=None, example=37.2)
 
+
 class ChatRequest(BaseModel):
     patient_id: str = Field(default="PT-B7-8921", example="PT-B7-8921")
     surgery_type: str = Field(default="Total Knee Arthroplasty (TKA)", example="Total Knee Arthroplasty (TKA)")
     affected_limb: str = Field(default="Right", example="Right")
     postop_day: int = Field(default=3, example=3)
+    surgery_date: Optional[str] = Field(default=None, example="2026-08-15T00:00:00.000Z")
     message: str = Field(..., example="Is it normal for my knee to swell after walking?")
+    chat_history: Optional[List[Dict[str, str]]] = Field(default=None)
+
 
 @app.get("/")
 def read_root():
@@ -53,12 +58,14 @@ def read_root():
         "docs_url": "/docs"
     }
 
+
 @app.get("/api/health")
 def health_check():
     return {
         "status": "healthy",
         "agents": ["SafetyTriageEngine", "SymptomAssessmentAgent", "ClinicalKnowledgeBase", "ChatAgent"]
     }
+
 
 @app.post("/api/assess-symptoms")
 def assess_symptoms(payload: SymptomAssessmentRequest):
@@ -76,6 +83,7 @@ def assess_symptoms(payload: SymptomAssessmentRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/api/chat")
 def chat(payload: ChatRequest):
     try:
@@ -84,11 +92,14 @@ def chat(payload: ChatRequest):
             surgery_type=payload.surgery_type,
             affected_limb=payload.affected_limb,
             postop_day=payload.postop_day,
-            user_message=payload.message
+            surgery_date=payload.surgery_date,
+            user_message=payload.message,
+            chat_history=payload.chat_history or [],
         )
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     import uvicorn

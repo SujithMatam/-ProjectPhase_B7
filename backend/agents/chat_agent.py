@@ -1,7 +1,6 @@
 """
 LLM Chatbot Agent for Orthopedic Post-Op Recovery
 Powered by Local Offline LLM (Ollama / Llama 3.2) + Clinical RAG + Safety Guardrails.
-Generates unique, context-aware, medically grounded answers for every question.
 """
 
 import json
@@ -15,6 +14,7 @@ from lam.schemas import resolve_procedure_code
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
 DEFAULT_MODEL = "llama3.2"
 
+
 class ChatAgent:
     @classmethod
     def answer_question(
@@ -27,31 +27,10 @@ class ChatAgent:
         chat_history: List[Dict[str, str]] = None,
         procedure: str = None,
         domain_instruction: Optional[str] = None,
-        precomputed_triage: Optional[Dict[str, Any]] = None
+        precomputed_triage: Optional[Dict[str, Any]] = None,
+        surgery_date: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """
-        Phase 4 notes (both optional, backward-compatible additions --
-        existing callers that omit them get byte-identical behavior to
-        before):
-
-        `domain_instruction` -- when a specialized agent (agents/agent_
-        router.py) supplies it, it steers the LLM prompt's framing (see
-        _query_llama) without adding a second RAG implementation or a
-        second LLM call.
-
-        `precomputed_triage` -- the LAM orchestrator already runs
-        SafetyTriageEngine.evaluate() once, upstream, before a specialized
-        agent is ever dispatched (RED short-circuits there and never
-        reaches this method at all). Passing that already-computed result
-        through here avoids evaluating safety triage a second time for the
-        same request. If omitted (direct/legacy ChatAgent callers not going
-        through the LAM), this method still runs its own triage exactly as
-        before -- callers outside the LAM have no other safety net.
-        """
-
-        # Step 1: Emergency Safety Triage Check (Hard rule filter).
-        # Reuse the LAM's already-computed result when supplied instead of
-        # evaluating it again -- see precomputed_triage note above.
+        # Safety triage is always based on the CURRENT message.
         triage = precomputed_triage if precomputed_triage is not None else SafetyTriageEngine.evaluate(
             symptoms=user_message,
             post_op_day=postop_day
@@ -73,12 +52,14 @@ class ChatAgent:
                 "sources": []
             }
 
-        # Step 2: Retrieve Relevant Orthopedic RAG Protocols
         procedure = procedure or resolve_procedure_code(surgery_type)
-        rag_docs = ClinicalKnowledgeBase.query(user_message, procedure=procedure, limit=2)
-        rag_context = "\n".join([f"- {d['topic']}: {d['content']}" for d in rag_docs])
+        rag_docs = ClinicalKnowledgeBase.query(
+            user_message, procedure=procedure, limit=2
+        )
+        rag_context = "\n".join(
+            [f"- {d['topic']}: {d['content']}" for d in rag_docs]
+        )
 
-        # Step 3: Local LLM Inference via Ollama (Llama 3.2)
         llm_response = cls._query_llama(
             user_message=user_message,
             patient_id=patient_id,
@@ -87,11 +68,19 @@ class ChatAgent:
             postop_day=postop_day,
             rag_context=rag_context,
             triage=triage,
-            domain_instruction=domain_instruction
+            chat_history=chat_history or [],
+            domain_instruction=domain_instruction,
+            surgery_date=surgery_date,
         )
 
-        # Ensure we filter out Meta's generic refusal if it triggers
-        if llm_response and not any(r in llm_response.lower() for r in ["can't provide medical advice", "cannot provide medical advice", "cannot give medical advice"]):
+        if llm_response and not any(
+            r in llm_response.lower()
+            for r in [
+                "can't provide medical advice",
+                "cannot provide medical advice",
+                "cannot give medical advice",
+            ]
+        ):
             return {
                 "reply": llm_response,
                 "triage_level": triage["triage_level"],
@@ -100,7 +89,6 @@ class ChatAgent:
                 "sources": [d["topic"] for d in rag_docs]
             }
 
-        # Smart generative fallback tailored to the user's specific text & day
         fallback_reply = cls._generate_smart_reply(
             user_message=user_message,
             patient_id=patient_id,
@@ -128,27 +116,46 @@ class ChatAgent:
         postop_day: int,
         rag_context: str,
         triage: Dict[str, Any],
-        domain_instruction: Optional[str] = None
+        chat_history: List[Dict[str, str]],
+        domain_instruction: Optional[str] = None,
+        surgery_date: Optional[str] = None,
     ) -> str:
-        # Byte-identical to the original prompt when no domain_instruction is
-        # supplied, so existing callers (direct ChatAgent use without the
-        # Phase 4 specialized-agent layer) see no behavior change.
+        history_lines = []
+        for turn in chat_history[-10:]:
+            role = turn.get("role", "user")
+            content = turn.get("content", "").strip()
+            if content:
+                history_lines.append(f"{role}: {content}")
+
+        history_text = "\n".join(history_lines) if history_lines else "No previous conversation turns."
+        surgery_date_text = surgery_date or "Not provided"
+
         if domain_instruction:
             prompt = f"""Read the provided physical therapy discharge reference for Day {postop_day} after {surgery_type} ({affected_limb}):
 {rag_context}
+
+Patient surgery date: {surgery_date_text}
+
+Previous conversation:
+{history_text}
 
 Specialist focus for this answer: {domain_instruction}
 
 User's Question: "{user_message}"
 
-Write a friendly, 2-3 sentence answer directly answering the user's question based on the discharge notes. Mention Day {postop_day} goals, icing, and limb elevation:"""
+Write a friendly, 2-3 sentence answer directly answering the user's question based on the discharge notes and relevant conversation context. Mention Day {postop_day} goals, icing, and limb elevation only when relevant:"""
         else:
             prompt = f"""Read the provided physical therapy discharge reference for Day {postop_day} after {surgery_type} ({affected_limb}):
 {rag_context}
 
+Patient surgery date: {surgery_date_text}
+
+Previous conversation:
+{history_text}
+
 User's Question: "{user_message}"
 
-Write a friendly, 2-3 sentence answer directly answering the user's question based on the discharge notes. Mention Day {postop_day} goals, icing, and limb elevation:"""
+Write a friendly, 2-3 sentence answer directly answering the user's question based on the discharge notes and relevant conversation context. Mention Day {postop_day} goals, icing, and limb elevation only when relevant:"""
 
         payload = {
             "model": DEFAULT_MODEL,
@@ -184,7 +191,6 @@ Write a friendly, 2-3 sentence answer directly answering the user's question bas
     ) -> str:
         lower = user_message.lower()
 
-        # Day specific exercise guidance
         if "exercise" in lower or "workout" in lower or "physio" in lower:
             if postop_day <= 2:
                 return f"For Post-Op Day {postop_day}, your focus is gentle in-bed mobility: ankle pumps (10 every hour) to prevent blood clots, gentle quad sets pushing your knee flat into the bed, and short assisted transfers with your walker."
