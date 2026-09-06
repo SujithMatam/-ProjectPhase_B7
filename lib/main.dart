@@ -97,7 +97,7 @@ const Map<String, Map<String, String>> uiText = {
 };
 
 class OrthoSyncApp extends StatefulWidget {
-  const OrthoSyncApp({Key? key}) : super(key: key);
+  const OrthoSyncApp({super.key});
 
   @override
   State<OrthoSyncApp> createState() => _OrthoSyncAppState();
@@ -119,7 +119,7 @@ class _OrthoSyncAppState extends State<OrthoSyncApp> {
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.transparent,
         primaryColor: const Color(0xFF1A73E8),
-        cardColor: Colors.white.withOpacity(0.9),
+        cardColor: Colors.white.withValues(alpha: 0.9),
         dividerColor: const Color(0xFFDADCE0),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
@@ -131,7 +131,7 @@ class _OrthoSyncAppState extends State<OrthoSyncApp> {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.transparent,
         primaryColor: const Color(0xFF8AB4F8),
-        cardColor: const Color(0xFF2A2D3E).withOpacity(0.9),
+        cardColor: const Color(0xFF2A2D3E).withValues(alpha: 0.9),
         dividerColor: const Color(0xFF3C4043),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
@@ -162,10 +162,10 @@ class MainScreen extends StatefulWidget {
   final Function(bool) toggleTheme;
   final bool isDarkMode;
   const MainScreen({
-    Key? key,
+    super.key,
     required this.toggleTheme,
     required this.isDarkMode,
-  }) : super(key: key);
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -536,7 +536,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildSidebar(ThemeData theme, Color textColor, bool isDesktop) {
     return Container(
       width: isDesktop ? 280 : double.infinity,
-      color: isDesktop ? theme.cardColor.withOpacity(0.4) : theme.cardColor,
+      color: isDesktop
+          ? theme.cardColor.withValues(alpha: 0.4)
+          : theme.cardColor,
       child: SafeArea(
         child: Column(
           children: [
@@ -639,7 +641,7 @@ class _MainScreenState extends State<MainScreen> {
                     margin: const EdgeInsets.all(16),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.dividerColor.withOpacity(0.3),
+                      color: theme.dividerColor.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -718,7 +720,7 @@ class _MainScreenState extends State<MainScreen> {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 42),
                         side: BorderSide(
-                          color: theme.primaryColor.withOpacity(0.5),
+                          color: theme.primaryColor.withValues(alpha: 0.5),
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -785,8 +787,8 @@ class _MainScreenState extends State<MainScreen> {
                                         padding: const EdgeInsets.all(20),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: theme.primaryColor.withOpacity(
-                                            0.1,
+                                          color: theme.primaryColor.withValues(
+                                            alpha: 0.1,
                                           ),
                                         ),
                                         child: Icon(
@@ -910,7 +912,9 @@ class _MainScreenState extends State<MainScreen> {
                             decoration: BoxDecoration(
                               color: theme.cardColor,
                               border: Border.all(
-                                color: theme.dividerColor.withOpacity(0.5),
+                                color: theme.dividerColor.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                               borderRadius: BorderRadius.circular(30),
                             ),
@@ -937,8 +941,8 @@ class _MainScreenState extends State<MainScreen> {
                                               vertical: 10,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.red.withOpacity(
-                                                0.1,
+                                              color: Colors.red.withValues(
+                                                alpha: 0.1,
                                               ),
                                               borderRadius:
                                                   BorderRadius.circular(20),
@@ -947,19 +951,17 @@ class _MainScreenState extends State<MainScreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                ...audioLevels
-                                                    .map(
-                                                      (h) => Container(
-                                                        margin:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 2,
-                                                            ),
-                                                        width: 3,
-                                                        height: h.toDouble(),
-                                                        color: Colors.red,
-                                                      ),
-                                                    )
-                                                    .toList(),
+                                                ...audioLevels.map(
+                                                  (h) => Container(
+                                                    margin:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 2,
+                                                        ),
+                                                    width: 3,
+                                                    height: h.toDouble(),
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
                                                 const SizedBox(width: 10),
                                                 Text(
                                                   t['stopRecording'] ?? 'Stop',
@@ -1229,11 +1231,13 @@ class _MainScreenState extends State<MainScreen> {
                                 padding: const EdgeInsets.all(30),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: theme.primaryColor.withOpacity(0.15),
+                                  color: theme.primaryColor.withValues(
+                                    alpha: 0.15,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: theme.primaryColor.withOpacity(
-                                        0.3,
+                                      color: theme.primaryColor.withValues(
+                                        alpha: 0.3,
                                       ),
                                       blurRadius: 30,
                                       spreadRadius: 5,
