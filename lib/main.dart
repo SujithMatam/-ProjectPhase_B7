@@ -153,11 +153,27 @@ class Message {
   final String text;
   final bool isKey;
   final String? imagePath;
+
+  final String? triageLevel;
+  final bool isEscalated;
+  final String? intent;
+  final String? targetAgent;
+  final String? action;
+  final String? scopeStatus;
+  final dynamic sources;
+
   Message({
     required this.sender,
     required this.text,
     this.isKey = false,
     this.imagePath,
+    this.triageLevel,
+    this.isEscalated = false,
+    this.intent,
+    this.targetAgent,
+    this.action,
+    this.scopeStatus,
+    this.sources,
   });
 }
 
@@ -353,46 +369,75 @@ class _MainScreenState extends State<MainScreen> {
 
   void handleSend() async {
     final text = _inputController.text.trim();
+
     if (text.isEmpty) return;
+
+    // Build conversation history BEFORE adding the current message so the
+    // backend receives only previous turns plus the explicit current message.
+    final chatHistory = messages
+        .skip(messages.length > 10 ? messages.length - 10 : 0)
+        .map(
+          (msg) => {
+            'role': msg.sender == 'user' ? 'user' : 'assistant',
+            'content': msg.text,
+          },
+        )
+        .toList();
+
     setState(() {
       messages.add(Message(sender: 'user', text: text));
+
       _inputController.clear();
       isTyping = true;
     });
+
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
 
     try {
       final res = await AiBackendService.instance.sendChatMessage(
         patient: currentPatient,
         message: text,
+        chatHistory: chatHistory,
       );
-      if (mounted) {
-        setState(() {
-          isTyping = false;
-          messages.add(
-            Message(
-              sender: 'bot',
-              text: res['reply'] as String? ?? 'I am analyzing your recovery protocols.',
-              isKey: false,
-            ),
-          );
-        });
-        _scrollToBottom();
-      }
+
+      if (!mounted) return;
+
+      setState(() {
+        isTyping = false;
+
+        messages.add(
+          Message(
+            sender: 'bot',
+            text:
+                res['reply'] as String? ??
+                'I am analyzing your recovery protocols.',
+            triageLevel: res['triage_level'] as String?,
+            isEscalated: res['is_escalated'] == true,
+            intent: res['intent'] as String?,
+            targetAgent: res['target_agent'] as String?,
+            action: res['action'] as String?,
+            scopeStatus: res['scope_status'] as String?,
+            sources: res['sources'],
+          ),
+        );
+      });
+
+      _scrollToBottom();
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          isTyping = false;
-          messages.add(
-            Message(
-              sender: 'bot',
-              text: 'I received your query. Remember to ice and elevate if experiencing swelling.',
-              isKey: false,
-            ),
-          );
-        });
-        _scrollToBottom();
-      }
+      if (!mounted) return;
+
+      setState(() {
+        isTyping = false;
+
+        messages.add(
+          Message(
+            sender: 'bot',
+            text: 'The local AI service is currently unavailable. Please start the backend and try again.',
+          ),
+        );
+      });
+
+      _scrollToBottom();
     }
   }
 
@@ -904,6 +949,53 @@ class _MainScreenState extends State<MainScreen> {
                                                   ),
                                                 ),
                                               ),
+
+                                            if (!isUser &&
+                                                msg.triageLevel != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 6,
+                                                ),
+                                                child: Text(
+                                                  'Triage: ${msg.triageLevel}',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color:
+                                                        msg.triageLevel == 'RED'
+                                                        ? Colors.red
+                                                        : msg.triageLevel ==
+                                                              'YELLOW'
+                                                        ? Colors.orange
+                                                        : Colors.green,
+                                                  ),
+                                                ),
+                                              ),
+
+                                            if (!isUser && msg.isEscalated)
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                  bottom: 8,
+                                                ),
+                                                padding: const EdgeInsets.all(
+                                                  8,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.withOpacity(
+                                                    0.1,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: const Text(
+                                                  'Emergency escalation required',
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+
                                             Text(
                                               msg.isKey
                                                   ? (t[msg.text] ?? msg.text)
