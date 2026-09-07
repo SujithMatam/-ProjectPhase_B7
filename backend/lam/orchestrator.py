@@ -23,17 +23,17 @@ from lam.intent_classifier import IntentClassifier
 
 
 _ROUTING_TABLE: dict[IntentLabel, tuple[TargetAgent, ActionType]] = {
-    IntentLabel.RECOVERY_PROGRESS: (TargetAgent.RECOVERY_AGENT,       ActionType.INFORM),
-    IntentLabel.PAIN_SYMPTOMS:     (TargetAgent.PAIN_AGENT,            ActionType.ASSESS),
-    IntentLabel.REHABILITATION:    (TargetAgent.REHAB_AGENT,           ActionType.ADVISE),
-    IntentLabel.MEDICATION:        (TargetAgent.MEDICATION_AGENT,      ActionType.INFORM),
-    IntentLabel.WOUND_CARE:        (TargetAgent.WOUND_CARE_AGENT,      ActionType.ADVISE),
-    IntentLabel.DAILY_ACTIVITY:    (TargetAgent.DAILY_ACTIVITY_AGENT,  ActionType.INFORM),
-    IntentLabel.NUTRITION:         (TargetAgent.NUTRITION_AGENT,       ActionType.INFORM),
-    IntentLabel.MENTAL_WELLBEING:  (TargetAgent.MENTAL_HEALTH_AGENT,   ActionType.ADVISE),
-    IntentLabel.EMERGENCY:         (TargetAgent.SAFETY_TRIAGE_AGENT,   ActionType.ESCALATE),
-    IntentLabel.OUT_OF_SCOPE:      (TargetAgent.DEFLECTION_AGENT,      ActionType.DEFLECT),
-    IntentLabel.INTAKE_CONTEXT:    (TargetAgent.INTAKE_CONTEXT_AGENT,  ActionType.INFORM),
+    IntentLabel.RECOVERY_PROGRESS: (TargetAgent.RECOVERY_AGENT,      ActionType.INFORM),
+    IntentLabel.PAIN_SYMPTOMS:     (TargetAgent.PAIN_AGENT,             ActionType.ASSESS),
+    IntentLabel.REHABILITATION:    (TargetAgent.REHAB_AGENT,            ActionType.ADVISE),
+    IntentLabel.MEDICATION:        (TargetAgent.MEDICATION_AGENT,       ActionType.INFORM),
+    IntentLabel.WOUND_CARE:        (TargetAgent.WOUND_CARE_AGENT,       ActionType.ADVISE),
+    IntentLabel.DAILY_ACTIVITY:    (TargetAgent.DAILY_ACTIVITY_AGENT,   ActionType.INFORM),
+    IntentLabel.NUTRITION:         (TargetAgent.NUTRITION_AGENT,        ActionType.INFORM),
+    IntentLabel.MENTAL_WELLBEING:  (TargetAgent.MENTAL_HEALTH_AGENT,    ActionType.ADVISE),
+    IntentLabel.EMERGENCY:         (TargetAgent.SAFETY_TRIAGE_AGENT,    ActionType.ESCALATE),
+    IntentLabel.OUT_OF_SCOPE:      (TargetAgent.DEFLECTION_AGENT,       ActionType.DEFLECT),
+    IntentLabel.INTAKE_CONTEXT:    (TargetAgent.INTAKE_CONTEXT_AGENT,   ActionType.INFORM),
 }
 
 _OUT_OF_SCOPE_REPLY = (
@@ -64,8 +64,6 @@ class LAMOrchestrator:
         current_rom: Optional[str] = None,
         exercise_history: Optional[str] = None,
     ) -> dict:
-        # The context is passed through the LAM, but deterministic triage below
-        # always evaluates the CURRENT user message first.
         context = LAMContext(
             patient_id=patient_id,
             surgery_type=surgery_type,
@@ -77,22 +75,15 @@ class LAMOrchestrator:
         )
 
         # STEP 1 -- Deterministic Safety Triage (ALWAYS FIRST)
-        # temperature_c (optional, Milestone Sec 2.6 structured symptom
-        # input) is passed straight into the SAME deterministic engine call
-        # used by every request -- when supplied it can raise a RED/YELLOW
-        # result via SafetyTriageEngine's own numeric threshold (see
-        # triage/safety_triage.py), same as the pre-existing
-        # /api/assess-symptoms path. Omitted (None) reproduces prior
-        # behavior exactly.
         triage = SafetyTriageEngine.evaluate(
-            symptoms=user_message,
-            post_op_day=postop_day,
-            temperature_c=temperature_c,
+             symptoms=user_message,
+             post_op_day=postop_day,
+             temperature_c=temperature_c,
         )
 
         if triage["triage_level"] == "RED":
             reply_text = (
-                "\U0001f6a8 **CRITICAL EMERGENCY ALERT**\n\n"
+                "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
                 f"Your symptoms require urgent medical evaluation: "
                 f"**{', '.join(triage['reasons'])}**.\n\n"
                 f"{triage['action_protocol']}\n\n"
@@ -130,11 +121,15 @@ class LAMOrchestrator:
                 scope_status=ScopeStatus.OUT_OF_SCOPE.value,
             ).to_dict()
 
-        # STEP 3 -- Intent Classification
-        intent_label: IntentLabel = IntentClassifier.classify(
-            query=user_message,
-            context=context,
-        )
+        # STEP 3 -- Intent Classification (with explicit override for intake/profile updates)
+        lower_msg = user_message.lower()
+        if any(kw in lower_msg for kw in ["update", "profile", "background", "history", "surgical background"]):
+            intent_label = IntentLabel.INTAKE_CONTEXT
+        else:
+            intent_label = IntentClassifier.classify(
+                query=user_message,
+                context=context,
+            )
 
         # STEP 4 -- Agent / Action Routing
         target_agent, action_type = cls._route(intent_label)
