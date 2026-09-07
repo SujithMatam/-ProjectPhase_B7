@@ -60,18 +60,33 @@ class ChatAgent:
             [f"- {d['topic']}: {d['content']}" for d in rag_docs]
         )
 
-        llm_response = cls._query_llama(
-            user_message=user_message,
-            patient_id=patient_id,
-            surgery_type=surgery_type,
-            affected_limb=affected_limb,
-            postop_day=postop_day,
-            rag_context=rag_context,
-            triage=triage,
-            chat_history=chat_history or [],
-            domain_instruction=domain_instruction,
-            surgery_date=surgery_date,
-        )
+        # Grounding gate: the local LLM has no reliable way to refuse to
+        # answer just because we ASK it to in the prompt -- a live test
+        # against llama3.2 showed it will confidently invent a recovery
+        # assessment ("you're doing great", "typically by Day 10...") and
+        # unsupported treatment advice even when rag_context is empty and it
+        # was told to answer "based on the discharge notes". So this is not
+        # a prompting problem to work around with stronger wording: when
+        # nothing relevant was retrieved, the free-generation LLM call must
+        # not run at all, and we go straight to the deterministic,
+        # never-invents-a-claim fallback below. This is also what keeps
+        # `sources` truthful -- an empty sources list will now always pair
+        # with a reply that only cites what was (not) retrieved, never with
+        # LLM-invented content attributed to no source.
+        llm_response = None
+        if rag_docs:
+            llm_response = cls._query_llama(
+                user_message=user_message,
+                patient_id=patient_id,
+                surgery_type=surgery_type,
+                affected_limb=affected_limb,
+                postop_day=postop_day,
+                rag_context=rag_context,
+                triage=triage,
+                chat_history=chat_history or [],
+                domain_instruction=domain_instruction,
+                surgery_date=surgery_date,
+            )
 
         if llm_response and not any(
             r in llm_response.lower()
@@ -244,7 +259,20 @@ Write a friendly, 2-3 sentence answer directly answering the user's question bas
         if rag_docs:
             return f"Based on your Day {postop_day} protocol for {surgery_type}: {rag_docs[0]['content']}"
 
-        return f"Hello! On Day {postop_day} of your recovery from {surgery_type} ({affected_limb}), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated."
+        # No retrieved protocol content matched this question -- do not
+        # assert a recovery assessment ("on track", "doing great"), a
+        # timeline ("typically by Day X..."), or unrequested clinical advice
+        # (icing, elevation, hydration) with no retrieved support behind it.
+        # This is the conservative reply Milestone Sec 2.5 requires when
+        # nothing relevant was retrieved for a recovery-progress-style
+        # question (see agents/specialized_agents.py::RecoveryProgressAgent).
+        return (
+            f"I don't have enough retrieved protocol information for Day {postop_day} "
+            f"of your {surgery_type} recovery to judge whether you're on track or give "
+            "a specific timeline for this question. Please continue following your "
+            "surgical and physical therapy team's existing guidance, and check with "
+            "them for a personalized assessment of your progress."
+        )
 
     @classmethod
     def _rehab_fallback_reply(

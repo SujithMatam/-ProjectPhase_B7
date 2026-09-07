@@ -221,14 +221,16 @@ def test_restriction_not_contradicted() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 5. Normal existing fallback behavior OUTSIDE symptom queries is unaffected
-# (generic/catch-all branches -- swelling/pain are covered by their own
-# dedicated tests below, since this turn intentionally changes them).
+# 5. Generic (non-symptom, non-rehab) fallback: the RAG-grounded branch is
+# unaffected; the no-rag_docs branch was ALSO invented ungrounded advice
+# ("elevate your leg", "stay hydrated") and is fixed here to match the
+# conservative no-invention pattern already used by the swelling/pain
+# branches (tests 8/9) -- see agents/chat_agent.py::_generate_smart_reply().
 # ---------------------------------------------------------------------------
 
 def test_non_rehab_fallback_unaffected() -> None:
     print("=" * 78)
-    print("5 -- Generic (non-symptom, non-rehab) fallback behavior is unaffected")
+    print("5 -- Generic (non-symptom, non-rehab) fallback behavior")
     print("=" * 78)
 
     generic_with_docs = ChatAgent._generate_smart_reply(
@@ -246,9 +248,18 @@ def test_non_rehab_fallback_unaffected() -> None:
         affected_limb="Right", postop_day=5, rag_docs=[],
     )
     print(f"    generic (no rag_docs) reply   = {generic_no_docs!r}")
-    _check("Hello! On Day 5 of your recovery" in generic_no_docs, "generic-no-rag_docs fallback branch changed unexpectedly")
+    lower_no_docs = generic_no_docs.lower()
+    _check(
+        "don't have enough retrieved protocol information" in lower_no_docs,
+        "generic-no-rag_docs fallback no longer states that no protocol was retrieved",
+    )
+    for phrase in ["your progress is on track", "doing great", "typically", "elevate your leg", "stay hydrated"]:
+        _check(
+            phrase not in lower_no_docs,
+            f"REGRESSION: generic-no-rag_docs fallback invented unsupported claim {phrase!r}",
+        )
 
-    print("    CONFIRMED: generic (non-symptom) fallback branches are unchanged.")
+    print("    CONFIRMED: generic (non-symptom) fallback branch no longer invents ungrounded recovery/advice claims.")
     print()
 
 
