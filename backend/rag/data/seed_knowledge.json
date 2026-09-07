@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TKA-01",
+    "topic": "Normal Post-Op Edema vs DVT",
+    "procedure": "TKA",
+    "days": "1-14",
+    "content": "Mild to moderate swelling of the operative knee and ankle is normal and expected up to 3 months post-op. Normal swelling decreases with limb elevation (foot above heart level) and ice application. In contrast, Deep Vein Thrombosis (DVT) is characterized by persistent unilateral calf pain, induration, localized tenderness, warmth, and swelling that does NOT improve after 1 hour of elevation.",
+    "keywords": ["swelling", "edema", "calf", "ice", "elevation", "dvt"]
+  },
+  {
+    "id": "TKA-02",
+    "topic": "Wound Healing & Incision Care",
+    "procedure": "TKA",
+    "days": "1-14",
+    "content": "Clear to slightly pink (serosanguinous) drainage is normal for the first 48 to 72 hours post-surgery. Wounds should be sealed and largely dry by Post-Op Day 5 to 7. Purulent (cloudy, thick yellow or green) drainage, foul odor, or redness expanding beyond 1 cm from the incision edges are high-risk indicators of Surgical Site Infection (SSI) requiring surgical team notification.",
+    "keywords": ["wound", "incision", "drainage", "pus", "redness", "dressing", "infection"]
+  },
+  {
+    "id": "TKA-03",
+    "topic": "Range of Motion & Extension Milestones",
+    "procedure": "TKA",
+    "days": "1-21",
+    "content": "Target milestones for Total Knee Arthroplasty: By Post-Op Day 7, patients should aim for 70°-90° of passive flexion and near-full extension (0°-5°). Full terminal extension is critical; patients should avoid putting pillows directly under the knee joint, placing pillows under the ankle/calf instead to promote gravity extension.",
+    "keywords": ["flexion", "extension", "range of motion", "bend", "straighten", "stiffness", "rom"]
+  },
+  {
+    "id": "THA-01",
+    "topic": "Hip Precautions & Dislocation Prevention",
+    "procedure": "THA",
+    "days": "1-42",
+    "content": "Posterior approach THA precautions (first 6 weeks): Avoid hip flexion greater than 90 degrees (do not bend forward past right angle), avoid crossing legs or ankles (adduction), and avoid internal rotation (pointing toes inward). Use elevated toilet seat, avoid low chairs, and sleep with an abduction wedge or pillow between knees.",
+    "keywords": ["hip", "precautions", "dislocation", "cross legs", "bend", "sitting", "sleeping"]
+  },
+  {
+    "id": "GEN-01",
+    "topic": "Pain Management & Analgesic Titration",
+    "procedure": "All",
+    "days": "1-30",
+    "content": "Multimodal analgesia protocol: Scheduled acetaminophen (paracetamol) and prescribed NSAIDs if indicated, with short-acting opioids strictly reserved for breakthrough pain prior to intensive physical therapy sessions. Sudden escalation of pain unresponsive to medication requires evaluating for hematoma, fracture, or acute infection.",
+    "keywords": ["pain", "medication", "paracetamol", "opioid", "severe pain", "ache", "soreness"]
+  }
+]

@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local Python virtual environment
+backend/.venv/
+
+# Phase 3 RAG: local persistent ChromaDB vector store (runtime cache,
+# regenerated from backend/rag/data/seed_knowledge.json -- not source data)
+backend/rag/data/chroma_db/
