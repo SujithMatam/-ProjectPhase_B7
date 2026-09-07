@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../services/database_helper.dart';
 
 class DbViewerScreen extends StatefulWidget {
@@ -34,9 +35,8 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading table: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error loading table: $e')));
       }
     }
   }
@@ -47,7 +47,9 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
     await _loadTableData(_selectedTable);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Database reset and re-seeded with demo data!')),
+        const SnackBar(
+          content: Text('Database reset and re-seeded with demo data!'),
+        ),
       );
     }
   }
@@ -110,7 +112,9 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
                       backgroundColor: const Color(0xFF334155),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : Colors.white70,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                       onSelected: (selected) {
                         if (selected) _loadTableData(table);
@@ -133,62 +137,76 @@ class _DbViewerScreenState extends State<DbViewerScreen> {
           // Content Area
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFF38BDF8)))
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF38BDF8)),
+                  )
                 : _records.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.folder_open_rounded, size: 64, color: Colors.white24),
-                            const SizedBox(height: 12),
-                            Text(
-                              'No records found in "$_selectedTable"',
-                              style: const TextStyle(color: Colors.white54, fontSize: 16),
-                            ),
-                          ],
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.folder_open_rounded,
+                          size: 64,
+                          color: Colors.white24,
                         ),
-                      )
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        scrollDirection: Axis.horizontal,
-                        child: SingleChildScrollView(
-                          child: DataTable(
-                            headingRowColor: WidgetStateProperty.all(const Color(0xFF1E293B)),
-                            dataRowColor: WidgetStateProperty.resolveWith(
-                              (states) => states.contains(WidgetState.hovered)
-                                  ? const Color(0xFF1E293B).withOpacity(0.5)
-                                  : const Color(0xFF0F172A),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No records found in "$_selectedTable"',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        headingRowColor: WidgetStateProperty.all(
+                          const Color(0xFF1E293B),
+                        ),
+                        dataRowColor: WidgetStateProperty.resolveWith(
+                          (states) => states.contains(WidgetState.hovered)
+                              ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                              : const Color(0xFF0F172A),
+                        ),
+                        border: TableBorder.all(
+                          color: Colors.white12,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        columns: _records.first.keys.map((key) {
+                          return DataColumn(
+                            label: Text(
+                              key,
+                              style: const TextStyle(
+                                color: Color(0xFF38BDF8),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            border: TableBorder.all(
-                              color: Colors.white12,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            columns: _records.first.keys.map((key) {
-                              return DataColumn(
-                                label: Text(
-                                  key,
+                          );
+                        }).toList(),
+                        rows: _records.map((row) {
+                          return DataRow(
+                            cells: row.values.map((val) {
+                              return DataCell(
+                                SelectableText(
+                                  val?.toString() ?? 'NULL',
                                   style: const TextStyle(
-                                    color: Color(0xFF38BDF8),
-                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 13,
                                   ),
                                 ),
                               );
                             }).toList(),
-                            rows: _records.map((row) {
-                              return DataRow(
-                                cells: row.values.map((val) {
-                                  return DataCell(
-                                    SelectableText(
-                                      val?.toString() ?? 'NULL',
-                                      style: const TextStyle(color: Colors.white, fontSize: 13),
-                                    ),
-                                  );
-                                }).toList(),
-                              );
-                            }).toList(),
-                          ),
-                        ),
+                          );
+                        }).toList(),
                       ),
+                    ),
+                  ),
           ),
         ],
       ),

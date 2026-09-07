@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../models/patient_user.dart';
 import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   final bool isDarkMode;
-  const RegisterScreen({Key? key, required this.isDarkMode}) : super(key: key);
+  const RegisterScreen({super.key, required this.isDarkMode});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -18,7 +19,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _patientIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   String _selectedSurgery = 'Total Knee Arthroplasty (TKA)';
   String _selectedLimb = 'Right';
@@ -43,7 +45,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     super.initState();
     // Pre-populate with hospital-standard Patient ID format
-    _patientIdController.text = 'PT-B7-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+    _patientIdController.text =
+        'PT-B7-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
   }
 
   @override
@@ -80,7 +83,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!_agreedToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please acknowledge the postoperative data consent.')),
+        const SnackBar(
+          content: Text('Please acknowledge the postoperative data consent.'),
+        ),
       );
       return;
     }
@@ -101,7 +106,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     final authService = AuthService();
-    final success = await authService.register(newUser, _passwordController.text);
+    final success = await authService.register(
+      newUser,
+      _passwordController.text,
+    );
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -122,7 +130,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Navigator.pop(context, true); // return true to trigger logged in state
     } else {
       setState(() {
-        _errorMessage = 'An account with this email is already registered. Please sign in.';
+        _errorMessage =
+            'An account with this email is already registered. Please sign in.';
       });
     }
   }
@@ -136,7 +145,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final textColor = isDark ? Colors.white : const Color(0xFF202124);
     final subTextColor = isDark ? Colors.white70 : const Color(0xFF5F6368);
     final primaryColor = const Color(0xFF1A73E8);
-    final inputFill = isDark ? const Color(0xFF1E2132) : const Color(0xFFF1F5F9);
+    final inputFill = isDark
+        ? const Color(0xFF1E2132)
+        : const Color(0xFFF1F5F9);
 
     final daysAgo = DateTime.now().difference(_surgeryDate).inDays;
 
@@ -161,7 +172,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.arrow_back_ios_new, color: textColor, size: 20),
+                          icon: Icon(
+                            Icons.arrow_back_ios_new,
+                            color: textColor,
+                            size: 20,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                         const SizedBox(width: 8),
@@ -184,11 +199,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: cardBg,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: isDark ? Colors.white12 : Colors.black.withOpacity(0.06),
+                          color: isDark
+                              ? Colors.white12
+                              : Colors.black.withValues(alpha: 0.06),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.4 : 0.06),
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.4 : 0.06,
+                            ),
                             blurRadius: 25,
                             offset: const Offset(0, 10),
                           ),
@@ -201,15 +220,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           children: [
                             // Header badge
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.12),
+                                color: primaryColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.medical_services_outlined, size: 14, color: primaryColor),
+                                  Icon(
+                                    Icons.medical_services_outlined,
+                                    size: 14,
+                                    color: primaryColor,
+                                  ),
                                   const SizedBox(width: 6),
                                   Text(
                                     'EHR Discharge Enrollment',
@@ -233,7 +259,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             Text(
                               'Configure your below-hip clinical recovery tracking',
-                              style: TextStyle(fontSize: 13, color: subTextColor),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: subTextColor,
+                              ),
                             ),
                             const SizedBox(height: 16),
 
@@ -241,18 +270,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.12),
+                                  color: Colors.red.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                                  border: Border.all(
+                                    color: Colors.red.withValues(alpha: 0.3),
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                                    const Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 18,
+                                    ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         _errorMessage!,
-                                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -262,7 +300,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ],
 
                             // SECTION 1: Personal Info
-                            _buildSectionHeader('1. Patient Demographics', textColor),
+                            _buildSectionHeader(
+                              '1. Patient Demographics',
+                              textColor,
+                            ),
                             const SizedBox(height: 12),
 
                             _buildTextField(
@@ -273,7 +314,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               textColor: textColor,
                               fillColor: inputFill,
                               primaryColor: primaryColor,
-                              validator: (v) => v == null || v.trim().isEmpty ? 'Enter full name' : null,
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Enter full name'
+                                  : null,
                             ),
                             const SizedBox(height: 12),
 
@@ -290,8 +333,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     fillColor: inputFill,
                                     primaryColor: primaryColor,
                                     validator: (v) {
-                                      if (v == null || v.trim().isEmpty) return 'Enter email';
-                                      if (!v.contains('@')) return 'Enter valid email';
+                                      if (v == null || v.trim().isEmpty)
+                                        return 'Enter email';
+                                      if (!v.contains('@'))
+                                        return 'Enter valid email';
                                       return null;
                                     },
                                   ),
@@ -307,7 +352,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     textColor: textColor,
                                     fillColor: inputFill,
                                     primaryColor: primaryColor,
-                                    validator: (v) => v == null || v.trim().isEmpty ? 'Enter phone' : null,
+                                    validator: (v) =>
+                                        v == null || v.trim().isEmpty
+                                        ? 'Enter phone'
+                                        : null,
                                   ),
                                 ),
                               ],
@@ -315,7 +363,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             const SizedBox(height: 20),
 
                             // SECTION 2: Clinical Surgery Information (Milestone 2)
-                            _buildSectionHeader('2. Orthopedic Surgery Details (Milestone 2)', textColor),
+                            _buildSectionHeader(
+                              '2. Orthopedic Surgery Details (Milestone 2)',
+                              textColor,
+                            ),
                             const SizedBox(height: 12),
 
                             _buildTextField(
@@ -326,35 +377,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               textColor: textColor,
                               fillColor: inputFill,
                               primaryColor: primaryColor,
-                              validator: (v) => v == null || v.trim().isEmpty ? 'Enter Patient ID' : null,
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Enter Patient ID'
+                                  : null,
                             ),
                             const SizedBox(height: 12),
 
                             // Surgery Type Dropdown
                             Text(
                               'Surgical Procedure',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textColor),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             DropdownButtonFormField<String>(
-                              value: _selectedSurgery,
+                              initialValue: _selectedSurgery,
                               dropdownColor: cardBg,
                               style: TextStyle(color: textColor, fontSize: 14),
                               decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.healing_outlined, color: primaryColor, size: 20),
+                                prefixIcon: Icon(
+                                  Icons.healing_outlined,
+                                  color: primaryColor,
+                                  size: 20,
+                                ),
                                 filled: true,
                                 fillColor: inputFill,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(14),
                                   borderSide: BorderSide.none,
                                 ),
                               ),
                               items: _surgeryOptions.map((opt) {
-                                return DropdownMenuItem(value: opt, child: Text(opt));
+                                return DropdownMenuItem(
+                                  value: opt,
+                                  child: Text(opt),
+                                );
                               }).toList(),
                               onChanged: (val) {
-                                if (val != null) setState(() => _selectedSurgery = val);
+                                if (val != null)
+                                  setState(() => _selectedSurgery = val);
                               },
                             ),
                             const SizedBox(height: 12),
@@ -364,32 +432,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Operated Limb',
-                                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textColor),
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: textColor,
+                                        ),
                                       ),
                                       const SizedBox(height: 6),
                                       DropdownButtonFormField<String>(
-                                        value: _selectedLimb,
+                                        initialValue: _selectedLimb,
                                         dropdownColor: cardBg,
-                                        style: TextStyle(color: textColor, fontSize: 14),
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 14,
+                                        ),
                                         decoration: InputDecoration(
-                                          prefixIcon: Icon(Icons.accessibility_new, color: primaryColor, size: 20),
+                                          prefixIcon: Icon(
+                                            Icons.accessibility_new,
+                                            color: primaryColor,
+                                            size: 20,
+                                          ),
                                           filled: true,
                                           fillColor: inputFill,
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 14,
+                                                vertical: 12,
+                                              ),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(14),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
                                             borderSide: BorderSide.none,
                                           ),
                                         ),
                                         items: _limbOptions.map((limb) {
-                                          return DropdownMenuItem(value: limb, child: Text(limb));
+                                          return DropdownMenuItem(
+                                            value: limb,
+                                            child: Text(limb),
+                                          );
                                         }).toList(),
                                         onChanged: (val) {
-                                          if (val != null) setState(() => _selectedLimb = val);
+                                          if (val != null)
+                                            setState(() => _selectedLimb = val);
                                         },
                                       ),
                                     ],
@@ -398,30 +488,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Surgery Date',
-                                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textColor),
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: textColor,
+                                        ),
                                       ),
                                       const SizedBox(height: 6),
                                       InkWell(
                                         onTap: _pickSurgeryDate,
                                         borderRadius: BorderRadius.circular(14),
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 13,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: inputFill,
-                                            borderRadius: BorderRadius.circular(14),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
                                           ),
                                           child: Row(
                                             children: [
-                                              Icon(Icons.calendar_today, color: primaryColor, size: 18),
+                                              Icon(
+                                                Icons.calendar_today,
+                                                color: primaryColor,
+                                                size: 18,
+                                              ),
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: Text(
                                                   '${_surgeryDate.day}/${_surgeryDate.month}/${_surgeryDate.year}',
-                                                  style: TextStyle(color: textColor, fontSize: 13),
+                                                  style: TextStyle(
+                                                    color: textColor,
+                                                    fontSize: 13,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -438,13 +545,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               alignment: Alignment.centerRight,
                               child: Text(
                                 'Calculated Postop Day: $daysAgo',
-                                style: TextStyle(fontSize: 11, color: primaryColor, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),
 
                             // SECTION 3: Account Credentials
-                            _buildSectionHeader('3. Security Credentials', textColor),
+                            _buildSectionHeader(
+                              '3. Security Credentials',
+                              textColor,
+                            ),
                             const SizedBox(height: 12),
 
                             _buildTextField(
@@ -458,14 +572,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               primaryColor: primaryColor,
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  _obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
                                   color: Colors.grey,
                                   size: 20,
                                 ),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
                               ),
                               validator: (v) {
-                                if (v == null || v.length < 6) return 'Password must be at least 6 characters';
+                                if (v == null || v.length < 6)
+                                  return 'Password must be at least 6 characters';
                                 return null;
                               },
                             ),
@@ -482,14 +601,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               primaryColor: primaryColor,
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
                                   color: Colors.grey,
                                   size: 20,
                                 ),
-                                onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                                onPressed: () => setState(
+                                  () => _obscureConfirmPassword =
+                                      !_obscureConfirmPassword,
+                                ),
                               ),
                               validator: (v) {
-                                if (v != _passwordController.text) return 'Passwords do not match';
+                                if (v != _passwordController.text)
+                                  return 'Passwords do not match';
                                 return null;
                               },
                             ),
@@ -505,15 +630,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   child: Checkbox(
                                     value: _agreedToTerms,
                                     activeColor: primaryColor,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                    onChanged: (v) => setState(() => _agreedToTerms = v ?? true),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    onChanged: (v) => setState(
+                                      () => _agreedToTerms = v ?? true,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     'I consent to offline encrypted storage of postoperative symptoms and clinical check-ins on this device.',
-                                    style: TextStyle(fontSize: 11, color: subTextColor),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: subTextColor,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -529,7 +661,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: primaryColor,
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
                                   elevation: 2,
                                 ),
                                 child: _isLoading
@@ -538,15 +672,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         width: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
                                         ),
                                       )
                                     : const Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Create Patient Profile',
-                                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                           SizedBox(width: 8),
                                           Icon(Icons.check, size: 18),
@@ -564,7 +705,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Already have an account? ', style: TextStyle(fontSize: 13, color: subTextColor)),
+                        Text(
+                          'Already have an account? ',
+                          style: TextStyle(fontSize: 13, color: subTextColor),
+                        ),
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: Text(
@@ -596,7 +740,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w700,
-        color: textColor.withOpacity(0.85),
+        color: textColor.withValues(alpha: 0.85),
         letterSpacing: 0.3,
       ),
     );
@@ -620,7 +764,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: textColor),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+          ),
         ),
         const SizedBox(height: 6),
         TextFormField(
@@ -635,7 +783,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: fillColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
