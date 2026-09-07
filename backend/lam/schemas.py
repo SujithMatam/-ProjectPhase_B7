@@ -48,6 +48,21 @@ class ActionType(enum.Enum):
     DEFLECT  = "deflect"
 
 
+class WeightBearingStatus(str, enum.Enum):
+    """
+    Controlled vocabulary for prescribed weight-bearing status (Milestone
+    Sec 2.7 -- Rehabilitation & Exercise Agent). str-subclassed so it
+    validates directly as a FastAPI/Pydantic request field (main.py) and
+    serializes as its plain string value with no separate encoding step.
+    Never guessed/defaulted by any caller -- absence (None) must be treated
+    as "not supplied", not as any particular status.
+    """
+    NWB = "NWB"    # Non-Weight-Bearing
+    PWB = "PWB"    # Partial Weight-Bearing
+    WBAT = "WBAT"  # Weight-Bearing As Tolerated
+    FWB = "FWB"    # Full Weight-Bearing
+
+
 PROCEDURE_MAP: dict[str, str] = {
     "total knee arthroplasty": "TKA",
     "knee arthroplasty":       "TKA",

@@ -95,7 +95,9 @@ class ChatAgent:
             surgery_type=surgery_type,
             affected_limb=affected_limb,
             postop_day=postop_day,
-            rag_docs=rag_docs
+            rag_docs=rag_docs,
+            procedure=procedure,
+            domain_instruction=domain_instruction,
         )
 
         return {
@@ -179,6 +181,28 @@ Write a friendly, 2-3 sentence answer directly answering the user's question bas
         except Exception:
             return None
 
+    # NOTE: this exact phrase is generated verbatim by
+    # agents/specialized_agents.py::_rehab_context_note() whenever a
+    # weight_bearing_status was supplied to RehabilitationAgent. It is
+    # checked here (via domain_instruction) as a deliberately minimal,
+    # no-new-parameter signal that a restriction is on record -- see
+    # _rehab_fallback_reply(). If that wording ever changes, update both.
+    _WEIGHT_BEARING_RESTRICTION_MARKER = "Prescribed weight-bearing status:"
+
+    # Anatomical body-region wording per RESOLVED procedure code, for
+    # fallback text only -- mirrors the same TKA->knee / THA->hip
+    # convention already used for RAG chunk metadata (see
+    # rag/ingest.py::_BODY_REGION_BY_PROCEDURE). Deliberately has NO entry
+    # for "GEN" (ankle/foot/lower-leg/unresolved): that code covers multiple
+    # distinct anatomical regions, so guessing a specific one would be an
+    # invented clinical assumption, not a lookup. Any procedure code with no
+    # entry here (including GEN) falls back to neutral wording instead.
+    _SWELLING_BODY_REGION_BY_PROCEDURE: Dict[str, str] = {
+        "TKA": "knee",
+        "THA": "hip",
+    }
+    _NEUTRAL_BODY_REGION = "operative area"
+
     @classmethod
     def _generate_smart_reply(
         cls,
@@ -187,25 +211,125 @@ Write a friendly, 2-3 sentence answer directly answering the user's question bas
         surgery_type: str,
         affected_limb: str,
         postop_day: int,
-        rag_docs: List[Dict[str, Any]]
+        rag_docs: List[Dict[str, Any]],
+        procedure: Optional[str] = None,
+        domain_instruction: Optional[str] = None,
     ) -> str:
         lower = user_message.lower()
 
         if "exercise" in lower or "workout" in lower or "physio" in lower:
-            if postop_day <= 2:
-                return f"For Post-Op Day {postop_day}, your focus is gentle in-bed mobility: ankle pumps (10 every hour) to prevent blood clots, gentle quad sets pushing your knee flat into the bed, and short assisted transfers with your walker."
-            elif postop_day <= 7:
-                return f"On Day {postop_day}, your targets are active-assisted heel slides aiming for 70°–90° flexion, straight leg raises to rebuild quadriceps strength, and walking 5–10 minutes with your walker every 2 hours."
-            else:
-                return f"At Day {postop_day}, work on progressing your passive flexion past 90°, standing calf raises, seated knee extension, and increasing your independent walking endurance as tolerated."
+            return cls._rehab_fallback_reply(
+                postop_day=postop_day,
+                rag_docs=rag_docs,
+                domain_instruction=domain_instruction,
+            )
 
         if "swell" in lower or "puff" in lower:
-            return f"Swelling in your {affected_limb} {('knee' if 'knee' in surgery_type.lower() else 'hip')} on Day {postop_day} is normal due to increased circulation during healing. Lie down with your foot elevated above heart level and apply an ice pack for 20 minutes."
+            body_region = cls._SWELLING_BODY_REGION_BY_PROCEDURE.get(
+                procedure, cls._NEUTRAL_BODY_REGION
+            )
+            return cls._symptom_fallback_reply(
+                symptom_label=f"swelling in your {affected_limb} {body_region}",
+                postop_day=postop_day,
+                rag_docs=rag_docs,
+            )
 
         if "pain" in lower or "hurt" in lower:
-            return f"Mild to moderate soreness is typical on Day {postop_day}. Take your prescribed pain medication 30-45 minutes before starting physical therapy to keep your discomfort manageable."
+            return cls._symptom_fallback_reply(
+                symptom_label="pain",
+                postop_day=postop_day,
+                rag_docs=rag_docs,
+            )
 
         if rag_docs:
             return f"Based on your Day {postop_day} protocol for {surgery_type}: {rag_docs[0]['content']}"
 
         return f"Hello! On Day {postop_day} of your recovery from {surgery_type} ({affected_limb}), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated."
+
+    @classmethod
+    def _rehab_fallback_reply(
+        cls,
+        postop_day: int,
+        rag_docs: List[Dict[str, Any]],
+        domain_instruction: Optional[str] = None,
+    ) -> str:
+        """
+        Deterministic (Ollama-unavailable) fallback for exercise/workout/
+        physio queries. `rag_docs` was already retrieved by
+        answer_question() via ClinicalKnowledgeBase.query(..., procedure=
+        procedure) -- i.e. already procedure-filtered (TKA/THA/GEN never
+        cross-contaminate, see rag/knowledge_base.py). This method must
+        NEVER hardcode procedure-specific exercise content itself (that was
+        the root cause of TKA-flavored ROM/rep numbers leaking to THA/GEN
+        patients) -- it only ever cites the already-filtered rag_docs, or
+        falls back to conservative, non-specific wording. No exercise name,
+        repetition count, or ROM value is invented here.
+        """
+        has_weight_bearing_restriction = (
+            domain_instruction is not None
+            and cls._WEIGHT_BEARING_RESTRICTION_MARKER in domain_instruction
+        )
+        restriction_note = (
+            " A weight-bearing restriction is on record for you -- please follow it exactly "
+            "and do not exceed what your care team has prescribed."
+            if has_weight_bearing_restriction else ""
+        )
+
+        if rag_docs:
+            return (
+                f"Based on your Day {postop_day} retrieved rehabilitation guidance: "
+                f"{rag_docs[0]['content']}{restriction_note}"
+            )
+
+        if has_weight_bearing_restriction:
+            return (
+                f"On Day {postop_day}, a weight-bearing restriction is on record for you, and "
+                "I don't have a matching retrieved exercise protocol for this question right "
+                "now. Please follow your prescribed restriction exactly and check with your "
+                "surgical or physical therapy team before starting or progressing any exercise."
+            )
+
+        return (
+            f"On Day {postop_day}, I don't have a specific retrieved exercise protocol for "
+            "this question right now. Please follow your surgical team's prescribed "
+            "rehabilitation plan, and check with your physical therapist before starting or "
+            "progressing any exercise."
+        )
+
+    @classmethod
+    def _symptom_fallback_reply(
+        cls,
+        symptom_label: str,
+        postop_day: int,
+        rag_docs: List[Dict[str, Any]],
+    ) -> str:
+        """
+        Deterministic (Ollama-unavailable) fallback for swelling/pain
+        symptom queries. `rag_docs` was already retrieved by
+        answer_question() via ClinicalKnowledgeBase.query(..., procedure=
+        procedure) -- i.e. already procedure-filtered (TKA/THA/GEN never
+        cross-contaminate, see rag/knowledge_base.py).
+
+        This method must NEVER hardcode a clinical judgment ("is normal",
+        "is typical"), a numeric treatment instruction (icing duration,
+        medication timing), or any threshold of its own -- that was the
+        root cause of unfounded claims like "normal due to increased
+        circulation" and "ice pack for 20 minutes" being asserted with no
+        grounding in the retrieved protocol. It only ever cites the
+        already-filtered rag_docs verbatim, or acknowledges the reported
+        symptom and defers to the patient's existing care-team/discharge
+        instructions when nothing relevant was retrieved -- never
+        classifying the symptom as normal or abnormal itself.
+        """
+        if rag_docs:
+            return (
+                f"You reported {symptom_label} on Day {postop_day}. Based on your retrieved "
+                f"clinical guidance: {rag_docs[0]['content']}"
+            )
+
+        return (
+            f"You reported {symptom_label} on Day {postop_day}. I don't have a matching "
+            "retrieved protocol for this right now, so please follow your existing "
+            "care-team or discharge instructions, and contact your surgical or physical "
+            "therapy team if you're unsure or if it changes."
+        )
