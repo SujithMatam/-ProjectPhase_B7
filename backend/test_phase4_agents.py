@@ -143,11 +143,26 @@ def run_all_agents_test() -> None:
             len(calls) == 1,
             f"{query!r} expected exactly 1 response-generation call, got {len(calls)}",
         )
-        _check(
-            captured_domain_instruction == expected_agent_cls.DOMAIN_FOCUS,
-            f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through, "
-            f"got {captured_domain_instruction!r}",
-        )
+        if expected_agent_cls is RecoveryProgressAgent:
+            # RecoveryProgressAgent (Milestone Sec 2.5) genuinely enriches its
+            # DOMAIN_FOCUS with retrieved-chunk milestone/day-window notes
+            # (see agents/specialized_agents.py) -- it must still always
+            # START WITH the unmodified DOMAIN_FOCUS instruction, just like
+            # every other agent, but may append grounded stage context after
+            # it. Dedicated coverage of the enrichment itself lives in
+            # test_recovery_progress_agent.py.
+            _check(
+                captured_domain_instruction is not None
+                and captured_domain_instruction.startswith(expected_agent_cls.DOMAIN_FOCUS),
+                f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through "
+                f"(as a prefix), got {captured_domain_instruction!r}",
+            )
+        else:
+            _check(
+                captured_domain_instruction == expected_agent_cls.DOMAIN_FOCUS,
+                f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through, "
+                f"got {captured_domain_instruction!r}",
+            )
         # Cross-check against the orchestrator's own routing table so metadata
         # (target_agent) and actual dispatch never drift apart.
         _check(

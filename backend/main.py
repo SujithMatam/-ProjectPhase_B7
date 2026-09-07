@@ -11,6 +11,7 @@ from typing import Optional, List, Dict, Any
 from agents.symptom_agent import SymptomAssessmentAgent
 from agents.chat_agent import ChatAgent
 from lam.orchestrator import LAMOrchestrator
+from lam.schemas import WeightBearingStatus
 from triage.safety_triage import SafetyTriageEngine
 
 app = FastAPI(
@@ -47,6 +48,24 @@ class ChatRequest(BaseModel):
     surgery_date: Optional[str] = Field(default=None, example="2026-08-15T00:00:00.000Z")
     message: str = Field(..., example="Is it normal for my knee to swell after walking?")
     chat_history: Optional[List[Dict[str, str]]] = Field(default=None)
+    # Optional structured symptom fields (Milestone Sec 2.6 -- Symptom
+    # Assessment). All additive/optional: omitting them reproduces prior
+    # /api/chat behavior exactly. When supplied, temperature_c also feeds
+    # the deterministic SafetyTriageEngine at Step 1 (see
+    # lam/orchestrator.py), not just PainSymptomsAgent.
+    pain_score: Optional[int] = Field(default=None, ge=0, le=10, example=6)
+    pain_characteristics: Optional[str] = Field(default=None, example="throbbing, worse at night")
+    swelling_description: Optional[str] = Field(default=None, example="mild swelling around the incision")
+    temperature_c: Optional[float] = Field(default=None, example=37.2)
+    # Optional structured rehabilitation fields (Milestone Sec 2.7 --
+    # Rehabilitation & Exercise Agent). All additive/optional: omitting them
+    # reproduces prior /api/chat behavior exactly. weight_bearing_status is
+    # validated against the controlled NWB/PWB/WBAT/FWB vocabulary by
+    # Pydantic -- an invalid value is rejected at the API boundary rather
+    # than silently guessed.
+    weight_bearing_status: Optional[WeightBearingStatus] = Field(default=None, example="WBAT")
+    current_rom: Optional[str] = Field(default=None, example="Flexion to about 80 degrees")
+    exercise_history: Optional[str] = Field(default=None, example="Completed heel slides and quad sets today; missed yesterday's session")
 
 
 @app.get("/")
@@ -95,6 +114,13 @@ def chat(payload: ChatRequest):
             surgery_date=payload.surgery_date,
             user_message=payload.message,
             chat_history=payload.chat_history or [],
+            pain_score=payload.pain_score,
+            pain_characteristics=payload.pain_characteristics,
+            swelling_description=payload.swelling_description,
+            temperature_c=payload.temperature_c,
+            weight_bearing_status=payload.weight_bearing_status,
+            current_rom=payload.current_rom,
+            exercise_history=payload.exercise_history,
         )
         return result
     except Exception as e:

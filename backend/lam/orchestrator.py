@@ -16,7 +16,7 @@ from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
 from lam.schemas import (
     IntentLabel, ScopeStatus, TargetAgent, ActionType,
-    LAMContext, LAMResult, resolve_procedure_code,
+    LAMContext, LAMResult, WeightBearingStatus, resolve_procedure_code,
 )
 from lam.scope_validator import ScopeValidator
 from lam.intent_classifier import IntentClassifier
@@ -33,6 +33,7 @@ _ROUTING_TABLE: dict[IntentLabel, tuple[TargetAgent, ActionType]] = {
     IntentLabel.MENTAL_WELLBEING:  (TargetAgent.MENTAL_HEALTH_AGENT,   ActionType.ADVISE),
     IntentLabel.EMERGENCY:         (TargetAgent.SAFETY_TRIAGE_AGENT,   ActionType.ESCALATE),
     IntentLabel.OUT_OF_SCOPE:      (TargetAgent.DEFLECTION_AGENT,      ActionType.DEFLECT),
+    IntentLabel.INTAKE_CONTEXT:    (TargetAgent.INTAKE_CONTEXT_AGENT,  ActionType.INFORM),
 }
 
 _OUT_OF_SCOPE_REPLY = (
@@ -55,6 +56,13 @@ class LAMOrchestrator:
         user_message: str,
         chat_history: Optional[List[Dict[str, str]]] = None,
         surgery_date: Optional[str] = None,
+        pain_score: Optional[int] = None,
+        pain_characteristics: Optional[str] = None,
+        swelling_description: Optional[str] = None,
+        temperature_c: Optional[float] = None,
+        weight_bearing_status: Optional[WeightBearingStatus] = None,
+        current_rom: Optional[str] = None,
+        exercise_history: Optional[str] = None,
     ) -> dict:
         # The context is passed through the LAM, but deterministic triage below
         # always evaluates the CURRENT user message first.
@@ -69,9 +77,17 @@ class LAMOrchestrator:
         )
 
         # STEP 1 -- Deterministic Safety Triage (ALWAYS FIRST)
+        # temperature_c (optional, Milestone Sec 2.6 structured symptom
+        # input) is passed straight into the SAME deterministic engine call
+        # used by every request -- when supplied it can raise a RED/YELLOW
+        # result via SafetyTriageEngine's own numeric threshold (see
+        # triage/safety_triage.py), same as the pre-existing
+        # /api/assess-symptoms path. Omitted (None) reproduces prior
+        # behavior exactly.
         triage = SafetyTriageEngine.evaluate(
             symptoms=user_message,
             post_op_day=postop_day,
+            temperature_c=temperature_c,
         )
 
         if triage["triage_level"] == "RED":
@@ -136,6 +152,13 @@ class LAMOrchestrator:
             chat_history=context.chat_history,
             surgery_date=surgery_date,
             precomputed_triage=triage,
+            pain_score=pain_score,
+            pain_characteristics=pain_characteristics,
+            swelling_description=swelling_description,
+            temperature_c=temperature_c,
+            weight_bearing_status=weight_bearing_status,
+            current_rom=current_rom,
+            exercise_history=exercise_history,
         )
 
         return LAMResult(
