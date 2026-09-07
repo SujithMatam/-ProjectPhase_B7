@@ -1,6 +1,7 @@
 ﻿"""
 LAM Schemas -- Enums, dataclasses, and shared helpers for the LAM pipeline.
 """
+
 from __future__ import annotations
 
 import enum
@@ -9,77 +10,86 @@ from typing import Optional, List, Dict
 
 
 class IntentLabel(enum.Enum):
-    RECOVERY_PROGRESS  = "recovery_progress"
-    PAIN_SYMPTOMS      = "pain_symptoms"
-    REHABILITATION     = "rehabilitation"
-    MEDICATION         = "medication"
-    WOUND_CARE         = "wound_care"
-    DAILY_ACTIVITY     = "daily_activity"
-    NUTRITION          = "nutrition"
-    MENTAL_WELLBEING   = "mental_wellbeing"
-    EMERGENCY          = "emergency"
-    OUT_OF_SCOPE       = "out_of_scope"
+    RECOVERY_PROGRESS = "recovery_progress"
+    PAIN_SYMPTOMS = "pain_symptoms"
+    REHABILITATION = "rehabilitation"
+    MEDICATION = "medication"
+    WOUND_CARE = "wound_care"
+    DAILY_ACTIVITY = "daily_activity"
+    NUTRITION = "nutrition"
+    MENTAL_WELLBEING = "mental_wellbeing"
+    INTAKE_CONTEXT = "intake_context"
+    EMERGENCY = "emergency"
+    OUT_OF_SCOPE = "out_of_scope"
 
 
 class ScopeStatus(enum.Enum):
-    IN_SCOPE       = "in_scope"
-    OUT_OF_SCOPE   = "out_of_scope"
-    NOT_EVALUATED  = "not_evaluated"
+    IN_SCOPE = "in_scope"
+    OUT_OF_SCOPE = "out_of_scope"
+    NOT_EVALUATED = "not_evaluated"
 
 
 class TargetAgent(enum.Enum):
-    RECOVERY_AGENT       = "RecoveryProgressAgent"
-    PAIN_AGENT           = "PainSymptomsAgent"
-    REHAB_AGENT          = "RehabilitationAgent"
-    MEDICATION_AGENT     = "MedicationAgent"
-    WOUND_CARE_AGENT     = "WoundCareAgent"
+    RECOVERY_AGENT = "RecoveryProgressAgent"
+    PAIN_AGENT = "PainSymptomsAgent"
+    REHAB_AGENT = "RehabilitationAgent"
+    MEDICATION_AGENT = "MedicationAgent"
+    WOUND_CARE_AGENT = "WoundCareAgent"
     DAILY_ACTIVITY_AGENT = "DailyActivityAgent"
-    NUTRITION_AGENT      = "NutritionAgent"
-    MENTAL_HEALTH_AGENT  = "MentalWellbeingAgent"
-    SAFETY_TRIAGE_AGENT  = "SafetyTriageAgent"
-    DEFLECTION_AGENT     = "DeflectionAgent"
+    NUTRITION_AGENT = "NutritionAgent"
+    MENTAL_HEALTH_AGENT = "MentalWellbeingAgent"
+    INTAKE_CONTEXT_AGENT = "IntakeContextAgent"
+    SAFETY_TRIAGE_AGENT = "SafetyTriageAgent"
+    DEFLECTION_AGENT = "DeflectionAgent"
 
 
 class ActionType(enum.Enum):
-    INFORM   = "inform"
-    ASSESS   = "assess"
-    ADVISE   = "advise"
+    INFORM = "inform"
+    ASSESS = "assess"
+    ADVISE = "advise"
     ESCALATE = "escalate"
-    DEFLECT  = "deflect"
+    DEFLECT = "deflect"
 
 
 class WeightBearingStatus(str, enum.Enum):
     """
-    Controlled vocabulary for prescribed weight-bearing status (Milestone
-    Sec 2.7 -- Rehabilitation & Exercise Agent). str-subclassed so it
-    validates directly as a FastAPI/Pydantic request field (main.py) and
-    serializes as its plain string value with no separate encoding step.
-    Never guessed/defaulted by any caller -- absence (None) must be treated
-    as "not supplied", not as any particular status.
+    Controlled vocabulary for prescribed weight-bearing status.
+
+    Never guessed/defaulted by any caller.
+    Absence (None) means the status was not supplied.
     """
-    NWB = "NWB"    # Non-Weight-Bearing
-    PWB = "PWB"    # Partial Weight-Bearing
-    WBAT = "WBAT"  # Weight-Bearing As Tolerated
-    FWB = "FWB"    # Full Weight-Bearing
+
+    NWB = "NWB"
+    PWB = "PWB"
+    WBAT = "WBAT"
+    FWB = "FWB"
 
 
 PROCEDURE_MAP: dict[str, str] = {
     "total knee arthroplasty": "TKA",
-    "knee arthroplasty":       "TKA",
-    "knee replacement":        "TKA",
-    "tka":                     "TKA",
-    "total hip arthroplasty":  "THA",
-    "hip arthroplasty":        "THA",
-    "hip replacement":         "THA",
-    "tha":                     "THA",
+    "knee arthroplasty": "TKA",
+    "knee replacement": "TKA",
+    "tka": "TKA",
+    "total hip arthroplasty": "THA",
+    "hip arthroplasty": "THA",
+    "hip replacement": "THA",
+    "tha": "THA",
 }
 
 
 def resolve_procedure_code(surgery_type: str) -> str:
+    """
+    Resolve a known surgery type to a procedure code.
+
+    Unknown procedures return GEN rather than assuming TKA.
+    """
+
     lower = surgery_type.lower()
+
     for keyword, code in PROCEDURE_MAP.items():
         if keyword in lower:
             return code
+
     return "GEN"
 
 
@@ -96,25 +106,25 @@ class LAMContext:
 
 @dataclass
 class LAMResult:
-    reply:        str
+    reply: str
     triage_level: str
     is_escalated: bool
-    engine:       str
-    sources:      List[str] = field(default_factory=list)
-    intent:       str = IntentLabel.OUT_OF_SCOPE.value
+    engine: str
+    sources: List[str] = field(default_factory=list)
+    intent: str = IntentLabel.OUT_OF_SCOPE.value
     target_agent: str = TargetAgent.DEFLECTION_AGENT.value
-    action:       str = ActionType.INFORM.value
+    action: str = ActionType.INFORM.value
     scope_status: str = ScopeStatus.IN_SCOPE.value
 
     def to_dict(self) -> dict:
         return {
-            "reply":        self.reply,
+            "reply": self.reply,
             "triage_level": self.triage_level,
             "is_escalated": self.is_escalated,
-            "engine":       self.engine,
-            "sources":      self.sources,
-            "intent":       self.intent,
+            "engine": self.engine,
+            "sources": self.sources,
+            "intent": self.intent,
             "target_agent": self.target_agent,
-            "action":       self.action,
+            "action": self.action,
             "scope_status": self.scope_status,
         }

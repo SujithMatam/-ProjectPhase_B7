@@ -8,7 +8,7 @@ Phase 2 strategy:
   - Embed the query with a Sentence-BERT model
     (sentence-transformers/all-MiniLM-L6-v2) and compare it, via cosine
     similarity, against a small set of hand-written prototype sentences for
-    each of the 8 ROUTABLE intents.
+    each of the 9 ROUTABLE intents.
   - Score per intent is the MAX similarity among that intent's prototypes
     (max-pooling).  The top-1 / top-2 scores and their margin decide whether
     the semantic result is trusted.
@@ -50,7 +50,7 @@ _MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 # deflects.
 _DEFAULT_ROUTABLE_INTENT = IntentLabel.RECOVERY_PROGRESS
 
-# The only 8 intents IntentClassifier.classify() may ever return.
+# The only 9 intents IntentClassifier.classify() may ever return.
 ROUTABLE_INTENTS: tuple[IntentLabel, ...] = (
     IntentLabel.RECOVERY_PROGRESS,
     IntentLabel.PAIN_SYMPTOMS,
@@ -60,6 +60,7 @@ ROUTABLE_INTENTS: tuple[IntentLabel, ...] = (
     IntentLabel.DAILY_ACTIVITY,
     IntentLabel.NUTRITION,
     IntentLabel.MENTAL_WELLBEING,
+    IntentLabel.INTAKE_CONTEXT,
 )
 
 # ---------------------------------------------------------------------------
@@ -132,10 +133,18 @@ _PROTOTYPE_SENTENCES: dict[IntentLabel, list[str]] = {
         "I feel overwhelmed by the recovery process.",
         "I feel nervous about putting weight on my surgical leg.",
     ],
+    IntentLabel.INTAKE_CONTEXT: [
+        "I want to provide my baseline information.",
+        "Let's set up my recovery profile.",
+        "Here are my surgery details and history.",
+        "I need to complete the initial intake.",
+        "I am checking in for the first time.",
+        "Here is my medical background.",
+    ],
 }
 
 # ---------------------------------------------------------------------------
-# Phase 1 keyword tables, restricted to the 8 routable intents only.
+# Phase 1 keyword tables, restricted to the 9 routable intents only.
 # EMERGENCY is intentionally excluded: the deterministic SafetyTriageEngine
 # owns that decision exclusively. OUT_OF_SCOPE is intentionally excluded:
 # the ScopeValidator owns that decision exclusively.
@@ -197,6 +206,10 @@ _ROUTABLE_KEYWORD_RULES: list[tuple[IntentLabel, frozenset[str]]] = [
         "protein", "calories", "vitamin", "supplement", "hydration",
         "water", "drink", "alcohol", "constipation", "bowel",
         "appetite", "weight", "lose weight",
+    })),
+    (IntentLabel.INTAKE_CONTEXT, frozenset({
+        "history", "baseline", "profile", "intake", "check-in",
+        "surgery details", "background",
     })),
 ]
 
@@ -326,7 +339,7 @@ class ClassificationDetail:
 
 class IntentClassifier:
     """
-    Classifies a patient query into one of the 8 ROUTABLE IntentLabels.
+    Classifies a patient query into one of the 9 ROUTABLE IntentLabels.
 
     Phase 2 implementation: Sentence-BERT semantic similarity, with a
     deterministic keyword fallback (Phase 1 logic, restricted to routable
@@ -349,7 +362,7 @@ class IntentClassifier:
                      and future context-aware enrichment).
 
         Returns:
-            One of the 8 ROUTABLE_INTENTS. Never EMERGENCY or OUT_OF_SCOPE.
+            One of the 9 ROUTABLE_INTENTS. Never EMERGENCY or OUT_OF_SCOPE.
         """
         return cls.classify_detailed(query, context).intent
 
@@ -427,7 +440,7 @@ class IntentClassifier:
     @classmethod
     def _classify_by_keywords(cls, query: str) -> IntentLabel:
         """
-        Keyword scan restricted to the 8 routable intents.
+        Keyword scan restricted to the 9 routable intents.
         Returns the first matching IntentLabel, or the safe routable default
         (RECOVERY_PROGRESS) if nothing matches. Never returns EMERGENCY or
         OUT_OF_SCOPE.

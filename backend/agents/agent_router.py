@@ -18,6 +18,7 @@ from agents.specialized_agents import (
     RecoveryProgressAgent,
     RehabilitationAgent,
     WoundCareAgent,
+    IntakeContextAgent,
 )
 from lam.schemas import IntentLabel, WeightBearingStatus
 
@@ -31,6 +32,7 @@ _AGENT_BY_INTENT: Dict[IntentLabel, Type[BaseClinicalAgent]] = {
     IntentLabel.DAILY_ACTIVITY: DailyActivityAgent,
     IntentLabel.NUTRITION: NutritionAgent,
     IntentLabel.MENTAL_WELLBEING: MentalWellbeingAgent,
+    IntentLabel.INTAKE_CONTEXT: IntakeContextAgent,
 }
 
 

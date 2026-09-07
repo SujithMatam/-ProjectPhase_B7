@@ -33,6 +33,7 @@ _ROUTING_TABLE: dict[IntentLabel, tuple[TargetAgent, ActionType]] = {
     IntentLabel.MENTAL_WELLBEING:  (TargetAgent.MENTAL_HEALTH_AGENT,   ActionType.ADVISE),
     IntentLabel.EMERGENCY:         (TargetAgent.SAFETY_TRIAGE_AGENT,   ActionType.ESCALATE),
     IntentLabel.OUT_OF_SCOPE:      (TargetAgent.DEFLECTION_AGENT,      ActionType.DEFLECT),
+    IntentLabel.INTAKE_CONTEXT:    (TargetAgent.INTAKE_CONTEXT_AGENT,  ActionType.INFORM),
 }
 
 _OUT_OF_SCOPE_REPLY = (

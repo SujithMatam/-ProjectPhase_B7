@@ -405,10 +405,41 @@ class NutritionAgent(BaseClinicalAgent):
     )
 
 
+
 class MentalWellbeingAgent(BaseClinicalAgent):
     TARGET_AGENT = TargetAgent.MENTAL_HEALTH_AGENT
     DOMAIN_FOCUS = (
         "Focus on recovery-related anxiety, fear of movement, frustration, and "
         "motivation. Keep guidance supportive and non-diagnostic, staying within "
         "postoperative-support scope."
+    )
+
+
+class IntakeContextAgent(BaseClinicalAgent):
+    """
+    Intake & Context Agent.
+
+    Consolidates the patient information already supplied to the LAM pipeline
+    and presents it as structured context for downstream clinical agents.
+
+    This agent does NOT perform emergency classification.
+    Emergency classification remains the responsibility of the deterministic
+    safety triage layer upstream.
+    """
+
+    TARGET_AGENT = TargetAgent.INTAKE_CONTEXT_AGENT
+
+    DOMAIN_FOCUS = (
+        "You are the Intake & Context Agent. "
+        "Your responsibility is to consolidate and organize the patient's "
+        "provided context for downstream orthopedic postoperative follow-up. "
+        "Use only information explicitly supplied in the patient context, "
+        "current message, and conversation history. "
+        "Do not invent missing patient information. "
+        "Do not assume an unknown procedure is TKA. "
+        "Clearly identify information that is missing or not supplied. "
+        "Do not perform emergency or red-flag classification. "
+        "Emergency classification is handled by the deterministic safety "
+        "triage layer upstream. "
+        "Keep the output structured and patient-specific."
     )
