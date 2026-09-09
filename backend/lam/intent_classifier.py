@@ -151,6 +151,14 @@ _PROTOTYPE_SENTENCES: dict[IntentLabel, list[str]] = {
 # ---------------------------------------------------------------------------
 
 _ROUTABLE_KEYWORD_RULES: list[tuple[IntentLabel, frozenset[str]]] = [
+    (IntentLabel.MEDICATION, frozenset({
+        "medication", "medicine", "drug", "drugs", "pill", "pills",
+        "tablet", "dose", "dosage", "paracetamol", "ibuprofen",
+        "opioid", "painkiller", "pain tablet", "pain pill", "aspirin",
+        "anticoagulant", "blood thinner", "warfarin", "rivaroxaban",
+        "antibiotic", "prescription", "take my medication", "when to take",
+        "missed dose", "side effect", "forgot",
+    })),
     (IntentLabel.PAIN_SYMPTOMS, frozenset({
         "pain", "hurt", "hurts", "hurting", "ache", "aching",
         "sore", "soreness", "sharp pain", "burning pain",
@@ -163,14 +171,6 @@ _ROUTABLE_KEYWORD_RULES: list[tuple[IntentLabel, frozenset[str]]] = [
         "suture", "drainage", "draining", "leaking", "discharge",
         "bandage", "dressing", "redness around wound", "infection",
         "pus", "yellow fluid", "wound care", "clean wound",
-    })),
-    (IntentLabel.MEDICATION, frozenset({
-        "medication", "medicine", "drug", "drugs", "pill", "pills",
-        "tablet", "dose", "dosage", "paracetamol", "ibuprofen",
-        "opioid", "painkiller", "aspirin", "anticoagulant",
-        "blood thinner", "warfarin", "rivaroxaban", "antibiotic",
-        "prescription", "take my medication", "when to take",
-        "missed dose", "side effect",
     })),
     (IntentLabel.REHABILITATION, frozenset({
         "exercise", "exercises", "physical therapy", "physio",

@@ -10,6 +10,7 @@ import 'services/auth_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/db_viewer_screen.dart';
+import 'screens/clinical_report_screen.dart';
 import 'services/database_helper.dart';
 import 'services/ai_backend_service.dart';
 
@@ -581,6 +582,49 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  /// Coloured pill badge that identifies which specialized agent responded.
+  Widget _agentBadge(String agentName, String? intent) {
+    // Map known agent names → accent colour
+    final Map<String, Color> agentColors = {
+      'MedicationAgent': const Color(0xFF8E44AD),
+      'NutritionAgent': const Color(0xFF27AE60),
+      'MentalWellbeingAgent': const Color(0xFF1ABC9C),
+      'RehabilitationAgent': const Color(0xFF4A90D9),
+      'PainSymptomsAgent': const Color(0xFFE74C3C),
+      'RecoveryProgressAgent': const Color(0xFFF39C12),
+      'WoundCareAgent': const Color(0xFF2980B9),
+      'DailyActivityAgent': const Color(0xFF16A085),
+    };
+    final color = agentColors[agentName] ?? const Color(0xFF607D8B);
+
+    // Shorten display name: "MedicationAgent" → "Medication"
+    final display = agentName.replaceAll('Agent', '');
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.smart_toy_outlined, size: 11, color: color),
+          const SizedBox(width: 4),
+          Text(
+            display,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   BoxDecoration _getBackgroundGradient() {
     if (widget.isDarkMode) {
       return const BoxDecoration(
@@ -688,6 +732,42 @@ class _MainScreenState extends State<MainScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
+                        ),
+                        const Divider(height: 24),
+                        // ── Clinical Report shortcut ──────────────────────
+                        ListTile(
+                          leading: const Icon(
+                            Icons.description_rounded,
+                            color: Color(0xFF4A90D9),
+                            size: 22,
+                          ),
+                          title: const Text(
+                            'Clinical Report',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: const Text(
+                            'Summary · PDF download',
+                            style: TextStyle(fontSize: 11),
+                          ),
+                          dense: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          onTap: () {
+                            if (!isDesktop) Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ClinicalReportScreen(
+                                  patient: currentPatient,
+                                  isDarkMode: widget.isDarkMode,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     )
@@ -983,9 +1063,7 @@ class _MainScreenState extends State<MainScreen> {
                                                   8,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.red.withOpacity(
-                                                    0.1,
-                                                  ),
+                                                  color: Colors.red.withValues(alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -995,6 +1073,44 @@ class _MainScreenState extends State<MainScreen> {
                                                     color: Colors.red,
                                                     fontWeight: FontWeight.bold,
                                                   ),
+                                                ),
+                                              ),
+
+                                            // ── Agent badge ──────────────────
+                                            if (!isUser &&
+                                                msg.targetAgent != null &&
+                                                msg.targetAgent!.isNotEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 6,
+                                                ),
+                                                child: Wrap(
+                                                  spacing: 6,
+                                                  runSpacing: 4,
+                                                  children: [
+                                                    _agentBadge(
+                                                      msg.targetAgent!,
+                                                      msg.intent,
+                                                    ),
+                                                    if (msg.action != null)
+                                                      Container(
+                                                        padding: const EdgeInsets.symmetric(
+                                                          horizontal: 7,
+                                                          vertical: 2,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.grey.withValues(alpha: 0.12),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        child: Text(
+                                                          msg.action!,
+                                                          style: const TextStyle(
+                                                            fontSize: 10,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                               ),
 
@@ -1009,6 +1125,39 @@ class _MainScreenState extends State<MainScreen> {
                                                 fontSize: 16,
                                               ),
                                             ),
+
+                                            // ── Sources footer ───────────────
+                                            if (!isUser &&
+                                                msg.sources != null &&
+                                                (msg.sources as List?)?.isNotEmpty == true)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 8,
+                                                ),
+                                                child: Wrap(
+                                                  spacing: 6,
+                                                  runSpacing: 4,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.library_books_outlined,
+                                                      size: 12,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    ...(msg.sources as List)
+                                                        .take(3)
+                                                        .map(
+                                                          (src) => Text(
+                                                            src.toString(),
+                                                            style: const TextStyle(
+                                                              fontSize: 10,
+                                                              color: Colors.grey,
+                                                              fontStyle: FontStyle.italic,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                  ],
+                                                ),
+                                              ),
                                           ],
                                         ),
                                       ),

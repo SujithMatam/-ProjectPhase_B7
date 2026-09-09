@@ -5,7 +5,14 @@
     "procedure": "TKA",
     "days": "1-14",
     "content": "Mild to moderate swelling of the operative knee and ankle is normal and expected up to 3 months post-op. Normal swelling decreases with limb elevation (foot above heart level) and ice application. In contrast, Deep Vein Thrombosis (DVT) is characterized by persistent unilateral calf pain, induration, localized tenderness, warmth, and swelling that does NOT improve after 1 hour of elevation.",
-    "keywords": ["swelling", "edema", "calf", "ice", "elevation", "dvt"]
+    "keywords": [
+      "swelling",
+      "edema",
+      "calf",
+      "ice",
+      "elevation",
+      "dvt"
+    ]
   },
   {
     "id": "TKA-02",
@@ -13,7 +20,15 @@
     "procedure": "TKA",
     "days": "1-14",
     "content": "Clear to slightly pink (serosanguinous) drainage is normal for the first 48 to 72 hours post-surgery. Wounds should be sealed and largely dry by Post-Op Day 5 to 7. Purulent (cloudy, thick yellow or green) drainage, foul odor, or redness expanding beyond 1 cm from the incision edges are high-risk indicators of Surgical Site Infection (SSI) requiring surgical team notification.",
-    "keywords": ["wound", "incision", "drainage", "pus", "redness", "dressing", "infection"]
+    "keywords": [
+      "wound",
+      "incision",
+      "drainage",
+      "pus",
+      "redness",
+      "dressing",
+      "infection"
+    ]
   },
   {
     "id": "TKA-03",
@@ -21,7 +36,27 @@
     "procedure": "TKA",
     "days": "1-21",
     "content": "Target milestones for Total Knee Arthroplasty: By Post-Op Day 7, patients should aim for 70°-90° of passive flexion and near-full extension (0°-5°). Full terminal extension is critical; patients should avoid putting pillows directly under the knee joint, placing pillows under the ankle/calf instead to promote gravity extension.",
-    "keywords": ["flexion", "extension", "range of motion", "bend", "straighten", "stiffness", "rom"]
+    "keywords": [
+      "flexion",
+      "extension",
+      "range of motion",
+      "bend",
+      "straighten",
+      "stiffness",
+      "rom",
+      "exercise",
+      "exercises",
+      "physio",
+      "physiotherapy",
+      "heel slides",
+      "walk",
+      "recovery",
+      "progress",
+      "progressing",
+      "milestone",
+      "milestones",
+      "knee"
+    ]
   },
   {
     "id": "THA-01",
@@ -29,7 +64,15 @@
     "procedure": "THA",
     "days": "1-42",
     "content": "Posterior approach THA precautions (first 6 weeks): Avoid hip flexion greater than 90 degrees (do not bend forward past right angle), avoid crossing legs or ankles (adduction), and avoid internal rotation (pointing toes inward). Use elevated toilet seat, avoid low chairs, and sleep with an abduction wedge or pillow between knees.",
-    "keywords": ["hip", "precautions", "dislocation", "cross legs", "bend", "sitting", "sleeping"]
+    "keywords": [
+      "hip",
+      "precautions",
+      "dislocation",
+      "cross legs",
+      "bend",
+      "sitting",
+      "sleeping"
+    ]
   },
   {
     "id": "GEN-01",
@@ -37,6 +80,96 @@
     "procedure": "All",
     "days": "1-30",
     "content": "Multimodal analgesia protocol: Scheduled acetaminophen (paracetamol) and prescribed NSAIDs if indicated, with short-acting opioids strictly reserved for breakthrough pain prior to intensive physical therapy sessions. Sudden escalation of pain unresponsive to medication requires evaluating for hematoma, fracture, or acute infection.",
-    "keywords": ["pain", "medication", "paracetamol", "opioid", "severe pain", "ache", "soreness"]
+    "keywords": [
+      "pain",
+      "medication",
+      "paracetamol",
+      "opioid",
+      "severe pain",
+      "ache",
+      "soreness"
+    ]
+  },
+  {
+    "id": "MED-01",
+    "topic": "Post-Op Multimodal Pain & Anticoagulation Protocols",
+    "procedure": "All",
+    "days": "1-42",
+    "content": "Post-op multimodal pain and DVT prophylaxis typically include scheduled paracetamol, a single prescribed NSAID if the surgeon authorised it, short-acting opioids only for breakthrough pain, and anticoagulation such as subcutaneous enoxaparin, an oral factor Xa inhibitor, or aspirin as prescribed. Time analgesics 30 to 45 minutes before physiotherapy. Missed-dose rule: take the dose when remembered unless the next dose is due soon; never double-dose anticoagulants, opioids, or paracetamol. Do not combine two NSAIDs (for example ibuprofen plus aspirin used as an anti-inflammatory) or add extra blood thinners. This assistant never changes prescriptions, starts, stops, or titrates doses; report bleeding, black stools, severe nausea, rash, or unusual bruising to the surgical team.",
+    "keywords": [
+      "medication",
+      "medicine",
+      "tablet",
+      "pill",
+      "dose",
+      "dosing",
+      "forgot",
+      "missed",
+      "painkiller",
+      "analgesic",
+      "enoxaparin",
+      "blood thinner",
+      "aspirin",
+      "paracetamol",
+      "schedule",
+      "nsaid",
+      "ibuprofen",
+      "opioid",
+      "antibiotic",
+      "anticoagulant"
+    ]
+  },
+  {
+    "id": "NUT-01",
+    "topic": "Orthopedic Recovery Nutrition",
+    "procedure": "All",
+    "days": "1-60",
+    "content": "After TKA or THA, protein pacing of about 1.2 to 1.5 g/kg/day supports collagen synthesis, wound healing, and muscle recovery; spread protein across meals using eggs, dairy, legumes, fish, or tofu. Vitamin C and zinc support collagen formation; calcium and vitamin D support bone ingrowth for cementless prostheses, using diet first and supplements only if the clinician advised them. Drink about 2 to 2.5 litres of fluid daily and add fibre (prunes, whole grains, vegetables) to manage opioid-induced constipation. For nausea or poor appetite, use small frequent protein-rich snacks rather than skipping meals. Nutrition guidance supports recovery and does not replace the surgical team's diet orders or medical nutrition therapy.",
+    "keywords": [
+      "nutrition",
+      "diet",
+      "food",
+      "protein",
+      "eat",
+      "eating",
+      "vitamin",
+      "calcium",
+      "zinc",
+      "hydration",
+      "water",
+      "constipation",
+      "fiber",
+      "meal",
+      "collagen",
+      "appetite",
+      "nausea"
+    ]
+  },
+  {
+    "id": "MEN-01",
+    "topic": "Kinesiophobia & Post-Surgical Psychological Coping",
+    "procedure": "All",
+    "days": "1-90",
+    "content": "A post-op recovery dip with low mood, poor sleep, and frustration is very common between Days 3 and 10. Kinesiophobia (fear of movement) is also common; discomfort during prescribed physiotherapy is expected and does not by itself mean the implant has failed. Validate the discomfort, then encourage only the movement the surgical and physiotherapy team already prescribed, using paced goals and brief breathing resets. This support is not a psychiatric diagnosis and must not label the patient with a mental disorder. Persistent hopelessness, inability to function, or talk of self-harm should be flagged for urgent clinical follow-up rather than handled as routine recovery coaching.",
+    "keywords": [
+      "mental",
+      "wellbeing",
+      "anxiety",
+      "anxious",
+      "fear",
+      "scared",
+      "afraid",
+      "depressed",
+      "sad",
+      "frustrated",
+      "frustration",
+      "mood",
+      "sleep",
+      "stress",
+      "coping",
+      "motivation",
+      "kinesiophobia",
+      "overwhelmed"
+    ]
   }
 ]

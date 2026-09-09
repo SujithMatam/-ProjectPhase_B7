@@ -3,13 +3,14 @@ FastAPI Agentic AI Backend for Orthopedic Post-Op Recovery
 Exposes endpoints for the Flutter mobile/web client.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
 from agents.symptom_agent import SymptomAssessmentAgent
 from agents.chat_agent import ChatAgent
+from agents.report_agent import ReportGenerationAgent
 from lam.orchestrator import LAMOrchestrator
 from lam.schemas import WeightBearingStatus
 from triage.safety_triage import SafetyTriageEngine
@@ -82,8 +83,47 @@ def read_root():
 def health_check():
     return {
         "status": "healthy",
-        "agents": ["SafetyTriageEngine", "SymptomAssessmentAgent", "ClinicalKnowledgeBase", "ChatAgent"]
+        "agents": [
+            "SafetyTriageEngine",
+            "SymptomAssessmentAgent",
+            "ClinicalKnowledgeBase",
+            "ChatAgent",
+            "ReportGenerationAgent",
+        ]
     }
+
+
+@app.get("/api/reports/summary/{patient_id}")
+def get_report_summary(patient_id: str, days: int = 7):
+    """
+    Synthesizes recovery metrics, pain trajectory, exercise milestones,
+    medication adherence, and safety triage alerts into a structured JSON summary.
+    """
+    try:
+        summary = ReportGenerationAgent.generate_patient_summary(patient_id=patient_id, days=days)
+        return summary
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/reports/pdf/{patient_id}")
+def get_pdf_report(patient_id: str, days: int = 7):
+    """
+    Exports a publication-quality orthopedic clinical report PDF (ReportLab)
+    suitable for physician review and patient discharge records.
+    """
+    try:
+        pdf_bytes = ReportGenerationAgent.export_pdf_report(patient_id=patient_id, days=days)
+        filename = f"OrthoSync_Report_{patient_id}.pdf"
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"inline; filename={filename}",
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/assess-symptoms")

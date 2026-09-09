@@ -506,7 +506,6 @@ question AND supported by the clinical reference material.
 
             return None
 
-<<<<<<< HEAD
     # NOTE: this exact phrase is generated verbatim by
     # agents/specialized_agents.py::_rehab_context_note() whenever a
     # weight_bearing_status was supplied to RehabilitationAgent. It is
@@ -528,11 +527,6 @@ question AND supported by the clinical reference material.
         "THA": "hip",
     }
     _NEUTRAL_BODY_REGION = "operative area"
-=======
-    # ============================================================
-    # FALLBACK RESPONSE
-    # ============================================================
->>>>>>> 7de97f8e167e51039a25c1664e2278b056e46d81
 
     @classmethod
     def _generate_smart_reply(
@@ -546,15 +540,31 @@ question AND supported by the clinical reference material.
         procedure: Optional[str] = None,
         domain_instruction: Optional[str] = None,
     ) -> str:
-
         lower = user_message.lower()
 
         if "exercise" in lower or "workout" in lower or "physio" in lower:
-<<<<<<< HEAD
             return cls._rehab_fallback_reply(
                 postop_day=postop_day,
                 rag_docs=rag_docs,
                 domain_instruction=domain_instruction,
+            )
+
+        if any(w in lower for w in ["medication", "medicine", "pill", "tablet", "dose", "painkiller", "enoxaparin", "blood thinner", "aspirin", "paracetamol", "nsaid", "ibuprofen", "antibiotic", "forgot", "missed"]):
+            return cls._medication_fallback_reply(
+                postop_day=postop_day,
+                rag_docs=rag_docs,
+            )
+
+        if any(w in lower for w in ["nutrition", "diet", "food", "protein", "eat", "eating", "vitamin", "calcium", "zinc", "hydration", "water", "constipation", "fiber", "fibre"]):
+            return cls._nutrition_fallback_reply(
+                postop_day=postop_day,
+                rag_docs=rag_docs,
+            )
+
+        if any(w in lower for w in ["anxious", "anxiety", "fear", "scared", "afraid", "depressed", "sad", "frustrated", "frustration", "mood", "stress", "kinesiophobia"]):
+            return cls._mental_wellbeing_fallback_reply(
+                postop_day=postop_day,
+                rag_docs=rag_docs,
             )
 
         if "swell" in lower or "puff" in lower:
@@ -572,55 +582,11 @@ question AND supported by the clinical reference material.
                 symptom_label="pain",
                 postop_day=postop_day,
                 rag_docs=rag_docs,
-=======
-
-            if postop_day <= 2:
-
-                return (
-                    f"For Post-Op Day {postop_day}, follow the exercises "
-                    f"and movement instructions given by your clinical team. "
-                    f"If you're unsure whether a particular exercise is "
-                    f"allowed yet, please confirm with your physiotherapist."
-                )
-
-            elif postop_day <= 7:
-
-                return (
-                    f"On Post-Op Day {postop_day}, continue the exercises "
-                    f"prescribed by your physiotherapist and progress only "
-                    f"as instructed by your clinical team."
-                )
-
-            else:
-
-                return (
-                    f"At Post-Op Day {postop_day}, continue progressing "
-                    f"your rehabilitation according to your prescribed "
-                    f"orthopedic recovery plan."
-                )
-
-        if "swell" in lower or "puff" in lower:
-
-            return (
-                f"Some swelling can occur during postoperative recovery. "
-                f"Follow your discharge instructions for elevation and "
-                f"icing, and contact your clinical team if the swelling "
-                f"is worsening or you are concerned about it."
-            )
-
-        if "pain" in lower or "hurt" in lower:
-
-            return (
-                f"Some pain or soreness can occur during recovery on "
-                f"Post-Op Day {postop_day}. Follow your prescribed pain "
-                f"management plan and contact your clinical team if the "
-                f"pain is severe, worsening, or concerning."
->>>>>>> 7de97f8e167e51039a25c1664e2278b056e46d81
             )
 
         if rag_docs:
+            return f"Based on your Day {postop_day} protocol for {surgery_type}: {rag_docs[0]['content']}"
 
-<<<<<<< HEAD
         return f"Hello! On Day {postop_day} of your recovery from {surgery_type} ({affected_limb}), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated."
 
     @classmethod
@@ -710,17 +676,79 @@ question AND supported by the clinical reference material.
             "care-team or discharge instructions, and contact your surgical or physical "
             "therapy team if you're unsure or if it changes."
         )
-=======
+
+    @classmethod
+    def _medication_fallback_reply(
+        cls,
+        postop_day: int,
+        rag_docs: List[Dict[str, Any]],
+    ) -> str:
+        """
+        Deterministic fallback for medication queries: provides safety guidelines,
+        missed-dose rules (never double-dose), contraindication cautions (do not mix NSAIDs
+        or blood thinners), and a clear non-prescribing disclaimer.
+        """
+        if rag_docs:
+            med_content = rag_docs[0]["content"]
             return (
-                f"Based on the available recovery information for "
-                f"Post-Op Day {postop_day}: "
-                f"{rag_docs[0]['content']}"
+                f"Regarding your medication on Day {postop_day}: {med_content} "
+                "Remember: if you missed a dose, take it when remembered unless it is close to your next scheduled dose, "
+                "and never double-dose. Note: this guidance provides adherence education, not a prescription change; "
+                "please contact your surgical team or pharmacist for any dosage adjustments."
             )
 
         return (
-            f"You're currently on Post-Op Day {postop_day} after "
-            f"{surgery_type} involving your {affected_limb}. "
-            f"Please continue following your surgeon's and "
-            f"physiotherapist's recovery instructions."
+            f"On Day {postop_day}, follow your discharge medication schedule exactly as prescribed by your surgical team. "
+            "As a general safety rule: if you forgot a dose, take it when you remember unless it is near the time for your next dose—never take a double dose. "
+            "Do not mix over-the-counter NSAIDs or blood thinners without clinical approval. "
+            "Please consult your surgeon or clinical pharmacist for specific prescription changes."
         )
->>>>>>> 7de97f8e167e51039a25c1664e2278b056e46d81
+
+    @classmethod
+    def _nutrition_fallback_reply(
+        cls,
+        postop_day: int,
+        rag_docs: List[Dict[str, Any]],
+    ) -> str:
+        """
+        Deterministic fallback for nutrition and recovery diet queries: supports tissue repair,
+        protein pacing (1.2-1.5 g/kg/day), hydration, micronutrients, and managing opioid-induced constipation.
+        """
+        if rag_docs:
+            nut_content = rag_docs[0]["content"]
+            return (
+                f"Recovery nutrition guidance for Day {postop_day}: {nut_content} "
+                "Ensure steady protein intake throughout the day, drink plenty of fluids, and include dietary fiber to keep bowel movements regular."
+            )
+
+        return (
+            f"For your Day {postop_day} recovery nutrition, aim for high-quality protein (approx 1.2–1.5 g per kg of body weight daily) "
+            "across small, regular meals to support tissue healing and collagen synthesis. Drink 2 to 2.5 litres of fluids daily and consume "
+            "dietary fiber (whole grains, vegetables, fruit) to prevent or relieve constipation from pain medications. "
+            "Always follow any dietary restrictions given at discharge."
+        )
+
+    @classmethod
+    def _mental_wellbeing_fallback_reply(
+        cls,
+        postop_day: int,
+        rag_docs: List[Dict[str, Any]],
+    ) -> str:
+        """
+        Deterministic fallback for mental wellbeing and kinesiophobia: validates discomfort,
+        normalizes Day 3-10 recovery dips, encourages safe prescribed rehabilitation, and avoids diagnostic labels.
+        """
+        if rag_docs:
+            men_content = rag_docs[0]["content"]
+            return (
+                f"Recovery wellbeing guidance for Day {postop_day}: {men_content} "
+                "Remember that recovery dips between Days 3 and 10 are completely normal. Take your physical therapy in paced, gentle steps."
+            )
+
+        return (
+            f"Recovery can feel emotionally challenging, and experiencing fatigue, worry, or frustration around Day {postop_day} is very common. "
+            "It is natural to feel hesitant or protective over your operated leg (kinesiophobia), but gentle prescribed movement helps recovery. "
+            "Pace your exercises, take brief breathing pauses, and acknowledge your progress. If you experience severe distress or feelings of hopelessness, "
+            "please reach out to your surgical care team or clinical counselor."
+        )
+
