@@ -199,6 +199,12 @@ _WOUND_TERMS = (
 )
 
 
+_WOUND_TERM_PATTERNS = tuple(
+    re.compile(r"\b" + re.escape(term) + r"\b")
+    for term in _WOUND_TERMS
+)
+
+
 def _contains_wound_term(
     text: str,
 ) -> bool:
@@ -206,8 +212,8 @@ def _contains_wound_term(
     text = _normalise(text)
 
     return any(
-        term in text
-        for term in _WOUND_TERMS
+        pattern.search(text)
+        for pattern in _WOUND_TERM_PATTERNS
     )
 
 
