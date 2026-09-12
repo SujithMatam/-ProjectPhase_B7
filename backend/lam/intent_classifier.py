@@ -305,6 +305,8 @@ _REHAB_KEYWORDS = {
     "physical therapy",
     "physio",
     "physiotherapy",
+    "heel slide",
+    "heel slides",
     "rehab",
     "rehabilitation",
     "stretch",

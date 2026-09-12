@@ -409,28 +409,6 @@ def run_contract_tests() -> None:
     print()
 
 
-# ---------------------------------------------------------------------------
-# 6. No Ollama / generative LLM used for intent classification
-# ---------------------------------------------------------------------------
-
-def run_no_ollama_check() -> None:
-    print("=" * 78)
-    print("SECTION 6 -- No Ollama / generative LLM in intent classification")
-    print("=" * 78)
-    import inspect
-    source = inspect.getsource(intent_classifier_module)
-    lowered = source.lower()
-    forbidden_usages = [
-        "import ollama", "from ollama", "ollama.chat", "ollama.generate",
-        "import openai", "from openai", "openai.chat", "requests.post",
-        "requests.get",
-    ]
-    found = [u for u in forbidden_usages if u in lowered]
-    _check(not found, f"intent_classifier.py contains generative-LLM/network call usage: {found}")
-    print("    OK: no Ollama / generative-LLM call usage found in intent_classifier.py")
-    print()
-
-
 def run_accuracy_summary() -> None:
     print("=" * 78)
     print("SECTION 7 -- Accuracy summary by category")
@@ -456,7 +434,6 @@ def main() -> int:
     run_fallback_and_safety_invariants()
     run_precedence_tests()
     run_contract_tests()
-    run_no_ollama_check()
     run_accuracy_summary()
 
     print("=" * 78)

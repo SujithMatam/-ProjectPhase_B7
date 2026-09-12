@@ -291,6 +291,19 @@ class RehabilitationAgent(BaseClinicalAgent):
 
 
 class MedicationAgent(BaseClinicalAgent):
+    """
+    Proactive Medication Adherence Agent.
+
+    Primary path: ProactiveMedicationEngine runs a structured, multi-turn
+    adherence check (dosage verification, missed-dose handling, safety
+    escalation) and returns a targeted, stateful reply.
+
+    Informational path: when the patient's message is a pure open-ended
+    clinical question (e.g. "what is enoxaparin for?"), the deterministic
+    clinical synthesis agent adds grounded RAG guidance to the proactive
+    adherence context.
+    """
+
     TARGET_AGENT = TargetAgent.MEDICATION_AGENT
     DOMAIN_FOCUS = (
         "You are the Medication Adherence Agent for orthopedic post-operative care. "
@@ -303,6 +316,92 @@ class MedicationAgent(BaseClinicalAgent):
         "invent a dose -- defer all prescription changes to the patient's clinician. "
         "Always include a brief safety disclaimer that this is adherence support, not a new prescription."
     )
+
+    # Actions that carry a proactive, stateful reply. These are returned
+    # directly without consulting the RAG knowledge base.
+    _PROACTIVE_ACTIONS = {"assess", "escalate", "advise"}
+
+    @classmethod
+    def handle(
+        cls,
+        *,
+        patient_id: str,
+        surgery_type: str,
+        affected_limb: str,
+        postop_day: int,
+        user_message: str,
+        procedure: str,
+        chat_history: Optional[List[Dict[str, str]]] = None,
+        surgery_date: Optional[str] = None,
+        precomputed_triage: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        from agents.medication_proactive import ProactiveMedicationEngine
+
+        # ------------------------------------------------------------------
+        # 1. Run the proactive adherence engine (always executes first).
+        # ------------------------------------------------------------------
+        engine_result = ProactiveMedicationEngine.evaluate_turn(
+            patient_id=patient_id,
+            user_message=user_message,
+            chat_history=chat_history,
+            postop_day=postop_day,
+        )
+
+        action = engine_result.get("action", "inform")
+
+        # ------------------------------------------------------------------
+        # 2. Proactive / safety path — return engine reply directly.
+        # ------------------------------------------------------------------
+        if action in cls._PROACTIVE_ACTIONS:
+            return {
+                "reply": engine_result["reply"],
+                "answer": engine_result["reply"],
+                "triage_level": engine_result.get("triage_level", "GREEN"),
+                "is_escalated": engine_result.get("is_escalated", False),
+                "sources": [],
+                "target_agent": cls.TARGET_AGENT.value,
+                "engine": engine_result.get("engine", "Medication Proactive Engine"),
+                "action": action,
+                "medication_state": engine_result.get("state", {}),
+            }
+
+        # ------------------------------------------------------------------
+        # 3. Informational / generic path — RAG + deterministic ChatAgent.
+        #    The proactive engine's "inform" reply is prepended as context so
+        #    the response opens with the adherence reminder, then answers the
+        #    clinical question with retrieved knowledge.
+        # ------------------------------------------------------------------
+        proactive_preamble = engine_result.get("reply", "")
+        enriched_message = (
+            f"{user_message}\n\n"
+            f"[Adherence context from Medication Agent: {proactive_preamble}]"
+            if proactive_preamble
+            else user_message
+        )
+
+        rag_result = ChatAgent.answer_question(
+            patient_id=patient_id,
+            surgery_type=surgery_type,
+            affected_limb=affected_limb,
+            postop_day=postop_day,
+            user_message=enriched_message,
+            chat_history=chat_history,
+            procedure=procedure,
+            domain_instruction=cls.DOMAIN_FOCUS,
+            precomputed_triage=precomputed_triage,
+            surgery_date=surgery_date,
+        )
+
+        # Normalize: ChatAgent returns 'reply'; our contract uses 'answer'.
+        # Keep both keys so downstream callers that already use 'reply' still work.
+        rag_answer = rag_result.get("reply") or rag_result.get("answer", "")
+        return {
+            **rag_result,
+            "answer": rag_answer,
+            "target_agent": cls.TARGET_AGENT.value,
+            "engine": "Medication Proactive + Clinical Synthesis",
+            "action": "inform",
+        }
 
 
 class WoundCareAgent(BaseClinicalAgent):

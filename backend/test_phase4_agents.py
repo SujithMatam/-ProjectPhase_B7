@@ -7,7 +7,7 @@ Run directly:
 Plain-Python script (no pytest dependency), consistent with
 test_phase2_intent.py / test_phase3_rag.py. Mocks the shared
 ChatAgent.answer_question() response-generation layer so routing/dispatch
-can be verified without Ollama -- the mock records exactly which
+can be verified without a generative model -- the mock records exactly which
 domain_instruction (i.e. which specialized agent) was actually invoked,
 proving dispatch is real rather than cosmetic.
 """
@@ -62,7 +62,7 @@ def _counting_safety_evaluate():
 
 def _stub_answer_question(reply: str = "stub reply", sources: Optional[list] = None):
     """A ChatAgent.answer_question() stand-in that records its kwargs and
-    returns a normal-shaped response, without touching Ollama/RAG/embeddings."""
+    returns a normal-shaped response, without touching RAG/embeddings."""
     calls: list[Dict[str, Any]] = []
 
     def _fn(**kwargs) -> Dict[str, Any]:
@@ -139,10 +139,16 @@ def run_all_agents_test() -> None:
             result["action"] == expected_action,
             f"{query!r} expected action {expected_action}, got {result['action']}",
         )
-        _check(
-            len(calls) == 1,
-            f"{query!r} expected exactly 1 response-generation call, got {len(calls)}",
-        )
+        if expected_agent_cls is MedicationAgent:
+            _check(
+                len(calls) == 0,
+                f"{query!r} should be handled by the proactive engine before synthesis, got {len(calls)} call(s)",
+            )
+        else:
+            _check(
+                len(calls) == 1,
+                f"{query!r} expected exactly 1 response-generation call, got {len(calls)}",
+            )
         if expected_agent_cls is RecoveryProgressAgent:
             # RecoveryProgressAgent (Milestone Sec 2.5) genuinely enriches its
             # DOMAIN_FOCUS with retrieved-chunk milestone/day-window notes
@@ -157,7 +163,7 @@ def run_all_agents_test() -> None:
                 f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through "
                 f"(as a prefix), got {captured_domain_instruction!r}",
             )
-        else:
+        elif expected_agent_cls is not MedicationAgent:
             _check(
                 captured_domain_instruction == expected_agent_cls.DOMAIN_FOCUS,
                 f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through, "
@@ -296,19 +302,18 @@ def run_dispatch_failure_behavior_test() -> None:
     print("SECTION 6 -- Dispatch failure behavior (unmapped intent)")
     print("=" * 78)
     fn, calls = _stub_answer_question()
-    # EMERGENCY is intentionally NOT a key in _AGENT_BY_INTENT (it never
-    # legitimately reaches AgentRouter in normal operation -- the
-    # orchestrator short-circuits before Step 5). Calling dispatch() with it
-    # directly simulates the "intent unexpectedly unmapped" defensive path.
+    # OUT_OF_SCOPE is intentionally NOT a key in _AGENT_BY_INTENT (it is
+    # short-circuited by the orchestrator). Calling dispatch() directly
+    # simulates the "intent unexpectedly unmapped" defensive path.
     with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
         try:
             result = AgentRouter.dispatch(
-                intent_label=IntentLabel.EMERGENCY,
+                intent_label=IntentLabel.OUT_OF_SCOPE,
                 patient_id="TEST-PT",
                 surgery_type="Total Knee Arthroplasty (TKA)",
                 affected_limb="Right",
                 postop_day=5,
-                user_message="irrelevant for this test",
+                user_message="How is my recovery progressing?",
                 procedure="TKA",
             )
             crashed = False
