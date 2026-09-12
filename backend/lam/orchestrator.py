@@ -7,9 +7,10 @@ Execution order:
 
 1. Deterministic safety triage
 2. Scope validation
-3. Intent classification
-4. Agent/action routing
-5. Specialized agent execution
+3. Recovery continuation check (narrow, Recovery-only -- see Step 2.5 below)
+4. Intent classification (skipped only if Step 3 matched)
+5. Agent/action routing
+6. Specialized agent execution
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ from typing import Optional, List, Dict
 
 from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
+from agents.recovery_integration import check_recovery_continuation
 
 from lam.schemas import (
     IntentLabel,
@@ -220,33 +222,74 @@ class LAMOrchestrator:
             ).to_dict()
 
         # ============================================================
-        # STEP 3
-        # INTENT CLASSIFICATION
+        # STEP 2.5
+        # RECOVERY CONTINUATION CHECK (narrow, Recovery-only)
+        #
+        # Runs AFTER Safety and Scope (both already short-circuited above
+        # if triggered) and BEFORE fresh intent classification. Uses
+        # peek_state() ONLY (exact-key lookup, no NODATE->dated adoption,
+        # never creates Recovery state) -- see recovery_integration.py's
+        # check_recovery_continuation() for the full contract. Matches ONLY
+        # when an existing Recovery episode has a real pending_field AND the
+        # current message plausibly answers THAT specific field; never uses
+        # "Recovery was the last active agent" as a signal, and never
+        # bypasses fresh classification for an unrelated topic (wound,
+        # medication, etc.) even while a Recovery field is pending.
         # ============================================================
 
-        classification = (
-            IntentClassifier.classify_detailed(
-                query=user_message,
-                context=context,
+        # Computed once here and reused for STEP 5 below -- resolve_procedure_code
+        # is a pure function of surgery_type, so this is a single computation,
+        # not a duplicated one.
+        resolved_procedure = resolve_procedure_code(surgery_type)
+
+        is_recovery_continuation = check_recovery_continuation(
+            patient_id=patient_id,
+            surgery_date_raw=surgery_date,
+            procedure=resolved_procedure,
+            user_message=user_message,
+        )
+
+        if is_recovery_continuation:
+
+            intent_label = IntentLabel.RECOVERY_PROGRESS
+
+            print(
+                "[LAM][CONTINUATION] "
+                f"query={user_message!r} "
+                "matched a pending Recovery field -- routing directly to "
+                "RecoveryProgressAgent without fresh intent classification."
             )
-        )
 
-        intent_label = classification.intent
+        else:
 
-        # IMPORTANT DEBUG OUTPUT.
-        #
-        # This lets you immediately see whether the problem is:
-        # classifier -> router -> agent -> response.
-        print(
-            "[LAM][INTENT] "
-            f"query={user_message!r} "
-            f"intent={intent_label.value} "
-            f"path={classification.decision_path} "
-            f"top1={getattr(classification.top1_intent, 'value', None)} "
-            f"score={classification.top1_score:.3f} "
-            f"top2={getattr(classification.top2_intent, 'value', None)} "
-            f"margin={classification.margin:.3f}"
-        )
+            # ========================================================
+            # STEP 3
+            # INTENT CLASSIFICATION
+            # ========================================================
+
+            classification = (
+                IntentClassifier.classify_detailed(
+                    query=user_message,
+                    context=context,
+                )
+            )
+
+            intent_label = classification.intent
+
+            # IMPORTANT DEBUG OUTPUT.
+            #
+            # This lets you immediately see whether the problem is:
+            # classifier -> router -> agent -> response.
+            print(
+                "[LAM][INTENT] "
+                f"query={user_message!r} "
+                f"intent={intent_label.value} "
+                f"path={classification.decision_path} "
+                f"top1={getattr(classification.top1_intent, 'value', None)} "
+                f"score={classification.top1_score:.3f} "
+                f"top2={getattr(classification.top2_intent, 'value', None)} "
+                f"margin={classification.margin:.3f}"
+            )
 
         # ============================================================
         # STEP 4
@@ -268,10 +311,8 @@ class LAMOrchestrator:
         # STEP 5
         # SPECIALIZED AGENT
         # ============================================================
-
-        resolved_procedure = resolve_procedure_code(
-            surgery_type
-        )
+        # resolved_procedure was already computed above (Step 2.5) for the
+        # Recovery continuation check -- reused here rather than recomputed.
 
         chat_result = AgentRouter.dispatch(
             intent_label=intent_label,
