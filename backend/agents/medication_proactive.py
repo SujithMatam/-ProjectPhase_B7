@@ -25,6 +25,8 @@ class MedicationCheckinState:
     adherence_status: Optional[str] = None  # "taken", "missed", "delayed", "dosage_error", "uncertain"
     verified_prescription: Optional[Dict[str, Any]] = None
     other_meds_checked: bool = False
+    late_hours: Optional[float] = None
+    reported_pain_score: Optional[int] = None
     turn_count: int = 0
 
 
@@ -105,9 +107,21 @@ class ProactiveMedicationEngine:
         lower = text.lower()
 
         # Adherence status
-        if any(kw in lower for kw in ["i took", "taken", "yes", "i had", "already took", "finished my dose"]):
+        if (
+            any(kw in lower for kw in ["i took", "taken", "i had", "already took", "finished my dose"])
+            or re.search(r"\byes\b", lower)
+        ):
             extracted["is_taken"] = True
-        if any(kw in lower for kw in ["forgot", "missed", "haven't taken", "havent taken", "didn't take", "did not take", "skipped", "not yet", "no"]):
+        if (
+            any(
+                kw in lower
+                for kw in [
+                    "forgot", "missed", "haven't taken", "havent taken",
+                    "didn't take", "did not take", "skipped", "not yet",
+                ]
+            )
+            or re.search(r"\bno\b", lower)
+        ):
             extracted["is_missed"] = True
             extracted["is_taken"] = False
 
@@ -191,6 +205,154 @@ class ProactiveMedicationEngine:
 
         return extracted
 
+    @staticmethod
+    def _extract_missed_dose_follow_up(text: str) -> Dict[str, Any]:
+        hours_match = re.search(
+            r"\b(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)\s*(?:late|ago)?\b",
+            text.lower(),
+        )
+        pain_match = re.search(
+            r"\bpain(?:\s+level)?\s*(?:is|=|:)?\s*(10|[0-9])\b",
+            text.lower(),
+        )
+        return {
+            "hours": float(hours_match.group(1)) if hours_match else None,
+            "pain": int(pain_match.group(1)) if pain_match else None,
+        }
+
+    @classmethod
+    def _informational_reply(
+        cls,
+        message: str,
+        state: MedicationCheckinState,
+        prescribed: List[Dict[str, Any]],
+    ) -> Optional[str]:
+        """Answer ordinary medication questions from the patient's record."""
+        lower = message.lower()
+        medication_question = any(
+            marker in lower
+            for marker in (
+                "dose", "dosage", "when", "how often", "take", "medication",
+                "medicine", "pill", "tablet", "prescription", "what is",
+                "paracetamol", "enoxaparin", "aspirin", "antibiotic",
+                "painkiller", "blood thinner", "anticoagulant", "anticoagulants",
+                "anticaogulant", "anticaogulants",
+                "interact", "interaction", "combine", "together", "safe with",
+            )
+        )
+        if not medication_question:
+            return None
+
+        selected = None
+        explicit_medication_reference = any(
+            marker in lower
+            for marker in (
+                "paracetamol", "enoxaparin", "aspirin", "oxycodone", "tramadol",
+                "docusate", "anticoagulant", "anticoagulants", "blood thinner",
+                "anticaogulant", "anticaogulants", "antibiotic", "painkiller",
+            )
+        )
+        if prescribed:
+            selected = next(
+                (
+                    med for med in prescribed
+                    if med.get("name", "").lower() in lower
+                ),
+                None,
+            )
+        if selected is None and not explicit_medication_reference and state.current_med_name:
+            selected = next(
+                (
+                    med for med in prescribed
+                    if med.get("name", "").lower() == state.current_med_name.lower()
+                ),
+                None,
+            )
+
+        asks_dose = any(marker in lower for marker in ("dose", "dosage"))
+        asks_timing = any(
+            marker in lower
+            for marker in (
+                "when", "how often", "take it", "next dose", "schedule",
+                "what time", "at what time", "time should",
+            )
+        )
+        asks_purpose = any(
+            marker in lower for marker in ("what is", "used for", "why", "purpose")
+        )
+
+        asks_quantity = any(marker in lower for marker in ("how many", "how much", "number of"))
+
+        if selected:
+            name = selected.get("name", "this medication")
+            dose = selected.get("dose") or "the dose printed on your prescription label"
+            purpose = selected.get("purpose")
+            if asks_timing:
+                return (
+                    f"For **{name}**, follow the timing and frequency on your "
+                    f"prescription label ({dose}); I cannot safely infer exact clock "
+                    "times from this chat. If you are unsure when the next dose is "
+                    "due, confirm with your pharmacist or surgical team. Do not "
+                    "take an extra dose to catch up."
+                )
+            if asks_dose:
+                return (
+                    f"Your postoperative record lists **{name}** as **{dose}**"
+                    + (f" for {purpose.lower()}." if purpose else ".")
+                    + " Please verify that against the label on your bottle before "
+                    "taking it; do not change the dose based on this chat."
+                )
+            if asks_purpose:
+                purpose_text = purpose.lower() if purpose else "your postoperative treatment"
+                return (
+                    f"**{name}** is listed for {purpose_text}. Take it only as prescribed, and "
+                    "check with your clinician or pharmacist before changing it."
+                )
+            if asks_quantity:
+                return (
+                    f"Only take the number of **{name}** doses or tablets written on "
+                    f"your prescription label ({dose}). Do not add another blood "
+                    "thinner or take extra tablets unless your prescriber explicitly "
+                    "tells you to. If the label is unclear, ask your pharmacist."
+                )
+            if any(marker in lower for marker in ("interact", "interaction", "combine", "together", "safe with")):
+                return (
+                    f"I can confirm that **{name}** is on your postoperative record, "
+                    "but I cannot safely approve combining it with another medicine "
+                    "without the complete medication list. Check with your pharmacist "
+                    "before taking it with anything new."
+                )
+            return (
+                f"I found **{name}** in your postoperative medication record. "
+                f"It is listed as {dose}"
+                + (f" for {purpose.lower()}." if purpose else ".")
+                + " What would you like to know about its timing, purpose, or safety?"
+            )
+
+        if asks_dose or asks_timing or asks_quantity:
+            if not prescribed:
+                return (
+                    "I cannot verify a medication or dose from your record. "
+                    "Please check the prescription label or discharge instructions "
+                    "and contact your pharmacist or surgical team before taking it."
+                )
+            medication_list = "; ".join(
+                f"{med.get('name', 'Unnamed medication')}: "
+                f"{med.get('dose') or 'see label'}"
+                for med in prescribed
+            )
+            return (
+                f"Your postoperative record lists: {medication_list}. "
+                "Use each medicine only according to its own label and do not "
+                "combine or double doses. Which medication are you asking about?"
+            )
+
+        return (
+            "I can help explain a medication in your postoperative record. "
+            "Tell me its name, or ask about its purpose, prescribed dose, timing, "
+            "or a possible side effect."
+        )
+
     @classmethod
     def evaluate_turn(
         cls,
@@ -223,6 +385,11 @@ class ProactiveMedicationEngine:
 
         # 2. Extract current turn entities
         current_ent = cls.extract_medication_entities(user_message, prescribed)
+        missed_follow_up = cls._extract_missed_dose_follow_up(user_message)
+        if missed_follow_up["hours"] is not None:
+            state.late_hours = missed_follow_up["hours"]
+        if missed_follow_up["pain"] is not None:
+            state.reported_pain_score = missed_follow_up["pain"]
 
         # Merge extracted entities into state
         if current_ent["med_name"]:
@@ -358,6 +525,41 @@ class ProactiveMedicationEngine:
                 "state": state.__dict__,
             }
 
+        # Answer the follow-up requested by the medication agent itself. This
+        # must remain on the medication route even when the reply mentions
+        # pain, because it supplies missed-dose timing context rather than a
+        # new standalone pain complaint.
+        if (
+            state.adherence_status == "missed"
+            and (state.late_hours is not None or state.reported_pain_score is not None)
+        ):
+            med_name = state.current_med_name or "the missed medication"
+            pain_text = (
+                f" Your reported pain level is {state.reported_pain_score}/10."
+                if state.reported_pain_score is not None
+                else ""
+            )
+            timing_text = (
+                f" You are about {state.late_hours:g} hour(s) late."
+                if state.late_hours is not None
+                else ""
+            )
+            return {
+                "reply": (
+                    f"Thanks for the update about **{med_name}**.{timing_text}{pain_text}\n\n"
+                    "Because this is a missed dose, do not take an extra dose to catch up. "
+                    "Check the prescription label for its missed-dose instructions; if the "
+                    "next dose is due soon, or you are unsure, contact your pharmacist or "
+                    "surgical team before taking it. If your pain is severe, worsening, or "
+                    "not controlled by the prescribed plan, contact your care team."
+                ),
+                "triage_level": "GREEN",
+                "is_escalated": False,
+                "engine": "Medication Proactive Adherence Engine",
+                "action": "advise",
+                "state": state.__dict__,
+            }
+
         # =====================================================================
         # CASE E: PURE GREETING / INITIATE PROACTIVE CHECK-IN
         # e.g., "Hi", "Hello", "Check-in"
@@ -454,6 +656,23 @@ class ProactiveMedicationEngine:
                     "action": "inform",
                     "state": state.__dict__,
                 }
+
+        # Ordinary medication questions should be answered by the stateful
+        # medication agent rather than the generic repeated chat fallback.
+        informational_reply = cls._informational_reply(
+            user_message,
+            state,
+            prescribed,
+        )
+        if informational_reply:
+            return {
+                "reply": informational_reply,
+                "triage_level": "GREEN",
+                "is_escalated": False,
+                "engine": "Medication Proactive Information Engine",
+                "action": "inform",
+                "state": state.__dict__,
+            }
 
         # If dose is known but time is missing
         if state.reported_dose and not state.reported_time:

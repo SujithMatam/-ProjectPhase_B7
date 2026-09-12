@@ -318,6 +318,95 @@ def t_medication_agent_informational_hits_rag():
 run("MedicationAgent.handle() generic question returns grounded inform response", t_medication_agent_informational_hits_rag)
 
 
+def t_medication_questions_use_record_context():
+    _reset(PID)
+    from agents.specialized_agents import MedicationAgent
+
+    common = {
+        "patient_id": PID,
+        "surgery_type": "TKA",
+        "affected_limb": "Right",
+        "postop_day": 3,
+        "procedure": "Total Knee Arthroplasty",
+    }
+    dosage = MedicationAgent.handle(user_message="dosage?", **common)["answer"]
+    paracetamol = MedicationAgent.handle(user_message="paracetamol?", **common)["answer"]
+    timing = MedicationAgent.handle(
+        user_message="when should I take it?",
+        chat_history=[{"role": "user", "content": "paracetamol?"}],
+        **common,
+    )["answer"]
+
+    assert "Paracetamol" in dosage and "650mg TDS" in dosage
+    assert "Paracetamol" in paracetamol and "scheduled analgesia" in paracetamol.lower()
+    assert "prescription label" in timing.lower()
+    assert "generic medication fallback" not in timing.lower()
+    assert dosage != paracetamol != timing
+
+
+run("Medication questions return distinct record-grounded contextual answers", t_medication_questions_use_record_context)
+
+
+def t_medication_context_covers_short_replies_and_misspellings():
+    from lam.intent_classifier import IntentClassifier
+    from lam.schemas import IntentLabel, LAMContext
+
+    history = [{"role": "user", "content": "paracetamol?"}]
+    for query in ("yes", "at what time should I take the tablets?", "how many anticaogulants"):
+        context = LAMContext(
+            patient_id=PID,
+            surgery_type="TKA",
+            affected_limb="Right",
+            postop_day=3,
+            user_message=query,
+            chat_history=history,
+        )
+        assert IntentClassifier.classify_detailed(query, context).intent == IntentLabel.MEDICATION
+
+
+run("Medication context preserves short replies and recognizes common misspellings", t_medication_context_covers_short_replies_and_misspellings)
+
+
+def t_missed_dose_follow_up_keeps_medication_context():
+    _reset(PID)
+    from agents.specialized_agents import MedicationAgent
+    from lam.intent_classifier import IntentClassifier
+    from lam.schemas import IntentLabel, LAMContext
+
+    common = {
+        "patient_id": PID,
+        "surgery_type": "TKA",
+        "affected_limb": "Right",
+        "postop_day": 3,
+        "procedure": "Total Knee Arthroplasty",
+    }
+    MedicationAgent.handle(user_message="enoxaparin?", **common)
+    MedicationAgent.handle(user_message="I missed it", **common)
+    follow_up = "It's been 2 hours and pain level is 5"
+    result = MedicationAgent.handle(user_message=follow_up, **common)
+    context = LAMContext(
+        patient_id=PID,
+        surgery_type="TKA",
+        affected_limb="Right",
+        postop_day=3,
+        user_message=follow_up,
+        chat_history=[
+            {"role": "user", "content": "enoxaparin?"},
+            {"role": "assistant", "content": "How many hours late is this dose?"},
+        ],
+    )
+
+    assert IntentClassifier.classify_detailed(follow_up, context).intent == IntentLabel.MEDICATION
+    assert result["target_agent"] == "MedicationAgent"
+    assert result["action"] == "advise"
+    assert "2 hour" in result["answer"]
+    assert "pain level is 5/10" in result["answer"]
+    assert "double" in result["answer"].lower() or "extra dose" in result["answer"].lower()
+
+
+run("Missed-dose hours and pain follow-up stays with MedicationAgent", t_missed_dose_follow_up_keeps_medication_context)
+
+
 # ===========================================================================
 # SECTION 3 — AgentRouter dispatch
 # ===========================================================================

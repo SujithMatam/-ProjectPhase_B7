@@ -243,6 +243,9 @@ _MEDICATION_KEYWORDS = {
     "painkiller",
     "aspirin",
     "anticoagulant",
+    "anticoagulants",
+    "anticaogulant",
+    "anticaogulants",
     "blood thinner",
     "warfarin",
     "rivaroxaban",
@@ -251,6 +254,33 @@ _MEDICATION_KEYWORDS = {
     "missed dose",
     "side effect",
 }
+
+
+def _looks_like_medication_follow_up(
+    text: str,
+    chat_history: list[dict[str, str]],
+) -> bool:
+    """Identify medication follow-ups whose current turn uses pronouns."""
+    medication_context = (
+        "medication", "medicine", "dose", "dosage", "tablet", "pill",
+        "paracetamol", "enoxaparin", "aspirin", "antibiotic", "painkiller",
+        "blood thinner", "prescription",
+    )
+    follow_up = (
+        "take it", "taking it", "took it", "next dose", "dose", "dosage",
+        "how often", "when should i take", "when do i take",
+        "hours late", "hour late", "pain level", "pain is",
+        "yes", "yeah", "yep", "no", "nope", "okay", "ok",
+    )
+    history_text = " ".join(
+        str(turn.get("content", "")).lower()
+        for turn in chat_history
+        if isinstance(turn, dict)
+    )
+    return (
+        any(marker in text for marker in follow_up)
+        and any(marker in history_text for marker in medication_context)
+    )
 
 
 _PAIN_KEYWORDS = {
@@ -831,6 +861,24 @@ class IntentClassifier:
     ) -> ClassificationDetail:
 
         text = _normalise_query(query)
+
+        # Short follow-ups often omit the medication noun ("when should I
+        # take it?"). Preserve the medication route when the conversation
+        # already established medication context.
+        if (
+            context.chat_history
+            and _looks_like_medication_follow_up(text, context.chat_history)
+        ):
+            return ClassificationDetail(
+                intent=IntentLabel.MEDICATION,
+                top1_intent=IntentLabel.MEDICATION,
+                top1_score=1.0,
+                top2_intent=None,
+                top2_score=0.0,
+                margin=1.0,
+                matched_prototype=None,
+                decision_path="deterministic_context",
+            )
 
         # ============================================================
         # STEP 1

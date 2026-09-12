@@ -39,6 +39,7 @@ class _ClinicalReportScreenState extends State<ClinicalReportScreen>
     with SingleTickerProviderStateMixin {
   // ── state ─────────────────────────────────────────────────────────────────
   Map<String, dynamic>? _summary;
+  Map<String, dynamic>? _reminderStatus;
   bool _loading = true;
   bool _error = false;
   String _errorMsg = '';
@@ -80,9 +81,18 @@ class _ClinicalReportScreenState extends State<ClinicalReportScreen>
         patientId: patientId,
         days: _selectedDays,
       );
+      Map<String, dynamic>? reminderStatus;
+      try {
+        reminderStatus =
+            await AiBackendService.instance.getMedicationReminderStatus();
+      } catch (_) {
+        // The report remains usable when the optional reminder status endpoint
+        // is unavailable during backend startup.
+      }
       if (mounted) {
         setState(() {
           _summary = data;
+          _reminderStatus = reminderStatus;
           _loading = false;
         });
         _fadeCtrl.forward(from: 0);
@@ -353,6 +363,13 @@ class _ClinicalReportScreenState extends State<ClinicalReportScreen>
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                _buildMedicationSchedule(
+                  s,
+                  cardBg,
+                  textPrimary,
+                  textSecondary,
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -750,6 +767,82 @@ class _ClinicalReportScreenState extends State<ClinicalReportScreen>
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicationSchedule(
+    Map<String, dynamic> s,
+    Color cardBg,
+    Color textPrimary,
+    Color textSecondary,
+  ) {
+    final adherence = s['medication_adherence'] as Map? ?? {};
+    final schedule = (adherence['daily_schedule'] as List? ?? []);
+    final reminderEmail =
+        _reminderStatus?['recipient'] ?? 'rvns12345@gamil.com';
+    final configured = _reminderStatus?['email_configured'] == true;
+    final running = _reminderStatus?['scheduler_running'] == true;
+
+    return _sectionCard(
+      icon: Icons.schedule_rounded,
+      iconColor: _kTeal,
+      title: "Today's Medication Schedule",
+      cardBg: cardBg,
+      textPrimary: textPrimary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Times and doses are taken from the prescribing doctor’s report.',
+            style: TextStyle(color: textSecondary, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowColor: WidgetStatePropertyAll(
+                _kTeal.withValues(alpha: 0.12),
+              ),
+              columns: const [
+                DataColumn(label: Text('Time')),
+                DataColumn(label: Text('Medicine')),
+                DataColumn(label: Text('Dose')),
+                DataColumn(label: Text('Purpose')),
+              ],
+              rows: schedule.map((entry) {
+                final row = entry as Map? ?? {};
+                return DataRow(cells: [
+                  DataCell(Text('${row['time'] ?? '—'}')),
+                  DataCell(Text('${row['medication'] ?? '—'}')),
+                  DataCell(Text('${row['dose'] ?? '—'}')),
+                  DataCell(Text('${row['purpose'] ?? '—'}')),
+                ]);
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                configured && running
+                    ? Icons.notifications_active
+                    : Icons.notifications_off,
+                size: 17,
+                color: configured && running ? _kGreen : _kOrange,
+              ),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  configured && running
+                      ? 'Email reminders are active for $reminderEmail.'
+                      : 'Reminder scheduler is running for $reminderEmail; email delivery needs SMTP configuration.',
+                  style: TextStyle(color: textSecondary, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

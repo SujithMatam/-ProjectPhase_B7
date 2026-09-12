@@ -6,6 +6,7 @@ Exposes endpoints for the Flutter mobile/web client.
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from datetime import date
 from typing import Optional, List, Dict, Any
 
 from agents.symptom_agent import SymptomAssessmentAgent
@@ -14,6 +15,7 @@ from agents.report_agent import ReportGenerationAgent
 from lam.orchestrator import LAMOrchestrator
 from lam.schemas import WeightBearingStatus
 from triage.safety_triage import SafetyTriageEngine
+from medication_reminders import reminder_service
 
 app = FastAPI(
     title="OrthoSync Agentic AI Backend",
@@ -29,6 +31,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def start_medication_reminders() -> None:
+    reminder_service.start()
+
+
+@app.on_event("shutdown")
+def stop_medication_reminders() -> None:
+    reminder_service.stop()
 
 
 class SymptomAssessmentRequest(BaseModel):
@@ -104,6 +116,28 @@ def get_report_summary(patient_id: str, days: int = 7):
         return summary
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/medications/schedule/{patient_id}")
+def get_medication_schedule(patient_id: str):
+    """Return today's doctor-record medication schedule for the patient view."""
+    try:
+        patient = ReportGenerationAgent.get_patient_record(patient_id)
+        return {
+            "patient_id": patient["patient_id"],
+            "patient_name": patient.get("full_name"),
+            "prescribing_doctor": patient.get("surgeon"),
+            "schedule_date": date.today().isoformat(),
+            "reminder_email": reminder_service.recipient,
+            "medications": ReportGenerationAgent.get_daily_medication_schedule(patient_id),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/medications/reminders/status")
+def get_medication_reminder_status():
+    return reminder_service.status()
 
 
 @app.get("/api/reports/pdf/{patient_id}")

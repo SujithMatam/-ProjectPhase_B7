@@ -112,10 +112,35 @@ class AiBackendService {
       } else {
         throw Exception('Report summary failed: ${response.statusCode}');
       }
+
     } catch (e) {
       debugPrint('Report summary unavailable: $e');
       rethrow;
     }
+  }
+
+  /// Fetch the doctor's expanded daily medication schedule.
+  Future<Map<String, dynamic>> getMedicationSchedule({
+    required String patientId,
+  }) async {
+    final response = await http
+        .get(Uri.parse('$baseUrl/api/medications/schedule/$patientId'))
+        .timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw Exception('Medication schedule failed: ${response.statusCode}');
+    }
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  /// Fetch reminder delivery configuration/status from the running backend.
+  Future<Map<String, dynamic>> getMedicationReminderStatus() async {
+    final response = await http
+        .get(Uri.parse('$baseUrl/api/medications/reminders/status'))
+        .timeout(const Duration(seconds: 5));
+    if (response.statusCode != 200) {
+      throw Exception('Medication reminder status failed: ${response.statusCode}');
+    }
+    return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
   /// Download the PDF clinical report as raw bytes.  The caller can open or

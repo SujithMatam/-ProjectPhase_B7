@@ -365,6 +365,22 @@ class MedicationAgent(BaseClinicalAgent):
                 "medication_state": engine_result.get("state", {}),
             }
 
+        # The proactive engine also answers ordinary medication questions from
+        # the patient's medication record. Do not replace that contextual
+        # answer with ChatAgent's generic medication fallback.
+        if engine_result.get("engine") == "Medication Proactive Information Engine":
+            return {
+                "reply": engine_result["reply"],
+                "answer": engine_result["reply"],
+                "triage_level": engine_result.get("triage_level", "GREEN"),
+                "is_escalated": engine_result.get("is_escalated", False),
+                "sources": [],
+                "target_agent": cls.TARGET_AGENT.value,
+                "engine": engine_result["engine"],
+                "action": "inform",
+                "medication_state": engine_result.get("state", {}),
+            }
+
         # ------------------------------------------------------------------
         # 3. Informational / generic path — RAG + deterministic ChatAgent.
         #    The proactive engine's "inform" reply is prepended as context so
