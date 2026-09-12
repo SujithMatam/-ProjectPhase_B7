@@ -38,37 +38,3 @@ class BaseClinicalAgent:
             precomputed_triage=precomputed_triage,
             surgery_date=surgery_date,
         )
-from agents.base_clinical_agent import BaseClinicalAgent
-from lam.schemas import TargetAgent
-
-class IntakeContextAgent(BaseClinicalAgent):
-    TARGET_AGENT = TargetAgent.INTAKE_CONTEXT_AGENT
-    DOMAIN_FOCUS = (
-        "You are the Intake & Context Agent. Consolidate the patient's postoperative information, "
-        "recent interactions, and relevant clinical context before processing a task. "
-        "Organize the relevant patient information required for downstream agent processing."
-    )
-
-class WoundCareAgent(BaseClinicalAgent):
-    TARGET_AGENT = TargetAgent.WOUND_CARE_AGENT
-    DOMAIN_FOCUS = (
-        "You are the Wound Care & Imaging Agent. Provide guidance related to postoperative incision care. "
-        "Assess observations for potentially concerning characteristics such as excessive redness, swelling, "
-        "wound separation, or abnormal drainage."
-    )
-
-class DailyActivityAgent(BaseClinicalAgent):
-    TARGET_AGENT = TargetAgent.DAILY_ACTIVITY_AGENT
-    DOMAIN_FOCUS = (
-        "You are the Daily Activity & ADL Agent. Provide guidance for safely performing Activities of "
-        "Daily Living (ADL) such as walking, stair navigation, sleeping positions, and transfers. "
-        "Apply procedure-specific precautions and postoperative restrictions."
-    )
-
-class SafetyTriageAgent(BaseClinicalAgent):
-    TARGET_AGENT = TargetAgent.SAFETY_TRIAGE_AGENT
-    DOMAIN_FOCUS = (
-        "You are the Emergency Escalation Agent. Handle cases classified as high-risk RED. "
-        "Provide immediate escalation guidance for the patient and forward the relevant emergency "
-        "information to the Clinician Interface."
-    )

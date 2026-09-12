@@ -97,6 +97,50 @@ class AiBackendService {
     }
   }
 
+  /// Fetch the structured JSON clinical summary for a patient (last [days] days).
+  Future<Map<String, dynamic>> getReportSummary({
+    required String patientId,
+    int days = 7,
+  }) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/api/reports/summary/$patientId?days=$days'))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Report summary failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Report summary unavailable: $e');
+      rethrow;
+    }
+  }
+
+  /// Download the PDF clinical report as raw bytes.  The caller can open or
+  /// save the bytes using url_launcher / universal_html on web, or
+  /// path_provider on mobile.
+  Future<Uint8List> downloadPdfReport({
+    required String patientId,
+    int days = 7,
+  }) async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/api/reports/pdf/$patientId?days=$days'))
+          .timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        throw Exception('PDF export failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('PDF download unavailable: $e');
+      rethrow;
+    }
+  }
+
   Map<String, dynamic> _localSafetyFallback(
     PatientUser patient,
     String symptoms,

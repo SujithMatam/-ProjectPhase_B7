@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional, Type, List
 
 from agents.base_clinical_agent import BaseClinicalAgent
 from agents.chat_agent import ChatAgent
+from agents.emergency_agent import EmergencyEscalationAgent
 from agents.specialized_agents import (
     DailyActivityAgent,
     MedicationAgent,
@@ -33,6 +34,7 @@ _AGENT_BY_INTENT: Dict[IntentLabel, Type[BaseClinicalAgent]] = {
     IntentLabel.NUTRITION: NutritionAgent,
     IntentLabel.MENTAL_WELLBEING: MentalWellbeingAgent,
     IntentLabel.INTAKE_CONTEXT: IntakeContextAgent,
+    IntentLabel.EMERGENCY: EmergencyEscalationAgent,
 }
 
 
@@ -75,11 +77,6 @@ class AgentRouter:
             )
 
         if agent_cls is PainSymptomsAgent:
-            # PainSymptomsAgent (Milestone Sec 2.6) is the only agent that
-            # accepts structured symptom fields -- forwarded here rather
-            # than added to BaseClinicalAgent.handle()'s shared signature,
-            # which would otherwise force all 7 unrelated agents to carry
-            # parameters they never use.
             return PainSymptomsAgent.handle(
                 patient_id=patient_id,
                 surgery_type=surgery_type,
@@ -97,10 +94,6 @@ class AgentRouter:
             )
 
         if agent_cls is RehabilitationAgent:
-            # RehabilitationAgent (Milestone Sec 2.7) is the only agent that
-            # accepts structured rehab fields -- forwarded here rather than
-            # added to BaseClinicalAgent.handle()'s shared signature, for
-            # the same reason as PainSymptomsAgent above.
             return RehabilitationAgent.handle(
                 patient_id=patient_id,
                 surgery_type=surgery_type,
