@@ -1063,7 +1063,9 @@ class _MainScreenState extends State<MainScreen> {
                                                   8,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.red.withValues(alpha: 0.1),
+                                                  color: Colors.red.withValues(
+                                                    alpha: 0.1,
+                                                  ),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -1094,27 +1096,36 @@ class _MainScreenState extends State<MainScreen> {
                                                     ),
                                                     if (msg.action != null)
                                                       Container(
-                                                        padding: const EdgeInsets.symmetric(
-                                                          horizontal: 7,
-                                                          vertical: 2,
-                                                        ),
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 7,
+                                                              vertical: 2,
+                                                            ),
                                                         decoration: BoxDecoration(
-                                                          color: Colors.grey.withValues(alpha: 0.12),
-                                                          borderRadius: BorderRadius.circular(8),
+                                                          color: Colors.grey
+                                                              .withValues(
+                                                                alpha: 0.12,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
                                                         ),
                                                         child: Text(
                                                           msg.action!,
-                                                          style: const TextStyle(
-                                                            fontSize: 10,
-                                                            color: Colors.grey,
-                                                          ),
+                                                          style:
+                                                              const TextStyle(
+                                                                fontSize: 10,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
                                                         ),
                                                       ),
                                                   ],
                                                 ),
                                               ),
 
-                                            Text(
+                                            SelectableText(
                                               msg.isKey
                                                   ? (t[msg.text] ?? msg.text)
                                                   : msg.text,
@@ -1129,7 +1140,9 @@ class _MainScreenState extends State<MainScreen> {
                                             // ── Sources footer ───────────────
                                             if (!isUser &&
                                                 msg.sources != null &&
-                                                (msg.sources as List?)?.isNotEmpty == true)
+                                                (msg.sources as List?)
+                                                        ?.isNotEmpty ==
+                                                    true)
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                   top: 8,
@@ -1139,7 +1152,8 @@ class _MainScreenState extends State<MainScreen> {
                                                   runSpacing: 4,
                                                   children: [
                                                     const Icon(
-                                                      Icons.library_books_outlined,
+                                                      Icons
+                                                          .library_books_outlined,
                                                       size: 12,
                                                       color: Colors.grey,
                                                     ),
@@ -1148,11 +1162,15 @@ class _MainScreenState extends State<MainScreen> {
                                                         .map(
                                                           (src) => Text(
                                                             src.toString(),
-                                                            style: const TextStyle(
-                                                              fontSize: 10,
-                                                              color: Colors.grey,
-                                                              fontStyle: FontStyle.italic,
-                                                            ),
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 10,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic,
+                                                                ),
                                                           ),
                                                         ),
                                                   ],
