@@ -1,6 +1,11 @@
 """
-Agent Router -- Phase 4 dispatcher from classified routable intent to its
-specialized clinical agent.
+Agent Router -- Phase 4 dispatcher.
+
+Routes each classified intent to its specialized clinical agent.
+
+Important:
+    WoundCareAgent is imported from agents.wound_care_agent because that
+    implementation contains the multi-turn wound assessment logic.
 """
 
 from __future__ import annotations
@@ -9,7 +14,9 @@ from typing import Any, Dict, Optional, Type, List
 
 from agents.base_clinical_agent import BaseClinicalAgent
 from agents.chat_agent import ChatAgent
+
 from agents.emergency_agent import EmergencyEscalationAgent
+
 from agents.specialized_agents import (
     DailyActivityAgent,
     MedicationAgent,
@@ -18,27 +25,66 @@ from agents.specialized_agents import (
     PainSymptomsAgent,
     RecoveryProgressAgent,
     RehabilitationAgent,
-    WoundCareAgent,
     IntakeContextAgent,
 )
-from lam.schemas import IntentLabel, WeightBearingStatus
+
+# IMPORTANT:
+# Use the dedicated multi-turn Wound Care Agent.
+from agents.wound_care_agent import WoundCareAgent
+
+from lam.schemas import (
+    IntentLabel,
+    WeightBearingStatus,
+)
 
 
-_AGENT_BY_INTENT: Dict[IntentLabel, Type[BaseClinicalAgent]] = {
-    IntentLabel.RECOVERY_PROGRESS: RecoveryProgressAgent,
-    IntentLabel.PAIN_SYMPTOMS: PainSymptomsAgent,
-    IntentLabel.REHABILITATION: RehabilitationAgent,
-    IntentLabel.MEDICATION: MedicationAgent,
-    IntentLabel.WOUND_CARE: WoundCareAgent,
-    IntentLabel.DAILY_ACTIVITY: DailyActivityAgent,
-    IntentLabel.NUTRITION: NutritionAgent,
-    IntentLabel.MENTAL_WELLBEING: MentalWellbeingAgent,
-    IntentLabel.INTAKE_CONTEXT: IntakeContextAgent,
-    IntentLabel.EMERGENCY: EmergencyEscalationAgent,
+# ============================================================================
+# INTENT -> AGENT
+# ============================================================================
+
+_AGENT_BY_INTENT: Dict[
+    IntentLabel,
+    Type[BaseClinicalAgent]
+] = {
+
+    IntentLabel.RECOVERY_PROGRESS:
+        RecoveryProgressAgent,
+
+    IntentLabel.PAIN_SYMPTOMS:
+        PainSymptomsAgent,
+
+    IntentLabel.REHABILITATION:
+        RehabilitationAgent,
+
+    IntentLabel.MEDICATION:
+        MedicationAgent,
+
+    IntentLabel.WOUND_CARE:
+        WoundCareAgent,
+
+    IntentLabel.DAILY_ACTIVITY:
+        DailyActivityAgent,
+
+    IntentLabel.NUTRITION:
+        NutritionAgent,
+
+    IntentLabel.MENTAL_WELLBEING:
+        MentalWellbeingAgent,
+
+    IntentLabel.INTAKE_CONTEXT:
+        IntakeContextAgent,
+
+    IntentLabel.EMERGENCY:
+        EmergencyEscalationAgent,
 }
 
 
+# ============================================================================
+# ROUTER
+# ============================================================================
+
 class AgentRouter:
+
     @classmethod
     def dispatch(
         cls,
@@ -61,9 +107,17 @@ class AgentRouter:
         current_rom: Optional[str] = None,
         exercise_history: Optional[str] = None,
     ) -> Dict[str, Any]:
-        agent_cls = _AGENT_BY_INTENT.get(intent_label)
+
+        agent_cls = _AGENT_BY_INTENT.get(
+            intent_label
+        )
+
+        # ------------------------------------------------------------
+        # No specialized agent
+        # ------------------------------------------------------------
 
         if agent_cls is None:
+
             return ChatAgent.answer_question(
                 patient_id=patient_id,
                 surgery_type=surgery_type,
@@ -76,7 +130,12 @@ class AgentRouter:
                 surgery_date=surgery_date,
             )
 
+        # ------------------------------------------------------------
+        # Pain Symptoms Agent
+        # ------------------------------------------------------------
+
         if agent_cls is PainSymptomsAgent:
+
             return PainSymptomsAgent.handle(
                 patient_id=patient_id,
                 surgery_type=surgery_type,
@@ -93,7 +152,12 @@ class AgentRouter:
                 temperature_c=temperature_c,
             )
 
+        # ------------------------------------------------------------
+        # Rehabilitation Agent
+        # ------------------------------------------------------------
+
         if agent_cls is RehabilitationAgent:
+
             return RehabilitationAgent.handle(
                 patient_id=patient_id,
                 surgery_type=surgery_type,
@@ -108,6 +172,34 @@ class AgentRouter:
                 current_rom=current_rom,
                 exercise_history=exercise_history,
             )
+
+        # ------------------------------------------------------------
+        # Wound Care Agent
+        #
+        # No special handling is required here.
+        #
+        # The dedicated WoundCareAgent receives the COMPLETE chat
+        # history and decides whether to ask the next assessment
+        # question or move to RAG + LLM.
+        # ------------------------------------------------------------
+
+        if agent_cls is WoundCareAgent:
+
+            return WoundCareAgent.handle(
+                patient_id=patient_id,
+                surgery_type=surgery_type,
+                affected_limb=affected_limb,
+                postop_day=postop_day,
+                user_message=user_message,
+                procedure=procedure,
+                chat_history=chat_history,
+                surgery_date=surgery_date,
+                precomputed_triage=precomputed_triage,
+            )
+
+        # ------------------------------------------------------------
+        # All other specialized agents
+        # ------------------------------------------------------------
 
         return agent_cls.handle(
             patient_id=patient_id,
