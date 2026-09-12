@@ -234,6 +234,7 @@ class ProactiveMedicationEngine:
             for marker in (
                 "dose", "dosage", "when", "how often", "take", "medication",
                 "medicine", "pill", "tablet", "prescription", "what is",
+                "timing", "schedule", "what time",
                 "paracetamol", "enoxaparin", "aspirin", "antibiotic",
                 "painkiller", "blood thinner", "anticoagulant", "anticoagulants",
                 "anticaogulant", "anticaogulants",
@@ -274,7 +275,7 @@ class ProactiveMedicationEngine:
             marker in lower
             for marker in (
                 "when", "how often", "take it", "next dose", "schedule",
-                "what time", "at what time", "time should",
+                "timing", "what time", "at what time", "time should",
             )
         )
         asks_purpose = any(

@@ -343,6 +343,15 @@ def t_medication_questions_use_record_context():
     assert "generic medication fallback" not in timing.lower()
     assert dosage != paracetamol != timing
 
+    short_timing = MedicationAgent.handle(
+        user_message="timing?",
+        chat_history=[{"role": "user", "content": "paracetamol?"}],
+        **common,
+    )
+    assert short_timing["target_agent"] == "MedicationAgent"
+    assert short_timing["action"] == "inform"
+    assert "prescription label" in short_timing["answer"].lower()
+
 
 run("Medication questions return distinct record-grounded contextual answers", t_medication_questions_use_record_context)
 

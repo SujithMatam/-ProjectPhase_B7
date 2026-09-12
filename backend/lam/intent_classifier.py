@@ -269,6 +269,7 @@ def _looks_like_medication_follow_up(
     follow_up = (
         "take it", "taking it", "took it", "next dose", "dose", "dosage",
         "how often", "when should i take", "when do i take",
+        "timing", "schedule", "what time",
         "hours late", "hour late", "pain level", "pain is",
         "yes", "yeah", "yep", "no", "nope", "okay", "ok",
     )
