@@ -542,6 +542,19 @@ only when relevant:
         )
 
         # ============================================================
+        # UNCERTAINTY
+        #
+        # wound_care_agent.py writes "not sure" for any field the
+        # patient still couldn't answer even after being offered a
+        # simpler way to check. This must never be silently absorbed
+        # into a "reassuring" verdict -- an unresolved field is a
+        # reason for a light check-in, not something to ignore just
+        # because the OTHER fields looked fine.
+        # ============================================================
+
+        has_uncertain = "not sure" in lower_summary
+
+        # ============================================================
         # OVERALL CONTEXT
         #
         # Emoji are only added on the "good news" branches -- a happy or
@@ -560,6 +573,16 @@ only when relevant:
             overall_context = (
                 "The reported findings include a potentially worsening "
                 "change that should not be ignored."
+            )
+
+        elif has_uncertain:
+            # Uncertainty takes priority over "reassuring" -- a field
+            # that's genuinely unknown must not get glossed over just
+            # because everything else looked fine.
+            overall_context = (
+                "Most of what you described sounds okay, but you "
+                "weren't able to tell about one or more things even "
+                "after trying an easier way to check."
             )
 
         elif has_improvement and has_reassuring:
@@ -597,6 +620,13 @@ only when relevant:
                 "especially if the change continues or becomes more "
                 "pronounced."
             )
+        elif has_uncertain:
+            next_step = (
+                "Since a couple of things weren't clear, it's worth "
+                "asking someone to take a look at the area for you, or "
+                "mentioning it the next time you're in touch with your "
+                "surgical team -- just so nothing gets missed."
+            )
         else:
             next_step = (
                 "Keep following the wound-care instructions from your "
@@ -624,7 +654,7 @@ only when relevant:
 
         opening = (
             "Thanks for walking me through that 🩹"
-            if not has_worsening
+            if not has_worsening and not has_uncertain
             else "Thanks for walking me through that."
         )
 

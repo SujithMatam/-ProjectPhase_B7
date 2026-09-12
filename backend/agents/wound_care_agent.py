@@ -151,6 +151,102 @@ _QUESTIONS: Dict[str, str] = {
 
 
 # ============================================================================
+# SIMPLIFIED FOLLOW-UP QUESTIONS
+#
+# Used ONLY when the patient answered the normal question with something
+# like "I don't know". Each one gives a concrete, easy way to check,
+# instead of just repeating the same abstract question and getting the
+# same "I don't know" again.
+# ============================================================================
+
+_ALT_QUESTIONS: Dict[str, str] = {
+    "onset": (
+        "No worries, even a rough idea is fine. Would you say it was "
+        "today, yesterday, or a few days ago?"
+    ),
+    "progression": (
+        "That's okay. Compared to when you first noticed it, does it "
+        "feel any different now at all, or does it feel about the same?"
+    ),
+    "appearance": (
+        "No problem. If you compare it to how it looked a day or two "
+        "ago (or a photo if you have one), does it look any different "
+        "at all, even slightly?"
+    ),
+    "warmth": (
+        "That's fine, here's an easy way to check: gently touch the "
+        "skin around the incision with the back of your hand, then "
+        "touch the same spot on your other arm or leg. Does the "
+        "incision area feel warmer, cooler, or about the same?"
+    ),
+    "drainage": (
+        "No worries. Has your dressing, bandage, or clothing near the "
+        "area gotten wet, stained, or needed changing more than usual?"
+    ),
+    "separation": (
+        "That's okay. Can you tell if the two edges of the incision "
+        "are still touching each other, or is there any gap or opening "
+        "you can see or feel?"
+    ),
+    "pain": (
+        "No problem, you don't need an exact number. On a scale of "
+        "0 (no pain) to 10 (the worst pain you can imagine), roughly "
+        "where would you put it right now?"
+    ),
+    "fever": (
+        "That's fine. Even without a thermometer, have you felt "
+        "unusually warm, chilly, sweaty, or generally unwell?"
+    ),
+}
+
+
+# ============================================================================
+# UNCERTAINTY DETECTION
+# ============================================================================
+
+_UNCERTAIN_PHRASES = (
+    "i don't know",
+    "i dont know",
+    "idk",
+    "don't know",
+    "dont know",
+    "not sure",
+    "unsure",
+    "no idea",
+    "no clue",
+    "can't tell",
+    "cant tell",
+    "hard to tell",
+    "not certain",
+    "not able to tell",
+    "unable to tell",
+)
+
+
+def _is_uncertain_answer(text: str) -> bool:
+    """
+    True when the patient's answer expresses genuine uncertainty rather
+    than an actual observation. This must NOT silently count as a normal
+    answer -- see _extract_answer_pairs, which either re-asks an easier
+    version of the question once, or (on a second uncertain answer)
+    explicitly records the field as "unknown" rather than guessing.
+    """
+
+    normalised = _normalise(text)
+
+    if not normalised:
+        return False
+
+    if normalised in ("dunno", "unknown", "not applicable", "n/a"):
+        return True
+
+    return any(
+        phrase in normalised
+        for phrase in _UNCERTAIN_PHRASES
+    )
+
+
+# ============================================================================
 # NORMALISATION
 # ============================================================================
 
@@ -188,7 +284,36 @@ def _history_with_current_message(
 # QUESTION IDENTIFICATION
 # ============================================================================
 
-def _field_from_question(
+def _alt_field_from_question(
+    text: str,
+) -> Optional[str]:
+    """
+    Identifies which field a SIMPLIFIED follow-up question (from
+    _ALT_QUESTIONS) was about, using a short unique marker phrase from
+    each one. Returns None if this isn't an alt question at all.
+    """
+
+    normalised = _normalise(text)
+
+    markers: Dict[str, str] = {
+        "onset": "even a rough idea is fine",
+        "progression": "does it feel any different now at all",
+        "appearance": "compare it to how it looked",
+        "warmth": "back of your hand",
+        "drainage": "gotten wet, stained",
+        "separation": "edges of the incision",
+        "pain": "0 (no pain) to 10",
+        "fever": "unusually warm, chilly, sweaty",
+    }
+
+    for field, marker in markers.items():
+        if marker in normalised:
+            return field
+
+    return None
+
+
+def _primary_field_from_question(
     text: str,
 ) -> Optional[str]:
 
@@ -277,6 +402,24 @@ def _field_from_question(
     return None
 
 
+def _field_from_question(
+    text: str,
+) -> Optional[str]:
+    """
+    Which field is this assistant question about -- checking BOTH the
+    normal question phrasing and the simplified alt phrasing. Used by
+    helpers that only care "what topic was being asked", not whether it
+    was the first or the simplified retry version.
+    """
+
+    alt_field = _alt_field_from_question(text)
+
+    if alt_field:
+        return alt_field
+
+    return _primary_field_from_question(text)
+
+
 def _previous_question_field(
     chat_history: Optional[List[Dict[str, str]]],
 ) -> Optional[str]:
@@ -315,7 +458,21 @@ def _previous_question_field(
 def _extract_answer_pairs(
     chat_history: Optional[List[Dict[str, str]]],
     current_message: str,
-) -> Dict[str, str]:
+) -> Tuple[Dict[str, str], set]:
+    """
+    Returns (assessment, needs_alt).
+
+    needs_alt is the set of fields where the patient answered "I don't
+    know" (or similar) to the FIRST (normal-phrasing) question for that
+    field. Those fields are deliberately left OUT of `assessment` here,
+    so the caller knows to re-ask using the simpler _ALT_QUESTIONS
+    version instead of accepting uncertainty as a real answer.
+
+    If the patient is STILL uncertain after the alt (simplified)
+    question, that field IS written into `assessment` as the literal
+    string "unknown" -- explicit and visible, rather than silently
+    treated as a normal/neutral answer.
+    """
 
     history = _history_with_current_message(
         chat_history,
@@ -323,8 +480,10 @@ def _extract_answer_pairs(
     )
 
     assessment: Dict[str, str] = {}
+    needs_alt: set = set()
 
     pending_field: Optional[str] = None
+    pending_is_alt: bool = False
 
     for item in history:
 
@@ -344,19 +503,43 @@ def _extract_answer_pairs(
 
         if role in {"assistant", "bot"}:
 
-            field = _field_from_question(content)
+            alt_field = _alt_field_from_question(content)
 
-            if field:
-                pending_field = field
+            if alt_field:
+                pending_field = alt_field
+                pending_is_alt = True
+            else:
+                field = _primary_field_from_question(content)
+
+                if field:
+                    pending_field = field
+                    pending_is_alt = False
 
             continue
 
         if role == "user" and pending_field:
 
-            assessment[pending_field] = content
-            pending_field = None
+            if _is_uncertain_answer(content):
 
-    return assessment
+                if pending_is_alt:
+                    # Already asked the simpler version and STILL
+                    # uncertain -- accept "unknown" explicitly rather
+                    # than looping forever.
+                    assessment[pending_field] = "unknown"
+                    needs_alt.discard(pending_field)
+                else:
+                    # First time uncertain -- don't accept it as the
+                    # answer. Flag for a simpler re-ask instead.
+                    needs_alt.add(pending_field)
+
+            else:
+                assessment[pending_field] = content
+                needs_alt.discard(pending_field)
+
+            pending_field = None
+            pending_is_alt = False
+
+    return assessment, needs_alt
 
 
 # ============================================================================
@@ -534,7 +717,11 @@ def _extract_direct_information(
 def _build_assessment(
     chat_history: Optional[List[Dict[str, str]]],
     current_message: str,
-) -> Dict[str, str]:
+) -> Tuple[Dict[str, str], set]:
+    """
+    Returns (assessment, needs_alt) -- see _extract_answer_pairs for what
+    needs_alt means.
+    """
 
     history = _history_with_current_message(
         chat_history,
@@ -571,14 +758,21 @@ def _build_assessment(
             assessment[field] = value
 
     # Explicit question-answer pairs have priority.
-    paired = _extract_answer_pairs(
+    paired, needs_alt = _extract_answer_pairs(
         chat_history,
         current_message,
     )
 
     assessment.update(paired)
 
-    return assessment
+    # If the patient gave usable direct information for a field
+    # elsewhere in the conversation, don't re-ask it just because they
+    # separately said "I don't know" to the formal question about it.
+    for field in list(needs_alt):
+        if field in assessment:
+            needs_alt.discard(field)
+
+    return assessment, needs_alt
 
 
 # ============================================================================
@@ -740,8 +934,21 @@ def _field_is_negative(
 # QUESTION SELECTION
 # ============================================================================
 
+_QUESTION_ORDER: Tuple[str, ...] = (
+    "onset",
+    "progression",
+    "appearance",
+    "warmth",
+    "drainage",
+    "separation",
+    "pain",
+    "fever",
+)
+
+
 def _next_question(
     assessment: Dict[str, str],
+    needs_alt: Optional[set] = None,
 ) -> Optional[Tuple[str, str]]:
     """
     Adaptive wound assessment.
@@ -764,95 +971,28 @@ def _next_question(
         onset + progression + appearance
 
     which was the previous bug.
+
+    If `needs_alt` contains a field (the patient answered "I don't
+    know" to its normal question), the SIMPLIFIED question from
+    _ALT_QUESTIONS is asked instead of repeating the same question.
     """
 
-    # ------------------------------------------------------------
-    # 1. Onset
-    # ------------------------------------------------------------
+    needs_alt = needs_alt or set()
 
-    if "onset" not in assessment:
-        return (
-            "onset",
-            _QUESTIONS["onset"],
-        )
+    for field in _QUESTION_ORDER:
 
-    # ------------------------------------------------------------
-    # 2. Progression
-    # ------------------------------------------------------------
+        if field not in assessment:
 
-    if "progression" not in assessment:
-        return (
-            "progression",
-            _QUESTIONS["progression"],
-        )
+            if field in needs_alt:
+                return (
+                    field,
+                    _ALT_QUESTIONS[field],
+                )
 
-    # ------------------------------------------------------------
-    # 3. Appearance
-    # ------------------------------------------------------------
-
-    if "appearance" not in assessment:
-        return (
-            "appearance",
-            _QUESTIONS["appearance"],
-        )
-
-    # ------------------------------------------------------------
-    # 4. Warmth
-    #
-    # We collect this because redness/warmth are important wound
-    # characteristics and it prevents premature conclusion.
-    # ------------------------------------------------------------
-
-    if "warmth" not in assessment:
-        return (
-            "warmth",
-            _QUESTIONS["warmth"],
-        )
-
-    # ------------------------------------------------------------
-    # 5. Drainage
-    # ------------------------------------------------------------
-
-    if "drainage" not in assessment:
-        return (
-            "drainage",
-            _QUESTIONS["drainage"],
-        )
-
-    # ------------------------------------------------------------
-    # 6. Separation / wound closure
-    # ------------------------------------------------------------
-
-    if "separation" not in assessment:
-        return (
-            "separation",
-            _QUESTIONS["separation"],
-        )
-
-    # ------------------------------------------------------------
-    # 7. Pain
-    #
-    # If the patient already reported pain in the original message,
-    # this field will already exist.
-    # ------------------------------------------------------------
-
-    if "pain" not in assessment:
-        return (
-            "pain",
-            _QUESTIONS["pain"],
-        )
-
-    # ------------------------------------------------------------
-    # 8. Fever / feeling unwell
-    #
-    # We collect this only after the core wound findings.
-    # ------------------------------------------------------------
-
-    if "fever" not in assessment:
-        return (
-            "fever",
-            _QUESTIONS["fever"],
-        )
+            return (
+                field,
+                _QUESTIONS[field],
+            )
 
     return None
 
@@ -1184,7 +1324,7 @@ def _deterministic_conclusion(
 
     pain_sentence = ""
 
-    if pain:
+    if pain and pain.strip().lower() != "unknown":
 
         if _is_improving(pain):
             pain_sentence = (
@@ -1195,11 +1335,43 @@ def _deterministic_conclusion(
                 " You also reported pain or tenderness around the area."
             )
 
+    # ============================================================
+    # UNKNOWN / UNCERTAIN FIELDS
+    #
+    # A field left as "unknown" must never be silently treated as
+    # neutral -- explicitly call it out so the patient (or whoever is
+    # reading this) knows something still needs checking.
+    # ============================================================
+
+    unknown_fields = [
+        field
+        for field, value in assessment.items()
+        if value == "unknown"
+    ]
+
+    uncertainty_sentence = ""
+
+    if unknown_fields:
+
+        readable_fields = ", ".join(
+            field.replace("_", " ")
+            for field in unknown_fields
+        )
+
+        uncertainty_sentence = (
+            "\n\nYou weren't able to tell about the following: "
+            f"{readable_fields}. Since that's not clear from what you "
+            "described, it's a good idea to have someone else take a "
+            "look at the area for you, or check with your surgical "
+            "team, just to be safe."
+        )
+
     reply = (
         "Thanks for going through that with me. "
         f"Based on what you've told me, {summary}."
         f"{pain_sentence}\n\n"
-        f"{action}\n\n"
+        f"{action}"
+        f"{uncertainty_sentence}\n\n"
         "This is a preliminary assessment based on the information "
         "you provided and cannot confirm how the incision is healing."
     )
@@ -1325,18 +1497,22 @@ class WoundCareAgent(BaseClinicalAgent):
         # Reconstruct COMPLETE assessment
         # ============================================================
 
-        assessment = _build_assessment(
+        assessment, needs_alt = _build_assessment(
             history,
             user_message,
         )
 
         print(
             "[WOUND] "
-            f"assessment={assessment}"
+            f"assessment={assessment} needs_alt={needs_alt}"
         )
 
         # ============================================================
         # Continue assessment until ALL CORE WOUND FIELDS exist
+        #
+        # If the patient was uncertain about a field, needs_alt makes
+        # _next_question ask the SIMPLIFIED version instead of moving
+        # on or repeating the same question.
         # ============================================================
 
         if not _should_conclude(
@@ -1344,7 +1520,8 @@ class WoundCareAgent(BaseClinicalAgent):
         ):
 
             next_question = _next_question(
-                assessment
+                assessment,
+                needs_alt,
             )
 
             if next_question:
@@ -1359,11 +1536,22 @@ class WoundCareAgent(BaseClinicalAgent):
 
         # ============================================================
         # FINAL CONCLUSION
+        #
+        # Fields the patient was never able to answer (still "I don't
+        # know" after the simplified question) show as "not sure"
+        # rather than their raw internal marker, so both the LLM prompt
+        # and the deterministic fallback treat them as explicitly
+        # unresolved instead of a normal finding.
         # ============================================================
 
         assessment_summary = "\n".join(
-            f"- {field}: {value}"
+            f"- {field}: {'not sure' if value == 'unknown' else value}"
             for field, value in assessment.items()
+        )
+
+        has_unknown_fields = any(
+            value == "unknown"
+            for value in assessment.values()
         )
 
         # ============================================================
@@ -1430,7 +1618,21 @@ class WoundCareAgent(BaseClinicalAgent):
             "simpler word works, and briefly explain any medical term you "
             "do need to use.\n\n"
 
-            "Do not independently perform emergency triage.\n"
+            + (
+                "IMPORTANT: One or more fields in the assessment are "
+                "marked 'not sure' -- the patient was genuinely unable "
+                "to tell, even after being offered an easier way to "
+                "check. Do NOT treat 'not sure' as a normal or "
+                "reassuring finding and do NOT silently ignore it. "
+                "Explicitly say which finding(s) are unclear, and "
+                "recommend the patient ask someone to look at the area "
+                "for them or check with their surgical team, so nothing "
+                "gets missed.\n\n"
+                if has_unknown_fields
+                else ""
+            )
+
+            + "Do not independently perform emergency triage.\n"
             "The deterministic SafetyTriageEngine result is authoritative.\n"
             "Do not invent medical thresholds, treatment instructions, "
             "doses, or timelines.\n\n"
