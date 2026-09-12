@@ -1,11 +1,15 @@
-﻿"""
-LAM Orchestrator -- controls the full LAM pipeline for /api/chat.
-Execution order (safety-first):
-  1. Deterministic safety triage.
-  2. Scope validation.
-  3. Intent classification.
-  4. Agent/action routing.
-  5. Specialized agent execution.
+﻿""""
+LAM Orchestrator.
+
+Controls the complete LAM pipeline for /api/chat.
+
+Execution order:
+
+1. Deterministic safety triage
+2. Scope validation
+3. Intent classification
+4. Agent/action routing
+5. Specialized agent execution
 """
 
 from __future__ import annotations
@@ -14,38 +18,109 @@ from typing import Optional, List, Dict
 
 from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
+
 from lam.schemas import (
-    IntentLabel, ScopeStatus, TargetAgent, ActionType,
-    LAMContext, LAMResult, WeightBearingStatus, resolve_procedure_code,
+    IntentLabel,
+    ScopeStatus,
+    TargetAgent,
+    ActionType,
+    LAMContext,
+    LAMResult,
+    WeightBearingStatus,
+    resolve_procedure_code,
 )
+
 from lam.scope_validator import ScopeValidator
 from lam.intent_classifier import IntentClassifier
 
 
-_ROUTING_TABLE: dict[IntentLabel, tuple[TargetAgent, ActionType]] = {
-    IntentLabel.RECOVERY_PROGRESS: (TargetAgent.RECOVERY_AGENT,       ActionType.INFORM),
-    IntentLabel.PAIN_SYMPTOMS:     (TargetAgent.PAIN_AGENT,            ActionType.ASSESS),
-    IntentLabel.REHABILITATION:    (TargetAgent.REHAB_AGENT,           ActionType.ADVISE),
-    IntentLabel.MEDICATION:        (TargetAgent.MEDICATION_AGENT,      ActionType.INFORM),
-    IntentLabel.WOUND_CARE:        (TargetAgent.WOUND_CARE_AGENT,      ActionType.ADVISE),
-    IntentLabel.DAILY_ACTIVITY:    (TargetAgent.DAILY_ACTIVITY_AGENT,  ActionType.INFORM),
-    IntentLabel.NUTRITION:         (TargetAgent.NUTRITION_AGENT,       ActionType.INFORM),
-    IntentLabel.MENTAL_WELLBEING:  (TargetAgent.MENTAL_HEALTH_AGENT,   ActionType.ADVISE),
-    IntentLabel.EMERGENCY:         (TargetAgent.SAFETY_TRIAGE_AGENT,   ActionType.ESCALATE),
-    IntentLabel.OUT_OF_SCOPE:      (TargetAgent.DEFLECTION_AGENT,      ActionType.DEFLECT),
-    IntentLabel.INTAKE_CONTEXT:    (TargetAgent.INTAKE_CONTEXT_AGENT,  ActionType.INFORM),
+# ============================================================================
+# ROUTING TABLE
+# ============================================================================
+
+_ROUTING_TABLE: dict[
+    IntentLabel,
+    tuple[TargetAgent, ActionType]
+] = {
+
+    IntentLabel.RECOVERY_PROGRESS: (
+        TargetAgent.RECOVERY_AGENT,
+        ActionType.INFORM,
+    ),
+
+    IntentLabel.PAIN_SYMPTOMS: (
+        TargetAgent.PAIN_AGENT,
+        ActionType.ASSESS,
+    ),
+
+    IntentLabel.REHABILITATION: (
+        TargetAgent.REHAB_AGENT,
+        ActionType.ADVISE,
+    ),
+
+    IntentLabel.MEDICATION: (
+        TargetAgent.MEDICATION_AGENT,
+        ActionType.INFORM,
+    ),
+
+    IntentLabel.WOUND_CARE: (
+        TargetAgent.WOUND_CARE_AGENT,
+        ActionType.ADVISE,
+    ),
+
+    IntentLabel.DAILY_ACTIVITY: (
+        TargetAgent.DAILY_ACTIVITY_AGENT,
+        ActionType.INFORM,
+    ),
+
+    IntentLabel.NUTRITION: (
+        TargetAgent.NUTRITION_AGENT,
+        ActionType.INFORM,
+    ),
+
+    IntentLabel.MENTAL_WELLBEING: (
+        TargetAgent.MENTAL_HEALTH_AGENT,
+        ActionType.ADVISE,
+    ),
+
+    IntentLabel.EMERGENCY: (
+        TargetAgent.SAFETY_TRIAGE_AGENT,
+        ActionType.ESCALATE,
+    ),
+
+    IntentLabel.OUT_OF_SCOPE: (
+        TargetAgent.DEFLECTION_AGENT,
+        ActionType.DEFLECT,
+    ),
+
+    IntentLabel.INTAKE_CONTEXT: (
+        TargetAgent.INTAKE_CONTEXT_AGENT,
+        ActionType.INFORM,
+    ),
 }
 
+
+# ============================================================================
+# OUT-OF-SCOPE RESPONSE
+# ============================================================================
+
 _OUT_OF_SCOPE_REPLY = (
-    "I'm OrthoSync, a specialised assistant for orthopedic post-operative recovery. "
-    "Your question doesn't appear to be related to your surgical recovery or orthopedic care. "
-    "For general health questions, please consult your GP or a relevant healthcare professional. "
-    "If you have a question about your recovery, wound, pain, medication, or rehabilitation, "
-    "I'm here to help!"
+    "I'm OrthoSync, a specialised assistant for orthopedic "
+    "post-operative recovery. Your question doesn't appear to "
+    "be related to your surgical recovery or orthopedic care. "
+    "For general health questions, please consult your GP or a "
+    "relevant healthcare professional. If you have a question "
+    "about your recovery, wound, pain, medication, or "
+    "rehabilitation, I'm here to help!"
 )
 
 
+# ============================================================================
+# ORCHESTRATOR
+# ============================================================================
+
 class LAMOrchestrator:
+
     @classmethod
     def process(
         cls,
@@ -64,8 +139,11 @@ class LAMOrchestrator:
         current_rom: Optional[str] = None,
         exercise_history: Optional[str] = None,
     ) -> dict:
-        # The context is passed through the LAM, but deterministic triage below
-        # always evaluates the CURRENT user message first.
+
+        # ============================================================
+        # CONTEXT
+        # ============================================================
+
         context = LAMContext(
             patient_id=patient_id,
             surgery_type=surgery_type,
@@ -76,29 +154,32 @@ class LAMOrchestrator:
             chat_history=chat_history or [],
         )
 
-        # STEP 1 -- Deterministic Safety Triage (ALWAYS FIRST)
-        # temperature_c (optional, Milestone Sec 2.6 structured symptom
-        # input) is passed straight into the SAME deterministic engine call
-        # used by every request -- when supplied it can raise a RED/YELLOW
-        # result via SafetyTriageEngine's own numeric threshold (see
-        # triage/safety_triage.py), same as the pre-existing
-        # /api/assess-symptoms path. Omitted (None) reproduces prior
-        # behavior exactly.
+        # ============================================================
+        # STEP 1
+        # SAFETY TRIAGE
+        # ============================================================
+
         triage = SafetyTriageEngine.evaluate(
             symptoms=user_message,
             post_op_day=postop_day,
             temperature_c=temperature_c,
         )
 
+        # ------------------------------------------------------------
+        # RED
+        # ------------------------------------------------------------
+
         if triage["triage_level"] == "RED":
+
             reply_text = (
-                "\U0001f6a8 **CRITICAL EMERGENCY ALERT**\n\n"
+                "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
                 f"Your symptoms require urgent medical evaluation: "
                 f"**{', '.join(triage['reasons'])}**.\n\n"
                 f"{triage['action_protocol']}\n\n"
-                "Please contact your hospital emergency line or visit the nearest "
-                "emergency department right away."
+                "Please contact your hospital emergency line or visit "
+                "the nearest emergency department right away."
             )
+
             return LAMResult(
                 reply=reply_text,
                 triage_level="RED",
@@ -111,13 +192,24 @@ class LAMOrchestrator:
                 scope_status=ScopeStatus.NOT_EVALUATED.value,
             ).to_dict()
 
-        # STEP 2 -- Scope Validation
+        # ============================================================
+        # STEP 2
+        # SCOPE VALIDATION
+        # ============================================================
+
         scope_status, scope_reason = ScopeValidator.validate(
             query=user_message,
             surgery_type=surgery_type,
         )
 
+        # Helpful server-side diagnostic.
+        print(
+            f"[LAM][SCOPE] status={scope_status.value} "
+            f"reason={scope_reason}"
+        )
+
         if scope_status == ScopeStatus.OUT_OF_SCOPE:
+
             return LAMResult(
                 reply=_OUT_OF_SCOPE_REPLY,
                 triage_level=triage["triage_level"],
@@ -130,17 +222,60 @@ class LAMOrchestrator:
                 scope_status=ScopeStatus.OUT_OF_SCOPE.value,
             ).to_dict()
 
-        # STEP 3 -- Intent Classification
-        intent_label: IntentLabel = IntentClassifier.classify(
-            query=user_message,
-            context=context,
+        # ============================================================
+        # STEP 3
+        # INTENT CLASSIFICATION
+        # ============================================================
+
+        classification = (
+            IntentClassifier.classify_detailed(
+                query=user_message,
+                context=context,
+            )
         )
 
-        # STEP 4 -- Agent / Action Routing
-        target_agent, action_type = cls._route(intent_label)
+        intent_label = classification.intent
 
-        # STEP 5 -- Specialized Agent Execution
-        resolved_procedure = resolve_procedure_code(surgery_type)
+        # IMPORTANT DEBUG OUTPUT.
+        #
+        # This lets you immediately see whether the problem is:
+        # classifier -> router -> agent -> response.
+        print(
+            "[LAM][INTENT] "
+            f"query={user_message!r} "
+            f"intent={intent_label.value} "
+            f"path={classification.decision_path} "
+            f"top1={getattr(classification.top1_intent, 'value', None)} "
+            f"score={classification.top1_score:.3f} "
+            f"top2={getattr(classification.top2_intent, 'value', None)} "
+            f"margin={classification.margin:.3f}"
+        )
+
+        # ============================================================
+        # STEP 4
+        # ROUTING
+        # ============================================================
+
+        target_agent, action_type = cls._route(
+            intent_label
+        )
+
+        print(
+            "[LAM][ROUTE] "
+            f"intent={intent_label.value} "
+            f"agent={target_agent.value} "
+            f"action={action_type.value}"
+        )
+
+        # ============================================================
+        # STEP 5
+        # SPECIALIZED AGENT
+        # ============================================================
+
+        resolved_procedure = resolve_procedure_code(
+            surgery_type
+        )
+
         chat_result = AgentRouter.dispatch(
             intent_label=intent_label,
             patient_id=patient_id,
@@ -161,6 +296,11 @@ class LAMOrchestrator:
             exercise_history=exercise_history,
         )
 
+        # ============================================================
+        # STEP 6
+        # FINAL RESULT
+        # ============================================================
+
         return LAMResult(
             reply=chat_result["reply"],
             triage_level=chat_result["triage_level"],
@@ -173,12 +313,20 @@ class LAMOrchestrator:
             scope_status=ScopeStatus.IN_SCOPE.value,
         ).to_dict()
 
+    # ============================================================
+    # ROUTING
+    # ============================================================
+
     @classmethod
     def _route(
         cls,
         intent_label: IntentLabel,
     ) -> tuple[TargetAgent, ActionType]:
+
         return _ROUTING_TABLE.get(
             intent_label,
-            (TargetAgent.DEFLECTION_AGENT, ActionType.INFORM),
+            (
+                TargetAgent.DEFLECTION_AGENT,
+                ActionType.INFORM,
+            ),
         )
