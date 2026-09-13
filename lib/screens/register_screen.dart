@@ -333,10 +333,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     fillColor: inputFill,
                                     primaryColor: primaryColor,
                                     validator: (v) {
-                                      if (v == null || v.trim().isEmpty)
+                                      if (v == null || v.trim().isEmpty) {
                                         return 'Enter email';
-                                      if (!v.contains('@'))
+                                      }
+                                      if (!v.contains('@')) {
                                         return 'Enter valid email';
+                                      }
                                       return null;
                                     },
                                   ),
@@ -421,8 +423,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 );
                               }).toList(),
                               onChanged: (val) {
-                                if (val != null)
+                                if (val != null) {
                                   setState(() => _selectedSurgery = val);
+                                }
                               },
                             ),
                             const SizedBox(height: 12),
@@ -478,8 +481,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           );
                                         }).toList(),
                                         onChanged: (val) {
-                                          if (val != null)
+                                          if (val != null) {
                                             setState(() => _selectedLimb = val);
+                                          }
                                         },
                                       ),
                                     ],
@@ -583,8 +587,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               validator: (v) {
-                                if (v == null || v.length < 6)
+                                if (v == null || v.length < 6) {
                                   return 'Password must be at least 6 characters';
+                                }
                                 return null;
                               },
                             ),
@@ -613,8 +618,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               validator: (v) {
-                                if (v != _passwordController.text)
+                                if (v != _passwordController.text) {
                                   return 'Passwords do not match';
+                                }
                                 return null;
                               },
                             ),
