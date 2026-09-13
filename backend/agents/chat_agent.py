@@ -616,23 +616,90 @@ only when relevant:
         if has_worsening:
             next_step = (
                 "Because you reported a worsening or changing finding, "
-                "please contact your surgical team for guidance, "
+                "please contact your surgical team today for guidance, "
                 "especially if the change continues or becomes more "
-                "pronounced."
+                "pronounced. In the meantime, here's what you can do:"
             )
         elif has_uncertain:
             next_step = (
                 "Since a couple of things weren't clear, it's worth "
                 "asking someone to take a look at the area for you, or "
                 "mentioning it the next time you're in touch with your "
-                "surgical team -- just so nothing gets missed."
+                "surgical team -- just so nothing gets missed. In the "
+                "meantime, here's what you can keep doing:"
             )
         else:
             next_step = (
                 "Keep following the wound-care instructions from your "
                 "surgical team, and you're doing the right thing by "
-                "tracking how it's healing 👍"
+                "tracking how it's healing 👍 Here's what to keep doing:"
             )
+
+        # ============================================================
+        # CONCRETE ACTION STEPS
+        #
+        # These are universal, safe, non-clinical-judgment wound-care
+        # habits (hygiene, protection, monitoring) -- not a diagnosis,
+        # not a treatment plan, and not a substitute for whatever your
+        # surgical team specifically told you. Nothing here invents a
+        # threshold, dose, or timeline; where the retrieved knowledge
+        # gives one (e.g. from rag_docs), that is quoted from the
+        # knowledge base itself, not invented here.
+        # ============================================================
+
+        if has_worsening:
+            action_steps = [
+                "Don't apply any creams, ointments, powders, or home "
+                "remedies to the area unless your surgical team has "
+                "specifically told you to.",
+                "Avoid pressure, tight clothing, or dressings rubbing "
+                "directly over the incision until it's been checked.",
+                "If you're able to, take a clear photo of the area now "
+                "so your surgical team can see exactly what you're "
+                "describing when you contact them.",
+                "Keep the area as clean and dry as you can in the "
+                "meantime.",
+                "If you develop a fever, chills, or the area spreads or "
+                "worsens quickly, treat that as more urgent and seek "
+                "care sooner rather than waiting.",
+            ]
+        else:
+            action_steps = [
+                "Keep following the dressing-change routine your "
+                "surgical team gave you, and wash your hands before "
+                "and after touching the area.",
+                "Avoid soaking the incision (baths, swimming pools, "
+                "hot tubs) until your surgical team clears you to.",
+                "Keep the area dry and avoid tight clothing rubbing "
+                "directly over it.",
+                "It's a good habit to take a photo every few days so "
+                "you and your surgical team can compare how it's "
+                "healing over time.",
+            ]
+
+        action_steps_text = "\n".join(
+            f"• {step}" for step in action_steps
+        )
+
+        # ============================================================
+        # GROUNDED KNOWLEDGE
+        #
+        # If real orthopedic wound-care knowledge was actually
+        # retrieved for this query, surface it -- this is genuine
+        # retrieved content from the knowledge base, not invented here.
+        # ============================================================
+
+        grounded_knowledge = ""
+
+        if rag_docs:
+            first_doc = rag_docs[0]
+            doc_content = str(first_doc.get("content", "")).strip()
+
+            if doc_content:
+                grounded_knowledge = (
+                    "\n\nFor reference, here's relevant guidance from "
+                    f"your postoperative care protocol: {doc_content}"
+                )
 
         # ============================================================
         # RESPONSE
@@ -664,6 +731,8 @@ only when relevant:
             f"{summary}\n\n"
             f"{overall_context}\n\n"
             f"{next_step}\n\n"
+            f"{action_steps_text}"
+            f"{grounded_knowledge}\n\n"
             f"{watch_for}"
         )
 
@@ -756,6 +825,53 @@ only when relevant:
                 f"{postop_day}. Take your prescribed pain medication "
                 "30-45 minutes before starting physical therapy to keep "
                 "your discomfort manageable."
+            )
+
+        # ============================================================
+        # ADDED: daily-activity keyword branches.
+        #
+        # These did not exist before -- any activity question (stairs,
+        # driving, showering, sleep position) that reached this shared
+        # fallback used to fall straight into the "if rag_docs" dump
+        # below (often an unrelated retrieved chunk) or the generic
+        # closing greeting. This does not change any branch above.
+        # ============================================================
+
+        if "stair" in lower:
+            return (
+                "Go up stairs leading with your non-operated leg, then "
+                "bring your operated leg and any walking aid up to meet "
+                "it -- \"up with the good, down with the bad.\" Coming "
+                "down, lead with your operated leg and walking aid "
+                "first. Always use the handrail and go at a slow, "
+                "steady pace, and follow your prescribed weight-bearing "
+                "status."
+            )
+
+        if "drive" in lower or "driving" in lower:
+            return (
+                "Don't drive until your surgical team has specifically "
+                "cleared you -- this depends on which leg was operated "
+                "on, your reaction time, and your medications. Avoid "
+                "driving while on prescription pain medication that "
+                "could affect alertness."
+            )
+
+        if "shower" in lower or "bath" in lower or "bathing" in lower:
+            return (
+                "Follow your surgical team's specific guidance on when "
+                "the incision can get wet. A shower chair or non-slip "
+                "mat can help, and keep the incision covered as "
+                "instructed until you're cleared for regular showering."
+            )
+
+        if "sleep" in lower:
+            return (
+                f"On Day {postop_day}, many patients find it more "
+                "comfortable to keep the operated leg slightly elevated "
+                "with a pillow under the calf or ankle rather than "
+                "directly under the knee, and to avoid lying in a "
+                "position that puts pressure on the incision."
             )
 
         if rag_docs:

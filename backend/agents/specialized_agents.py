@@ -9,7 +9,9 @@ DOMAIN_FOCUS instruction -- these are domain INSTRUCTIONS steering how the
 existing RAG + local-LLM pipeline frames its answer, not new clinical facts
 or a second knowledge store. All actual retrieval, generation, and fallback
 logic is inherited unchanged from BaseClinicalAgent.handle() ->
-ChatAgent.answer_question().
+ChatAgent.answer_question(), EXCEPT where an agent below overrides handle()
+for its own domain-specific behaviour (RecoveryProgressAgent,
+PainSymptomsAgent, RehabilitationAgent, DailyActivityAgent).
 
 EMERGENCY and OUT_OF_SCOPE intentionally have no corresponding class here:
 those are deterministic upstream paths (SafetyTriageEngine / ScopeValidator)
@@ -88,6 +90,27 @@ class RecoveryProgressAgent(BaseClinicalAgent):
         surgery_date: Optional[str] = None,
         precomputed_triage: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
+        """
+        Milestone Sec 2.5 (Recovery Progress Agent): compares postop_day
+        against the Day-range window already attached to each RAG-retrieved
+        clinical benchmark, so the underlying LLM/fallback pipeline can give
+        genuine stage-specific guidance, milestone framing, and timeline
+        reassurance -- grounded in the SAME retrieved chunks it would use
+        anyway, not a second knowledge source or invented values.
+
+        This performs one extra, local, read-only RAG lookup (identical
+        query/procedure/limit to the one ChatAgent.answer_question() makes
+        internally) purely to read each chunk's `days` metadata before the
+        LLM prompt is built. It is intentionally NOT threaded through as a
+        shared parameter on ChatAgent/BaseClinicalAgent -- retrieval is
+        local, deterministic, and cheap (see rag/vector_store.py), so the
+        small duplicate lookup is simpler and safer than widening the
+        shared response-generation interface for one agent's use.
+
+        Any failure here (e.g. vector store unavailable) is swallowed and
+        falls back to the plain DOMAIN_FOCUS unchanged -- milestone framing
+        is a best-effort enrichment, never a precondition for answering.
+        """
         domain_instruction = cls.DOMAIN_FOCUS
         try:
             detail = ClinicalKnowledgeBase.retrieve_detailed(
@@ -128,6 +151,12 @@ def _symptom_context_note(
     swelling_description: Optional[str],
     temperature_c: Optional[float],
 ) -> Optional[str]:
+    """
+    Restate ONLY the structured symptom fields the caller actually supplied
+    -- verbatim text, unmodified numbers -- with no thresholds, scoring, or
+    clinical judgment applied here. Returns None when nothing was supplied,
+    so old/plain chat callers (no symptom fields) are unaffected.
+    """
     parts: List[str] = []
     if pain_score is not None:
         parts.append(f"Reported NPRS pain score: {pain_score}/10.")
@@ -171,6 +200,31 @@ class PainSymptomsAgent(BaseClinicalAgent):
         swelling_description: Optional[str] = None,
         temperature_c: Optional[float] = None,
     ) -> Dict[str, Any]:
+        """
+        Milestone Sec 2.6 (Symptom Assessment role) -- fulfilled by evolving
+        this EXISTING LAM PainSymptomsAgent rather than adding a second,
+        competing symptom-assessment agent into the LAM pipeline (see
+        backend/agents/symptom_agent.py::SymptomAssessmentAgent, which
+        remains a separate, untouched legacy pipeline behind
+        /api/assess-symptoms -- outside intent routing/scope validation).
+
+        When the caller supplies structured symptom fields (NPRS pain score,
+        pain characteristics, swelling description, body temperature), they
+        are restated verbatim into the domain instruction so the shared RAG
+        + LLM / deterministic-fallback pipeline can genuinely incorporate
+        them -- the same grounding pattern RecoveryProgressAgent uses for
+        retrieved `days` metadata (see above). All four fields are optional
+        and purely additive: a plain chat message that supplies none of them
+        behaves byte-identically to before this change.
+
+        Safety invariant: `temperature_c`, if supplied, is ALSO passed by
+        LAMOrchestrator.process() straight to SafetyTriageEngine.evaluate()
+        at Step 1 (lam/orchestrator.py) -- upstream of intent classification
+        and this agent entirely. RED/YELLOW temperature thresholds are
+        decided there, once, before this agent ever runs. This agent only
+        restates the reported number as context for the LLM; it never
+        re-derives, overrides, or softens that triage decision.
+        """
         domain_instruction = cls.DOMAIN_FOCUS
         symptom_note = _symptom_context_note(
             pain_score, pain_characteristics, swelling_description, temperature_c
@@ -218,6 +272,15 @@ def _rehab_context_note(
     current_rom: Optional[str],
     exercise_history: Optional[str],
 ) -> Optional[str]:
+    """
+    Restate ONLY the structured rehab-context fields the caller actually
+    supplied. `weight_bearing_status` is expanded to its standard clinical
+    label purely as terminology (NWB -> "Non-Weight-Bearing (NWB)") -- not a
+    fabricated clinical fact. `current_rom` / `exercise_history` are
+    restated verbatim; nothing here is invented, scored, or judged. Returns
+    None when nothing was supplied, so old/plain chat callers behave
+    exactly as before this change.
+    """
     parts: List[str] = []
     if weight_bearing_status is not None:
         label = _WEIGHT_BEARING_LABELS.get(weight_bearing_status, str(weight_bearing_status))
@@ -254,6 +317,26 @@ class RehabilitationAgent(BaseClinicalAgent):
         current_rom: Optional[str] = None,
         exercise_history: Optional[str] = None,
     ) -> Dict[str, Any]:
+        """
+        Milestone Sec 2.7 (Rehabilitation & Exercise Agent) -- evolves this
+        EXISTING LAM RehabilitationAgent rather than adding a second,
+        competing rehab pipeline. When the caller supplies structured rehab
+        fields (weight_bearing_status: NWB/PWB/WBAT/FWB, current_rom,
+        exercise_history), they are restated into the domain instruction
+        (same untrusted-data framing pattern as PainSymptomsAgent above) so
+        the shared RAG + LLM / deterministic-fallback pipeline can genuinely
+        respect them -- never a second knowledge source, never invented
+        numbers. All three fields are optional and purely additive: a plain
+        chat message supplying none of them behaves byte-identically to
+        before this change.
+
+        Safety: weight_bearing_status is a rehabilitation-guidance
+        restriction, not a triage signal -- it is never sent to
+        SafetyTriageEngine and never changes the RED/YELLOW/GREEN result
+        (unlike PainSymptomsAgent's temperature_c). It only constrains what
+        this agent is allowed to recommend once triage has already cleared
+        the request as non-RED.
+        """
         domain_instruction = cls.DOMAIN_FOCUS
         rehab_note = _rehab_context_note(weight_bearing_status, current_rom, exercise_history)
         if rehab_note:
@@ -306,15 +389,9 @@ class MedicationAgent(BaseClinicalAgent):
 
     TARGET_AGENT = TargetAgent.MEDICATION_AGENT
     DOMAIN_FOCUS = (
-        "You are the Medication Adherence Agent for orthopedic post-operative care. "
-        "Focus on adherence, timing (including analgesics 30-45 minutes before physiotherapy), "
-        "missed-dose handling, and general safety information for prescribed analgesics, "
-        "NSAIDs, antibiotics, and anticoagulants such as enoxaparin or aspirin. "
-        "If a dose was missed, explain the usual take-when-remembered rule and never advise "
-        "a double dose. Clarify that combining multiple NSAIDs or extra blood thinners is unsafe. "
-        "Never independently prescribe, stop, increase, or decrease any medication, and never "
-        "invent a dose -- defer all prescription changes to the patient's clinician. "
-        "Always include a brief safety disclaimer that this is adherence support, not a new prescription."
+        "Focus on medication timing, adherence, and general information questions. "
+        "Do not independently prescribe, stop, increase, or decrease any "
+        "medication -- defer dosing changes to the patient's clinician."
     )
 
     # Actions that carry a proactive, stateful reply. These are returned
@@ -429,39 +506,279 @@ class WoundCareAgent(BaseClinicalAgent):
     )
 
 
+# ============================================================================
+# DAILY ACTIVITY & ADL AGENT
+#
+# Milestone Sec 2.10. Previously a bare stub (TARGET_AGENT + DOMAIN_FOCUS
+# only), inheriting BaseClinicalAgent.handle() unchanged. That meant any
+# time the local LLM failed to answer, ChatAgent._generate_smart_reply()'s
+# generic fallback took over -- which has no branch for activity questions
+# like stairs/driving/showering/sleeping, so it fell through to either an
+# unrelated RAG-doc dump or the generic Day-X reminder, regardless of what
+# was actually asked (e.g. "can I climb stairs?" got a generic PT/hydration
+# reminder with no mention of stairs at all).
+#
+# This gives DailyActivityAgent its own dedicated, activity-specific
+# fallback -- mirroring the pattern already used for WoundCareAgent
+# (agents/wound_care_agent.py) and ChatAgent._generate_final_wound_fallback:
+# try the real LLM first, and only fall back to a hand-written, genuinely
+# relevant answer if the LLM path fails or returns something generic.
+#
+# The guidance below is universal, standard patient-education content
+# (e.g. "up with the good leg, down with the bad" for stairs) -- not
+# patient-specific numeric thresholds, doses, or timelines, and every
+# reply explicitly defers to the patient's actual weight-bearing status
+# and surgical team instructions rather than asserting a one-size-fits-all
+# rule.
+# ============================================================================
+
+
+def _is_unhelpful_reply(reply: str) -> bool:
+    """
+    Same generic-reply detection pattern used by WoundCareAgent
+    (agents/wound_care_agent.py::_is_unhelpful_llm_reply). Duplicated
+    locally (rather than imported) to keep this agent independent of the
+    wound-care module.
+    """
+    text = (reply or "").strip().lower()
+
+    if not text:
+        return True
+
+    generic_phrases = (
+        "i don't have enough specific information",
+        "i do not have enough specific information",
+        "please provide a little more detail about what you would like help with",
+        "please provide more detail about what you would like help with",
+        "i need more information about what you would like help with",
+    )
+
+    return any(phrase in text for phrase in generic_phrases)
+
+
+_STAIRS_STEPS = (
+    "Going up: lead with your non-operated (\"good\") leg first, then bring "
+    "your operated leg and any walking aid up to meet it -- \"up with the "
+    "good, down with the bad.\"",
+    "Going down: lead with your operated leg and your walking aid first, "
+    "then bring your non-operated leg down to meet them.",
+    "Always use the handrail if one is available, and go at a slow, "
+    "steady pace -- there's no need to rush.",
+    "If you feel unsteady, ask someone to spot you, or avoid stairs alone "
+    "until you feel more confident.",
+)
+
+_DRIVING_STEPS = (
+    "Don't drive until your surgical team has specifically cleared you -- "
+    "this depends on which leg was operated on, your reaction time, and "
+    "your medications.",
+    "Avoid driving while taking prescription pain medication that can "
+    "affect alertness or reaction time.",
+    "Once you're cleared, start with short, low-traffic trips before "
+    "longer drives.",
+)
+
+_SHOWER_STEPS = (
+    "Follow your surgical team's specific guidance on when the incision "
+    "is allowed to get wet -- this varies by procedure and how it's "
+    "healing.",
+    "Use a shower chair or non-slip mat, and consider a handheld "
+    "showerhead if getting in and out of a tub is difficult.",
+    "Keep the incision covered as instructed until you're cleared for "
+    "regular showering.",
+)
+
+_SLEEP_STEPS = (
+    "Many patients find it more comfortable to keep the operated leg "
+    "slightly elevated with a pillow under the calf or ankle -- not "
+    "directly under the knee -- rather than lying fully flat.",
+    "Avoid sleeping in a position that puts direct pressure on the "
+    "incision.",
+    "Use pillows for support and adjust your position gradually as "
+    "comfort allows.",
+)
+
+_TRANSFER_STEPS = (
+    "When getting out of bed or a chair, lead with your operated leg and "
+    "push up through your arms or walking aid, rather than pulling up "
+    "through the operated leg alone.",
+    "Move slowly and pause if you feel dizzy or unsteady before "
+    "standing all the way up.",
+    "Keep frequently used items within easy reach so you're not making "
+    "unnecessary transfers early in recovery.",
+)
+
+_GENERAL_ACTIVITY_STEPS = (
+    "Pace yourself -- alternate activity with rest rather than pushing "
+    "through fatigue.",
+    "Follow your prescribed weight-bearing status for this activity, "
+    "the same way you would for walking.",
+    "If an activity causes a sharp increase in pain or swelling, stop "
+    "and rest, and mention it to your surgical team if it continues.",
+)
+
+_ACTIVITY_STEPS_BY_TYPE: Dict[str, Tuple[str, ...]] = {
+    "stairs": _STAIRS_STEPS,
+    "driving": _DRIVING_STEPS,
+    "shower": _SHOWER_STEPS,
+    "sleep": _SLEEP_STEPS,
+    "transfer": _TRANSFER_STEPS,
+    "general": _GENERAL_ACTIVITY_STEPS,
+}
+
+_ACTIVITY_LABELS: Dict[str, str] = {
+    "stairs": "climbing stairs",
+    "driving": "driving",
+    "shower": "showering or bathing",
+    "sleep": "sleep positioning",
+    "transfer": "getting in and out of bed or a chair",
+    "general": "daily activities",
+}
+
+
+def _detect_activity_type(user_message: str) -> str:
+
+    text = (user_message or "").lower()
+
+    if "stair" in text:
+        return "stairs"
+
+    if "drive" in text or "driving" in text or " car " in f" {text} ":
+        return "driving"
+
+    if "shower" in text or "bath" in text or "bathing" in text:
+        return "shower"
+
+    if "sleep" in text or "lying down" in text:
+        return "sleep"
+
+    if (
+        "transfer" in text
+        or "get out of bed" in text
+        or "getting out of bed" in text
+        or "getting up" in text
+        or "stand up" in text
+        or "sit down" in text
+    ):
+        return "transfer"
+
+    return "general"
+
+
 class DailyActivityAgent(BaseClinicalAgent):
     TARGET_AGENT = TargetAgent.DAILY_ACTIVITY_AGENT
     DOMAIN_FOCUS = (
         "Focus on daily activities such as walking, stairs, sleeping position, "
-        "bathing, transfers, and driving during recovery."
+        "bathing, transfers, and driving during recovery. Ground any specific "
+        "guidance in the retrieved clinical context and the patient's "
+        "prescribed weight-bearing status where relevant -- do not invent "
+        "numeric thresholds or timelines that aren't supported by what was "
+        "retrieved."
     )
+
+    @classmethod
+    def handle(
+        cls,
+        *,
+        patient_id: str,
+        surgery_type: str,
+        affected_limb: str,
+        postop_day: int,
+        user_message: str,
+        procedure: str,
+        chat_history: Optional[List[Dict[str, str]]] = None,
+        surgery_date: Optional[str] = None,
+        precomputed_triage: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Milestone Sec 2.10 (Daily Activity & ADL Agent).
+
+        Tries the normal RAG + local-LLM pipeline first, exactly like the
+        inherited BaseClinicalAgent.handle() did before. The ONLY change
+        is what happens if that pipeline fails or returns something
+        generic: instead of falling through to the shared, activity-blind
+        ChatAgent._generate_smart_reply() fallback, this returns concrete,
+        activity-specific guidance (stairs / driving / showering / sleep
+        positioning / transfers / general), detected from the patient's
+        own message.
+
+        Safety: this never overrides or re-evaluates the safety triage
+        result already computed upstream (precomputed_triage / the RED
+        short-circuit in LAMOrchestrator) -- it only replaces the WORDING
+        of a non-emergency activity answer.
+        """
+        llm_result = ChatAgent.answer_question(
+            patient_id=patient_id,
+            surgery_type=surgery_type,
+            affected_limb=affected_limb,
+            postop_day=postop_day,
+            user_message=user_message,
+            chat_history=chat_history,
+            procedure=procedure,
+            domain_instruction=cls.DOMAIN_FOCUS,
+            precomputed_triage=precomputed_triage,
+            surgery_date=surgery_date,
+        )
+
+        reply = str(llm_result.get("reply", "")).strip()
+        engine = str(llm_result.get("engine", ""))
+
+        # A genuine RED emergency short-circuit must always be returned
+        # as-is, untouched.
+        if llm_result.get("triage_level") == "RED":
+            return llm_result
+
+        # If the real local LLM actually answered (not the shared generic
+        # fallback), and it looks like a real answer, keep it.
+        if (
+            reply
+            and engine.startswith("Local LLM")
+            and not _is_unhelpful_reply(reply)
+        ):
+            return llm_result
+
+        # Otherwise: build a concrete, activity-specific answer instead of
+        # letting the shared generic fallback take over.
+        activity = _detect_activity_type(user_message)
+        steps = _ACTIVITY_STEPS_BY_TYPE.get(activity, _GENERAL_ACTIVITY_STEPS)
+        activity_label = _ACTIVITY_LABELS.get(activity, "daily activities")
+
+        steps_text = "\n".join(f"• {step}" for step in steps)
+
+        reply_text = (
+            f"Good question about {activity_label} on Day {postop_day} "
+            f"after your {surgery_type} ({affected_limb}). Here's some "
+            "general guidance:\n\n"
+            f"{steps_text}\n\n"
+            "This is general guidance -- always follow your surgical "
+            "team's specific instructions for your case, especially your "
+            "prescribed weight-bearing status."
+        )
+
+        return {
+            "reply": reply_text,
+            "triage_level": llm_result.get("triage_level", "GREEN"),
+            "is_escalated": llm_result.get("is_escalated", False),
+            "engine": "Daily Activity Agent - Guided Fallback",
+            "sources": llm_result.get("sources", []),
+        }
 
 
 class NutritionAgent(BaseClinicalAgent):
     TARGET_AGENT = TargetAgent.NUTRITION_AGENT
     DOMAIN_FOCUS = (
-        "You are the Nutrition & Recovery Diet Agent. Focus on postoperative diet that "
-        "supports tissue repair, collagen synthesis, wound healing, bone remodeling, "
-        "hydration, and GI regularity after TKA or THA. Use retrieved guidance for "
-        "protein pacing around 1.2-1.5 g/kg/day, fluid and fibre for opioid-related "
-        "constipation, and micronutrients (vitamin C and zinc for collagen; calcium "
-        "and vitamin D for bone ingrowth). Address nausea, poor appetite, and "
-        "constipation without inventing supplement doses the clinician did not prescribe. "
-        "Do not present nutrition advice as a medical diet order."
+        "Focus on postoperative diet, protein intake, hydration, and nutrition "
+        "supporting recovery."
     )
+
 
 
 class MentalWellbeingAgent(BaseClinicalAgent):
     TARGET_AGENT = TargetAgent.MENTAL_HEALTH_AGENT
     DOMAIN_FOCUS = (
-        "You are the Mental Wellbeing Agent. Focus on recovery-related anxiety, "
-        "kinesiophobia (fear of movement), frustration, sleep disruption, and mood "
-        "during orthopedic rehabilitation. Normalize common post-op recovery dips "
-        "between Days 3 and 10, validate discomfort, and encourage only the movement "
-        "already prescribed by the care team. Do not diagnose psychiatric conditions "
-        "or apply diagnostic labels. If the patient describes severe distress, "
-        "hopelessness, or possible self-harm, flag the need for urgent clinical "
-        "follow-up without attempting therapy beyond supportive recovery coaching."
+        "Focus on recovery-related anxiety, fear of movement, frustration, and "
+        "motivation. Keep guidance supportive and non-diagnostic, staying within "
+        "postoperative-support scope."
     )
 
 
@@ -481,46 +798,15 @@ class IntakeContextAgent(BaseClinicalAgent):
 
     DOMAIN_FOCUS = (
         "You are the Intake & Context Agent. "
-        "Your responsibility is to manage, review, and help update the patient's "
-        "provided context and medical history for downstream orthopedic postoperative follow-up. "
-        "When the user requests to update their recovery profile, surgical background, or medical history, "
-        "do not respond with a brief greeting or a static one-liner. "
-        "Provide a structured, comprehensive breakdown of their current intake status, acknowledge their update request, "
-        "and interactively prompt them for the specific details, past surgeries, or background modifications they wish to make. "
-        "Do not perform emergency or red-flag classification (handled upstream)."
+        "Your responsibility is to consolidate and organize the patient's "
+        "provided context for downstream orthopedic postoperative follow-up. "
+        "Use only information explicitly supplied in the patient context, "
+        "current message, and conversation history. "
+        "Do not invent missing patient information. "
+        "Do not assume an unknown procedure is TKA. "
+        "Clearly identify information that is missing or not supplied. "
+        "Do not perform emergency or red-flag classification. "
+        "Emergency classification is handled by the deterministic safety "
+        "triage layer upstream. "
+        "Keep the output structured and patient-specific."
     )
-
-    @classmethod
-    def handle(
-        cls,
-        *,
-        patient_id: str,
-        surgery_type: str,
-        affected_limb: str,
-        postop_day: int,
-        user_message: str,
-        procedure: str,
-        chat_history: Optional[List[Dict[str, str]]] = None,
-        surgery_date: Optional[str] = None,
-        precomputed_triage: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        domain_instruction = cls.DOMAIN_FOCUS
-        if any(kw in user_message.lower() for kw in ["update", "profile", "background", "history", "surgical"]):
-            domain_instruction = (
-                f"{cls.DOMAIN_FOCUS} The user is explicitly asking to update their profile or background records. "
-                "Acknowledge this clearly, outline what profile areas can be modified (surgical background, prior medical history, implant notes), "
-                "and ask them to provide the exact information they want to add or change."
-            )
-
-        return ChatAgent.answer_question(
-            patient_id=patient_id,
-            surgery_type=surgery_type,
-            affected_limb=affected_limb,
-            postop_day=postop_day,
-            user_message=user_message,
-            chat_history=chat_history,
-            procedure=procedure,
-            domain_instruction=domain_instruction,
-            precomputed_triage=precomputed_triage,
-            surgery_date=surgery_date,
-        )
