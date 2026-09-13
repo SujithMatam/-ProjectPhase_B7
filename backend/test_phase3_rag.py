@@ -352,12 +352,12 @@ def run_offline_fallback_test() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 8. End-to-end /api/chat smoke test (no Ollama required)
+# 8. End-to-end /api/chat smoke test
 # ---------------------------------------------------------------------------
 
 def run_end_to_end_smoke_test() -> None:
     print("=" * 78)
-    print("SECTION 8 -- End-to-end /api/chat smoke test (RAG layer only, no Ollama needed)")
+    print("SECTION 8 -- End-to-end /api/chat smoke test (RAG layer only)")
     print("=" * 78)
     result = LAMOrchestrator.process(
         patient_id="TEST-PT",

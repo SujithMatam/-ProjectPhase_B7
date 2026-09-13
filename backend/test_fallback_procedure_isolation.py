@@ -1,14 +1,14 @@
 """
-Regression suite for the ChatAgent deterministic (Ollama-unavailable)
-fallback -- procedure isolation for exercise/rehab replies.
+Regression suite for the ChatAgent deterministic synthesis path and
+procedure isolation for exercise/rehab replies.
 
 Root cause fixed here: agents/chat_agent.py::_generate_smart_reply()'s
 "exercise"/"workout"/"physio" branch used to return hardcoded,
 TKA/knee-specific exercise text (flexion degrees, quad sets, heel slides,
 calf raises) regardless of the patient's actual procedure or the ALREADY
 procedure-filtered rag_docs it was passed. A THA (or GEN/ankle) patient
-could receive knee-specific fallback advice whenever Ollama was
-unreachable. See agents/chat_agent.py::_rehab_fallback_reply() for the fix:
+could receive knee-specific fallback advice when model-backed generation was
+unavailable. See agents/chat_agent.py::_rehab_fallback_reply() for the fix:
 it grounds itself in the already procedure-filtered rag_docs, or falls back
 to conservative non-specific wording -- it never hardcodes exercise content
 of its own, so cross-procedure leakage is structurally impossible.
@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import sys
 from typing import Any, Dict
+from contextlib import nullcontext
 from unittest.mock import patch
 
 from agents.chat_agent import ChatAgent
@@ -55,22 +56,21 @@ _TKA_ONLY_PHRASES = ["passive flexion", "quad set", "heel slide", "calf raise", 
 _THA_ONLY_PHRASES = ["hip flexion", "abduction wedge", "crossing legs", "dislocation"]
 
 
-def _force_ollama_unavailable():
-    """Patch ChatAgent._query_llama to behave exactly as it does when Ollama
-    is unreachable (returns None), so answer_question() falls through to
-    the deterministic _generate_smart_reply() path under test."""
-    return patch.object(ChatAgent, "_query_llama", classmethod(lambda cls, **kwargs: None))
+def _deterministic_synthesis():
+    """Keep the test scope explicit now that deterministic synthesis is the
+    only response path."""
+    return nullcontext()
 
 
 # ---------------------------------------------------------------------------
-# 1. THA exercise query with Ollama unavailable must NOT get knee/TKA advice
+# 1. THA exercise query must NOT get knee/TKA advice
 # ---------------------------------------------------------------------------
 
 def test_tha_fallback_has_no_tka_language() -> None:
     print("=" * 78)
     print("1 -- THA exercise fallback contains no TKA/knee-specific language")
     print("=" * 78)
-    with _force_ollama_unavailable():
+    with _deterministic_synthesis():
         result = LAMOrchestrator.process(
             patient_id="TEST-PT",
             surgery_type="Total Hip Arthroplasty (THA)",
@@ -95,7 +95,7 @@ def test_tka_fallback_has_no_tha_language() -> None:
     print("=" * 78)
     print("2 -- TKA exercise fallback contains no THA-only language")
     print("=" * 78)
-    with _force_ollama_unavailable():
+    with _deterministic_synthesis():
         result = LAMOrchestrator.process(
             patient_id="TEST-PT",
             surgery_type="Total Knee Arthroplasty (TKA)",
@@ -121,7 +121,7 @@ def test_gen_fallback_does_not_become_tka() -> None:
     print("=" * 78)
     print("3 -- GEN/ankle exercise fallback does not silently become TKA")
     print("=" * 78)
-    with _force_ollama_unavailable():
+    with _deterministic_synthesis():
         result = LAMOrchestrator.process(
             patient_id="TEST-PT",
             surgery_type="Ankle ORIF",
@@ -246,7 +246,10 @@ def test_non_rehab_fallback_unaffected() -> None:
         affected_limb="Right", postop_day=5, rag_docs=[],
     )
     print(f"    generic (no rag_docs) reply   = {generic_no_docs!r}")
-    _check("Hello! On Day 5 of your recovery" in generic_no_docs, "generic-no-rag_docs fallback branch changed unexpectedly")
+    _check(
+        "don't have enough specific information" in generic_no_docs.lower(),
+        "generic-no-rag_docs fallback should defer when no protocol is retrieved",
+    )
 
     print("    CONFIRMED: generic (non-symptom) fallback branches are unchanged.")
     print()
@@ -457,7 +460,7 @@ def test_red_precedence_unaffected() -> None:
     print("=" * 78)
     print("11 -- RED safety precedence unaffected by the fallback fixes")
     print("=" * 78)
-    with _force_ollama_unavailable(), \
+    with _deterministic_synthesis(), \
          patch.object(ChatAgent, "_generate_smart_reply", side_effect=AssertionError("fallback must never run for a RED query")) as fallback_mock:
         result = LAMOrchestrator.process(
             patient_id="TEST-PT",

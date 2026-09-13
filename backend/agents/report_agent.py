@@ -105,6 +105,10 @@ class ReportGenerationAgent:
     """
 
     @classmethod
+    def known_patient_ids(cls) -> List[str]:
+        return list(_PATIENT_REGISTRY.keys())
+
+    @classmethod
     def get_patient_record(cls, patient_id: str) -> Dict[str, Any]:
         clean_id = (patient_id or "PT-B7-8921").strip().upper()
         if clean_id in _PATIENT_REGISTRY:
@@ -134,6 +138,39 @@ class ReportGenerationAgent:
             ],
             "triage_events": [],
         }
+
+    @classmethod
+    def get_daily_medication_schedule(cls, patient_id: str) -> List[Dict[str, Any]]:
+        """Expand doctor-record frequency notation into today's display rows."""
+        frequency_times = {
+            "OD": ("08:00",),
+            "BD": ("08:00", "20:00"),
+            "TDS": ("08:00", "14:00", "20:00"),
+            "QDS": ("08:00", "12:00", "16:00", "20:00"),
+        }
+        rows: List[Dict[str, Any]] = []
+        for medication in cls.get_patient_record(patient_id).get("current_medications", []):
+            explicit_times = medication.get("times") or medication.get("schedule_times")
+            if isinstance(explicit_times, list):
+                times = [str(value) for value in explicit_times]
+            else:
+                dose = str(medication.get("dose", "")).upper()
+                times = next(
+                    (list(values) for frequency, values in frequency_times.items() if frequency in dose),
+                    [],
+                )
+            if not times:
+                times = ["As needed"]
+            for medication_time in times:
+                rows.append({
+                    "medication": medication.get("name", "Unnamed medication"),
+                    "dose": medication.get("dose") or "See prescription label",
+                    "purpose": medication.get("purpose") or "Post-operative treatment",
+                    "time": medication_time,
+                    "reminder_enabled": medication_time != "As needed",
+                    "source": "doctor_report",
+                })
+        return sorted(rows, key=lambda row: (row["time"] == "As needed", row["time"]))
 
     @classmethod
     def generate_patient_summary(cls, patient_id: str, days: int = 7) -> Dict[str, Any]:
@@ -207,6 +244,7 @@ class ReportGenerationAgent:
             "medication_adherence": {
                 "overall_adherence_pct": overall_med_adherence,
                 "active_prescriptions": meds,
+                "daily_schedule": cls.get_daily_medication_schedule(patient_id),
             },
             "safety_triage": {
                 "status": safety_status,

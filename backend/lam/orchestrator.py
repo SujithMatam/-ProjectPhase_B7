@@ -5,20 +5,41 @@ Controls the complete LAM pipeline for /api/chat.
 
 Execution order:
 
-1. Deterministic safety triage
-2. Scope validation
-3. Intent classification
-4. Agent/action routing
-5. Specialized agent execution
+1. Deterministic safety triage (RED short-circuits everything below)
+2. Wound context determination (explicit wound message OR an active
+   Wound Care follow-up -- a bare short answer alone never counts)
+3. Scope validation (genuine Wound context bypasses standalone
+   rejection of terse in-conversation answers; OUT_OF_SCOPE still
+   short-circuits everything below)
+4. Continuation / intent ownership:
+     - genuine Wound context owns this turn -> WOUND_CARE
+     - otherwise, narrow Recovery continuation check
+       (check_recovery_continuation) -> RECOVERY_PROGRESS on match
+     - otherwise, fresh IntentClassifier
+5. Agent/action routing
+6. Specialized agent execution
 
 Important Wound Care behaviour:
 
 - Explicit wound messages are routed to WoundCareAgent.
-- Answers to an active Wound Care question stay in WoundCareAgent.
+- Answers to an ACTIVE Wound Care question stay in WoundCareAgent.
 - Short answers such as "yesterday", "better", "less red",
   "less warm", "yes", "no", etc. are not treated as standalone
-  out-of-scope queries.
+  out-of-scope queries when they are genuinely part of an active
+  Wound Care conversation -- but a bare short answer by itself, with
+  no active Wound follow-up and no explicit wound term, does NOT
+  establish Wound context on its own.
 - Safety triage still runs FIRST on every turn.
+
+Important Recovery behaviour:
+
+- Recovery continuation uses check_recovery_continuation(), which reads
+  existing Recovery state via peek_state() ONLY (never creates state)
+  and matches ONLY when a real pending_field exists and the message
+  plausibly answers that specific field (e.g. "80 degrees",
+  "I don't know.", "Same as yesterday." while flexion is pending).
+- Recovery continuation never overrides RED safety, OUT_OF_SCOPE, an
+  explicit/active Wound Care conversation, or a genuine topic switch.
 """
 
 from __future__ import annotations
@@ -28,6 +49,7 @@ from typing import Optional, List, Dict
 
 from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
+from agents.recovery_integration import check_recovery_continuation
 
 from lam.schemas import (
     IntentLabel,
@@ -177,6 +199,12 @@ _WOUND_TERMS = (
 )
 
 
+_WOUND_TERM_PATTERNS = tuple(
+    re.compile(r"\b" + re.escape(term) + r"\b")
+    for term in _WOUND_TERMS
+)
+
+
 def _contains_wound_term(
     text: str,
 ) -> bool:
@@ -184,8 +212,8 @@ def _contains_wound_term(
     text = _normalise(text)
 
     return any(
-        term in text
-        for term in _WOUND_TERMS
+        pattern.search(text)
+        for pattern in _WOUND_TERM_PATTERNS
     )
 
 
@@ -366,8 +394,15 @@ def _has_active_wound_followup(
 # ============================================================================
 # SHORT ANSWER DETECTION
 #
-# These are common answers to Wound Care questions.
-# They must not be sent through normal scope detection.
+# These are common answers to Wound Care questions. They are used ONLY for
+# diagnostic logging and to justify skipping standalone scope rejection
+# while genuine Wound context (see _has_active_wound_followup /
+# _contains_wound_term) already applies. A short answer by itself must
+# NEVER establish Wound context on its own -- see the wound_context
+# expression below -- otherwise generic short replies such as "same" or
+# "yesterday" would be misrouted to Wound Care even with no active wound
+# conversation (e.g. stealing a pending Recovery flexion answer like
+# "Same as yesterday.").
 # ============================================================================
 
 _SHORT_WOUND_ANSWERS = (
@@ -638,53 +673,38 @@ class LAMOrchestrator:
 
         # ============================================================
         # STEP 2
-        # DETERMINE ACTIVE WOUND CONVERSATION
+        # DETERMINE GENUINE WOUND CONTEXT
         #
         # IMPORTANT:
         #
-        # This is checked BEFORE ScopeValidator.
+        # This is checked BEFORE ScopeValidator and BEFORE the Recovery
+        # continuation check.
         #
         # Otherwise:
         #
         # "less warm"
         #
-        # can be rejected as an isolated out-of-scope sentence.
+        # could be rejected as an isolated out-of-scope sentence.
+        #
+        # CRITICAL: a bare short answer ("yes", "same", "yesterday", ...)
+        # by itself must NOT establish Wound context. Only an explicit
+        # wound-related message, or a reply to an ACTUALLY active Wound
+        # Care follow-up question, does. This is what keeps a pending
+        # Recovery flexion answer such as "Same as yesterday." eligible
+        # for Recovery continuation (Step 4 below) when there is no
+        # active Wound conversation -- see _looks_like_short_wound_answer's
+        # docstring for why short_wound_answer is excluded here.
         # ============================================================
 
-        active_wound_followup = (
-            _has_active_wound_followup(
-                history
-            )
-        )
-
-        explicit_wound_message = (
-            _contains_wound_term(
-                user_message
-            )
-        )
-
-        short_wound_answer = (
-            _looks_like_short_wound_answer(
-                user_message
-            )
-        )
-
-        explicit_different_domain = (
-            _has_explicit_different_domain(
-                user_message
-            )
-        )
-
+        active_wound_followup = _has_active_wound_followup(history)
+        explicit_wound_message = _contains_wound_term(user_message)
+        short_wound_answer = _looks_like_short_wound_answer(user_message)
+        explicit_different_domain = _has_explicit_different_domain(user_message)
 
         wound_context = (
-            (
-                active_wound_followup
-                or explicit_wound_message
-                or short_wound_answer
-            )
+            (active_wound_followup or explicit_wound_message)
             and not explicit_different_domain
         )
-
 
         print(
             "[LAM][WOUND CONTEXT] "
@@ -700,10 +720,9 @@ class LAMOrchestrator:
         # STEP 3
         # SCOPE VALIDATION
         #
-        # Active Wound Care follow-ups are already known to be inside
-        # the orthopedic postoperative conversation.
-        #
-        # We therefore do NOT run standalone scope rejection on:
+        # Active/explicit Wound Care conversations are already known to
+        # be inside the orthopedic postoperative conversation. We
+        # therefore do NOT run standalone scope rejection on:
         #
         #   yesterday
         #   better
@@ -712,7 +731,11 @@ class LAMOrchestrator:
         #   yes
         #   no
         #
-        # Safety triage has still already run.
+        # when they are genuinely part of one. Otherwise the normal
+        # ScopeValidator still runs, and OUT_OF_SCOPE still short-
+        # circuits everything below (including Recovery continuation).
+        #
+        # Safety triage has already run.
         # ============================================================
 
         if wound_context:
@@ -769,9 +792,40 @@ class LAMOrchestrator:
                 ).to_dict()
 
 
+        # Computed once here and reused for STEP 6 below -- resolve_procedure_code
+        # is a pure function of surgery_type, so this is a single computation,
+        # not a duplicated one.
+        resolved_procedure = resolve_procedure_code(surgery_type)
+
+
         # ============================================================
         # STEP 4
-        # INTENT CLASSIFICATION
+        # CONTINUATION / INTENT OWNERSHIP
+        #
+        # Ownership order:
+        #
+        #   1. Genuine Wound context (explicit wound message, or an
+        #      ACTIVE Wound Care follow-up) owns this turn -> WOUND_CARE
+        #      directly, without running Recovery continuation or fresh
+        #      classification.
+        #   2. Otherwise, the narrow Recovery continuation check --
+        #      matches ONLY when an existing Recovery episode (found via
+        #      peek_state(), never created here) has a real pending_field
+        #      that this message plausibly answers. See
+        #      recovery_integration.check_recovery_continuation() for the
+        #      full contract. Never uses "Recovery was the last active
+        #      agent" as a signal, and never bypasses fresh classification
+        #      for an unrelated topic (wound, medication, etc.) even while
+        #      a Recovery field is pending.
+        #   3. Otherwise, fresh IntentClassifier.
+        #
+        # This ordering is what keeps both directions safe:
+        #   - "My wound is red and leaking." while a Recovery flexion
+        #     field is pending -> wound_context is True -> WOUND_CARE.
+        #   - "Same as yesterday." while a Recovery flexion field is
+        #     pending and there is NO active Wound conversation ->
+        #     wound_context is False -> Recovery continuation runs and
+        #     matches -> RECOVERY_PROGRESS.
         # ============================================================
 
         if wound_context:
@@ -789,25 +843,49 @@ class LAMOrchestrator:
 
         else:
 
-            classification = (
-                IntentClassifier.classify_detailed(
-                    query=user_message,
-                    context=context,
+            is_recovery_continuation = check_recovery_continuation(
+                patient_id=patient_id,
+                surgery_date_raw=surgery_date,
+                procedure=resolved_procedure,
+                user_message=user_message,
+            )
+
+            if is_recovery_continuation:
+
+                intent_label = IntentLabel.RECOVERY_PROGRESS
+
+                print(
+                    "[LAM][CONTINUATION] "
+                    f"query={user_message!r} "
+                    "matched a pending Recovery field -- routing directly to "
+                    "RecoveryProgressAgent without fresh intent classification."
                 )
-            )
 
-            intent_label = classification.intent
+            else:
 
-            print(
-                "[LAM][INTENT] "
-                f"query={user_message!r} "
-                f"intent={intent_label.value} "
-                f"path={classification.decision_path} "
-                f"top1={getattr(classification.top1_intent, 'value', None)} "
-                f"score={classification.top1_score:.3f} "
-                f"top2={getattr(classification.top2_intent, 'value', None)} "
-                f"margin={classification.margin:.3f}"
-            )
+                classification = (
+                    IntentClassifier.classify_detailed(
+                        query=user_message,
+                        context=context,
+                    )
+                )
+
+                intent_label = classification.intent
+
+                # IMPORTANT DEBUG OUTPUT.
+                #
+                # This lets you immediately see whether the problem is:
+                # classifier -> router -> agent -> response.
+                print(
+                    "[LAM][INTENT] "
+                    f"query={user_message!r} "
+                    f"intent={intent_label.value} "
+                    f"path={classification.decision_path} "
+                    f"top1={getattr(classification.top1_intent, 'value', None)} "
+                    f"score={classification.top1_score:.3f} "
+                    f"top2={getattr(classification.top2_intent, 'value', None)} "
+                    f"margin={classification.margin:.3f}"
+                )
 
 
         # ============================================================
@@ -835,12 +913,8 @@ class LAMOrchestrator:
         # STEP 6
         # SPECIALIZED AGENT
         # ============================================================
-
-        resolved_procedure = (
-            resolve_procedure_code(
-                surgery_type
-            )
-        )
+        # resolved_procedure was already computed above (Step 3) for the
+        # Recovery continuation check -- reused here rather than recomputed.
 
         chat_result = AgentRouter.dispatch(
             intent_label=intent_label,
