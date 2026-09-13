@@ -5,6 +5,7 @@ Exposes endpoints for the Flutter mobile/web client.
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
@@ -14,6 +15,9 @@ from agents.report_agent import ReportGenerationAgent
 from lam.orchestrator import LAMOrchestrator
 from lam.schemas import WeightBearingStatus
 from triage.safety_triage import SafetyTriageEngine
+
+# NEW: admin PDF report-extraction feature
+from admin_report_routes import router as admin_report_router
 
 app = FastAPI(
     title="OrthoSync Agentic AI Backend",
@@ -29,6 +33,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# NEW: mounts POST /api/admin/extract-report
+app.include_router(admin_report_router)
 
 
 class SymptomAssessmentRequest(BaseModel):
@@ -165,6 +172,12 @@ def chat(payload: ChatRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# NEW: serves the admin dashboard page at http://127.0.0.1:8000/admin
+@app.get("/admin")
+def admin_dashboard():
+    return FileResponse("admin_dashboard.html")
 
 
 if __name__ == "__main__":

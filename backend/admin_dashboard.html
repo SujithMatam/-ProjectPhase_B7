@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrthoSync Admin — Report Intake</title>
+<style>
+  :root {
+    --ink: #16211f;
+    --ink-soft: #4a5a56;
+    --paper: #f7f8f6;
+    --panel: #ffffff;
+    --line: #dde3e0;
+    --pine: #1f4a43;
+    --pine-deep: #123430;
+    --amber: #b5762c;
+    --amber-bg: #fdf3e6;
+    --ok-bg: #eef5ee;
+    --ok-line: #b9d6bb;
+    --radius: 6px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--pine-deep);
+    color: #eef2f0;
+    padding: 18px 28px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--pine);
+  }
+
+  header .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+
+  header .tag {
+    font-size: 12.5px;
+    color: #a9c2ba;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 880px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    min-height: 560px;
+  }
+
+  .panel-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-head h2 {
+    font-size: 14px;
+    margin: 0;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .panel-body {
+    flex: 1;
+    padding: 18px;
+    overflow: auto;
+  }
+
+  /* --- Upload / preview panel --- */
+
+  .drop-zone {
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .drop-zone:hover {
+    border-color: var(--pine);
+    background: #fafcfb;
+  }
+
+  .drop-zone svg { opacity: 0.55; }
+
+  .btn {
+    background: var(--pine);
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn:hover { background: var(--pine-deep); }
+
+  .btn:disabled {
+    background: #b8c3c0;
+    cursor: not-allowed;
+  }
+
+  #pdf-frame {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    border: none;
+    display: none;
+  }
+
+  .filename-row {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  /* --- Extracted fields panel --- */
+
+  .field {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eef1ef;
+  }
+
+  .field:last-child { border-bottom: none; }
+
+  .field-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #7c8c87;
+    margin-bottom: 4px;
+  }
+
+  .field-value {
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .field-value.empty {
+    color: #9aa6a2;
+    font-style: italic;
+  }
+
+  .field-value ul {
+    margin: 4px 0 0 18px;
+    padding: 0;
+  }
+
+  .status-banner {
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    margin-bottom: 18px;
+    display: none;
+  }
+
+  .status-banner.warning {
+    background: var(--amber-bg);
+    border: 1px solid #e7cda3;
+    color: #7a5116;
+  }
+
+  .status-banner.ok {
+    background: var(--ok-bg);
+    border: 1px solid var(--ok-line);
+    color: #2f5c33;
+  }
+
+  .empty-state {
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+    margin-top: 80px;
+  }
+
+  .spinner {
+    display: none;
+    text-align: center;
+    margin-top: 80px;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+  }
+
+  .method-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #eef2f0;
+    color: var(--ink-soft);
+    margin-left: 8px;
+  }
+
+  input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>OrthoSync Admin</h1>
+    <span class="tag">Report Intake &amp; Extraction</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- LEFT: upload + preview -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Report File</h2>
+      <span class="filename-row" id="filename-row"></span>
+    </div>
+    <div class="panel-body" style="padding:0;">
+      <div class="drop-zone" id="drop-zone" style="margin:18px; height: calc(100% - 36px);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+        </svg>
+        <div>Click to choose a PDF report from your computer</div>
+        <button class="btn" type="button" id="choose-btn">Choose PDF file</button>
+        <input type="file" id="file-input" accept="application/pdf">
+      </div>
+      <iframe id="pdf-frame"></iframe>
+    </div>
+  </section>
+
+  <!-- RIGHT: extracted fields -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Extracted Details</h2>
+      <span id="method-tag"></span>
+    </div>
+    <div class="panel-body">
+      <div class="status-banner" id="status-banner"></div>
+      <div class="empty-state" id="empty-state">
+        Select a PDF report to automatically extract patient details.
+      </div>
+      <div class="spinner" id="spinner">Reading report and extracting details…</div>
+      <div id="fields-container" style="display:none;"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const chooseBtn = document.getElementById('choose-btn');
+  const fileInput = document.getElementById('file-input');
+  const pdfFrame = document.getElementById('pdf-frame');
+  const filenameRow = document.getElementById('filename-row');
+  const emptyState = document.getElementById('empty-state');
+  const spinner = document.getElementById('spinner');
+  const fieldsContainer = document.getElementById('fields-container');
+  const statusBanner = document.getElementById('status-banner');
+  const methodTag = document.getElementById('method-tag');
+
+  // Change this if your backend runs on a different host/port.
+  const EXTRACT_ENDPOINT = '/api/admin/extract-report';
+
+  const FIELD_LABELS = {
+    full_name: 'Full Name',
+    age: 'Age',
+    sex: 'Sex',
+    diagnosis: 'Diagnosis',
+    surgery_date: 'Surgery Date',
+    surgery_type: 'Surgery Type',
+    prescriptions: 'Prescriptions',
+    current_medical_plan: 'Current Medical Plan',
+  };
+
+  chooseBtn.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) handleFile(file);
+  });
+
+  function handleFile(file) {
+    filenameRow.textContent = file.name;
+
+    // Show the PDF preview.
+    const fileUrl = URL.createObjectURL(file);
+    dropZone.style.display = 'none';
+    pdfFrame.style.display = 'block';
+    pdfFrame.src = fileUrl;
+
+    extractReport(file);
+  }
+
+  async function extractReport(file) {
+    emptyState.style.display = 'none';
+    fieldsContainer.style.display = 'none';
+    statusBanner.style.display = 'none';
+    methodTag.textContent = '';
+    spinner.style.display = 'block';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(EXTRACT_ENDPOINT, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || `Server returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      renderExtraction(data.extraction);
+
+    } catch (err) {
+      spinner.style.display = 'none';
+      statusBanner.className = 'status-banner warning';
+      statusBanner.style.display = 'block';
+      statusBanner.textContent =
+        'Could not reach the extraction service: ' + err.message +
+        '. Confirm the backend is running and EXTRACT_ENDPOINT is correct.';
+      emptyState.style.display = 'block';
+      emptyState.textContent = 'Extraction failed — see message above.';
+    }
+  }
+
+  function renderExtraction(extraction) {
+    spinner.style.display = 'none';
+    fieldsContainer.style.display = 'block';
+    fieldsContainer.innerHTML = '';
+
+    if (extraction.extraction_method) {
+      const label = extraction.extraction_method === 'llm'
+        ? 'Extracted by AI'
+        : extraction.extraction_method === 'regex_fallback'
+          ? 'Fallback — verify manually'
+          : 'Failed';
+      methodTag.innerHTML = `<span class="method-tag">${label}</span>`;
+    }
+
+    if (extraction.warnings && extraction.warnings.length > 0) {
+      statusBanner.className = 'status-banner warning';
+      statusBanner.style.display = 'block';
+      statusBanner.textContent = extraction.warnings.join(' ');
+    } else {
+      statusBanner.className = 'status-banner ok';
+      statusBanner.style.display = 'block';
+      statusBanner.textContent = 'All fields extracted successfully.';
+    }
+
+    for (const [key, label] of Object.entries(FIELD_LABELS)) {
+      const value = extraction[key];
+      const fieldEl = document.createElement('div');
+      fieldEl.className = 'field';
+
+      let valueHtml;
+      if (key === 'prescriptions') {
+        if (Array.isArray(value) && value.length > 0) {
+          valueHtml = '<ul>' + value.map(v => `<li>${escapeHtml(v)}</li>`).join('') + '</ul>';
+        } else {
+          valueHtml = '<span class="empty">Not found</span>';
+        }
+      } else if (value) {
+        valueHtml = escapeHtml(value);
+      } else {
+        valueHtml = '<span class="empty">Not found</span>';
+      }
+
+      fieldEl.innerHTML = `
+        <div class="field-label">${label}</div>
+        <div class="field-value ${!value && key !== 'prescriptions' ? 'empty' : ''}">${valueHtml}</div>
+      `;
+      fieldsContainer.appendChild(fieldEl);
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
