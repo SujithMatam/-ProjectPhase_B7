@@ -21,60 +21,44 @@ dispatched (see agent_router.py).
 
 from __future__ import annotations
 
-import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from agents.base_clinical_agent import BaseClinicalAgent
 from agents.chat_agent import ChatAgent
+from agents import recovery_integration
+from agents import recovery_logic
+from agents import recovery_state
 from lam.schemas import TargetAgent, WeightBearingStatus
 from rag.knowledge_base import ClinicalKnowledgeBase
 
-_DAY_RANGE_RE = re.compile(r"^\s*(\d+)\s*-\s*(\d+)\s*$")
-
-
-def _parse_day_range(days_text: str) -> Optional[Tuple[int, int]]:
-    """
-    Parse the `days` window already attached to a retrieved clinical chunk
-    (e.g. "1-21", from rag/data/seed_knowledge.json) into (low, high).
-    Returns None for anything that doesn't match -- callers must then skip
-    stage annotation for that chunk rather than guess a value.
-    """
-    match = _DAY_RANGE_RE.match(days_text or "")
-    if not match:
-        return None
-    return int(match.group(1)), int(match.group(2))
-
-
-def _stage_note(postop_day: int, title: str, day_range: Tuple[int, int]) -> str:
-    """
-    One sentence stating postop_day relative to a retrieved chunk's own
-    `days` APPLICABILITY window. Every number here comes from either the
-    caller (postop_day) or the retrieved chunk's existing `days` metadata --
-    nothing is invented. Deliberately neutral: `days` only marks when the
-    retrieved guidance applies, not a clinical milestone or expected-recovery
-    claim -- the wording here must not assert one unless the underlying
-    clinical text itself does.
-    """
-    lo, hi = day_range
-    if postop_day < lo:
-        relation = f"before the retrieved guidance's Day {lo}-{hi} applicability window"
-    elif postop_day > hi:
-        relation = (
-            f"after the retrieved guidance's Day {lo}-{hi} applicability window; "
-            "this guidance may be less applicable at the current postoperative stage"
-        )
-    else:
-        relation = f"within the retrieved guidance's Day {lo}-{hi} applicability window"
-    return f"'{title}': Day {postop_day} is {relation}."
-
 
 class RecoveryProgressAgent(BaseClinicalAgent):
+    """
+    Agentic Recovery Progress Agent -- Pass 2 integration.
+
+    Real logic (state, extraction, milestone table, decision function) is
+    owned entirely by the approved recovery_state.py / recovery_logic.py
+    modules; this class is the OBSERVE -> DECIDE -> ACT -> UPDATE executor
+    that wires them together for one turn, plus the deterministic
+    patient-facing templates in recovery_integration.py.
+
+    THA/GEN (no supported quantitative milestone in the current corpus) skip
+    the deterministic loop entirely and fall through to the existing,
+    unmodified ChatAgent/RAG grounded-guidance path -- see
+    _grounded_guidance(). TKA always runs the full loop, including for a
+    generic opening message ("How is my recovery going?"), which is exactly
+    what naturally produces an ASK_FOR_INFORMATION turn instead of an
+    immediate guess.
+    """
+
     TARGET_AGENT = TargetAgent.RECOVERY_AGENT
     DOMAIN_FOCUS = (
         "Focus on recovery milestones, expected postoperative progression, and "
         "realistic healing timelines. Do not present an exact recovery date as "
         "guaranteed -- frame timelines as typical ranges, not promises."
     )
+
+    ENGINE_NAME = "Recovery Deterministic Assessment Engine"
 
     @classmethod
     def handle(
@@ -90,47 +74,263 @@ class RecoveryProgressAgent(BaseClinicalAgent):
         surgery_date: Optional[str] = None,
         precomputed_triage: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """
-        Milestone Sec 2.5 (Recovery Progress Agent): compares postop_day
-        against the Day-range window already attached to each RAG-retrieved
-        clinical benchmark, so the underlying LLM/fallback pipeline can give
-        genuine stage-specific guidance, milestone framing, and timeline
-        reassurance -- grounded in the SAME retrieved chunks it would use
-        anyway, not a second knowledge source or invented values.
+        supported_metrics = recovery_logic.SUPPORTED_METRICS_BY_PROCEDURE.get(procedure, ())
 
-        This performs one extra, local, read-only RAG lookup (identical
-        query/procedure/limit to the one ChatAgent.answer_question() makes
-        internally) purely to read each chunk's `days` metadata before the
-        LLM prompt is built. It is intentionally NOT threaded through as a
-        shared parameter on ChatAgent/BaseClinicalAgent -- retrieval is
-        local, deterministic, and cheap (see rag/vector_store.py), so the
-        small duplicate lookup is simpler and safer than widening the
-        shared response-generation interface for one agent's use.
-
-        Any failure here (e.g. vector store unavailable) is swallowed and
-        falls back to the plain DOMAIN_FOCUS unchanged -- milestone framing
-        is a best-effort enrichment, never a precondition for answering.
-        """
-        domain_instruction = cls.DOMAIN_FOCUS
-        try:
-            detail = ClinicalKnowledgeBase.retrieve_detailed(
-                user_message, procedure=procedure, limit=2
+        if not supported_metrics:
+            # THA / GEN: no sourced deterministic progress milestone exists
+            # for either in the current corpus (THA-01 is precautions-only;
+            # no GEN-specific document exists at all) -- preserve the
+            # existing, unmodified grounded-guidance path rather than running
+            # the TKA-only deterministic loop. This is intentional: it means
+            # no RecoverySessionState is created and no interview/
+            # continuation loop runs for THA/GEN today. If a future pass adds
+            # a sourced THA/GEN deterministic milestone, this early return
+            # must be revisited so those procedures can participate in the
+            # state/interview/continuation loop like TKA does. No functional
+            # THA/GEN change in this pass.
+            return cls._grounded_guidance(
+                patient_id=patient_id, surgery_type=surgery_type, affected_limb=affected_limb,
+                postop_day=postop_day, user_message=user_message, procedure=procedure,
+                chat_history=chat_history, surgery_date=surgery_date, precomputed_triage=precomputed_triage,
             )
-            stage_notes = [
-                _stage_note(postop_day, chunk.title, day_range)
-                for chunk in detail.results
-                for day_range in [_parse_day_range(chunk.days)]
-                if day_range is not None
-            ]
-            if stage_notes:
-                domain_instruction = (
-                    f"{cls.DOMAIN_FOCUS} Ground your answer in these retrieved "
-                    "milestone windows -- do not state a different timeline "
-                    "than what is given here: " + " ".join(stage_notes)
-                )
-        except Exception:
-            pass
 
+        # ================================================================
+        # OBSERVE
+        # ================================================================
+        state = recovery_state.get_or_create_state(
+            patient_id=patient_id, surgery_date_raw=surgery_date, procedure=procedure,
+        )
+        # Diagnostic only -- never authoritative for any comparison. This is
+        # the ONE intentional public field assignment on RecoverySessionState
+        # from outside its own methods (everything else routes through the
+        # approved set_fact/mark_pending/mark_unknown/mark_unavailable/
+        # apply_verified_day/clear_verified_day API). client_reported_postop_day
+        # exists solely so a conflicting client-supplied day can be compared
+        # against effective_postop_day for diagnostics/tests -- see Section 4
+        # smoke case H below. Known API-consistency cleanup item for Pass 3:
+        # consider a dedicated RecoverySessionState mutator for this field so
+        # ALL writes route through a method; not addressed in this pass
+        # because no functional bug requires it.
+        state.client_reported_postop_day = postop_day
+
+        effective_day = recovery_integration.derive_effective_postop_day(surgery_date)
+        if effective_day is not None:
+            state.apply_verified_day(effective_day)
+        else:
+            state.clear_verified_day()
+
+        extraction = recovery_logic.extract_and_apply(user_message, state)
+        ambiguous_field_names = tuple(a.field_name for a in extraction.ambiguous_fields)
+
+        metric = cls._select_metric_for_turn(
+            state, supported_metrics, extraction, ambiguous_field_names,
+        )
+
+        # ONE Recovery-owned retrieval for this entire turn -- the same
+        # result feeds the decision function's evidence gate, the full
+        # checkpoint evaluation, and source attribution below. No second,
+        # independent retrieval on the assess branch. The query is the real
+        # user message, augmented with a small metric-specific hint (see
+        # recovery_integration.build_retrieval_query) so a terse
+        # continuation reply ("80 degrees") still retrieves reliably.
+        evidence = cls._retrieve_recovery_evidence(user_message, procedure, metric)
+
+        # ================================================================
+        # DECIDE (pure -- see recovery_logic.decide_progress_verdict_action)
+        # ================================================================
+        decision = recovery_logic.decide_progress_verdict_action(
+            state, procedure=procedure, metric=metric, evidence=evidence,
+            ambiguous_fields=ambiguous_field_names,
+        )
+
+        # ================================================================
+        # ACT + UPDATE (state transitions owned here -- see the executor
+        # transition table in the Pass-2 report)
+        # ================================================================
+        return cls._execute_decision(
+            state=state, decision=decision, metric=metric, evidence=evidence,
+            precomputed_triage=precomputed_triage,
+        )
+
+    # ------------------------------------------------------------------
+    # Metric selection -- one metric drives each turn (see Pass-2 report
+    # for why: decide_progress_verdict_action is specified per-metric, and
+    # combining multiple metrics into one response is out of this pass's
+    # scope; see also ONE ACTION PER TURN in the Pass-2-correction report --
+    # this executor already returns exactly one reply per turn, so picking
+    # exactly one metric here is what keeps that true).
+    #
+    # PRIORITY (highest first) -- correction-pass fix: flexion/extension are
+    # INDEPENDENT supported comparisons, so a metric the patient just
+    # answered must never be dropped in favor of asking about the OTHER
+    # metric. Previously this scanned supported_metrics in fixed order and
+    # returned the first not-yet-current one, which meant a just-supplied
+    # flexion value was silently skipped whenever extension also happened to
+    # be not-current (e.g. NEVER_ASKED) -- the patient's answer was stored
+    # but never assessed, and extension was asked instead. Fixed order below:
+    #
+    #   1. a supported metric THIS TURN's extraction applied
+    #      (extraction.applied_facts) AND that is now current
+    #      (state.is_current(metric)) -- assess what was just supplied.
+    #   2. a supported metric THIS TURN was marked UNKNOWN
+    #      (extraction.marked_unknown_fields) -- keep deciding about THAT
+    #      metric ("I don't know" must not silently switch metrics).
+    #   3. a supported metric THIS TURN was reported ambiguous
+    #      (ambiguous_field_names) -- clarification targets that metric.
+    #   4. the existing pending_field, if it names a supported metric --
+    #      an open question is not abandoned just because this turn
+    #      supplied/flagged nothing for it.
+    #   5. the next supported metric that is not yet current (canonical
+    #      SUPPORTED_METRICS_BY_PROCEDURE order -- for TKA that is flexion,
+    #      then extension).
+    #   6. deterministic fallback: the first supported metric, once every
+    #      supported metric is already current and nothing new happened
+    #      this turn.
+    #
+    # MULTI-FACT DETERMINISM (rule C): if one message supplies more than one
+    # supported metric at once (e.g. "I can bend to 80 and straighten to 3
+    # degrees."), extract_and_apply() has already stored BOTH facts via
+    # set_fact() before this runs -- this method still returns exactly ONE
+    # metric for THIS turn's decision/response, chosen by scanning
+    # `supported_metrics` in its canonical order (flexion before extension
+    # for TKA), so flexion wins a tie. The other supplied fact remains
+    # stored and available for selection on a later turn; this pass never
+    # produces two verdicts in one reply.
+    #
+    # Reads only extraction.applied_facts / marked_unknown_fields (the
+    # approved ExtractionResult fields) plus state.is_current() /
+    # state.pending_field (both public) -- never re-scans raw message text
+    # and never reaches into RecoverySessionState's private fields.
+    # ------------------------------------------------------------------
+    @classmethod
+    def _select_metric_for_turn(
+        cls,
+        state,
+        supported_metrics,
+        extraction: "recovery_logic.ExtractionResult",
+        ambiguous_field_names: tuple,
+    ) -> str:
+        applied_field_names = tuple(f.field_name for f in extraction.applied_facts)
+
+        # 1. Supplied/updated this turn and now current -- assess it.
+        for metric in supported_metrics:
+            if metric in applied_field_names and state.is_current(metric):
+                return metric
+
+        # 2. Marked UNKNOWN this turn -- keep deciding for that metric.
+        for metric in supported_metrics:
+            if metric in extraction.marked_unknown_fields:
+                return metric
+
+        # 3. Ambiguous this turn -- clarification targets that metric.
+        for metric in supported_metrics:
+            if metric in ambiguous_field_names:
+                return metric
+
+        # 4. An outstanding pending question on a supported metric.
+        if state.pending_field in supported_metrics:
+            return state.pending_field
+
+        # 5. Next supported metric that is not yet current.
+        for metric in supported_metrics:
+            if not state.is_current(metric):
+                return metric
+
+        # 6. Everything current, nothing new this turn -- deterministic
+        # fallback to the first supported metric.
+        return supported_metrics[0]
+
+    # ------------------------------------------------------------------
+    # Single Recovery-owned retrieval per progress-verdict turn.
+    # ------------------------------------------------------------------
+    @classmethod
+    def _retrieve_recovery_evidence(
+        cls, user_message: str, procedure: str, metric: str
+    ) -> Optional["recovery_logic.RecoveryEvidence"]:
+        query = recovery_integration.build_retrieval_query(user_message, metric)
+        try:
+            detail = ClinicalKnowledgeBase.retrieve_detailed(query, procedure=procedure, limit=2)
+        except Exception:
+            return None
+        if not detail.results:
+            return None
+        return recovery_integration.build_recovery_evidence_from_chunk(detail.results[0])
+
+    # ------------------------------------------------------------------
+    # Executor -- owns every state transition the pure decision function
+    # itself does not perform. See the transition table in the Pass-2
+    # report for the exact action -> state-method mapping.
+    # ------------------------------------------------------------------
+    @classmethod
+    def _execute_decision(
+        cls, *, state, decision, metric: str, evidence, precomputed_triage: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        RA = recovery_logic.RecoveryAction
+        DRC = recovery_logic.DecisionReasonCode
+
+        if decision.action == RA.ASK_FOR_INFORMATION:
+            state.mark_pending(metric)
+            reply = recovery_integration.format_ask_question(metric)
+            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+
+        if decision.action == RA.AWAIT_INFORMATION:
+            # metric is already the tracked pending_field -- no duplicate
+            # mark_pending(), no state mutation at all.
+            reply = recovery_integration.format_ask_question(metric)
+            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+
+        if decision.action == RA.DECLINE_TO_ASSESS:
+            if decision.reason_code == DRC.RETRY_EXHAUSTED:
+                # The ONE transition the executor must perform on decline:
+                # retries are exhausted, so the field is now UNAVAILABLE for
+                # the remainder of this interview. Every other decline
+                # reason (FIELD_UNAVAILABLE already, or an evidence/day/
+                # source/window failure) performs NO interview mutation.
+                state.mark_unavailable(metric)
+            reply = recovery_integration.format_decline_message(decision.reason_code, metric=metric, evidence=evidence)
+            sources = [evidence.source_id] if evidence is not None else []
+            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=sources)
+
+        if decision.action == RA.ASSESS_SUPPORTED_METRIC:
+            # No interview mutation merely because an assessment succeeded.
+            checkpoint = recovery_logic.evaluate_checkpoint(
+                state, procedure=decision.procedure, metric=metric, evidence=evidence,
+            )
+            reply = recovery_integration.format_assess_message(checkpoint)
+            sources = [evidence.source_id] if evidence is not None else []
+            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=sources)
+
+        # Defensive fallback only -- decide_progress_verdict_action() never
+        # returns PROVIDE_GROUNDED_GUIDANCE in this design (THA/GEN are
+        # routed around the decision function entirely, above). Degrades
+        # safely rather than crashing if that ever changes.
+        reply = recovery_integration.format_decline_message("unexpected_action", metric=metric, evidence=evidence)
+        return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+
+    @classmethod
+    def _structured_reply(
+        cls, reply_text: str, *, precomputed_triage: Optional[Dict[str, Any]], sources: List[str],
+    ) -> Dict[str, Any]:
+        triage_level = precomputed_triage.get("triage_level", "GREEN") if precomputed_triage else "GREEN"
+        is_escalated = precomputed_triage.get("is_escalated", False) if precomputed_triage else False
+        return {
+            "reply": reply_text,
+            "triage_level": triage_level,
+            "is_escalated": is_escalated,
+            "engine": cls.ENGINE_NAME,
+            "sources": sources,
+        }
+
+    # ------------------------------------------------------------------
+    # Ordinary grounded guidance -- UNCHANGED existing ChatAgent/RAG path.
+    # chat_agent.py is not modified; this is not a duplicate implementation.
+    # ------------------------------------------------------------------
+    @classmethod
+    def _grounded_guidance(
+        cls, *, patient_id: str, surgery_type: str, affected_limb: str, postop_day: int,
+        user_message: str, procedure: str, chat_history: Optional[List[Dict[str, str]]],
+        surgery_date: Optional[str], precomputed_triage: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
         return ChatAgent.answer_question(
             patient_id=patient_id,
             surgery_type=surgery_type,
@@ -139,7 +339,7 @@ class RecoveryProgressAgent(BaseClinicalAgent):
             user_message=user_message,
             chat_history=chat_history,
             procedure=procedure,
-            domain_instruction=domain_instruction,
+            domain_instruction=cls.DOMAIN_FOCUS,
             precomputed_triage=precomputed_triage,
             surgery_date=surgery_date,
         )
