@@ -102,6 +102,7 @@ class LAMContext:
     user_message: str
     surgery_date: Optional[str] = None
     chat_history: List[Dict[str, str]] = field(default_factory=list)
+    medication_names: List[str] = field(default_factory=list)
 
 
 @dataclass

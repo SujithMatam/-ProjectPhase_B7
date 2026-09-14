@@ -51,6 +51,7 @@ from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
 from agents.recovery_integration import check_recovery_continuation
 from doctor_alert import doctor_alert_notifier
+from agents.report_agent import ReportGenerationAgent
 
 from lam.schemas import (
     IntentLabel,
@@ -604,6 +605,13 @@ class LAMOrchestrator:
             user_message=user_message,
             surgery_date=surgery_date,
             chat_history=history,
+            medication_names=[
+                str(medication.get("name", "")).strip()
+                for medication in ReportGenerationAgent.get_patient_record(patient_id).get(
+                    "current_medications", []
+                )
+                if medication.get("name")
+            ],
         )
 
 

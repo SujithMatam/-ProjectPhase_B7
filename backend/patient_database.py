@@ -214,6 +214,14 @@ def list_patient_ids(path: Optional[str] = None) -> List[str]:
         return [row[0] for row in connection.execute("SELECT patient_id FROM patients ORDER BY patient_id")]
 
 
+def list_patients(path: Optional[str] = None) -> List[Dict[str, Any]]:
+    initialize_database(path)
+    return [
+        get_patient(patient_id, path)
+        for patient_id in list_patient_ids(path)
+    ]
+
+
 def save_source_report(patient_id: Optional[str], filename: str, extraction: Dict[str, Any],
                        path: Optional[str] = None) -> None:
     initialize_database(path)

@@ -293,6 +293,13 @@ def _looks_like_medication_follow_up(
     )
 
 
+def _matches_recorded_medication(text: str, medication_names: list[str]) -> bool:
+    return any(
+        name and re.search(r"\b" + re.escape(name.lower()) + r"\b", text)
+        for name in medication_names
+    )
+
+
 _PAIN_KEYWORDS = {
     "pain",
     "hurt",
@@ -871,6 +878,18 @@ class IntentClassifier:
     ) -> ClassificationDetail:
 
         text = _normalise_query(query)
+
+        if _matches_recorded_medication(text, context.medication_names):
+            return ClassificationDetail(
+                intent=IntentLabel.MEDICATION,
+                top1_intent=IntentLabel.MEDICATION,
+                top1_score=1.0,
+                top2_intent=None,
+                top2_score=0.0,
+                margin=1.0,
+                matched_prototype=None,
+                decision_path="deterministic_patient_record",
+            )
 
         # Short follow-ups often omit the medication noun ("when should I
         # take it?"). Preserve the medication route when the conversation

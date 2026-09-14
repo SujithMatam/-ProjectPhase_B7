@@ -48,3 +48,9 @@ Patient records and report-derived recovery data are stored in SQLite
 scheduler starts on application startup, polls every 30 seconds, and sends
 only doctor-recorded non-PRN doses when SMTP credentials are configured.
 Without SMTP credentials it logs due reminders but does not send mail.
+
+The local admin dashboard is available at `/admin`. Sign in with the seeded
+local admin account (`admin` / `admin123`) to view patient records in a table,
+upload a PDF for extraction, and press **Refresh database** after extraction
+to reload the persisted SQLite records. Admin API access uses a process-local
+bearer token and is intended for local development only.

@@ -442,6 +442,24 @@ def t_router_dispatches_medication_agent():
 run("AgentRouter dispatches MEDICATION intent to MedicationAgent", t_router_dispatches_medication_agent)
 
 
+def t_recorded_medication_names_route_to_medication_agent():
+    _reset(PID)
+    from lam.orchestrator import LAMOrchestrator
+
+    for medication_name in ("paracetamol", "enoxaparin", "oxycodone", "docusate sodium"):
+        result = LAMOrchestrator.process(
+            patient_id=PID,
+            surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right",
+            postop_day=3,
+            user_message=f"{medication_name}?",
+        )
+        assert result["target_agent"] == "MedicationAgent"
+
+
+run("All recorded medication names route to MedicationAgent", t_recorded_medication_names_route_to_medication_agent)
+
+
 def t_router_medication_missed_dose_end_to_end():
     _reset(PID)
     from agents.agent_router import AgentRouter

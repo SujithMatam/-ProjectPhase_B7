@@ -15,11 +15,12 @@ from __future__ import annotations
 import os
 import uuid
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Header
 from fastapi.responses import JSONResponse
 
 from report_extractor import extract_report
-from patient_database import create_patient, save_source_report
+from patient_database import create_patient, list_patients, save_source_report
+from admin_auth import authenticate, is_authenticated
 import sqlite3
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -27,8 +28,32 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
+def require_admin(authorization: str | None = Header(default=None)) -> str:
+    token = authorization.removeprefix("Bearer ").strip() if authorization else None
+    if not is_authenticated(token):
+        raise HTTPException(status_code=401, detail="Admin login required")
+    return token
+
+
+@router.post("/login")
+def admin_login(payload: dict):
+    token = authenticate(str(payload.get("username", "")), str(payload.get("password", "")))
+    if not token:
+        raise HTTPException(status_code=401, detail="Invalid admin credentials")
+    return {"token": token, "username": "admin"}
+
+
+@router.get("/patients")
+def admin_patients(_: str = Depends(require_admin)):
+    return {"patients": list_patients()}
+
+
 @router.post("/extract-report")
-async def extract_report_endpoint(file: UploadFile = File(...), patient_id: str | None = None):
+async def extract_report_endpoint(
+    file: UploadFile = File(...),
+    patient_id: str | None = None,
+    _: str = Depends(require_admin),
+):
     """
     Accepts a single uploaded PDF, runs the dynamic extraction pipeline,
     and returns the structured fields as JSON.
@@ -101,6 +126,8 @@ async def extract_report_endpoint(file: UploadFile = File(...), patient_id: str 
             }
         )
 
+    except HTTPException:
+        raise
     except Exception as exc:
         # Never let an unexpected extraction error leak a raw traceback
         # to the admin dashboard -- log it server-side in a real
