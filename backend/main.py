@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from datetime import date
+from pathlib import Path
 from typing import Optional, List, Dict, Any
 
 from agents.symptom_agent import SymptomAssessmentAgent
@@ -255,7 +256,8 @@ def chat(payload: ChatRequest):
 # NEW: serves the admin dashboard page at http://127.0.0.1:8000/admin
 @app.get("/admin")
 def admin_dashboard():
-    return FileResponse("admin_dashboard.html")
+    dashboard_path = Path(__file__).resolve().with_name("admin_dashboard.html")
+    return FileResponse(dashboard_path)
 
 
 if __name__ == "__main__":
