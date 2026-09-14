@@ -37,6 +37,14 @@ $env:REMINDER_SMTP_PASSWORD="your-gmail-app-password"
 python -m uvicorn main:app --app-dir backend --reload
 ```
 
+For RED doctor alerts, use `SMTP_PASSWORD` with the `SMTP_USERNAME` account
+and `DOCTOR_ALERT_EMAIL` recipient. For medication reminders, use
+`REMINDER_SMTP_USER` and `REMINDER_SMTP_PASSWORD`. These are separate
+configuration channels. If using `setx` on Windows, close and reopen the
+terminal before starting Uvicorn; `setx` does not update an already-running
+server process. You can also set variables in the current PowerShell session
+with `$env:NAME="value"` before starting the backend.
+
 Optional SMTP settings are `REMINDER_SMTP_HOST` (defaults to
 `smtp.gmail.com`), `REMINDER_SMTP_PORT` (defaults to `587`), and
 `REMINDER_SMTP_FROM`. The reminder status is available at
@@ -48,6 +56,9 @@ Patient records and report-derived recovery data are stored in SQLite
 scheduler starts on application startup, polls every 30 seconds, and sends
 only doctor-recorded non-PRN doses when SMTP credentials are configured.
 Without SMTP credentials it logs due reminders but does not send mail.
+
+After signing in to `/admin`, `GET /api/admin/notifications/status` reports
+whether each SMTP channel has credentials present without exposing passwords.
 
 The local admin dashboard is available at `/admin`. Sign in with the seeded
 local admin account (`admin` / `admin123`) to view patient records in a table,

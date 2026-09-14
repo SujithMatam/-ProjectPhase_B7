@@ -21,6 +21,7 @@ from fastapi.responses import JSONResponse
 from report_extractor import extract_report
 from patient_database import create_patient, delete_patient, list_patients, save_source_report
 from admin_auth import authenticate, is_authenticated
+from doctor_alert import doctor_alert_notifier
 import sqlite3
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -46,6 +47,24 @@ def admin_login(payload: dict):
 @router.get("/patients")
 def admin_patients(_: str = Depends(require_admin)):
     return {"patients": list_patients()}
+
+
+@router.get("/notifications/status")
+def admin_notification_status(_: str = Depends(require_admin)):
+    """Expose configuration state without returning SMTP secrets."""
+    return {
+        "red_doctor_alert": doctor_alert_notifier.status(),
+        "medication_reminders": {
+            "configured": bool(
+                os.getenv("REMINDER_SMTP_USER")
+                and os.getenv("REMINDER_SMTP_PASSWORD")
+            ),
+            "smtp_host": os.getenv("REMINDER_SMTP_HOST", "smtp.gmail.com"),
+            "smtp_port": int(os.getenv("REMINDER_SMTP_PORT", "587")),
+            "sender_present": bool(os.getenv("REMINDER_SMTP_USER")),
+            "password_present": bool(os.getenv("REMINDER_SMTP_PASSWORD")),
+        },
+    }
 
 
 @router.delete("/patients/{patient_id}")
