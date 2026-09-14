@@ -13,12 +13,14 @@ it's a new, separate route for the admin dashboard only.
 from __future__ import annotations
 
 import os
-import tempfile
+import uuid
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 
 from report_extractor import extract_report
+from patient_database import create_patient, save_source_report
+import sqlite3
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -26,7 +28,7 @@ MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
 @router.post("/extract-report")
-async def extract_report_endpoint(file: UploadFile = File(...)):
+async def extract_report_endpoint(file: UploadFile = File(...), patient_id: str | None = None):
     """
     Accepts a single uploaded PDF, runs the dynamic extraction pipeline,
     and returns the structured fields as JSON.
@@ -49,20 +51,53 @@ async def extract_report_endpoint(file: UploadFile = File(...)):
     if not contents:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
-    # Write to a temp file -- pdfplumber/report_extractor works off a
-    # file path, and this avoids holding the whole PDF in memory twice.
+    # Keep the upload in a project-local staging directory.  This avoids
+    # relying on an OS temp directory and keeps extraction cleanup explicit.
     tmp_path = None
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+        staging_dir = os.path.join(os.path.dirname(__file__), ".report_uploads")
+        os.makedirs(staging_dir, exist_ok=True)
+        tmp_path = os.path.join(staging_dir, f"{uuid.uuid4().hex}.pdf")
+        with open(tmp_path, "wb") as tmp_file:
             tmp_file.write(contents)
-            tmp_path = tmp_file.name
 
         result = extract_report(tmp_path)
+        extraction = result.to_dict()
+        linked_patient_id = patient_id.strip().upper() if patient_id else None
+        if extraction.get("full_name"):
+            # Persist only values explicitly extracted from the report.  A
+            # supplied ID links the source report; otherwise create a new
+            # stable record ID without guessing any clinical values.
+            if not linked_patient_id:
+                linked_patient_id = f"PT-{uuid.uuid4().hex[:12].upper()}"
+            extracted_patient = {
+                "patient_id": linked_patient_id,
+                "full_name": extraction["full_name"],
+                "age": int(extraction["age"]) if str(extraction.get("age", "")).isdigit() else None,
+                "gender": extraction.get("sex"),
+                "surgery_type": extraction.get("surgery_type"),
+                "surgery_date": extraction.get("surgery_date"),
+                "current_medications": [
+                    {"name": medication}
+                    for medication in extraction.get("prescriptions", [])
+                ],
+            }
+            try:
+                create_patient(extracted_patient)
+            except sqlite3.IntegrityError:
+                if not patient_id:
+                    raise HTTPException(
+                        status_code=409,
+                        detail="Generated patient ID already exists; please retry the upload.",
+                    )
+        save_source_report(linked_patient_id, file.filename, extraction)
 
         return JSONResponse(
             content={
                 "filename": file.filename,
-                "extraction": result.to_dict(),
+                "extraction": extraction,
+                "source_report_saved": True,
+                "patient_id": linked_patient_id,
             }
         )
 

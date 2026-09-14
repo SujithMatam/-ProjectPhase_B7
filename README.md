@@ -26,12 +26,12 @@ reminder.
 
 When the backend starts, its medication reminder scheduler checks the report
 schedule every 30 seconds. The current recipient defaults to
-`rvns12345@gamil.com` and can be changed with `MEDICATION_REMINDER_EMAIL`.
+`rvns12345@gmail.com` and can be changed with `MEDICATION_REMINDER_EMAIL`.
 Email delivery requires SMTP credentials in environment variables; no
 credentials are stored in the repository:
 
 ```powershell
-$env:MEDICATION_REMINDER_EMAIL="rvns12345@gamil.com"
+$env:MEDICATION_REMINDER_EMAIL="rvns12345@gmail.com"
 $env:REMINDER_SMTP_USER="your-sender@gmail.com"
 $env:REMINDER_SMTP_PASSWORD="your-gmail-app-password"
 python -m uvicorn main:app --app-dir backend --reload
@@ -42,3 +42,9 @@ Optional SMTP settings are `REMINDER_SMTP_HOST` (defaults to
 `REMINDER_SMTP_FROM`. The reminder status is available at
 `GET /api/medications/reminders/status`; the patient schedule is available at
 `GET /api/medications/schedule/{patient_id}`.
+
+Patient records and report-derived recovery data are stored in SQLite
+(`PATIENT_DATABASE_PATH`, or `backend/patients.sqlite3` by default). The
+scheduler starts on application startup, polls every 30 seconds, and sends
+only doctor-recorded non-PRN doses when SMTP credentials are configured.
+Without SMTP credentials it logs due reminders but does not send mail.

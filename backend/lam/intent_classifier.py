@@ -228,7 +228,9 @@ _INTAKE_PATTERNS = [
 
 _MEDICATION_KEYWORDS = {
     "medication",
+    "medications",
     "medicine",
+    "medicines",
     "drug",
     "drugs",
     "pill",
@@ -253,6 +255,13 @@ _MEDICATION_KEYWORDS = {
     "prescription",
     "missed dose",
     "side effect",
+    "timing",
+    "schedule",
+    "purpose",
+    "safety",
+    "safe",
+    "warning",
+    "precaution",
 }
 
 

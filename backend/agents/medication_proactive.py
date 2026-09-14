@@ -229,6 +229,8 @@ class ProactiveMedicationEngine:
     ) -> Optional[str]:
         """Answer ordinary medication questions from the patient's record."""
         lower = message.lower()
+        from agents.report_agent import ReportGenerationAgent
+
         medication_question = any(
             marker in lower
             for marker in (
@@ -239,6 +241,8 @@ class ProactiveMedicationEngine:
                 "painkiller", "blood thinner", "anticoagulant", "anticoagulants",
                 "anticaogulant", "anticaogulants",
                 "interact", "interaction", "combine", "together", "safe with",
+                "purpose", "safety", "side effect", "side-effect", "warning",
+                "precaution", "risk",
             )
         )
         if not medication_question:
@@ -281,20 +285,85 @@ class ProactiveMedicationEngine:
         asks_purpose = any(
             marker in lower for marker in ("what is", "used for", "why", "purpose")
         )
+        asks_safety = any(
+            marker in lower
+            for marker in (
+                "safety", "safe", "side effect", "side-effect", "warning",
+                "risk", "precaution", "adverse", "harm",
+            )
+        )
 
         asks_quantity = any(marker in lower for marker in ("how many", "how much", "number of"))
+
+        asks_list = any(
+            marker in lower
+            for marker in (
+                "my medication", "my medications", "my medicine", "my medicines",
+                "medications", "medicines", "list", "all medication", "all medicine",
+            )
+        )
+
+        if (asks_list or asks_purpose or asks_safety) and not selected:
+            schedule = ReportGenerationAgent.get_daily_medication_schedule(state.patient_id)
+            if not prescribed:
+                return (
+                    "I cannot find a medication list in your doctor-provided record. "
+                    "Please check your discharge prescription or contact your pharmacist."
+                )
+            lines = []
+            for med in prescribed:
+                name = med.get("name", "Unnamed medication")
+                rows = [
+                    row for row in schedule
+                    if row.get("medication", "").lower() == name.lower()
+                ]
+                times = ", ".join(row["time"] for row in rows) or "as directed on the label"
+                detail = (
+                    f"purpose: {med.get('purpose') or 'not specified'}"
+                    if asks_purpose or asks_list
+                    else "follow the label and do not change it without clinical advice"
+                )
+                lines.append(
+                    f"**{name}** - "
+                    f"{med.get('dose') or 'see label'}; "
+                    f"{detail}; daily timing: {times}"
+                )
+            prefix = (
+                "Your doctor-record medication details are:"
+                if asks_list
+                else "Here are the medication details from your doctor-record:"
+            )
+            safety_note = (
+                "\n\nFor safety, never double a dose or add another medicine without "
+                "checking with your pharmacist or surgical team. Ask about a specific "
+                "medicine if you need its side-effect warnings."
+                if asks_safety
+                else ""
+            )
+            return (
+                prefix + "\n\n"
+                + "\n".join(f"- {line}" for line in lines)
+                + "\n\nThese display times are expanded from the recorded frequency. "
+                "Follow the prescription label if it differs." + safety_note
+            )
 
         if selected:
             name = selected.get("name", "this medication")
             dose = selected.get("dose") or "the dose printed on your prescription label"
             purpose = selected.get("purpose")
             if asks_timing:
+                schedule = ReportGenerationAgent.get_daily_medication_schedule(state.patient_id)
+                times = [
+                    row["time"] for row in schedule
+                    if row.get("medication", "").lower() == name.lower()
+                ]
+                timing = ", ".join(times) if times else "as directed on the prescription label"
                 return (
-                    f"For **{name}**, follow the timing and frequency on your "
-                    f"prescription label ({dose}); I cannot safely infer exact clock "
-                    "times from this chat. If you are unsure when the next dose is "
-                    "due, confirm with your pharmacist or surgical team. Do not "
-                    "take an extra dose to catch up."
+                    f"For **{name}**, the doctor-record schedule is **{timing}** "
+                    f"({dose}). These are display times expanded from the recorded "
+                    "frequency; follow your prescription label if it differs. If "
+                    "you are unsure when the next dose is due, confirm with your "
+                    "pharmacist or surgical team. Do not take an extra dose to catch up."
                 )
             if asks_dose:
                 return (
@@ -309,6 +378,35 @@ class ProactiveMedicationEngine:
                     f"**{name}** is listed for {purpose_text}. Take it only as prescribed, and "
                     "check with your clinician or pharmacist before changing it."
                 )
+            if asks_safety:
+                lower_name = name.lower()
+                if any(term in lower_name for term in ("enoxaparin", "warfarin", "heparin", "aspirin")):
+                    warning = (
+                        "Watch for unusual bleeding, black stools, blood in urine, "
+                        "or extensive bruising; seek urgent help for severe bleeding. "
+                        "Do not add another blood thinner or stop this medicine without "
+                        "your surgical team."
+                    )
+                elif any(term in lower_name for term in ("oxycodone", "tramadol", "opioid")):
+                    warning = (
+                        "It may cause drowsiness, dizziness, nausea, or constipation. "
+                        "Do not take extra doses or combine it with alcohol or sedatives; "
+                        "seek urgent help for extreme sleepiness or slow breathing."
+                    )
+                elif any(term in lower_name for term in ("paracetamol", "acetaminophen")):
+                    warning = (
+                        "Do not exceed the prescribed amount or combine it with another "
+                        "product containing paracetamol/acetaminophen. Report a rash or "
+                        "concerning reaction and ask a pharmacist about liver risks."
+                    )
+                else:
+                    warning = (
+                        "Take it only as prescribed and ask a pharmacist before adding "
+                        "another medicine. Report a rash, breathing difficulty, severe "
+                        "vomiting, unusual bleeding, or another concerning reaction "
+                        "to your clinical team."
+                    )
+                return f"Safety for **{name}**: {warning}"
             if asks_quantity:
                 return (
                     f"Only take the number of **{name}** doses or tablets written on "
@@ -337,15 +435,25 @@ class ProactiveMedicationEngine:
                     "Please check the prescription label or discharge instructions "
                     "and contact your pharmacist or surgical team before taking it."
                 )
+            schedule = ReportGenerationAgent.get_daily_medication_schedule(state.patient_id)
             medication_list = "; ".join(
                 f"{med.get('name', 'Unnamed medication')}: "
                 f"{med.get('dose') or 'see label'}"
+                + (
+                    " at " + ", ".join(
+                        row["time"] for row in schedule
+                        if row.get("medication", "").lower()
+                        == med.get("name", "").lower()
+                    )
+                    if asks_timing else ""
+                )
                 for med in prescribed
             )
             return (
                 f"Your postoperative record lists: {medication_list}. "
-                "Use each medicine only according to its own label and do not "
-                "combine or double doses. Which medication are you asking about?"
+                "These display times are expanded from the recorded frequency; "
+                "follow the prescription label if it differs. Do not combine or "
+                "double doses. Which medication are you asking about?"
             )
 
         return (

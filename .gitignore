@@ -55,3 +55,7 @@ backend/.venv/
 backend/rag/data/chroma_db/
 
 backend/models/
+
+# Runtime patient data (schema and demo rows are seeded on startup)
+backend/patients.sqlite3
+backend/.report_uploads/
