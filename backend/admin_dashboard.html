@@ -258,7 +258,11 @@
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { text-align: left; padding: 9px; border-bottom: 1px solid var(--line); vertical-align: top; }
   th { color: var(--ink-soft); background: #f4f7f5; }
-  .toolbar { display: flex; gap: 10px; align-items: center; }
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn.secondary { background: #eef2f0; color: var(--pine-deep); border: 1px solid var(--line); }
+  .btn.danger { background: #a83b3b; }
+  .btn.danger:hover { background: #812d2d; }
+  .file-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 </style>
 </head>
 <body>
@@ -296,8 +300,11 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <path d="M14 2v6h6"/>
         </svg>
-        <div>Click to choose a PDF report from your computer</div>
-        <button class="btn" type="button" id="choose-btn">Choose PDF file</button>
+        <div>Choose a PDF report, then preview it before extracting.</div>
+        <div class="file-actions">
+          <button class="btn secondary" type="button" id="choose-btn">Open / replace PDF</button>
+          <button class="btn" type="button" id="extract-btn" disabled>Extract details</button>
+        </div>
         <input type="file" id="file-input" accept="application/pdf">
       </div>
       <iframe id="pdf-frame"></iframe>
@@ -329,7 +336,7 @@
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Patient ID</th><th>Name</th><th>Age</th><th>Surgery</th><th>Medications</th><th>Updated data</th></tr></thead>
+      <thead><tr><th>Patient ID</th><th>Name</th><th>Age</th><th>Surgery</th><th>Medications</th><th>Updated data</th><th>Actions</th></tr></thead>
       <tbody id="patient-table-body"></tbody>
     </table>
   </div>
@@ -340,6 +347,7 @@
   const dropZone = document.getElementById('drop-zone');
   const chooseBtn = document.getElementById('choose-btn');
   const fileInput = document.getElementById('file-input');
+  const extractBtn = document.getElementById('extract-btn');
   const pdfFrame = document.getElementById('pdf-frame');
   const filenameRow = document.getElementById('filename-row');
   const emptyState = document.getElementById('empty-state');
@@ -359,6 +367,7 @@
   const EXTRACT_ENDPOINT = '/api/admin/extract-report';
   const tokenKey = 'orthosync_admin_token';
   let adminToken = sessionStorage.getItem(tokenKey);
+  let selectedFile = null;
 
   const FIELD_LABELS = {
     full_name: 'Full Name',
@@ -372,7 +381,12 @@
   };
 
   chooseBtn.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('click', () => fileInput.click());
+  extractBtn.addEventListener('click', () => {
+    if (selectedFile) extractReport(selectedFile);
+  });
+  dropZone.addEventListener('click', (event) => {
+    if (event.target === dropZone) fileInput.click();
+  });
   loginForm.addEventListener('submit', login);
   refreshBtn.addEventListener('click', loadPatients);
 
@@ -424,7 +438,8 @@
         <td>${escapeHtml(String(patient.age ?? ''))}</td>
         <td>${escapeHtml(patient.surgery_type || '')}</td>
         <td>${meds}</td>
-        <td>${escapeHtml(String(patient.updated_at || ''))}</td></tr>`;
+        <td>${escapeHtml(String(patient.updated_at || ''))}</td>
+        <td><button class="btn danger" type="button" onclick="deletePatient('${escapeHtml(patient.patient_id)}')">Delete</button></td></tr>`;
     }).join('');
   }
 
@@ -434,15 +449,18 @@
   });
 
   function handleFile(file) {
+    selectedFile = file;
     filenameRow.textContent = file.name;
 
     // Show the PDF preview.
     const fileUrl = URL.createObjectURL(file);
-    dropZone.style.display = 'none';
+    dropZone.style.display = 'flex';
     pdfFrame.style.display = 'block';
     pdfFrame.src = fileUrl;
-
-    extractReport(file);
+    extractBtn.disabled = false;
+    emptyState.style.display = 'block';
+    emptyState.textContent = 'PDF selected. Click Extract details when ready.';
+    fieldsContainer.style.display = 'none';
   }
 
   async function extractReport(file) {
@@ -537,6 +555,22 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  async function deletePatient(patientId) {
+    if (!window.confirm(`Delete patient ${patientId} and all stored clinical details? This cannot be undone.`)) {
+      return;
+    }
+    const response = await fetch(`/api/admin/patients/${encodeURIComponent(patientId)}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      window.alert(`Patient could not be deleted: ${error}`);
+      return;
+    }
+    await loadPatients();
   }
 
   if (adminToken) showAdminApp();

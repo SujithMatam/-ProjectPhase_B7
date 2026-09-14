@@ -19,7 +19,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Header
 from fastapi.responses import JSONResponse
 
 from report_extractor import extract_report
-from patient_database import create_patient, list_patients, save_source_report
+from patient_database import create_patient, delete_patient, list_patients, save_source_report
 from admin_auth import authenticate, is_authenticated
 import sqlite3
 
@@ -46,6 +46,13 @@ def admin_login(payload: dict):
 @router.get("/patients")
 def admin_patients(_: str = Depends(require_admin)):
     return {"patients": list_patients()}
+
+
+@router.delete("/patients/{patient_id}")
+def admin_delete_patient(patient_id: str, _: str = Depends(require_admin)):
+    if not delete_patient(patient_id):
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return {"deleted": True, "patient_id": patient_id.strip().upper()}
 
 
 @router.post("/extract-report")

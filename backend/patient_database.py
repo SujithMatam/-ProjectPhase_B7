@@ -222,6 +222,19 @@ def list_patients(path: Optional[str] = None) -> List[Dict[str, Any]]:
     ]
 
 
+def delete_patient(patient_id: str, path: Optional[str] = None) -> bool:
+    """Delete a patient and all dependent clinical records."""
+    clean_id = str(patient_id or "").strip().upper()
+    if not clean_id:
+        return False
+    initialize_database(path)
+    with connection_scope(path) as connection:
+        cursor = connection.execute(
+            "DELETE FROM patients WHERE patient_id = ?", (clean_id,)
+        )
+        return cursor.rowcount > 0
+
+
 def save_source_report(patient_id: Optional[str], filename: str, extraction: Dict[str, Any],
                        path: Optional[str] = None) -> None:
     initialize_database(path)
