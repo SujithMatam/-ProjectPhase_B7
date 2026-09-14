@@ -50,6 +50,7 @@ from typing import Optional, List, Dict
 from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
 from agents.recovery_integration import check_recovery_continuation
+from doctor_alert import doctor_alert_notifier
 
 from lam.schemas import (
     IntentLabel,
@@ -648,6 +649,32 @@ class LAMOrchestrator:
             reason_text = ", ".join(
                 reasons
             ) if reasons else "your reported symptoms"
+
+            # ========================================================
+            # DOCTOR ALERT NOTIFICATION
+            #
+            # This is the single point where the deterministic
+            # SafetyTriageEngine can produce RED for /api/chat -- this
+            # branch always returns before any downstream agent runs,
+            # so at most one alert is scheduled per request. Notification
+            # is strictly secondary to patient safety and must never
+            # delay the patient-facing RED response: the background
+            # entry point hands the SMTP send off to a bounded thread
+            # pool and returns immediately (see doctor_alert.py). Any
+            # failure to even schedule it is caught and logged here too.
+            # ========================================================
+
+            try:
+                doctor_alert_notifier.notify_red_triage_background(
+                    patient_id=patient_id,
+                    user_message=user_message,
+                    triage=triage,
+                    surgery_type=surgery_type,
+                    surgery_date=surgery_date,
+                    postop_day=postop_day,
+                )
+            except Exception as exc:
+                print(f"[DOCTOR ALERT] notification scheduling failed: {exc}")
 
             reply_text = (
                 "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
