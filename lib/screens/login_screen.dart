@@ -51,7 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pop(context, true); // Return success to main screen
     } else {
       setState(() {
-        _errorMessage = 'Invalid Patient ID/Email or password. Check credentials or try quick demo.';
+        final attemptedAdmin = _idController.text.trim().toLowerCase() == 'admin';
+        _errorMessage = attemptedAdmin
+            ? 'The admin account is for the backend dashboard. Open /admin in your browser and sign in there.'
+            : 'Invalid Patient ID/Email or password. Check credentials or try quick demo.';
       });
     }
   }
@@ -378,6 +381,16 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             const SizedBox(height: 12),
+
+                            Text(
+                              'Administrators: use the backend dashboard at /admin. '
+                              'This screen is for patient accounts.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: subTextColor,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
 
                             // Remember me & Forgot Password Row
                             Row(
