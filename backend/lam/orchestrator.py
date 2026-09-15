@@ -356,17 +356,22 @@ def _last_assistant_message(
         if not isinstance(item, dict):
             continue
 
-        role = str(
-            item.get("role", "")
-        ).lower().strip()
+        role = str(item.get("role", "")).lower().strip()
 
         content = str(
-            item.get("content", "")
+            item.get("content")
+            or item.get("reply")
+            or item.get("message")
+            or item.get("text")
+            or ""
         ).strip()
 
         if role in {
             "assistant",
             "bot",
+            "ai",
+            "model",
+            "assistant_message",
         } and content:
 
             return content
