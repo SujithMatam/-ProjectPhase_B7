@@ -40,24 +40,36 @@ class AiBackendService {
       'chat_history': chatHistory,
     };
 
-    try {
-      final response = await http
-          .post(
-            Uri.parse('$baseUrl/api/chat'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(payload),
-          )
-          .timeout(const Duration(seconds: 15));
+    Object? lastError;
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        final response = await http
+            .post(
+              Uri.parse('$baseUrl/api/chat'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(payload),
+            )
+            .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
-      } else {
-        throw Exception('Server returned status: ${response.statusCode}');
+        if (response.statusCode == 200) {
+          return jsonDecode(response.body) as Map<String, dynamic>;
+        }
+
+        final detail = response.body.trim();
+        throw Exception(
+          'Server returned status: ${response.statusCode}'
+          '${detail.isEmpty ? '' : ' - $detail'}',
+        );
+      } catch (e) {
+        lastError = e;
+        if (attempt == 0) {
+          await Future<void>.delayed(const Duration(milliseconds: 750));
+        }
       }
-    } catch (e) {
-      debugPrint('AI Chatbot Backend unavailable: $e');
-      rethrow;
     }
+
+    debugPrint('AI Chatbot Backend unavailable: $lastError');
+    throw lastError ?? Exception('AI chatbot request failed');
   }
 
   /// Send patient symptoms to Python Agentic Backend for assessment
