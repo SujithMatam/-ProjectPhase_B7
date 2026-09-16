@@ -430,10 +430,27 @@ def _extract_onset_direct(text: str) -> Optional[str]:
 # and PAIN_CHARACTERISTICS). Deliberately simple pattern matching, not a
 # general parser -- falls back to the bare anchor word, and finally to the
 # original trimmed text, when no tighter phrase can be formed.
-_LOCATION_PHRASE_RE = re.compile(
+#
+# SPECIFICITY: split into two patterns, checked in order, rather than one
+# combined alternation searched left-to-right. A relational/directional
+# phrase ("behind the knee", "around the incision", ...) pins down WHERE
+# on/around the joint the pain is, which is strictly more specific than a
+# bare region mention ("my knee") -- so it must win regardless of which one
+# happens to appear EARLIER in the sentence. Without this split, a message
+# like "My knee pain is 6/10, it started suddenly behind the knee..." would
+# report the generic "My knee" match simply because it comes first, losing
+# the more specific "behind the knee" the patient actually gave. A message
+# with only a generic mention (no relational phrase at all) is unaffected
+# -- it still falls through to _LOCATION_GENERIC_PHRASE_RE exactly as
+# before.
+_LOCATION_SPECIFIC_PHRASE_RE = re.compile(
     r"\b((?:behind|in front of|around|near|in|on|at|toward|towards|below|above)"
-    r"\s+(?:the|my)\s+(?:lower\s+)?\w+"
-    r"|(?:the|my)\s+(?:calf|lower leg|shin|knee|thigh|ankle|hip|incision|surgical site))\b",
+    r"\s+(?:the|my)\s+(?:lower\s+)?\w+)\b",
+    re.IGNORECASE,
+)
+
+_LOCATION_GENERIC_PHRASE_RE = re.compile(
+    r"\b((?:the|my)\s+(?:calf|lower leg|shin|knee|thigh|ankle|hip|incision|surgical site))\b",
     re.IGNORECASE,
 )
 
@@ -441,9 +458,12 @@ _LOCATION_ANCHOR_WORDS = _LOCATION_TERMS + ("knee", "thigh", "ankle", "hip")
 
 
 def _extract_location_phrase(text: str) -> str:
-    match = _LOCATION_PHRASE_RE.search(text)
-    if match:
-        return match.group(1).strip()
+    specific_match = _LOCATION_SPECIFIC_PHRASE_RE.search(text)
+    if specific_match:
+        return specific_match.group(1).strip()
+    generic_match = _LOCATION_GENERIC_PHRASE_RE.search(text)
+    if generic_match:
+        return generic_match.group(1).strip()
     normalised = _normalise(text)
     for term in _LOCATION_ANCHOR_WORDS:
         if term in normalised:

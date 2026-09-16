@@ -766,8 +766,30 @@ class LAMOrchestrator:
         short_wound_answer = _looks_like_short_wound_answer(user_message)
         explicit_different_domain = _has_explicit_different_domain(user_message)
 
+        # AGENT-AWARE OWNERSHIP (computed BEFORE wound_context below):
+        # _has_active_wound_followup above is a crude TEXT match against the
+        # assistant's last question (e.g. the generic marker "getting
+        # worse") -- but Pain has its own trend question ("Is it getting
+        # worse, getting better, or staying about the same?") that shares
+        # that same vocabulary, so a text match alone cannot tell WHICH
+        # agent actually asked it. _has_active_pain_followup is the
+        # stronger, agent-aware two-signal check (the assistant's last
+        # message matches one of Pain's OWN specific question markers, AND
+        # the server-side PainSessionState independently agrees a field is
+        # pending for that SAME field) -- resolved here, first, so a
+        # genuinely Pain-owned question is never stolen by the generic
+        # wound-followup text detector purely on vocabulary overlap. An
+        # EXPLICIT wound/incision message still always wins regardless (see
+        # wound_context below, unaffected by this signal).
+        genuine_pain_followup = _has_active_pain_followup(
+            patient_id, history, user_message,
+        )
+
         wound_context = (
-            (active_wound_followup or explicit_wound_message)
+            (
+                (active_wound_followup and not genuine_pain_followup)
+                or explicit_wound_message
+            )
             and not explicit_different_domain
         )
 
@@ -801,7 +823,7 @@ class LAMOrchestrator:
 
         active_pain_followup = (
             not wound_context
-            and _has_active_pain_followup(patient_id, history, user_message)
+            and genuine_pain_followup
         )
 
         pain_context = (

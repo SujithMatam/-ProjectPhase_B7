@@ -1720,6 +1720,386 @@ def test_final_turn_chat_history_scoped_to_active_assessment() -> None:
     print()
 
 
+# ---------------------------------------------------------------------------
+# 36. Regression: an ungrounded final LLM reply that invents an unreported
+# symptom ("Swelling in your knee is normal...") must be rejected and
+# replaced with the deterministic, assessment-grounded summary. Reproduces
+# the exact real-UI conversation that produced the bug.
+# ---------------------------------------------------------------------------
+
+def test_final_turn_rejects_ungrounded_unreported_symptom() -> None:
+    print("=" * 78)
+    print("36 -- Ungrounded final reply (invented, unreported swelling) is rejected")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    patient_id = "UNGROUNDED-PT"
+
+    ungrounded_reply = (
+        "Swelling in your Right knee on Day 3 is normal due to increased "
+        "circulation during healing. Lie down with your foot elevated."
+    )
+
+    results = _converse(
+        patient_id,
+        [
+            "My knee pain suddenly got worse today.",
+            "6",
+            "behind the knee",
+        ],
+        stub_reply=ungrounded_reply,
+    )
+    final = results[-1]
+    print(f"    final engine={final['engine']}")
+    print(f"    final reply={final['reply']!r}")
+
+    _check(
+        final["engine"] == PainSymptomsAgent.ENGINE_FALLBACK,
+        "an ungrounded reply inventing an unreported symptom must fall back to deterministic_summary",
+    )
+    _check(
+        "swelling" not in final["reply"].lower(),
+        "final response must not claim the patient has swelling -- it was never reported",
+    )
+    _check("6/10" in final["reply"], "final response must reflect the reported 6/10 pain score")
+    _check("behind the knee" in final["reply"], "final response must reflect the reported behind-the-knee location")
+    _check(
+        "sudden" in final["reply"].lower() or "worsening" in final["reply"].lower(),
+        "final response must reflect the reported sudden onset / worsening trend",
+    )
+    print("    CONFIRMED: ungrounded reply rejected; final response reflects only actually-collected facts.")
+    print()
+
+    # Unit-level check on the grounding function itself, independent of the
+    # full agent flow above.
+    grounded_assessment = {
+        pain_logic.PAIN_SCORE: 6,
+        pain_logic.ONSET: "sudden",
+        pain_logic.LOCATION: "behind the knee",
+        pain_logic.WORSENING_OR_IMPROVING: "worsening",
+    }
+    flagged = pain_integration.reply_invents_unreported_symptom(ungrounded_reply, grounded_assessment)
+    _check(flagged == pain_logic.SWELLING, f"reply_invents_unreported_symptom should flag 'swelling', got {flagged!r}")
+
+    # A conditional mention of the same symptom ("if you notice swelling")
+    # must NOT be flagged -- retrieved context is allowed to say what to
+    # watch for without asserting the patient has it now.
+    conditional_reply = (
+        "Based on what you've described, contact your surgical team if you "
+        "notice swelling, redness, or fever."
+    )
+    _check(
+        pain_integration.reply_invents_unreported_symptom(conditional_reply, grounded_assessment) is None,
+        "a purely conditional symptom mention ('if you notice swelling') must not be flagged as ungrounded",
+    )
+
+    # A symptom the patient DID actually report must never be flagged.
+    swelling_reported_assessment = dict(grounded_assessment)
+    swelling_reported_assessment[pain_logic.SWELLING] = "yes, noticeable swelling"
+    _check(
+        pain_integration.reply_invents_unreported_symptom(ungrounded_reply, swelling_reported_assessment) is None,
+        "swelling actually reported by the patient must never be flagged as ungrounded",
+    )
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 37. Cross-agent follow-up ownership must be AGENT-AWARE, not a bare text
+# match: Pain's own trend question ("Is it getting worse, getting better,
+# or staying about the same?") textually overlaps with Wound's generic
+# progression markers ("getting worse", "staying about the same" in
+# lam/orchestrator.py's _WOUND_FOLLOWUP_MARKERS), so a short reply to a
+# Pain-owned question must never be stolen by Wound's text-only detector.
+# ---------------------------------------------------------------------------
+
+def test_pain_trend_followup_not_stolen_by_wound() -> None:
+    print("=" * 78)
+    print("37 -- Pain trend follow-up ownership is agent-aware, not text-overlap-based")
+    print("=" * 78)
+
+    def _fake_chat(**kwargs):
+        return {"reply": "stub", "triage_level": "GREEN", "is_escalated": False, "engine": "x", "sources": []}
+
+    # A. Exact reported bug: Pain's OWN trend question, textually
+    # overlapping with Wound's generic "getting worse" / "staying about the
+    # same" markers, must stay owned by Pain -- WoundCareAgent must never
+    # be dispatched for the reply.
+    pain_state._clear_all_state_for_tests()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=_fake_chat), \
+         patch("agents.wound_care_agent.WoundCareAgent.handle") as wound_handle:
+        r1 = LAMOrchestrator.process(
+            patient_id="XAGENT-PT", surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=3,
+            user_message="My knee pain is 6 out of 10, it started suddenly behind the knee and it is swollen.",
+        )
+        print(f"    A1. reply={r1['reply']!r}")
+        _check(
+            pain_logic.QUESTIONS[pain_logic.WORSENING_OR_IMPROVING] in r1["reply"],
+            "setup: turn 1 should ask the Pain trend/progression question",
+        )
+
+        history = [
+            {"role": "user", "content": "My knee pain is 6 out of 10, it started suddenly behind the knee and it is swollen."},
+            {"role": "assistant", "content": r1["reply"]},
+        ]
+        r2 = LAMOrchestrator.process(
+            patient_id="XAGENT-PT", surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=3,
+            user_message="its getting worse",
+            chat_history=history,
+        )
+        print(f"    A2. intent={r2['intent']} target_agent={r2['target_agent']} reply={r2['reply']!r}")
+        _check(r2["intent"] == "pain_symptoms", "a Pain-owned trend follow-up must classify as pain_symptoms")
+        _check(r2["target_agent"] == "PainSymptomsAgent", "a Pain-owned trend follow-up must route to PainSymptomsAgent")
+        _check(wound_handle.call_count == 0, "WoundCareAgent must never be dispatched for a Pain-owned trend follow-up")
+    print("    CONFIRMED: Pain's own trend question is not stolen by Wound's text-overlap detector.")
+
+    # B. Opposite direction: a REAL WoundCareAgent progression follow-up,
+    # followed by the SAME short reply text ("it's getting worse"), must
+    # still stay with Wound -- this fix must not weaken genuine Wound
+    # follow-up ownership.
+    pain_state._clear_all_state_for_tests()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=_fake_chat):
+        history = [
+            {"role": "user", "content": "My incision looks a little red today."},
+            {
+                "role": "assistant",
+                "content": (
+                    "Since you first noticed it, has it been getting better, "
+                    "getting worse, or staying about the same?"
+                ),
+            },
+        ]
+        r3 = LAMOrchestrator.process(
+            patient_id="XAGENT-WOUND-PT", surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=3,
+            user_message="it's getting worse",
+            chat_history=history,
+        )
+    print(f"    B. intent={r3['intent']} target_agent={r3['target_agent']}")
+    _check(r3["intent"] == "wound_care", "a genuine active Wound follow-up must still route to Wound")
+    _check(r3["target_agent"] == "WoundCareAgent", "a genuine active Wound follow-up must still route to WoundCareAgent")
+
+    # C. An explicit wound/incision message still routes to Wound, with no
+    # prior follow-up context at all.
+    pain_state._clear_all_state_for_tests()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=_fake_chat):
+        r4 = LAMOrchestrator.process(
+            patient_id="XAGENT-EXPLICIT-WOUND-PT", surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=3,
+            user_message="my incision is more red today",
+        )
+    print(f"    C. intent={r4['intent']} target_agent={r4['target_agent']}")
+    _check(r4["intent"] == "wound_care", "explicit 'my incision is more red today' must still route to Wound Care")
+
+    # D. A generic (non-incision) symptom message still routes to Pain.
+    pain_state._clear_all_state_for_tests()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=_fake_chat):
+        r5 = LAMOrchestrator.process(
+            patient_id="XAGENT-GENERIC-PAIN-PT", surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=3,
+            user_message="my knee is swollen",
+        )
+    print(f"    D. intent={r5['intent']} target_agent={r5['target_agent']}")
+    _check(r5["intent"] == "pain_symptoms", "generic 'my knee is swollen' must still route to Pain")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 38. Final-response consistency with the collected assessment AND the
+# authoritative triage. A reply may correctly avoid inventing an unreported
+# symptom (reply_invents_unreported_symptom) yet still be unacceptable if
+# it ignores the rest of what was collected (score/location/trend) or
+# contradicts a YELLOW/RED triage with blanket reassurance and no
+# escalation guidance -- reply_consistent_with_assessment_and_triage covers
+# that separate failure mode.
+# ---------------------------------------------------------------------------
+
+def test_final_reply_consistency_with_assessment_and_triage() -> None:
+    print("=" * 78)
+    print("38 -- Final reply must be consistent with the assessment AND authoritative triage")
+    print("=" * 78)
+
+    assessment = {
+        pain_logic.PAIN_SCORE: 6,
+        pain_logic.ONSET: "sudden",
+        pain_logic.LOCATION: "behind the knee",
+        pain_logic.WORSENING_OR_IMPROVING: "worsening",
+        pain_logic.SWELLING: "present",
+    }
+    yellow_triage = {
+        "triage_level": "YELLOW",
+        "is_escalated": True,
+        "action_protocol": (
+            "Contact the orthopedic nursing hotline or schedule a same-day "
+            "follow-up. Elevate the limb and monitor for any worsening "
+            "swelling, redness, or fever."
+        ),
+    }
+
+    # A. YELLOW + worsening pain + (reported) swelling: a reply that
+    # ignores the score/location/trend and blankly reassures "is normal"
+    # with no escalation guidance must be REJECTED, even though swelling
+    # itself was genuinely reported (so reply_invents_unreported_symptom
+    # alone would let it through).
+    reply_a = (
+        "Swelling in your Right knee on Day 3 is normal due to increased "
+        "circulation during healing. Lie down with your foot elevated "
+        "above heart level and apply an ice pack for 20 minutes."
+    )
+    _check(
+        pain_integration.reply_invents_unreported_symptom(reply_a, assessment) is None,
+        "setup: swelling was actually reported, so the grounding check alone must not flag this reply",
+    )
+    consistent_a = pain_integration.reply_consistent_with_assessment_and_triage(reply_a, assessment, yellow_triage)
+    print(f"    A. consistent={consistent_a}")
+    _check(consistent_a is False, "a YELLOW reply that ignores score/trend and blankly reassures 'is normal' must be rejected")
+
+    # B. Same assessment/triage: a reply that acknowledges the 6/10 score,
+    # the worsening trend, and follows the YELLOW action_protocol's own
+    # guidance must be ACCEPTED.
+    reply_b = (
+        "Thanks for letting me know your pain is now 6/10 behind the knee "
+        "and it's been worsening since it started suddenly, along with "
+        "some swelling. Given this, please contact the orthopedic nursing "
+        "hotline or arrange a same-day follow-up -- elevate the limb in "
+        "the meantime and monitor for any further swelling, redness, or "
+        "fever."
+    )
+    consistent_b = pain_integration.reply_consistent_with_assessment_and_triage(reply_b, assessment, yellow_triage)
+    print(f"    B. consistent={consistent_b}")
+    _check(consistent_b is True, "a YELLOW reply that acknowledges 6/10/worsening and follows the action_protocol must be accepted")
+
+    # C. GREEN mild/stable case: grounded reassurance ("normal") must still
+    # be ALLOWED -- this check must never globally ban the word "normal".
+    green_assessment = {
+        pain_logic.PAIN_SCORE: 2,
+        pain_logic.ONSET: "gradual",
+        pain_logic.LOCATION: "knee",
+    }
+    green_triage = {
+        "triage_level": "GREEN", "is_escalated": False,
+        "action_protocol": "Continue prescribed home exercises and monitor as usual.",
+    }
+    reply_c = (
+        "Thanks for sharing that -- a mild 2/10 ache around your knee that "
+        "built up gradually is a normal part of healing at this stage. "
+        "Continue your prescribed home exercises and ice as needed."
+    )
+    consistent_c = pain_integration.reply_consistent_with_assessment_and_triage(reply_c, green_assessment, green_triage)
+    print(f"    C. consistent={consistent_c}")
+    _check(consistent_c is True, "a GREEN, grounded reassuring reply for a mild stable case must remain allowed")
+    print()
+
+    # D. END-TO-END wiring check: the exact reported bug scenario, routed
+    # through PainSymptomsAgent.handle itself, must fall back to
+    # deterministic_summary (never send reply_a's ungrounded reassurance
+    # to the patient), and the fallback text must reflect the collected
+    # facts and the authoritative YELLOW action_protocol.
+    pain_state._clear_all_state_for_tests()
+
+    def _fake_bad_reply(**kwargs) -> Dict[str, Any]:
+        return {"reply": reply_a, "triage_level": "GREEN", "is_escalated": False, "engine": "x", "sources": ["s"]}
+
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=_fake_bad_reply):
+        result = PainSymptomsAgent.handle(
+            patient_id="CONSISTENCY-PT",
+            surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right",
+            postop_day=3,
+            user_message=(
+                "My knee pain is 6 out of 10, it started suddenly, mostly "
+                "behind the knee, it's swollen, and it's getting worse."
+            ),
+            procedure="TKA",
+            chat_history=[],
+            precomputed_triage=yellow_triage,
+        )
+    print(f"    D. engine={result['engine']}")
+    print(f"    D. reply={result['reply']!r}")
+    _check(result["engine"] == PainSymptomsAgent.ENGINE_FALLBACK, "an inconsistent YELLOW reply must fall back to deterministic_summary end-to-end")
+    _check("6/10" in result["reply"], "fallback reply must reflect the reported 6/10 pain score")
+    _check("worsening" in result["reply"].lower(), "fallback reply must reflect the reported worsening trend")
+    _check(
+        "is normal" not in result["reply"].lower(),
+        "fallback reply must never carry the rejected reply's blanket 'is normal' reassurance",
+    )
+    _check(
+        "Contact the orthopedic nursing hotline" in result["reply"],
+        "fallback reply must carry the authoritative YELLOW action_protocol text",
+    )
+    print("    CONFIRMED: ungrounded-but-reported-symptom reply is still rejected on consistency grounds, end-to-end.")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 39. Location extraction must prefer a more specific relational phrase
+# ("behind the knee") over a generic containing-region mention ("my knee")
+# whenever BOTH appear in the same message -- regardless of which one
+# happens to appear earlier in the sentence.
+# ---------------------------------------------------------------------------
+
+def test_location_extraction_prefers_more_specific_phrase() -> None:
+    print("=" * 78)
+    print("39 -- Location extraction prefers the more specific phrase over a generic region")
+    print("=" * 78)
+
+    # 1. The exact reported UI scenario: a generic "My knee" mention comes
+    # FIRST in the sentence, but the more specific "behind the knee" later
+    # in the same sentence must win.
+    assessment_1, _ = pain_logic.build_assessment(
+        [],
+        "My knee pain is 6 out of 10, it started suddenly behind the knee and it is swollen.",
+    )
+    print(f"    1. location={assessment_1.get(pain_logic.LOCATION)!r}")
+    _check(
+        assessment_1.get(pain_logic.LOCATION) == "behind the knee",
+        f"expected the specific 'behind the knee' to win over generic 'My knee', got {assessment_1.get(pain_logic.LOCATION)!r}",
+    )
+
+    # 2. A plain generic mention with NO specific relational phrase present
+    # must still work exactly as before. A bare "knee" is not itself in
+    # _LOCATION_TERMS (see that list's own docstring -- opportunistic,
+    # un-asked-for extraction deliberately excludes it, since a bare joint
+    # name is too generic to branch on), so it is exercised the same way
+    # pending-answer attribution does: directly through
+    # _extract_location_phrase, the exact helper this fix changed.
+    location_2 = pain_logic._extract_location_phrase("my knee hurts")
+    print(f"    2. location={location_2!r}")
+    _check(
+        "knee" in location_2.lower(),
+        f"expected a plain generic 'knee' mention to still resolve to a knee location, got {location_2!r}",
+    )
+
+    # 3. Calf location must remain unaffected by this specificity change,
+    # and must still classify into the calf follow-up branch.
+    assessment_3, _ = pain_logic.build_assessment(
+        [], "I suddenly have 8 out of 10 pain in my calf.",
+    )
+    print(f"    3. location={assessment_3.get(pain_logic.LOCATION)!r}")
+    _check(
+        assessment_3.get(pain_logic.LOCATION) is not None
+        and "calf" in assessment_3[pain_logic.LOCATION].lower(),
+        f"expected calf location to still be extracted, got {assessment_3.get(pain_logic.LOCATION)!r}",
+    )
+    _check(
+        pain_logic.classify_location_branch(assessment_3[pain_logic.LOCATION]) == "calf",
+        "calf location must still classify into the calf follow-up branch",
+    )
+
+    # 4. Sanity: a specific relational phrase for a DIFFERENT anatomical
+    # anchor (incision) also still wins over nothing else competing --
+    # confirms the fix is generic, not knee-specific.
+    assessment_4, _ = pain_logic.build_assessment(
+        [], "I feel pain around the incision, near the staples.",
+    )
+    print(f"    4. location={assessment_4.get(pain_logic.LOCATION)!r}")
+    _check(
+        assessment_4.get(pain_logic.LOCATION) == "around the incision",
+        f"expected the specific 'around the incision' phrase, got {assessment_4.get(pain_logic.LOCATION)!r}",
+    )
+    print()
+
+
 def main() -> int:
     test_fresh_independent_prompt_works()
     test_multiple_facts_extracted_from_one_sentence()
@@ -1756,6 +2136,10 @@ def main() -> int:
     test_pain_score_persistence_numeric_and_category()
     test_foreign_key_enforcement_on_symptom_assessments()
     test_final_turn_chat_history_scoped_to_active_assessment()
+    test_final_turn_rejects_ungrounded_unreported_symptom()
+    test_pain_trend_followup_not_stolen_by_wound()
+    test_final_reply_consistency_with_assessment_and_triage()
+    test_location_extraction_prefers_more_specific_phrase()
 
     print("=" * 78)
     if _FAILURES:

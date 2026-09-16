@@ -36,6 +36,7 @@ already computed upstream.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from agents import pain_logic
@@ -354,6 +355,279 @@ def is_unhelpful_llm_reply(reply: str) -> bool:
 
 
 # ============================================================================
+# FINAL-RESPONSE GROUNDING CHECK -- narrowly scoped: catches an LLM reply
+# that asserts the patient currently has a symptom (swelling, warmth/
+# redness, stiffness, numbness/weakness, fever) that the structured
+# assessment does NOT show as reported. This is the failure mode a generic
+# "does the reply look empty/boilerplate" check (is_unhelpful_llm_reply,
+# above) cannot catch: a fluent, specific-sounding reply that is simply
+# ungrounded, e.g. "Swelling in your knee is normal..." when the patient
+# never mentioned swelling at all.
+#
+# Deliberately narrow: only the small, closed set of opportunistic Pain
+# symptom fields (pain_logic.SWELLING / WARMTH_OR_REDNESS / STIFFNESS /
+# NUMBNESS_OR_WEAKNESS / FEVER_OR_TEMPERATURE) is checked, and a mention is
+# only flagged when it is NOT conditional -- retrieved clinical context is
+# allowed to surface a symptom conditionally ("if you notice swelling,
+# contact your team"), since that never claims the patient has it now.
+# ============================================================================
+
+_SYMPTOM_FIELD_KEYWORDS: Dict[str, Tuple[str, ...]] = {
+    pain_logic.SWELLING: ("swelling", "swollen"),
+    pain_logic.WARMTH_OR_REDNESS: ("warmth", "redness"),
+    pain_logic.STIFFNESS: ("stiffness",),
+    pain_logic.NUMBNESS_OR_WEAKNESS: ("numbness", "weakness"),
+    pain_logic.FEVER_OR_TEMPERATURE: ("fever", "feverish"),
+}
+
+# Any of these appearing in the SAME sentence as a symptom keyword marks
+# the mention as conditional/hypothetical ("if you develop swelling...")
+# rather than an assertion that the patient has the symptom now.
+_CONDITIONAL_MENTION_MARKERS = (
+    "if you", "if it", "if this", "if the", "if there",
+    "should you", "should it", "should this",
+    "watch for", "notice any", "notice a", "develop",
+    "let your", "contact your", "in case",
+)
+
+
+def _field_reported_present(assessment: Dict[str, Any], field_name: str) -> bool:
+    """True only when the patient actually reported this symptom as
+    present -- absent from the assessment, "unknown", or a negative answer
+    ("no", "not really", ...) all resolve to False, matching the same
+    "present" semantics pain_logic.py's own symptom-context helper uses."""
+    value = assessment.get(field_name)
+    if value is None or value == "unknown":
+        return False
+    text = str(value).strip().lower()
+    if text in ("no", "nope", "none", "not really", "nothing", "never"):
+        return False
+    return not text.startswith(("no ", "nope ", "not really ", "none ", "nothing "))
+
+
+def _split_sentences(text: str) -> List[str]:
+    return re.split(r"(?<=[.!?])\s+", text)
+
+
+def reply_invents_unreported_symptom(reply: str, assessment: Dict[str, Any]) -> Optional[str]:
+    """
+    Returns the field name of the first unreported symptom the reply
+    asserts as present, or None when the reply is grounded. Used only on
+    the FINAL Pain turn, alongside is_unhelpful_llm_reply, to decide
+    whether to fall back to deterministic_summary.
+    """
+    text = (reply or "").strip()
+    if not text:
+        return None
+
+    for field_name, keywords in _SYMPTOM_FIELD_KEYWORDS.items():
+        if _field_reported_present(assessment, field_name):
+            continue
+        for sentence in _split_sentences(text):
+            sentence_lower = sentence.lower()
+            if not any(keyword in sentence_lower for keyword in keywords):
+                continue
+            if any(marker in sentence_lower for marker in _CONDITIONAL_MENTION_MARKERS):
+                continue
+            return field_name
+    return None
+
+
+# ============================================================================
+# FINAL-RESPONSE ASSESSMENT/TRIAGE CONSISTENCY CHECK -- narrowly scoped,
+# generic (nothing below is hardcoded to a specific score, location, or
+# symptom; every check is derived from the assessment/precomputed_triage
+# values actually passed in). This catches a DIFFERENT failure mode than
+# reply_invents_unreported_symptom above: a reply that only ever mentions
+# facts that WERE reported (so the grounding check above correctly lets it
+# through), but still ignores the rest of what was collected -- e.g.
+# replying only about a reported symptom while silently dropping the pain
+# score, location, and worsening trend -- or that contradicts an
+# authoritative YELLOW/RED triage result with unsupported blanket
+# reassurance ("is normal") and no escalation guidance at all.
+#
+# precomputed_triage remains the SOLE authority for the triage_level/
+# is_escalated fields themselves (see specialized_agents.py's unconditional
+# override after this check runs) -- this function only checks that the
+# reply's own TEXT does not contradict that already-decided authority.
+# ============================================================================
+
+_STOPWORDS = frozenset({
+    "the", "and", "for", "with", "your", "you", "this", "that", "from",
+    "into", "onto", "than", "then", "have", "has", "will", "shall",
+    "should", "about", "over", "under", "when", "while", "being", "been",
+    "were", "area", "please", "there", "their", "also", "some", "just",
+    "still", "each", "more", "most", "very",
+})
+
+
+def _significant_words(text: str) -> set:
+    """Lowercased, >3-letter, non-stopword tokens -- used for a loose
+    word-overlap comparison, never an exact-phrase match, since neither
+    the assessment's own phrasing nor an action_protocol's wording is
+    guaranteed to be echoed verbatim by a fluent LLM reply."""
+    return {
+        word for word in re.findall(r"[a-z']+", text.lower())
+        if len(word) > 3 and word not in _STOPWORDS
+    }
+
+
+def _reflects_pain_score(lowered_reply: str, assessment: Dict[str, Any]) -> bool:
+    value = assessment.get(pain_logic.PAIN_SCORE)
+    if value is None or value == "unknown":
+        return True
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        score_text = str(int(value)) if float(value).is_integer() else str(value)
+        return any(
+            pattern in lowered_reply
+            for pattern in (f"{score_text}/10", f"{score_text} / 10", f"{score_text} out of 10")
+        )
+    # Categorical severity ("mild"/"moderate"/"severe") -- reflected simply
+    # by the category word itself appearing.
+    return str(value).strip().lower() in lowered_reply
+
+
+def _reflects_location(lowered_reply: str, assessment: Dict[str, Any]) -> bool:
+    value = assessment.get(pain_logic.LOCATION)
+    if value is None or value == "unknown":
+        return True
+    location_text = str(value).strip().lower()
+    if not location_text:
+        return True
+    if location_text in lowered_reply:
+        return True
+    # Fallback: a reply may phrase the same location slightly differently
+    # ("behind your right knee" vs "behind the knee") -- accept it as long
+    # as at least one non-trivial word from the reported location is
+    # actually present, rather than requiring the exact reported phrase.
+    location_words = _significant_words(location_text)
+    if not location_words:
+        return True
+    return bool(location_words & _significant_words(lowered_reply))
+
+
+_WORSENING_SYNONYMS = ("worsening", "worse", "worsened", "deteriorating")
+
+
+def _reflects_worsening_trend(lowered_reply: str, assessment: Dict[str, Any]) -> bool:
+    # Only enforced when the patient reported WORSENING specifically --
+    # this is the clinically significant direction a final reply must
+    # never silently drop. "improving" / "about the same" are not gated
+    # here (requirement 1 treats trend as required only "when known and
+    # clinically relevant").
+    if assessment.get(pain_logic.WORSENING_OR_IMPROVING) != "worsening":
+        return True
+    return any(word in lowered_reply for word in _WORSENING_SYNONYMS)
+
+
+# Blanket-reassurance phrasing -- deliberately NOT a ban on the word
+# "normal" itself (a GREEN reply may legitimately say a grounded finding
+# is normal); only checked at all when triage_level is YELLOW/RED (see
+# reply_consistent_with_assessment_and_triage below).
+_BLANKET_REASSURANCE_PHRASES = (
+    "is normal", "are normal", "completely normal", "perfectly normal",
+    "totally normal", "is expected", "are expected", "expected part of",
+    "expected during recovery", "nothing to worry about",
+    "nothing to be concerned about", "no cause for concern",
+    "not a cause for concern", "no need to worry",
+)
+
+
+def _contains_blanket_reassurance(lowered_reply: str) -> bool:
+    return any(phrase in lowered_reply for phrase in _BLANKET_REASSURANCE_PHRASES)
+
+
+# Generic escalation/contact signal -- not tied to any specific
+# action_protocol wording, only to whether the reply gives SOME form of
+# "reach out to your care team" guidance at all.
+_ESCALATION_SIGNAL_TERMS = (
+    "contact", "call ", "notify", "reach out", "surgical team",
+    "care team", "doctor", "physician", "provider", "nurse", "nursing",
+    "clinic", "hospital", "hotline", "emergency", "urgent", "same-day",
+    "same day", "seek ", "follow up", "follow-up",
+)
+
+
+def _has_escalation_signal(lowered_reply: str) -> bool:
+    return any(term in lowered_reply for term in _ESCALATION_SIGNAL_TERMS)
+
+
+def _action_protocol_reflected(lowered_reply: str, action_protocol: str) -> bool:
+    """
+    True when the reply meaningfully reflects precomputed_triage's OWN
+    action_protocol text (loose word-overlap against that protocol's own
+    significant words -- never a fixed vocabulary of our own), OR, when no
+    usable protocol text is available (or the overlap is thin), the reply
+    at least contains a generic escalation/contact signal. Either path is
+    enough to catch the actual defect this guards against: a YELLOW/RED
+    reply that gives ZERO escalation guidance (the reported bug -- generic
+    ice/elevation advice with no mention of contacting anyone despite
+    YELLOW).
+    """
+    protocol_words = _significant_words(action_protocol)
+    if protocol_words:
+        reply_words = _significant_words(lowered_reply)
+        overlap = protocol_words & reply_words
+        if len(overlap) >= max(2, int(len(protocol_words) * 0.25)):
+            return True
+    return _has_escalation_signal(lowered_reply)
+
+
+def reply_consistent_with_assessment_and_triage(
+    reply: str,
+    assessment: Dict[str, Any],
+    precomputed_triage: Optional[Dict[str, Any]],
+) -> bool:
+    """
+    Narrow, generic final-turn consistency check. Returns True when `reply`
+    may be sent to the patient as-is; False when it should be rejected in
+    favour of deterministic_summary. Checks, in order:
+
+      1. The reply reflects the core collected facts that are actually
+         known (pain score/severity, location, a reported worsening
+         trend) -- see requirement 1. A field never asked/answered is
+         never required to appear (nothing invented either direction).
+      2. When precomputed_triage is YELLOW or RED, the reply's TEXT must
+         not contradict that authority with blanket reassurance ("is
+         normal" / "is expected" / "nothing to worry about" ...) and must
+         give some real escalation/action guidance, preferring
+         precomputed_triage["action_protocol"] as that guidance's source
+         of truth when available (requirements 2-4). GREEN is never
+         gated by this second check (requirement 5) -- a GREEN reply may
+         freely use reassuring language as long as check 1 passed.
+
+    Deliberately narrow: this is a content-presence/consistency check, not
+    a clinical correctness judge -- it does not evaluate whether the
+    guidance itself is sound, only whether the reply is grounded in and
+    does not contradict what was actually collected/decided upstream.
+    """
+    text = (reply or "").strip()
+    if not text:
+        return False
+    lowered = text.lower()
+
+    if not _reflects_pain_score(lowered, assessment):
+        return False
+    if not _reflects_location(lowered, assessment):
+        return False
+    if not _reflects_worsening_trend(lowered, assessment):
+        return False
+
+    triage_level = "GREEN"
+    if precomputed_triage:
+        triage_level = precomputed_triage.get("triage_level", "GREEN")
+
+    if triage_level in ("YELLOW", "RED"):
+        if _contains_blanket_reassurance(lowered):
+            return False
+        action_protocol = str((precomputed_triage or {}).get("action_protocol") or "")
+        if not _action_protocol_reflected(lowered, action_protocol):
+            return False
+
+    return True
+
+
+# ============================================================================
 # FINAL-TURN MESSAGE CONSTRUCTION (passed as `user_message` into
 # ChatAgent.answer_question -- same mechanism wound_care_agent.py already
 # uses for its own final-turn message, so no change to chat_agent.py is
@@ -434,7 +708,15 @@ def build_final_turn_message(
         "or the safety triage guidance already provided -- never invent a "
         "threshold or timeframe of your own. Do not state a diagnosis. Do "
         "not give unsupported reassurance that everything is definitely "
-        "normal."
+        "normal. The PATIENT-REPORTED PAIN ASSESSMENT block above is the "
+        "ONLY source of truth for what the patient has actually reported -- "
+        "the retrieved clinical context may inform general guidance, but "
+        "must never be used to state or imply that the patient currently "
+        "has a symptom (e.g. swelling, warmth/redness, stiffness, "
+        "numbness/weakness, fever) that is not listed in that block. If the "
+        "retrieved context discusses a symptom the patient did not report, "
+        "you may mention it only conditionally (e.g. 'if you notice "
+        "swelling'), never as something the patient currently has."
     )
 
 
@@ -470,6 +752,23 @@ def build_final_turn_domain_instruction(
         "directly supported by the retrieved clinical context or the "
         "safety triage guidance already provided -- never invent a "
         "threshold or timeframe of your own.\n\n"
+        "GROUNDING (source of truth): the PATIENT-REPORTED PAIN ASSESSMENT "
+        "block below is the SOLE source of truth for WHAT THE PATIENT HAS "
+        "REPORTED. The retrieved clinical context (RAG) may supply general "
+        "guidance and reasoning, but it must never be used to manufacture a "
+        "new patient finding. Concretely: never write 'your swelling', "
+        "'the swelling', 'your stiffness', 'your numbness/weakness', or "
+        "'your fever' (or state that any of these is 'normal' or "
+        "'expected') unless that exact symptom appears in the assessment "
+        "block below as something the patient actually reported. A "
+        "retrieved source that discusses a symptom in general (e.g. "
+        "'postoperative swelling is common') may be reflected only as "
+        "conditional guidance for what to watch for ('if you develop "
+        "swelling...'), never rewritten as a statement about this "
+        "patient's current condition. Do not reassure the patient that a "
+        "symptom they did not report is 'normal' -- reassurance about "
+        "something is only appropriate for findings actually present in "
+        "the assessment below.\n\n"
         f"{data_block}"
         f"{uncertainty_clause}"
     )

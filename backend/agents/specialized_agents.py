@@ -667,7 +667,38 @@ class PainSymptomsAgent(BaseClinicalAgent):
 
         llm_reply = str(llm_result.get("reply", "")).strip()
 
-        if llm_reply and not pain_integration.is_unhelpful_llm_reply(llm_reply):
+        ungrounded_field = (
+            pain_integration.reply_invents_unreported_symptom(llm_reply, assessment)
+            if llm_reply
+            else None
+        )
+        if ungrounded_field:
+            print(
+                f"[PAIN] rejecting ungrounded final LLM reply -- asserts "
+                f"unreported symptom '{ungrounded_field}' not present in the "
+                f"collected assessment"
+            )
+
+        is_consistent_reply = (
+            pain_integration.reply_consistent_with_assessment_and_triage(
+                llm_reply, assessment, precomputed_triage,
+            )
+            if llm_reply
+            else False
+        )
+        if llm_reply and not is_consistent_reply:
+            print(
+                "[PAIN] rejecting final LLM reply -- does not consistently "
+                "reflect the collected assessment and/or the authoritative "
+                "triage action guidance"
+            )
+
+        if (
+            llm_reply
+            and not pain_integration.is_unhelpful_llm_reply(llm_reply)
+            and not ungrounded_field
+            and is_consistent_reply
+        ):
             result = dict(llm_result)
         else:
             result = {
