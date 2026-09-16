@@ -51,6 +51,7 @@ from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
 from agents.recovery_integration import check_recovery_continuation
 from doctor_alert import doctor_alert_notifier
+from agents.report_agent import ReportGenerationAgent
 
 from lam.schemas import (
     IntentLabel,
@@ -355,17 +356,22 @@ def _last_assistant_message(
         if not isinstance(item, dict):
             continue
 
-        role = str(
-            item.get("role", "")
-        ).lower().strip()
+        role = str(item.get("role", "")).lower().strip()
 
         content = str(
-            item.get("content", "")
+            item.get("content")
+            or item.get("reply")
+            or item.get("message")
+            or item.get("text")
+            or ""
         ).strip()
 
         if role in {
             "assistant",
             "bot",
+            "ai",
+            "model",
+            "assistant_message",
         } and content:
 
             return content
@@ -604,6 +610,13 @@ class LAMOrchestrator:
             user_message=user_message,
             surgery_date=surgery_date,
             chat_history=history,
+            medication_names=[
+                str(medication.get("name", "")).strip()
+                for medication in ReportGenerationAgent.get_patient_record(patient_id).get(
+                    "current_medications", []
+                )
+                if medication.get("name")
+            ],
         )
 
 

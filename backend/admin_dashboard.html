@@ -234,6 +234,35 @@
   }
 
   input[type="file"] { display: none; }
+
+  #login-panel {
+    max-width: 420px;
+    margin: 70px auto;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+
+  #login-panel h2 { margin-top: 0; }
+  #login-panel input {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  #admin-app { display: none; }
+  .table-panel { max-width: 1400px; margin: 0 auto 24px; }
+  .table-wrap { overflow: auto; padding: 0 18px 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink-soft); background: #f4f7f5; }
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn.secondary { background: #eef2f0; color: var(--pine-deep); border: 1px solid var(--line); }
+  .btn.danger { background: #a83b3b; }
+  .btn.danger:hover { background: #812d2d; }
+  .file-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 </style>
 </head>
 <body>
@@ -245,6 +274,18 @@
   </div>
 </header>
 
+<section id="login-panel">
+  <h2>Admin login</h2>
+  <p>Sign in to view patient records and extract reports.</p>
+  <form id="login-form">
+    <label>Username<input id="username" value="admin" autocomplete="username" required></label>
+    <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+    <button class="btn" type="submit">Sign in</button>
+  </form>
+  <div class="status-banner warning" id="login-error"></div>
+</section>
+
+<div id="admin-app">
 <main>
 
   <!-- LEFT: upload + preview -->
@@ -259,8 +300,11 @@
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <path d="M14 2v6h6"/>
         </svg>
-        <div>Click to choose a PDF report from your computer</div>
-        <button class="btn" type="button" id="choose-btn">Choose PDF file</button>
+        <div>Choose a PDF report, then preview it before extracting.</div>
+        <div class="file-actions">
+          <button class="btn secondary" type="button" id="choose-btn">Open / replace PDF</button>
+          <button class="btn" type="button" id="extract-btn" disabled>Extract details</button>
+        </div>
         <input type="file" id="file-input" accept="application/pdf">
       </div>
       <iframe id="pdf-frame"></iframe>
@@ -271,7 +315,7 @@
   <section class="panel">
     <div class="panel-head">
       <h2>Extracted Details</h2>
-      <span id="method-tag"></span>
+      <div class="toolbar"><button class="btn" type="button" id="refresh-btn">Refresh database</button><span id="method-tag"></span></div>
     </div>
     <div class="panel-body">
       <div class="status-banner" id="status-banner"></div>
@@ -285,10 +329,25 @@
 
 </main>
 
+<section class="panel table-panel">
+  <div class="panel-head">
+    <h2>Patient database</h2>
+    <span id="patient-count"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Patient ID</th><th>Name</th><th>Age</th><th>Surgery</th><th>Medications</th><th>Updated data</th><th>Actions</th></tr></thead>
+      <tbody id="patient-table-body"></tbody>
+    </table>
+  </div>
+</section>
+</div>
+
 <script>
   const dropZone = document.getElementById('drop-zone');
   const chooseBtn = document.getElementById('choose-btn');
   const fileInput = document.getElementById('file-input');
+  const extractBtn = document.getElementById('extract-btn');
   const pdfFrame = document.getElementById('pdf-frame');
   const filenameRow = document.getElementById('filename-row');
   const emptyState = document.getElementById('empty-state');
@@ -296,9 +355,19 @@
   const fieldsContainer = document.getElementById('fields-container');
   const statusBanner = document.getElementById('status-banner');
   const methodTag = document.getElementById('method-tag');
+  const loginPanel = document.getElementById('login-panel');
+  const adminApp = document.getElementById('admin-app');
+  const loginForm = document.getElementById('login-form');
+  const loginError = document.getElementById('login-error');
+  const patientTableBody = document.getElementById('patient-table-body');
+  const patientCount = document.getElementById('patient-count');
+  const refreshBtn = document.getElementById('refresh-btn');
 
   // Change this if your backend runs on a different host/port.
   const EXTRACT_ENDPOINT = '/api/admin/extract-report';
+  const tokenKey = 'orthosync_admin_token';
+  let adminToken = sessionStorage.getItem(tokenKey);
+  let selectedFile = null;
 
   const FIELD_LABELS = {
     full_name: 'Full Name',
@@ -312,7 +381,67 @@
   };
 
   chooseBtn.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('click', () => fileInput.click());
+  extractBtn.addEventListener('click', () => {
+    if (selectedFile) extractReport(selectedFile);
+  });
+  dropZone.addEventListener('click', (event) => {
+    if (event.target === dropZone) fileInput.click();
+  });
+  loginForm.addEventListener('submit', login);
+  refreshBtn.addEventListener('click', loadPatients);
+
+  function authHeaders() {
+    return adminToken ? { Authorization: `Bearer ${adminToken}` } : {};
+  }
+
+  async function login(event) {
+    event.preventDefault();
+    loginError.style.display = 'none';
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: username.value, password: password.value}),
+    });
+    if (!response.ok) {
+      loginError.textContent = 'Invalid admin credentials.';
+      loginError.style.display = 'block';
+      return;
+    }
+    adminToken = (await response.json()).token;
+    sessionStorage.setItem(tokenKey, adminToken);
+    showAdminApp();
+  }
+
+  function showAdminApp() {
+    loginPanel.style.display = 'none';
+    adminApp.style.display = 'block';
+    loadPatients();
+  }
+
+  async function loadPatients() {
+    const response = await fetch('/api/admin/patients', {headers: authHeaders()});
+    if (response.status === 401) {
+      sessionStorage.removeItem(tokenKey);
+      adminToken = null;
+      loginPanel.style.display = 'block';
+      adminApp.style.display = 'none';
+      return;
+    }
+    const data = await response.json();
+    patientCount.textContent = `${data.patients.length} patient(s)`;
+    patientTableBody.innerHTML = data.patients.map(patient => {
+      const meds = (patient.current_medications || []).map(m => escapeHtml(
+        `${m.name}${m.dose ? ` (${m.dose})` : ''}`
+      )).join('<br>') || '<span class="empty">None recorded</span>';
+      return `<tr><td>${escapeHtml(patient.patient_id)}</td>
+        <td>${escapeHtml(patient.full_name || '')}</td>
+        <td>${escapeHtml(String(patient.age ?? ''))}</td>
+        <td>${escapeHtml(patient.surgery_type || '')}</td>
+        <td>${meds}</td>
+        <td>${escapeHtml(String(patient.updated_at || ''))}</td>
+        <td><button class="btn danger" type="button" onclick="deletePatient('${escapeHtml(patient.patient_id)}')">Delete</button></td></tr>`;
+    }).join('');
+  }
 
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -320,15 +449,18 @@
   });
 
   function handleFile(file) {
+    selectedFile = file;
     filenameRow.textContent = file.name;
 
     // Show the PDF preview.
     const fileUrl = URL.createObjectURL(file);
-    dropZone.style.display = 'none';
+    dropZone.style.display = 'flex';
     pdfFrame.style.display = 'block';
     pdfFrame.src = fileUrl;
-
-    extractReport(file);
+    extractBtn.disabled = false;
+    emptyState.style.display = 'block';
+    emptyState.textContent = 'PDF selected. Click Extract details when ready.';
+    fieldsContainer.style.display = 'none';
   }
 
   async function extractReport(file) {
@@ -344,6 +476,7 @@
     try {
       const response = await fetch(EXTRACT_ENDPOINT, {
         method: 'POST',
+        headers: authHeaders(),
         body: formData,
       });
 
@@ -354,6 +487,7 @@
 
       const data = await response.json();
       renderExtraction(data.extraction);
+      await loadPatients();
 
     } catch (err) {
       spinner.style.display = 'none';
@@ -422,6 +556,24 @@
     div.textContent = str;
     return div.innerHTML;
   }
+
+  async function deletePatient(patientId) {
+    if (!window.confirm(`Delete patient ${patientId} and all stored clinical details? This cannot be undone.`)) {
+      return;
+    }
+    const response = await fetch(`/api/admin/patients/${encodeURIComponent(patientId)}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      window.alert(`Patient could not be deleted: ${error}`);
+      return;
+    }
+    await loadPatients();
+  }
+
+  if (adminToken) showAdminApp();
 </script>
 
 </body>

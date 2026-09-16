@@ -17,6 +17,10 @@ import os
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+from patient_database import (
+    initialize_database, get_patient, list_patient_ids, seed_patients,
+)
+
 try:
     from reportlab.lib.pagesizes import letter
     from reportlab.lib import colors
@@ -95,7 +99,14 @@ _PATIENT_REGISTRY: Dict[str, Dict[str, Any]] = {
             {"timestamp": "2026-09-04 10:15", "level": "GREEN", "symptom": "Incision tightness on sitting", "action": "Reiterated posterior hip precautions (no flexion > 90 deg)"}
         ],
     }
+
 }
+
+# Keep the historical demo fixtures, but make them durable and available to
+# the scheduler after a process restart.  INSERT-ignore semantics in
+# seed_patients preserve any patient data already stored by an administrator.
+initialize_database()
+seed_patients(_PATIENT_REGISTRY.values())
 
 
 class ReportGenerationAgent:
@@ -106,13 +117,15 @@ class ReportGenerationAgent:
 
     @classmethod
     def known_patient_ids(cls) -> List[str]:
-        return list(_PATIENT_REGISTRY.keys())
+        ids = list_patient_ids()
+        return ids or list(_PATIENT_REGISTRY.keys())
 
     @classmethod
     def get_patient_record(cls, patient_id: str) -> Dict[str, Any]:
         clean_id = (patient_id or "PT-B7-8921").strip().upper()
-        if clean_id in _PATIENT_REGISTRY:
-            return _PATIENT_REGISTRY[clean_id]
+        stored = get_patient(clean_id)
+        if stored:
+            return stored
 
         # Generic default template for any other ID
         return {

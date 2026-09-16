@@ -88,6 +88,17 @@ class DoctorAlertNotifier:
             and os.getenv("SMTP_PASSWORD")
         )
 
+    def status(self) -> Dict[str, Any]:
+        """Return non-secret configuration state for diagnostics."""
+        return {
+            "configured": self.is_configured,
+            "smtp_host": self._smtp_host,
+            "smtp_port": int(os.getenv("SMTP_PORT", _DEFAULT_SMTP_PORT)),
+            "smtp_username": self._smtp_username,
+            "recipient": self.recipient,
+            "password_present": bool(os.getenv("SMTP_PASSWORD")),
+        }
+
     def notify_red_triage(
         self,
         *,

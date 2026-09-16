@@ -20,7 +20,7 @@ from agents.report_agent import ReportGenerationAgent
 
 LOGGER = logging.getLogger(__name__)
 
-DEFAULT_REMINDER_EMAIL = "rvns12345@gamil.com"
+DEFAULT_REMINDER_EMAIL = "rvns12345@gmail.com"
 def build_daily_schedule(patient_id: str) -> List[Dict[str, Any]]:
     """Return today's display/reminder rows from the doctor's report."""
     return ReportGenerationAgent.get_daily_medication_schedule(patient_id)
@@ -30,7 +30,7 @@ class MedicationReminderService:
     """Small process-local scheduler for configured SMTP email reminders."""
 
     def __init__(self) -> None:
-        self.recipient = os.getenv("MEDICATION_REMINDER_EMAIL", DEFAULT_REMINDER_EMAIL)
+        self.recipient = os.getenv("MEDICATION_REMINDER_EMAIL", DEFAULT_REMINDER_EMAIL).strip()
         self._sent: set[tuple[str, str, str]] = set()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None

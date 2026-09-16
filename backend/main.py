@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from datetime import date
+from pathlib import Path
 from typing import Optional, List, Dict, Any
 
 from agents.symptom_agent import SymptomAssessmentAgent
@@ -17,6 +18,8 @@ from lam.orchestrator import LAMOrchestrator
 from lam.schemas import WeightBearingStatus
 from triage.safety_triage import SafetyTriageEngine
 from medication_reminders import reminder_service
+from patient_database import create_patient, get_patient, initialize_database, list_patient_ids
+import sqlite3
 
 # NEW: admin PDF report-extraction feature
 from admin_report_routes import router as admin_report_router
@@ -42,6 +45,7 @@ app.include_router(admin_report_router)
 
 @app.on_event("startup")
 def start_medication_reminders() -> None:
+    initialize_database()
     reminder_service.start()
 
 
@@ -86,6 +90,47 @@ class ChatRequest(BaseModel):
     weight_bearing_status: Optional[WeightBearingStatus] = Field(default=None, example="WBAT")
     current_rom: Optional[str] = Field(default=None, example="Flexion to about 80 degrees")
     exercise_history: Optional[str] = Field(default=None, example="Completed heel slides and quad sets today; missed yesterday's session")
+
+
+class PatientRecordRequest(BaseModel):
+    patient_id: str
+    full_name: str
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    allergies: Optional[str] = None
+    surgery_type: Optional[str] = None
+    affected_limb: Optional[str] = None
+    surgery_date: Optional[str] = None
+    postop_day: Optional[int] = None
+    surgeon: Optional[str] = None
+    implant: Optional[str] = None
+    weight_bearing_status: Optional[str] = None
+    current_medications: List[Dict[str, Any]] = Field(default_factory=list)
+    metrics_history: List[Dict[str, Any]] = Field(default_factory=list)
+    triage_events: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+@app.get("/api/patients")
+def list_patients():
+    return {"patient_ids": list_patient_ids()}
+
+
+@app.get("/api/patients/{patient_id}")
+def get_patient_endpoint(patient_id: str):
+    patient = get_patient(patient_id.strip().upper())
+    if patient is None:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return patient
+
+
+@app.post("/api/patients", status_code=201)
+def create_patient_endpoint(payload: PatientRecordRequest):
+    try:
+        return create_patient(payload.dict())
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=409, detail="patient_id already exists")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @app.get("/")
@@ -211,7 +256,8 @@ def chat(payload: ChatRequest):
 # NEW: serves the admin dashboard page at http://127.0.0.1:8000/admin
 @app.get("/admin")
 def admin_dashboard():
-    return FileResponse("admin_dashboard.html")
+    dashboard_path = Path(__file__).resolve().with_name("admin_dashboard.html")
+    return FileResponse(dashboard_path)
 
 
 if __name__ == "__main__":
