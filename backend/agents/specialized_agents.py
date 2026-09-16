@@ -269,14 +269,23 @@ class RecoveryProgressAgent(BaseClinicalAgent):
         DRC = recovery_logic.DecisionReasonCode
 
         if decision.action == RA.ASK_FOR_INFORMATION:
+            # Read the retry count BEFORE mark_pending() -- mark_pending()
+            # doesn't touch ask_count, but reading first keeps this in the
+            # same order regardless, and gives format_ask_question() a
+            # stable seed to rotate its acknowledgment phrase by.
+            variation_seed = state.ask_count_of(metric)
             state.mark_pending(metric)
-            reply = recovery_integration.format_ask_question(metric)
+            reply = recovery_integration.format_ask_question(
+                metric, reason_code=decision.reason_code, variation_seed=variation_seed,
+            )
             return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
 
         if decision.action == RA.AWAIT_INFORMATION:
             # metric is already the tracked pending_field -- no duplicate
             # mark_pending(), no state mutation at all.
-            reply = recovery_integration.format_ask_question(metric)
+            reply = recovery_integration.format_ask_question(
+                metric, reason_code=decision.reason_code, variation_seed=state.ask_count_of(metric),
+            )
             return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
 
         if decision.action == RA.DECLINE_TO_ASSESS:

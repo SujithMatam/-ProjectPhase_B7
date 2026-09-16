@@ -145,6 +145,19 @@ def _stub_answer_question(reply: str = "stub reply", sources: Optional[list] = N
 _FORBIDDEN_TRAJECTORY_PHRASES = ("on track", "above expected", "ahead of schedule", "normal recovery")
 _FORBIDDEN_DIRECTIONAL_PHRASES = ("better", "worse", "ahead", "behind")
 
+# Style-pass regression guard: the report-style phrasing the conversational
+# rewrite was specifically meant to eliminate (see recovery_integration.py's
+# format_assess_message / format_decline_message / format_ask_question).
+# None of these should ever appear in a Recovery reply again.
+_FORBIDDEN_ROBOTIC_PHRASES = (
+    "has been noted",
+    "reported metric",
+    "supplied value",
+    "there isn't a stated target to compare against yet",
+    "your reported",
+    "noted",
+)
+
 
 def _assert_no_forbidden_trajectory_language(reply: str, label: str) -> None:
     lower = reply.lower()
@@ -156,6 +169,12 @@ def _assert_no_forbidden_directional_language(reply: str, label: str) -> None:
     lower = reply.lower()
     for phrase in _FORBIDDEN_DIRECTIONAL_PHRASES:
         _check(phrase not in lower, f"{label}: forbidden directional phrase {phrase!r} leaked into reply: {reply!r}")
+
+
+def _assert_no_forbidden_robotic_language(reply: str, label: str) -> None:
+    lower = reply.lower()
+    for phrase in _FORBIDDEN_ROBOTIC_PHRASES:
+        _check(phrase not in lower, f"{label}: robotic report-style phrase {phrase!r} leaked into reply: {reply!r}")
 
 
 # ============================================================================
@@ -277,7 +296,9 @@ def test_assessment_wording_and_negative_assertions() -> None:
     print(f"    Day6 flex60: {reply!r}")
     _check(cp.verdict == rl.CheckpointVerdict.TARGET_NOT_YET_DUE, "Day6 flex60 must be TARGET_NOT_YET_DUE")
     _check("below" not in reply.lower(), "Day6 flex60 (not yet due) must not say 'below'")
+    _check("70" not in reply and "90" not in reply, "Day6 flex60 (not yet due) must not invent the Day-7 range as a Day-6 target")
     _assert_no_forbidden_trajectory_language(reply, "Day6 flex60")
+    _assert_no_forbidden_robotic_language(reply, "Day6 flex60")
 
     # Day 7 + flexion 80 -> within 70-90 stated for Post-Op Day 7.
     cp = checkpoint_for(7, rl.ROM_FLEXION_DEGREES, 80)
@@ -334,6 +355,13 @@ def test_assessment_wording_and_negative_assertions() -> None:
     _check(cp.verdict == rl.CheckpointVerdict.OUTSIDE_STATED_RANGE, "Day7 ext8 must be OUTSIDE_STATED_RANGE")
     _assert_no_forbidden_directional_language(reply, "Day7 ext8")
     _assert_no_forbidden_trajectory_language(reply, "Day7 ext8")
+
+    for label, r in (
+        ("Day6 flex60", ri.format_assess_message(checkpoint_for(6, rl.ROM_FLEXION_DEGREES, 60))),
+        ("Day7 flex80", ri.format_assess_message(checkpoint_for(7, rl.ROM_FLEXION_DEGREES, 80))),
+        ("Day8 flex80", ri.format_assess_message(checkpoint_for(8, rl.ROM_FLEXION_DEGREES, 80))),
+    ):
+        _assert_no_forbidden_robotic_language(r, label)
     print()
 
 
@@ -364,6 +392,7 @@ def test_decline_reasons() -> None:
     _check(d.reason_code == rl.DecisionReasonCode.EVIDENCE_MISSING, f"missing evidence: {d}")
     reply = ri.format_decline_message(d.reason_code, metric=rl.ROM_FLEXION_DEGREES, evidence=None)
     _check("supported evidence" in reply, "missing-evidence decline text must not claim a clinical abnormality")
+    _assert_no_forbidden_robotic_language(reply, "missing evidence decline")
 
     # Wrong evidence source.
     s = fresh_verified("D-wrong-source")
@@ -398,6 +427,7 @@ def test_decline_reasons() -> None:
         _check(not cp.supported and cp.reason_code == rl.ReasonCode.INVALID_METRIC_VALUE, f"{label} value {bad_value!r}: {cp}")
         reply = ri.format_decline_message(rl.DecisionReasonCode.INVALID_METRIC_VALUE, metric=rl.ROM_FLEXION_DEGREES, evidence=TKA03_EVIDENCE)
         _check("doesn't look usable" in reply, f"{label} value decline text must not claim a clinical abnormality")
+        _assert_no_forbidden_robotic_language(reply, f"{label} value decline")
     print()
 
 
@@ -1097,6 +1127,169 @@ def test_postop_day_procedure_and_chat_history_reach_grounded_guidance() -> None
     print()
 
 
+# ============================================================================
+# 18. CONVERSATIONAL STYLE -- MOCKED-BOUNDARY (retrieval mocked) /
+#    REAL-INTEGRATION (orchestrator wound-priority). Verifies the Pass-4
+#    style-only rewrite: natural acknowledgment + grounded explanation +
+#    at most one question, with no report-style wording and no invented
+#    targets -- WITHOUT pinning to one exact full sentence. State-machine
+#    behavior (ASK/AWAIT/ASSESS, pending-field handling, RED/wound
+#    priority) is untouched and re-verified here only to confirm the style
+#    pass didn't disturb it.
+# ============================================================================
+
+def test_conversational_style_and_grounding() -> None:
+    _section("18 -- Conversational style: natural wording + preserved grounding [MOCKED-BOUNDARY: retrieval / REAL-INTEGRATION: wound priority]")
+
+    spy = _RetrievalSpy()
+
+    # ------------------------------------------------------------------
+    # A + D: "60 degrees" answered BEFORE the first milestone (Day 4 <
+    # checkpoint Day 7) -- must sound conversational, mention 60 degrees,
+    # explain (grounded in the patient's own day and the checkpoint day)
+    # that it's too early to compare, and must NOT invent a Day-4 target
+    # (no 70/90 range leaking in).
+    # ------------------------------------------------------------------
+    surgery_date_day4 = _dynamic_surgery_date(3)  # Day 4
+    _reset_recovery_store()
+    state_a = recovery_state.get_or_create_state(patient_id="CS-A", surgery_date_raw=surgery_date_day4, procedure="TKA")
+    state_a.apply_verified_day(4)
+    state_a.mark_pending(rl.ROM_FLEXION_DEGREES)
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy):
+        result_a = RecoveryProgressAgent.handle(
+            patient_id="CS-A", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=4, user_message="60 degrees", procedure="TKA", surgery_date=surgery_date_day4,
+        )
+    reply_a = result_a["reply"]
+    print(f"    A/D (Day4, '60 degrees'): {reply_a!r}")
+    _check(state_a.is_current(rl.ROM_FLEXION_DEGREES), "A: 60 degrees must be stored as the current flexion value")
+    _check(state_a.get_fact(rl.ROM_FLEXION_DEGREES).value == 60.0, "A: stored value must be 60")
+    _check("60" in reply_a, "A: reply must mention the reported 60 degrees")
+    _check("4" in reply_a and "7" in reply_a, "A/D: reply must ground the explanation in both the patient's day (4) and the checkpoint day (7)")
+    _check("70" not in reply_a and "90" not in reply_a, "A/D: reply must not invent the Day-7 flexion range as a Day-4 target")
+    _assert_no_forbidden_trajectory_language(reply_a, "A/D Day4 60-degrees")
+    _assert_no_forbidden_robotic_language(reply_a, "A/D Day4 60-degrees")
+    _check("noted" not in reply_a.lower(), "A/D: acknowledgment must not sound like a database entry ('noted')")
+    _check(
+        "?" not in reply_a,
+        f"A/D: a not-yet-due ASSESS reply must contain NO question -- the state machine cannot track or "
+        f"attribute an answer to a free-floating follow-up question (pending_field is already cleared by "
+        f"the time this reply is built), got {reply_a!r}",
+    )
+
+    # ------------------------------------------------------------------
+    # B: "Same as yesterday." must still be interpreted as an answer to
+    # the pending field (unchanged extraction/continuation logic) and
+    # produce a natural, grounded reply once the checkpoint is due.
+    # ------------------------------------------------------------------
+    surgery_date_day7 = _dynamic_surgery_date(6)  # Day 7 today
+    _reset_recovery_store()
+    state_b = recovery_state.get_or_create_state(patient_id="CS-B", surgery_date_raw=surgery_date_day7, procedure="TKA")
+    state_b.apply_verified_day(6)
+    state_b.set_fact(rl.ROM_FLEXION_DEGREES, 75, effective_postop_day=6)
+    state_b.apply_verified_day(7)
+    state_b.mark_pending(rl.ROM_FLEXION_DEGREES)
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy):
+        result_b = RecoveryProgressAgent.handle(
+            patient_id="CS-B", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=7, user_message="Same as yesterday.", procedure="TKA", surgery_date=surgery_date_day7,
+        )
+    reply_b = result_b["reply"]
+    print(f"    B ('Same as yesterday.'): {reply_b!r}")
+    _check(state_b.is_current(rl.ROM_FLEXION_DEGREES), "B: 'same as yesterday' must still be applied as the current flexion value")
+    _check(state_b.get_fact(rl.ROM_FLEXION_DEGREES).value == 75, "B: carried-forward value must stay 75")
+    _check("75" in reply_b, "B: reply must reflect the carried-forward value (75)")
+    _assert_no_forbidden_robotic_language(reply_b, "B same-as-yesterday")
+
+    # ------------------------------------------------------------------
+    # C: "I don't know." must be handled naturally -- a short, varied
+    # acknowledgment ahead of the re-ask, not a bare repeated question.
+    # ------------------------------------------------------------------
+    surgery_date_day10 = _dynamic_surgery_date(9)  # Day 10
+    _reset_recovery_store()
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy):
+        RecoveryProgressAgent.handle(  # Turn 1: opener -> asks flexion (no ack -- nothing to acknowledge yet)
+            patient_id="CS-C", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=10, user_message="How is my recovery going?", procedure="TKA", surgery_date=surgery_date_day10,
+        )
+        result_c = RecoveryProgressAgent.handle(  # Turn 2: "I don't know."
+            patient_id="CS-C", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=10, user_message="I don't know.", procedure="TKA", surgery_date=surgery_date_day10,
+        )
+    reply_c = result_c["reply"]
+    print(f"    C (\"I don't know.\"): {reply_c!r}")
+    state_c = recovery_state.peek_state(patient_id="CS-C", surgery_date_raw=surgery_date_day10, procedure="TKA")
+    _check(state_c.ask_count_of(rl.ROM_FLEXION_DEGREES) == 1, "C: 'I don't know' must still be recorded as a retry (state machine untouched)")
+    bare_question = ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES]
+    _check(
+        reply_c.strip() != bare_question and reply_c.endswith(bare_question),
+        f"C: reply must open with a short natural acknowledgment before re-asking the same question, got {reply_c!r}",
+    )
+    _check("degrees" in reply_c.lower() or "bend" in reply_c.lower(), "C: reply must still re-ask the flexion question")
+    _assert_no_forbidden_robotic_language(reply_c, "C don't-know retry")
+
+    # ------------------------------------------------------------------
+    # E: day WITH an available milestone (Day 10, past checkpoint Day 7,
+    # flexion 80 within 70-90) -- natural grounded comparison, still
+    # stating the real range and the real (earlier) checkpoint day.
+    # ------------------------------------------------------------------
+    _reset_recovery_store()
+    state_e = recovery_state.get_or_create_state(patient_id="CS-E", surgery_date_raw=surgery_date_day10, procedure="TKA")
+    state_e.apply_verified_day(10)
+    state_e.mark_pending(rl.ROM_FLEXION_DEGREES)
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy):
+        result_e = RecoveryProgressAgent.handle(
+            patient_id="CS-E", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=10, user_message="I can bend to about 80 degrees.", procedure="TKA", surgery_date=surgery_date_day10,
+        )
+    reply_e = result_e["reply"]
+    print(f"    E (Day10, flexion 80): {reply_e!r}")
+    _check("80" in reply_e, "E: reply must mention the reported 80 degrees")
+    _check("70" in reply_e and "90" in reply_e, "E: reply must state the real 70-90 checkpoint range")
+    _check("earlier Post-Op Day 7" in reply_e, "E: reply must reference the real (earlier) Day-7 checkpoint, grounded not invented")
+    _assert_no_forbidden_trajectory_language(reply_e, "E Day10 flexion80")
+    _assert_no_forbidden_directional_language(reply_e, "E Day10 flexion80")
+    _assert_no_forbidden_robotic_language(reply_e, "E Day10 flexion80")
+
+    # ------------------------------------------------------------------
+    # F: RED safety still overrides Recovery entirely -- re-verified here
+    # (already proven in test_safety_and_scope_precedence) purely as a
+    # style-pass regression guard: the conversational rewrite must not
+    # have touched orchestrator-level precedence.
+    # ------------------------------------------------------------------
+    surgery_date_flat = "2026-09-02T00:00:00.000"
+    _reset_recovery_store()
+    state_f = recovery_state.get_or_create_state(patient_id="CS-F", surgery_date_raw=surgery_date_flat, procedure="TKA")
+    state_f.mark_pending(rl.ROM_FLEXION_DEGREES)
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed") as rag_mock_f:
+        result_f = LAMOrchestrator.process(
+            patient_id="CS-F", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=10, user_message="I can't breathe and have severe chest pain", surgery_date=surgery_date_flat,
+        )
+    _check(result_f["intent"] == IntentLabel.EMERGENCY.value, "F: RED query must still return EMERGENCY, unaffected by the style pass")
+    _check(rag_mock_f.call_count == 0, "F: RED must still short-circuit before Recovery's retrieval is ever reached")
+    _check(state_f.pending_field == rl.ROM_FLEXION_DEGREES, "F: RED short-circuit must still leave the pending Recovery field untouched")
+
+    # ------------------------------------------------------------------
+    # G: an explicit wound issue still overrides an outstanding Recovery
+    # question -- re-verified here as a style-pass regression guard on
+    # orchestrator-level wound priority (untouched by this pass).
+    # ------------------------------------------------------------------
+    _reset_recovery_store()
+    state_g = recovery_state.get_or_create_state(patient_id="CS-G", surgery_date_raw=surgery_date_flat, procedure="TKA")
+    state_g.mark_pending(rl.ROM_FLEXION_DEGREES)
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed") as rag_mock_g:
+        result_g = LAMOrchestrator.process(
+            patient_id="CS-G", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=10, user_message="My wound looks more red today and it's leaking some fluid.", surgery_date=surgery_date_flat,
+        )
+    print(f"    G (explicit wound issue): intent={result_g['intent']} target_agent={result_g['target_agent']}")
+    _check(result_g["target_agent"] == TargetAgent.WOUND_CARE_AGENT.value, f"G: explicit wound issue must route to WoundCareAgent, got {result_g['target_agent']}")
+    _check(rag_mock_g.call_count == 0, "G: wound priority must short-circuit before Recovery's own retrieval is ever reached")
+    _check(state_g.pending_field == rl.ROM_FLEXION_DEGREES, "G: wound priority must not mutate the still-outstanding Recovery field")
+    print()
+
+
 def main() -> int:
     test_postop_day_derivation()
     test_checkpoint_day_6_7_8_boundary()
@@ -1115,6 +1308,7 @@ def main() -> int:
     test_client_reported_postop_day_is_diagnostic_only()
     test_routing_and_response_shape()
     test_postop_day_procedure_and_chat_history_reach_grounded_guidance()
+    test_conversational_style_and_grounding()
 
     print("=" * 78)
     if _FAILURES:
