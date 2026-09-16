@@ -42,11 +42,21 @@ from lam.schemas import TargetAgent
 
 # ============================================================================
 # WOUND TERMS
+#
+# UNAMBIGUOUS WOUND ANCHORS ONLY -- kept in sync with lam/orchestrator.py's
+# own _WOUND_TERMS (see that module's comment for the full rationale).
+# Ambiguous, generic symptom words (swelling/swollen, redness/red,
+# warm(th)/warmer/hot, fluid) are deliberately excluded here too: this
+# module's _is_wound_conversation() must not disagree with the orchestrator
+# about what counts as an unambiguous wound term, or the two layers could
+# silently diverge on whether a bare "My knee is swollen." should be treated
+# as wound-related.
 # ============================================================================
 
 _WOUND_TERMS = (
     "wound",
     "incision",
+    "surgical site",
     "surgical cut",
     "scar",
     "stitch",
@@ -63,15 +73,6 @@ _WOUND_TERMS = (
     "leaking",
     "leak",
     "pus",
-    "fluid",
-    "redness",
-    "red",
-    "warm",
-    "warmer",
-    "warmth",
-    "hot",
-    "swelling",
-    "swollen",
     "separation",
     "opening",
     "opened",

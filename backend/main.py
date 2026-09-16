@@ -6,7 +6,7 @@ Exposes endpoints for the Flutter mobile/web client.
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from datetime import date
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -90,6 +90,38 @@ class ChatRequest(BaseModel):
     weight_bearing_status: Optional[WeightBearingStatus] = Field(default=None, example="WBAT")
     current_rom: Optional[str] = Field(default=None, example="Flexion to about 80 degrees")
     exercise_history: Optional[str] = Field(default=None, example="Completed heel slides and quad sets today; missed yesterday's session")
+
+    @field_validator("patient_id")
+    @classmethod
+    def _patient_id_must_not_be_blank(cls, value: str) -> str:
+        """
+        Reject an EXPLICITLY-supplied blank/whitespace-only patient_id at
+        the request boundary, rather than letting it silently reach
+        LAMOrchestrator.process() -> ... -> pain_state.py, where
+        _normalize_patient_id() would otherwise fold it into a shared
+        "UNKNOWN_PATIENT" (or, for whitespace-only input, an even more
+        obscure literal "") bucket that multiple unrelated anonymous
+        callers could collide on -- sharing pending_field, ask_counts, and
+        cached structured pain_score/swelling facts across totally
+        different people.
+
+        Pydantic v2 does NOT validate a field's DEFAULT value unless
+        `validate_default=True` is set (not set here) -- so this validator
+        only ever runs when the CLIENT explicitly supplied a patient_id in
+        the request body. Omitting the field entirely still resolves to
+        the existing default ("PT-B7-8921") completely untouched by this
+        check, preserving prior behavior exactly. An explicitly-supplied
+        value is stripped once here (the request-model boundary), so
+        every downstream consumer (pain_state.py, recovery_state.py,
+        etc.) already receives a trimmed id.
+        """
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError(
+                "patient_id must not be blank -- omit the field entirely "
+                "to use the default, or supply a real patient id"
+            )
+        return stripped
 
 
 class PatientRecordRequest(BaseModel):
