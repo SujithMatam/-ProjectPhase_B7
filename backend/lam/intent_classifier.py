@@ -857,6 +857,80 @@ class ClassificationDetail:
 class IntentClassifier:
 
     @classmethod
+    def detect_applicable_intents(
+        cls,
+        query: str,
+        context: LAMContext,
+    ) -> tuple[IntentLabel, ...]:
+        """
+        Detect every domain explicitly present in one turn.
+
+        This is deliberately deterministic and keyword-based.  The normal
+        classifier remains the source of truth for single-domain semantic
+        routing, while this method prevents a combined clinical statement
+        from being reduced to its first matching intent.
+        """
+        text = _normalise_query(query)
+        detected: list[IntentLabel] = []
+
+        if _matches_recorded_medication(text, context.medication_names) or (
+            context.chat_history and _looks_like_medication_follow_up(
+                text, context.chat_history
+            )
+        ):
+            detected.append(IntentLabel.MEDICATION)
+
+        for intent, keywords in _DETERMINISTIC_RULES:
+            if intent in detected:
+                continue
+            matches = [
+                keyword for keyword in keywords
+                if re.search(r"\b" + re.escape(keyword) + r"\b", text)
+            ]
+            # "pain tablet/medicine/pill" identifies the medication, not a
+            # second pain-assessment request.  Retain pain when the turn also
+            # contains an independent symptom (for example "pain is worse").
+            if (
+                intent == IntentLabel.PAIN_SYMPTOMS
+                and IntentLabel.MEDICATION in detected
+                and matches
+                and all(keyword in {"pain", "hurt", "hurts", "sore", "soreness"}
+                        for keyword in matches)
+                and all(
+                    re.search(
+                        r"\b" + re.escape(keyword)
+                        + r"\s+(?:tablet|tablets|pill|pills|medicine|medication|killer)\b",
+                        text,
+                    )
+                    for keyword in matches
+                )
+            ):
+                matches = []
+            if matches:
+                detected.append(intent)
+
+        # Active wound follow-ups can be terse, so retain wound ownership.
+        if (
+            context.chat_history
+            and any(
+                marker in " ".join(
+                    str(turn.get("content", "")).lower()
+                    for turn in context.chat_history
+                    if isinstance(turn, dict)
+                )
+                for marker in ("wound care", "wound", "incision", "drainage")
+            )
+            and not any(intent == IntentLabel.WOUND_CARE for intent in detected)
+            and len(text.split()) <= 8
+        ):
+            detected.append(IntentLabel.WOUND_CARE)
+
+        if not detected:
+            detected.append(cls.classify(query, context))
+
+        return tuple(detected)
+
+    @classmethod
     def classify(
         cls,
         query: str,
