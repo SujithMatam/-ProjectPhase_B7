@@ -34,6 +34,7 @@ const Map<String, Map<String, String>> uiText = {
     'botGreeting':
         'Hello. I am OrthoSync AI. How is your recovery progressing today?',
     'botAuthReply': 'I am analyzing your specific recovery protocols.',
+    'loginRequiredReply': 'Please log in to use OrthoSync AI. Your recovery data is needed to provide personalized postoperative guidance.',
     'botVoiceReply': 'I received your voice note. How is your pain level?',
     'newCheckinPrompt': 'Starting a new check-in session. To begin, how would you rate your pain today on a scale of 1 to 10?',
     'patientRecords': 'Patient Records',
@@ -59,6 +60,7 @@ const Map<String, Map<String, String>> uiText = {
     'placeholder': 'Describa sus síntomas...',
     'botGreeting': 'Hola. Soy OrthoSync AI. ¿Cómo progresa su recuperación?',
     'botAuthReply': 'Estoy analizando sus protocolos.',
+    'loginRequiredReply': 'Inicie sesión para usar OrthoSync AI. Sus datos de recuperación son necesarios para brindar orientación posoperatoria personalizada.',
     'botVoiceReply': 'He recibido su nota de voz. ¿Cómo es su dolor?',
     'newCheckinPrompt': 'Iniciando un nuevo control. Para empezar, ¿cómo calificaría su dolor hoy del 1 al 10?',
     'patientRecords': 'Registros del Paciente',
@@ -84,6 +86,7 @@ const Map<String, Map<String, String>> uiText = {
     'placeholder': 'लक्षणों का वर्णन करें...',
     'botGreeting': 'नमस्ते। मैं OrthoSync AI हूँ। रिकवरी कैसी है?',
     'botAuthReply': 'मैं आपके प्रोटोकॉल का विश्लेषण कर रहा हूँ।',
+    'loginRequiredReply': 'OrthoSync AI का उपयोग करने के लिए कृपया लॉग इन करें। व्यक्तिगत पोस्टऑपरेटिव मार्गदर्शन के लिए आपके रिकवरी डेटा की आवश्यकता है।',
     'botVoiceReply': 'मुझे आपका वॉयस नोट मिला। दर्द कैसा है?',
     'newCheckinPrompt': 'नया चेक-इन सत्र शुरू हो रहा है। आज आपका दर्द 1 से 10 के पैमाने पर कैसा है?',
     'patientRecords': 'रोगी के रिकॉर्ड',
@@ -495,7 +498,27 @@ class _MainScreenState extends State<MainScreen> {
     final text = _inputController.text.trim();
 
     if (text.isEmpty) return;
-    if (!isLoggedIn || currentPatient == null) return;
+
+    // OrthoSync AI is intended to operate only with an authenticated patient
+    // context. Do not send logged-out prompts to the backend, so they cannot
+    // be triaged, classified, or routed to any clinical agent.
+    if (!isLoggedIn || currentPatient == null) {
+      final userMessage = Message(sender: 'user', text: text);
+      final loginMessage = Message(
+        sender: 'bot',
+        text: 'loginRequiredReply',
+        isKey: true,
+      );
+
+      setState(() {
+        messages.add(userMessage);
+        messages.add(loginMessage);
+        _inputController.clear();
+      });
+
+      Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+      return;
+    }
 
     // Sending is always associated with the currently selected recovery day.
     // The normal workflow is to chat on the current day; historical days are
