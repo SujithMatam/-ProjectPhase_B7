@@ -74,6 +74,11 @@ CREATE TABLE IF NOT EXISTS source_reports (
     extracted_json TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS patient_credentials (
+    patient_id TEXT PRIMARY KEY REFERENCES patients(patient_id) ON DELETE CASCADE,
+    username TEXT NOT NULL,
+    password_hash TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS symptom_assessments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     patient_id TEXT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
@@ -146,6 +151,11 @@ def initialize_database(path: Optional[str] = None) -> None:
     with connection_scope(path) as connection:
         connection.executescript(SCHEMA)
         _ensure_symptom_assessment_columns(connection)
+        connection.execute(
+            """INSERT OR IGNORE INTO patient_credentials
+               (patient_id, username, password_hash)
+               SELECT patient_id, patient_id, LOWER(patient_id) FROM patients"""
+        )
 
 
 def _insert_children(connection: sqlite3.Connection, patient: Dict[str, Any]) -> None:
@@ -208,7 +218,30 @@ def create_patient(patient: Dict[str, Any], path: Optional[str] = None) -> Dict[
              record.get("implant"), record.get("weight_bearing_status")),
         )
         _insert_children(connection, record)
+        username = str(record.get("username") or record.get("full_name") or required).strip()
+        connection.execute(
+            """INSERT OR REPLACE INTO patient_credentials
+               (patient_id, username, password_hash) VALUES (?, ?, ?)""",
+            (required, username, required.lower()),
+        )
     return get_patient(required, path)  # type: ignore[return-value]
+
+
+def authenticate_patient(
+    identifier: str,
+    password: str,
+    path: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """Authenticate by patient ID or extracted full name."""
+    clean_identifier = str(identifier or "").strip().casefold()
+    with connection_scope(path) as connection:
+        row = connection.execute(
+            """SELECT patient_id FROM patient_credentials
+               WHERE (LOWER(patient_id) = ? OR LOWER(username) = ?)
+                 AND password_hash = ?""",
+            (clean_identifier, clean_identifier, str(password or "").strip()),
+        ).fetchone()
+    return get_patient(row["patient_id"], path) if row else None
 
 
 def seed_patients(patients: Iterable[Dict[str, Any]], path: Optional[str] = None) -> None:
