@@ -34,7 +34,6 @@ const Map<String, Map<String, String>> uiText = {
     'botGreeting':
         'Hello. I am OrthoSync AI. How is your recovery progressing today?',
     'botAuthReply': 'I am analyzing your specific recovery protocols.',
-    'loginRequiredReply': 'Please log in to use OrthoSync AI. Your recovery data is needed to provide personalized postoperative guidance.',
     'botVoiceReply': 'I received your voice note. How is your pain level?',
     'newCheckinPrompt': 'Starting a new check-in session. To begin, how would you rate your pain today on a scale of 1 to 10?',
     'patientRecords': 'Patient Records',
@@ -60,7 +59,6 @@ const Map<String, Map<String, String>> uiText = {
     'placeholder': 'Describa sus síntomas...',
     'botGreeting': 'Hola. Soy OrthoSync AI. ¿Cómo progresa su recuperación?',
     'botAuthReply': 'Estoy analizando sus protocolos.',
-    'loginRequiredReply': 'Inicie sesión para usar OrthoSync AI. Sus datos de recuperación son necesarios para brindar orientación posoperatoria personalizada.',
     'botVoiceReply': 'He recibido su nota de voz. ¿Cómo es su dolor?',
     'newCheckinPrompt': 'Iniciando un nuevo control. Para empezar, ¿cómo calificaría su dolor hoy del 1 al 10?',
     'patientRecords': 'Registros del Paciente',
@@ -86,7 +84,6 @@ const Map<String, Map<String, String>> uiText = {
     'placeholder': 'लक्षणों का वर्णन करें...',
     'botGreeting': 'नमस्ते। मैं OrthoSync AI हूँ। रिकवरी कैसी है?',
     'botAuthReply': 'मैं आपके प्रोटोकॉल का विश्लेषण कर रहा हूँ।',
-    'loginRequiredReply': 'OrthoSync AI का उपयोग करने के लिए कृपया लॉग इन करें। व्यक्तिगत पोस्टऑपरेटिव मार्गदर्शन के लिए आपके रिकवरी डेटा की आवश्यकता है।',
     'botVoiceReply': 'मुझे आपका वॉयस नोट मिला। दर्द कैसा है?',
     'newCheckinPrompt': 'नया चेक-इन सत्र शुरू हो रहा है। आज आपका दर्द 1 से 10 के पैमाने पर कैसा है?',
     'patientRecords': 'रोगी के रिकॉर्ड',
@@ -208,6 +205,8 @@ class _MainScreenState extends State<MainScreen> {
   // then the day advances automatically every 24 hours.
   int currentRecoveryDay = 1;
   int selectedRecoveryDay = 1;
+  int selectedConversationIndex = 0;
+  int currentConversationIndex = 0;
   DateTime? recoveryStartAt;
   Timer? recoveryDayTimer;
 
@@ -272,13 +271,22 @@ class _MainScreenState extends State<MainScreen> {
 
     if (!mounted) return;
 
+    final nextIndex = await DatabaseHelper.instance.getNextConversationIndex(
+      patient.patientId,
+      day,
+    );
+
+    final conversationIndex = nextIndex == 0 ? 0 : nextIndex - 1;
+
     setState(() {
       currentRecoveryDay = day;
       selectedRecoveryDay = day;
+      currentConversationIndex = conversationIndex;
+      selectedConversationIndex = conversationIndex;
       messages = [];
     });
 
-    await _loadMessagesForDay(day);
+    await _loadMessagesForConversation(day, conversationIndex);
     _startRecoveryDayTimer();
   }
 
@@ -293,20 +301,32 @@ class _MainScreenState extends State<MainScreen> {
         setState(() {
           currentRecoveryDay = newDay;
           selectedRecoveryDay = newDay;
+          currentConversationIndex = 0;
+          selectedConversationIndex = 0;
           messages = [];
         });
-        await _loadMessagesForDay(newDay);
+        await _loadMessagesForConversation(newDay, 0);
       }
     });
   }
 
-  Future<void> _loadMessagesForDay(int day) async {
+  String _conversationTitle(int day, int conversationIndex) {
+    return conversationIndex == 0
+        ? 'Day $day'
+        : 'Day $day ($conversationIndex)';
+  }
+
+  Future<void> _loadMessagesForConversation(
+    int day,
+    int conversationIndex,
+  ) async {
     final patient = currentPatient;
     if (patient == null) return;
 
     final rows = await DatabaseHelper.instance.getChatMessages(
       patient.patientId,
       day,
+      conversationIndex,
     );
 
     final loaded = rows.map(_messageFromMap).toList();
@@ -316,9 +336,67 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       messages = loaded;
       selectedRecoveryDay = day;
+      selectedConversationIndex = conversationIndex;
+
+      if (day == currentRecoveryDay) {
+        currentConversationIndex = conversationIndex;
+      }
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  Future<void> _startNewChat({bool isDesktop = true}) async {
+    final patient = currentPatient;
+    if (!isLoggedIn || patient == null) return;
+
+    _closeMenus();
+
+    final day = currentRecoveryDay;
+    final newIndex = await DatabaseHelper.instance.getNextConversationIndex(
+      patient.patientId,
+      day,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      selectedRecoveryDay = day;
+      selectedConversationIndex = newIndex;
+      currentConversationIndex = newIndex;
+      messages = [];
+      isTyping = false;
+      _inputController.clear();
+    });
+
+    if (!isDesktop) {
+      Navigator.pop(context);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  Future<void> _selectConversation(
+    int day,
+    int conversationIndex,
+    bool isDesktop,
+  ) async {
+    if (!isLoggedIn || currentPatient == null) return;
+
+    _closeMenus();
+
+    if (!isDesktop) {
+      Navigator.pop(context);
+    }
+
+    await _loadMessagesForConversation(day, conversationIndex);
+  }
+
+  Future<void> _loadMessagesForDay(int day) async {
+    final patient = currentPatient;
+    if (patient == null) return;
+
+    await _loadMessagesForConversation(day, 0);
   }
 
   Message _messageFromMap(Map<String, dynamic> row) {
@@ -344,6 +422,7 @@ class _MainScreenState extends State<MainScreen> {
     await DatabaseHelper.instance.insertChatMessage(
       patientId: patient.patientId,
       recoveryDay: selectedRecoveryDay,
+      conversationIndex: selectedConversationIndex,
       sender: message.sender,
       message: message.text,
       timestamp: DateTime.now(),
@@ -370,6 +449,15 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     setState(() => isPlusMenuOpen = false);
+
+    if (!isLoggedIn || currentPatient == null) {
+      showModal(
+        'Login Required',
+        'Please log in to use OrthoSync AI. Your recovery information is needed to provide personalized postoperative guidance.',
+      );
+      return;
+    }
+
     try {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
@@ -499,32 +587,35 @@ class _MainScreenState extends State<MainScreen> {
 
     if (text.isEmpty) return;
 
-    // OrthoSync AI is intended to operate only with an authenticated patient
-    // context. Do not send logged-out prompts to the backend, so they cannot
-    // be triaged, classified, or routed to any clinical agent.
+    // LOGGED-OUT USERS: do not call the backend or save anything.
+    // Show the typed message and explicitly ask the user to log in.
     if (!isLoggedIn || currentPatient == null) {
       final userMessage = Message(sender: 'user', text: text);
+
       final loginMessage = Message(
         sender: 'bot',
-        text: 'loginRequiredReply',
-        isKey: true,
+        text: 'Please log in to use OrthoSync AI. Your recovery information is needed to provide personalized postoperative guidance.',
       );
 
       setState(() {
         messages.add(userMessage);
         messages.add(loginMessage);
         _inputController.clear();
+        isTyping = false;
       });
 
-      Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
       return;
     }
 
-    // Sending is always associated with the currently selected recovery day.
-    // The normal workflow is to chat on the current day; historical days are
-    // still available from the sidebar for review.
-    if (selectedRecoveryDay != currentRecoveryDay) {
-      await _loadMessagesForDay(currentRecoveryDay);
+    // New messages are created in the currently selected conversation.
+    // Historical conversations remain read-only from the sidebar.
+    if (selectedRecoveryDay != currentRecoveryDay ||
+        selectedConversationIndex != currentConversationIndex) {
+      await _loadMessagesForConversation(
+        currentRecoveryDay,
+        currentConversationIndex,
+      );
       return;
     }
 
@@ -600,6 +691,14 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void startRecording() {
+    if (!isLoggedIn || currentPatient == null) {
+      showModal(
+        'Login Required',
+        'Please log in to use OrthoSync AI. Your recovery information is needed to provide personalized postoperative guidance.',
+      );
+      return;
+    }
+
     setState(() => isRecording = true);
     waveTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
       setState(() {
@@ -610,6 +709,12 @@ class _MainScreenState extends State<MainScreen> {
 
   void stopRecording() {
     waveTimer?.cancel();
+
+    if (!isLoggedIn || currentPatient == null) {
+      setState(() => isRecording = false);
+      return;
+    }
+
     final voiceMessage = Message(sender: 'user', text: "[Voice Note Attached]");
     setState(() {
       isRecording = false;
@@ -646,6 +751,8 @@ class _MainScreenState extends State<MainScreen> {
         isLoggedIn = true;
         currentPatient = user;
         messages.clear();
+        currentConversationIndex = 0;
+        selectedConversationIndex = 0;
         isMenuOpen = false;
       });
       if (user != null) {
@@ -669,6 +776,8 @@ class _MainScreenState extends State<MainScreen> {
         isLoggedIn = true;
         currentPatient = user;
         messages.clear();
+        currentConversationIndex = 0;
+        selectedConversationIndex = 0;
         isMenuOpen = false;
       });
       if (user != null) {
@@ -681,6 +790,10 @@ class _MainScreenState extends State<MainScreen> {
     recoveryDayTimer?.cancel();
     recoveryDayTimer = null;
     recoveryStartAt = null;
+    currentRecoveryDay = 1;
+    selectedRecoveryDay = 1;
+    currentConversationIndex = 0;
+    selectedConversationIndex = 0;
     AuthService().logout();
     setState(() {
       isLoggedIn = false;
@@ -859,6 +972,24 @@ class _MainScreenState extends State<MainScreen> {
                   ? ListView(
                       padding: const EdgeInsets.all(16),
                       children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () =>
+                                _startNewChat(isDesktop: isDesktop),
+                            icon: const Icon(Icons.add_rounded, size: 20),
+                            label: const Text('New Chat'),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 44),
+                              backgroundColor: theme.primaryColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
                         const Text(
                           'Recovery History',
                           style: TextStyle(
@@ -868,35 +999,93 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        for (int day = currentRecoveryDay; day >= 1; day--)
-                          ListTile(
-                            leading: Icon(
-                              day == currentRecoveryDay
-                                  ? Icons.today_rounded
-                                  : Icons.history_rounded,
-                              size: 20,
-                              color: day == selectedRecoveryDay
-                                  ? theme.primaryColor
-                                  : Colors.grey,
-                            ),
-                            title: Text(
-                              'Day $day',
-                              style: TextStyle(
-                                fontWeight: day == selectedRecoveryDay
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                            subtitle: day == currentRecoveryDay
-                                ? const Text('Current day')
-                                : null,
-                            selected: day == selectedRecoveryDay,
-                            selectedTileColor: theme.dividerColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            onTap: () => _selectRecoveryDay(day, isDesktop),
+                        FutureBuilder<List<Map<String, int>>>(
+                          future: DatabaseHelper.instance.getChatSessions(
+                            currentPatient!.patientId,
                           ),
+                          builder: (context, snapshot) {
+                            final sessions = <Map<String, int>>[];
+
+                            if (snapshot.hasData) {
+                              sessions.addAll(snapshot.data!);
+                            }
+
+                            // Always show the currently active empty/new chat.
+                            final currentKey =
+                                '$currentRecoveryDay:$currentConversationIndex';
+
+                            final hasCurrent = sessions.any(
+                              (session) =>
+                                  '${session['recovery_day']}:${session['conversation_index']}' ==
+                                  currentKey,
+                            );
+
+                            if (!hasCurrent) {
+                              sessions.insert(0, {
+                                'recovery_day': currentRecoveryDay,
+                                'conversation_index': currentConversationIndex,
+                              });
+                            }
+
+                            return Column(
+                              children: [
+                                for (final session in sessions)
+                                  Builder(
+                                    builder: (context) {
+                                      final day = session['recovery_day'] ?? 1;
+                                      final conversationIndex =
+                                          session['conversation_index'] ?? 0;
+                                      final isSelected =
+                                          day == selectedRecoveryDay &&
+                                          conversationIndex ==
+                                              selectedConversationIndex;
+
+                                      return ListTile(
+                                        leading: Icon(
+                                          day == currentRecoveryDay
+                                              ? Icons.today_rounded
+                                              : Icons.history_rounded,
+                                          size: 20,
+                                          color: isSelected
+                                              ? theme.primaryColor
+                                              : Colors.grey,
+                                        ),
+                                        title: Text(
+                                          _conversationTitle(
+                                            day,
+                                            conversationIndex,
+                                          ),
+                                          style: TextStyle(
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.normal,
+                                          ),
+                                        ),
+                                        subtitle:
+                                            day == currentRecoveryDay &&
+                                                conversationIndex ==
+                                                    currentConversationIndex
+                                            ? const Text('Current chat')
+                                            : null,
+                                        selected: isSelected,
+                                        selectedTileColor: theme.dividerColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        onTap: () => _selectConversation(
+                                          day,
+                                          conversationIndex,
+                                          isDesktop,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
                         const Divider(height: 24),
                         // ── Clinical Report shortcut ──────────────────────
                         ListTile(

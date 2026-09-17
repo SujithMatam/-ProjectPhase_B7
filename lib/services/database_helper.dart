@@ -42,7 +42,7 @@ class DatabaseHelper {
       databaseFactory = databaseFactoryFfiWeb;
       return await openDatabase(
         'postop_recovery.db',
-        version: 2,
+        version: 3,
         onCreate: _createTables,
         onUpgrade: _upgradeDatabase,
       );
@@ -52,7 +52,7 @@ class DatabaseHelper {
     final path = p.join(dbPath, 'postop_recovery.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createTables,
       onUpgrade: _upgradeDatabase,
     );
@@ -110,6 +110,16 @@ class DatabaseHelper {
     if (oldVersion < 2) {
       await _createRecoveryTables(db);
     }
+
+    if (oldVersion < 3) {
+      await db.execute(
+        'ALTER TABLE chat_messages ADD COLUMN conversation_index INTEGER NOT NULL DEFAULT 0',
+      );
+      await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_chat_messages_patient_day_chat '
+        'ON chat_messages(patient_id, recovery_day, conversation_index, id)',
+      );
+    }
   }
 
   Future<void> _createRecoveryTables(Database db) async {
@@ -138,12 +148,19 @@ class DatabaseHelper {
         action TEXT,
         scope_status TEXT,
         sources TEXT,
+        conversation_index INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (patient_id) REFERENCES patients (patient_id) ON DELETE CASCADE
       )
     ''');
 
     await db.execute(
-      'CREATE INDEX IF NOT EXISTS idx_chat_messages_patient_day ON chat_messages(patient_id, recovery_day, id)',
+      'CREATE INDEX IF NOT EXISTS idx_chat_messages_patient_day '
+      'ON chat_messages(patient_id, recovery_day, id)',
+    );
+
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_chat_messages_patient_day_chat '
+      'ON chat_messages(patient_id, recovery_day, conversation_index, id)',
     );
   }
 
@@ -424,6 +441,7 @@ class DatabaseHelper {
   Future<int> insertChatMessage({
     required String patientId,
     required int recoveryDay,
+    required int conversationIndex,
     required String sender,
     required String message,
     required DateTime timestamp,
@@ -444,6 +462,7 @@ class DatabaseHelper {
     final row = <String, dynamic>{
       'patient_id': patientId,
       'recovery_day': recoveryDay,
+      'conversation_index': conversationIndex,
       'sender': sender,
       'message': message,
       'timestamp': timestamp.toIso8601String(),
@@ -470,13 +489,14 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getChatMessages(
     String patientId,
     int recoveryDay,
+    int conversationIndex,
   ) async {
     final db = await database;
     if (db != null) {
       final rows = await db.query(
         'chat_messages',
-        where: 'patient_id = ? AND recovery_day = ?',
-        whereArgs: [patientId, recoveryDay],
+        where: 'patient_id = ? AND recovery_day = ? AND conversation_index = ?',
+        whereArgs: [patientId, recoveryDay, conversationIndex],
         orderBy: 'id ASC',
       );
       return rows.map((row) {
@@ -493,7 +513,92 @@ class DatabaseHelper {
 
     return List<Map<String, dynamic>>.from(
       _memChatMessages[patientId] ?? const [],
-    )..removeWhere((row) => row['recovery_day'] != recoveryDay);
+    )..removeWhere(
+      (row) =>
+          row['recovery_day'] != recoveryDay ||
+          row['conversation_index'] != conversationIndex,
+    );
+  }
+
+  Future<int> getNextConversationIndex(
+    String patientId,
+    int recoveryDay,
+  ) async {
+    final db = await database;
+    if (db != null) {
+      final rows = await db.rawQuery(
+        'SELECT MAX(conversation_index) AS max_index '
+        'FROM chat_messages WHERE patient_id = ? AND recovery_day = ?',
+        [patientId, recoveryDay],
+      );
+
+      final value = rows.first['max_index'];
+      final maxIndex = value == null
+          ? -1
+          : int.tryParse(value.toString()) ?? -1;
+      return maxIndex + 1;
+    }
+
+    final rows = _memChatMessages[patientId] ?? const [];
+    final indexes = rows
+        .where((row) => row['recovery_day'] == recoveryDay)
+        .map((row) => row['conversation_index'])
+        .whereType<int>()
+        .toList();
+
+    if (indexes.isEmpty) return 0;
+    return indexes.reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  Future<List<Map<String, int>>> getChatSessions(String patientId) async {
+    final db = await database;
+
+    if (db != null) {
+      final rows = await db.rawQuery(
+        'SELECT recovery_day, conversation_index '
+        'FROM chat_messages '
+        'WHERE patient_id = ? '
+        'GROUP BY recovery_day, conversation_index '
+        'ORDER BY recovery_day DESC, conversation_index DESC',
+        [patientId],
+      );
+
+      return rows
+          .map(
+            (row) => {
+              'recovery_day': int.tryParse(row['recovery_day'].toString()) ?? 1,
+              'conversation_index':
+                  int.tryParse(row['conversation_index'].toString()) ?? 0,
+            },
+          )
+          .toList();
+    }
+
+    final rows = _memChatMessages[patientId] ?? const [];
+    final seen = <String>{};
+    final result = <Map<String, int>>[];
+
+    for (final row in rows) {
+      final day = row['recovery_day'] as int? ?? 1;
+      final index = row['conversation_index'] as int? ?? 0;
+      final key = '$day:$index';
+
+      if (seen.add(key)) {
+        result.add({'recovery_day': day, 'conversation_index': index});
+      }
+    }
+
+    result.sort((a, b) {
+      final dayCompare = (b['recovery_day'] ?? 0).compareTo(
+        a['recovery_day'] ?? 0,
+      );
+      if (dayCompare != 0) return dayCompare;
+      return (b['conversation_index'] ?? 0).compareTo(
+        a['conversation_index'] ?? 0,
+      );
+    });
+
+    return result;
   }
 
   Future<List<int>> getChatDays(String patientId) async {
