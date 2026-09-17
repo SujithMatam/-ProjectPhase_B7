@@ -22,6 +22,31 @@ class AiBackendService {
     } catch (e) {
       return false;
     }
+
+  }
+
+  Future<Map<String, dynamic>?> patientLogin({
+    required String identifier,
+    required String password,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/api/patient-login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'identifier': identifier,
+              'password': password,
+            }),
+          )
+          .timeout(const Duration(seconds: 8));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (e) {
+      debugPrint('Patient backend login unavailable: $e');
+    }
+    return null;
   }
 
   /// Send message to Chatbot Agent with patient context and previous turns.
