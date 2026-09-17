@@ -149,6 +149,11 @@ async def extract_report_endpoint(
                 "extraction": extraction,
                 "source_report_saved": True,
                 "patient_id": linked_patient_id,
+                "login": {
+                    "username": extraction.get("full_name") or linked_patient_id,
+                    "patient_id": linked_patient_id,
+                    "password": linked_patient_id.lower(),
+                },
             }
         )
 

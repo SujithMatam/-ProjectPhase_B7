@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../models/patient_user.dart';
 import 'database_helper.dart';
+import 'ai_backend_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -38,6 +39,33 @@ class AuthService {
         await _dbHelper.ensureRecoveryStart(pat.patientId);
         return _currentUser;
       }
+    }
+
+    final backendResult = await AiBackendService.instance.patientLogin(
+      identifier: identifier,
+      password: password,
+    );
+    final backendPatient = backendResult?['patient'];
+    if (backendPatient is Map<String, dynamic>) {
+      final patientUser = PatientUser(
+        patientId: backendPatient['patient_id']?.toString() ?? '',
+        fullName: backendPatient['full_name']?.toString() ?? identifier.trim(),
+        email: '${(backendPatient['patient_id'] ?? 'patient').toString().toLowerCase()}@orthosync.local',
+        phoneNumber: backendPatient['phone_number']?.toString() ?? '',
+        surgeryType: backendPatient['surgery_type']?.toString() ??
+            'Total Knee Arthroplasty (TKA)',
+        affectedLimb: backendPatient['affected_limb']?.toString() ?? 'Right',
+        surgeryDate: DateTime.tryParse(
+              backendPatient['surgery_date']?.toString() ?? '',
+            ) ??
+            DateTime.now(),
+        postopDayCount: int.tryParse(
+          backendPatient['postop_day']?.toString() ?? '1',
+        ),
+      );
+      await _dbHelper.insertPatient(patientUser);
+      _currentUser = patientUser;
+      return _currentUser;
     }
 
     return null;

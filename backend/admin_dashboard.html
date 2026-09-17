@@ -486,7 +486,7 @@
       }
 
       const data = await response.json();
-      renderExtraction(data.extraction);
+      renderExtraction(data.extraction, data.login);
       await loadPatients();
 
     } catch (err) {
@@ -501,7 +501,7 @@
     }
   }
 
-  function renderExtraction(extraction) {
+  function renderExtraction(extraction, loginDetails) {
     spinner.style.display = 'none';
     fieldsContainer.style.display = 'block';
     fieldsContainer.innerHTML = '';
@@ -548,6 +548,20 @@
         <div class="field-value ${!value && key !== 'prescriptions' ? 'empty' : ''}">${valueHtml}</div>
       `;
       fieldsContainer.appendChild(fieldEl);
+    }
+
+    if (loginDetails) {
+      const credentials = document.createElement('div');
+      credentials.className = 'field';
+      credentials.innerHTML = `
+        <div class="field-label">Patient login</div>
+        <div class="field-value">
+          Username: <strong>${escapeHtml(loginDetails.username || loginDetails.patient_id)}</strong><br>
+          Patient ID: <strong>${escapeHtml(loginDetails.patient_id || '')}</strong><br>
+          Password: <strong>${escapeHtml(loginDetails.password || '')}</strong>
+        </div>
+      `;
+      fieldsContainer.appendChild(credentials);
     }
   }
 
