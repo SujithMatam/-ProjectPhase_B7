@@ -66,6 +66,7 @@ from lam.schemas import (
 
 from lam.scope_validator import ScopeValidator
 from lam.intent_classifier import IntentClassifier
+from lam.multi_agent_coordinator import MultiAgentCoordinator
 
 
 # ============================================================================
@@ -206,6 +207,18 @@ _WOUND_TERM_PATTERNS = tuple(
     for term in _WOUND_TERMS
 )
 
+# Generic redness, warmth, swelling, and pain are symptom signals rather than
+# proof that the patient is asking about wound care.  Keep wound ownership for
+# an actual wound/incision reference or an active wound follow-up.
+_EXPLICIT_WOUND_TERMS = (
+    "wound", "incision", "surgical cut", "scar", "stitch", "stitches",
+    "suture", "sutures", "staple", "staples", "dressing", "bandage",
+    "drainage", "draining", "discharge", "pus", "yellow fluid",
+)
+_EXPLICIT_WOUND_TERM_PATTERNS = tuple(
+    re.compile(r"\b" + re.escape(term) + r"\b")
+    for term in _EXPLICIT_WOUND_TERMS
+)
 
 def _contains_wound_term(
     text: str,
@@ -213,10 +226,7 @@ def _contains_wound_term(
 
     text = _normalise(text)
 
-    return any(
-        pattern.search(text)
-        for pattern in _WOUND_TERM_PATTERNS
-    )
+    return any(pattern.search(text) for pattern in _EXPLICIT_WOUND_TERM_PATTERNS)
 
 
 # ============================================================================
@@ -740,10 +750,14 @@ class LAMOrchestrator:
         explicit_wound_message = _contains_wound_term(user_message)
         short_wound_answer = _looks_like_short_wound_answer(user_message)
         explicit_different_domain = _has_explicit_different_domain(user_message)
+        detected_intents = IntentClassifier.detect_applicable_intents(
+            query=user_message,
+            context=context,
+        )
 
         wound_context = (
             (active_wound_followup or explicit_wound_message)
-            and not explicit_different_domain
+            and len(detected_intents) == 1
         )
 
         print(
@@ -868,11 +882,14 @@ class LAMOrchestrator:
         #     matches -> RECOVERY_PROGRESS.
         # ============================================================
 
-        if wound_context:
+        applicable_intents: tuple[IntentLabel, ...] = ()
+
+        if wound_context and not explicit_different_domain:
 
             intent_label = (
                 IntentLabel.WOUND_CARE
             )
+            applicable_intents = (intent_label,)
 
             print(
                 "[LAM][INTENT] "
@@ -893,6 +910,7 @@ class LAMOrchestrator:
             if is_recovery_continuation:
 
                 intent_label = IntentLabel.RECOVERY_PROGRESS
+                applicable_intents = (intent_label,)
 
                 print(
                     "[LAM][CONTINUATION] "
@@ -911,6 +929,9 @@ class LAMOrchestrator:
                 )
 
                 intent_label = classification.intent
+                applicable_intents = detected_intents
+                if intent_label not in applicable_intents:
+                    applicable_intents = (intent_label,) + applicable_intents
 
                 # IMPORTANT DEBUG OUTPUT.
                 #
@@ -932,6 +953,10 @@ class LAMOrchestrator:
         # STEP 5
         # ROUTING
         # ============================================================
+
+        if not applicable_intents:
+            applicable_intents = (intent_label,)
+        ordered_intents = MultiAgentCoordinator.order_intents(applicable_intents)
 
         target_agent, action_type = _ROUTING_TABLE.get(
             intent_label,
@@ -956,8 +981,7 @@ class LAMOrchestrator:
         # resolved_procedure was already computed above (Step 3) for the
         # Recovery continuation check -- reused here rather than recomputed.
 
-        chat_result = AgentRouter.dispatch(
-            intent_label=intent_label,
+        dispatch_kwargs = dict(
             patient_id=patient_id,
             surgery_type=surgery_type,
             affected_limb=affected_limb,
@@ -975,6 +999,19 @@ class LAMOrchestrator:
             current_rom=current_rom,
             exercise_history=exercise_history,
         )
+        if len(ordered_intents) > 1:
+            coordinated = MultiAgentCoordinator.execute(
+                intents=tuple(ordered_intents),
+                dispatch_kwargs=dispatch_kwargs,
+            )
+            chat_result = coordinated
+            target_agent = coordinated["target_agent"]
+            action_type = coordinated["action"]
+        else:
+            chat_result = AgentRouter.dispatch(
+                intent_label=ordered_intents[0],
+                **dispatch_kwargs,
+            )
 
 
         # ============================================================
@@ -982,7 +1019,7 @@ class LAMOrchestrator:
         # FINAL RESULT
         # ============================================================
 
-        return LAMResult(
+        final_result = LAMResult(
             reply=chat_result.get(
                 "reply",
                 "",
@@ -1011,8 +1048,36 @@ class LAMOrchestrator:
                 "sources",
                 [],
             ),
-            intent=intent_label.value,
-            target_agent=target_agent.value,
-            action=action_type.value,
+            intent=(
+                ",".join(intent.value for intent in ordered_intents)
+                if len(ordered_intents) > 1
+                else intent_label.value
+            ),
+            target_agent=(
+                target_agent
+                if isinstance(target_agent, str)
+                else target_agent.value
+            ),
+            action=(
+                action_type
+                if isinstance(action_type, str)
+                else action_type.value
+            ),
             scope_status=ScopeStatus.IN_SCOPE.value,
         ).to_dict()
+        if len(ordered_intents) > 1:
+            final_result["execution_plan"] = [
+                {
+                    "step": index,
+                    "intent": intent.value,
+                    "target_agent": _ROUTING_TABLE[intent][0].value,
+                    "action": _ROUTING_TABLE[intent][1].value,
+                }
+                for index, intent in enumerate(ordered_intents, start=1)
+            ]
+            final_result["handoffs"] = coordinated["handoffs"]
+            final_result["participating_agents"] = [
+                item["target_agent"]
+                for item in final_result["execution_plan"]
+            ]
+        return final_result

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:path/path.dart' as p;
+
 import '../models/patient_user.dart';
 
 class DatabaseHelper {
@@ -12,10 +15,11 @@ class DatabaseHelper {
   Database? _db;
   bool _useInMemoryFallback = false;
 
-  // In-memory fallback if browser worker is blocked
   final Map<String, Map<String, dynamic>> _memAccounts = {};
   final Map<String, PatientUser> _memPatients = {};
   final Map<String, MedicalHistory> _memMedicalHistory = {};
+  final Map<String, DateTime> _memRecoveryStarts = {};
+  final Map<String, List<Map<String, dynamic>>> _memChatMessages = {};
 
   Future<Database?> get database async {
     if (_useInMemoryFallback) return null;
@@ -24,7 +28,9 @@ class DatabaseHelper {
       _db = await _initDatabase();
       return _db!;
     } catch (e) {
-      debugPrint('Database initialization failed ($e). Switching to safe fallback.');
+      debugPrint(
+        'Database initialization failed ($e). Switching to safe fallback.',
+      );
       _useInMemoryFallback = true;
       _seedMemoryData();
       return null;
@@ -36,18 +42,20 @@ class DatabaseHelper {
       databaseFactory = databaseFactoryFfiWeb;
       return await openDatabase(
         'postop_recovery.db',
-        version: 1,
+        version: 2,
         onCreate: _createTables,
-      );
-    } else {
-      final dbPath = await getDatabasesPath();
-      final path = p.join(dbPath, 'postop_recovery.db');
-      return await openDatabase(
-        path,
-        version: 1,
-        onCreate: _createTables,
+        onUpgrade: _upgradeDatabase,
       );
     }
+
+    final dbPath = await getDatabasesPath();
+    final path = p.join(dbPath, 'postop_recovery.db');
+    return await openDatabase(
+      path,
+      version: 2,
+      onCreate: _createTables,
+      onUpgrade: _upgradeDatabase,
+    );
   }
 
   Future<void> _createTables(Database db, int version) async {
@@ -90,7 +98,53 @@ class DatabaseHelper {
       )
     ''');
 
+    await _createRecoveryTables(db);
     await _seedInitialData(db);
+  }
+
+  Future<void> _upgradeDatabase(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      await _createRecoveryTables(db);
+    }
+  }
+
+  Future<void> _createRecoveryTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS recovery_sessions (
+        patient_id TEXT PRIMARY KEY,
+        first_login_at TEXT NOT NULL,
+        FOREIGN KEY (patient_id) REFERENCES patients (patient_id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        patient_id TEXT NOT NULL,
+        recovery_day INTEGER NOT NULL,
+        sender TEXT NOT NULL,
+        message TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        is_key INTEGER NOT NULL DEFAULT 0,
+        image_path TEXT,
+        triage_level TEXT,
+        is_escalated INTEGER NOT NULL DEFAULT 0,
+        intent TEXT,
+        target_agent TEXT,
+        action TEXT,
+        scope_status TEXT,
+        sources TEXT,
+        FOREIGN KEY (patient_id) REFERENCES patients (patient_id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_chat_messages_patient_day ON chat_messages(patient_id, recovery_day, id)',
+    );
   }
 
   void _seedMemoryData() {
@@ -145,7 +199,8 @@ class DatabaseHelper {
       'email': 'b7@amrita.edu',
       'password_hash': 'password123',
       'created_at': DateTime.now().toIso8601String(),
-    });
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
     await db.insert('patients', {
       'patient_id': 'PT-B7-8921',
       'full_name': 'Rishi Priyan V N',
@@ -153,9 +208,12 @@ class DatabaseHelper {
       'phone_number': '+91 98765 43210',
       'surgery_type': 'Total Knee Arthroplasty (TKA)',
       'affected_limb': 'Right',
-      'surgery_date': DateTime.now().subtract(const Duration(days: 3)).toIso8601String(),
+      'surgery_date': DateTime.now()
+          .subtract(const Duration(days: 3))
+          .toIso8601String(),
       'postop_day_count': 3,
-    });
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
     await db.insert('medical_history', {
       'patient_id': 'PT-B7-8921',
       'allergies': 'Penicillin, NSAIDs (mild rash)',
@@ -167,13 +225,14 @@ class DatabaseHelper {
       'emergency_contact_phone': '+91 94440 12345',
       'notes': 'Post-op Day 3: Ambulating with walker, 45 deg passive flexion.',
       'updated_at': DateTime.now().toIso8601String(),
-    });
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
     await db.insert('accounts', {
       'email': 'sujith@amrita.edu',
       'password_hash': 'password123',
       'created_at': DateTime.now().toIso8601String(),
-    });
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
     await db.insert('patients', {
       'patient_id': 'PT-B7-8922',
       'full_name': 'Sujith Matam',
@@ -181,34 +240,31 @@ class DatabaseHelper {
       'phone_number': '+91 98765 43211',
       'surgery_type': 'Total Hip Arthroplasty (THA)',
       'affected_limb': 'Left',
-      'surgery_date': DateTime.now().subtract(const Duration(days: 7)).toIso8601String(),
+      'surgery_date': DateTime.now()
+          .subtract(const Duration(days: 7))
+          .toIso8601String(),
       'postop_day_count': 7,
-    });
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
   }
 
-  // --- Account CRUD ---
   Future<int> insertAccount(String email, String password) async {
     final cleanEmail = email.trim().toLowerCase();
     final db = await database;
     if (db != null) {
-      return await db.insert(
-        'accounts',
-        {
-          'email': cleanEmail,
-          'password_hash': password,
-          'created_at': DateTime.now().toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    } else {
-      _memAccounts[cleanEmail] = {
-        'id': _memAccounts.length + 1,
+      return await db.insert('accounts', {
         'email': cleanEmail,
         'password_hash': password,
         'created_at': DateTime.now().toIso8601String(),
-      };
-      return _memAccounts.length;
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
     }
+
+    _memAccounts[cleanEmail] = {
+      'id': _memAccounts.length + 1,
+      'email': cleanEmail,
+      'password_hash': password,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+    return _memAccounts.length;
   }
 
   Future<Map<String, dynamic>?> getAccountByEmail(String email) async {
@@ -222,9 +278,8 @@ class DatabaseHelper {
         limit: 1,
       );
       return res.isNotEmpty ? res.first : null;
-    } else {
-      return _memAccounts[cleanEmail];
     }
+    return _memAccounts[cleanEmail];
   }
 
   Future<int> updatePassword(String email, String newPassword) async {
@@ -237,16 +292,14 @@ class DatabaseHelper {
         where: 'LOWER(email) = ?',
         whereArgs: [cleanEmail],
       );
-    } else {
-      if (_memAccounts.containsKey(cleanEmail)) {
-        _memAccounts[cleanEmail]!['password_hash'] = newPassword;
-        return 1;
-      }
-      return 0;
     }
+    if (_memAccounts.containsKey(cleanEmail)) {
+      _memAccounts[cleanEmail]!['password_hash'] = newPassword;
+      return 1;
+    }
+    return 0;
   }
 
-  // --- Patient CRUD ---
   Future<int> insertPatient(PatientUser user) async {
     final db = await database;
     if (db != null) {
@@ -255,10 +308,9 @@ class DatabaseHelper {
         user.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-    } else {
-      _memPatients[user.patientId] = user;
-      return 1;
     }
+    _memPatients[user.patientId] = user;
+    return 1;
   }
 
   Future<PatientUser?> getPatientByIdOrEmail(String identifier) async {
@@ -271,18 +323,17 @@ class DatabaseHelper {
         whereArgs: [cleanId, cleanId],
         limit: 1,
       );
-      if (res.isNotEmpty) {
-        return PatientUser.fromMap(res.first);
-      }
-      return null;
-    } else {
-      for (final p in _memPatients.values) {
-        if (p.patientId.toLowerCase() == cleanId || p.email.toLowerCase() == cleanId) {
-          return p;
-        }
-      }
+      if (res.isNotEmpty) return PatientUser.fromMap(res.first);
       return null;
     }
+
+    for (final p in _memPatients.values) {
+      if (p.patientId.toLowerCase() == cleanId ||
+          p.email.toLowerCase() == cleanId) {
+        return p;
+      }
+    }
+    return null;
   }
 
   Future<List<PatientUser>> getAllPatients() async {
@@ -290,12 +341,10 @@ class DatabaseHelper {
     if (db != null) {
       final res = await db.query('patients');
       return res.map((m) => PatientUser.fromMap(m)).toList();
-    } else {
-      return _memPatients.values.toList();
     }
+    return _memPatients.values.toList();
   }
 
-  // --- Medical History CRUD ---
   Future<int> saveMedicalHistory(MedicalHistory history) async {
     final db = await database;
     if (db != null) {
@@ -307,17 +356,15 @@ class DatabaseHelper {
           where: 'patient_id = ?',
           whereArgs: [history.patientId],
         );
-      } else {
-        return await db.insert(
-          'medical_history',
-          history.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
       }
-    } else {
-      _memMedicalHistory[history.patientId] = history;
-      return 1;
+      return await db.insert(
+        'medical_history',
+        history.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
+    _memMedicalHistory[history.patientId] = history;
+    return 1;
   }
 
   Future<MedicalHistory?> getMedicalHistory(String patientId) async {
@@ -329,44 +376,195 @@ class DatabaseHelper {
         whereArgs: [patientId],
         limit: 1,
       );
-      if (res.isNotEmpty) {
-        return MedicalHistory.fromMap(res.first);
-      }
+      if (res.isNotEmpty) return MedicalHistory.fromMap(res.first);
       return null;
-    } else {
-      return _memMedicalHistory[patientId];
     }
+    return _memMedicalHistory[patientId];
   }
 
-  // --- Debug / Viewer Queries ---
-  Future<List<Map<String, dynamic>>> queryTable(String tableName) async {
+  Future<DateTime?> getRecoveryStart(String patientId) async {
     final db = await database;
     if (db != null) {
-      return await db.query(tableName);
-    } else {
-      if (tableName == 'patients') {
-        return _memPatients.values.map((p) => p.toMap()).toList();
-      } else if (tableName == 'accounts') {
-        return _memAccounts.values.toList();
-      } else if (tableName == 'medical_history') {
-        return _memMedicalHistory.values.map((h) => h.toMap()).toList();
+      final res = await db.query(
+        'recovery_sessions',
+        where: 'patient_id = ?',
+        whereArgs: [patientId],
+        limit: 1,
+      );
+      if (res.isNotEmpty) {
+        return DateTime.tryParse(res.first['first_login_at'].toString());
       }
-      return [];
+      return null;
     }
+    return _memRecoveryStarts[patientId];
+  }
+
+  Future<DateTime> createRecoveryStart(String patientId) async {
+    final existing = await getRecoveryStart(patientId);
+    if (existing != null) return existing;
+
+    final now = DateTime.now();
+    final db = await database;
+    if (db != null) {
+      await db.insert('recovery_sessions', {
+        'patient_id': patientId,
+        'first_login_at': now.toIso8601String(),
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      final saved = await getRecoveryStart(patientId);
+      return saved ?? now;
+    }
+
+    _memRecoveryStarts[patientId] = now;
+    return now;
+  }
+
+  Future<DateTime> ensureRecoveryStart(String patientId) =>
+      createRecoveryStart(patientId);
+
+  Future<int> insertChatMessage({
+    required String patientId,
+    required int recoveryDay,
+    required String sender,
+    required String message,
+    required DateTime timestamp,
+    bool isKey = false,
+    String? imagePath,
+    String? triageLevel,
+    bool isEscalated = false,
+    String? intent,
+    String? targetAgent,
+    String? action,
+    String? scopeStatus,
+    dynamic sources,
+  }) async {
+    final encodedSources = sources == null
+        ? null
+        : jsonEncode(sources is List ? sources : [sources]);
+
+    final row = <String, dynamic>{
+      'patient_id': patientId,
+      'recovery_day': recoveryDay,
+      'sender': sender,
+      'message': message,
+      'timestamp': timestamp.toIso8601String(),
+      'is_key': isKey ? 1 : 0,
+      'image_path': imagePath,
+      'triage_level': triageLevel,
+      'is_escalated': isEscalated ? 1 : 0,
+      'intent': intent,
+      'target_agent': targetAgent,
+      'action': action,
+      'scope_status': scopeStatus,
+      'sources': encodedSources,
+    };
+
+    final db = await database;
+    if (db != null) return await db.insert('chat_messages', row);
+
+    final list = _memChatMessages.putIfAbsent(patientId, () => []);
+    row['id'] = list.length + 1;
+    list.add(row);
+    return list.length;
+  }
+
+  Future<List<Map<String, dynamic>>> getChatMessages(
+    String patientId,
+    int recoveryDay,
+  ) async {
+    final db = await database;
+    if (db != null) {
+      final rows = await db.query(
+        'chat_messages',
+        where: 'patient_id = ? AND recovery_day = ?',
+        whereArgs: [patientId, recoveryDay],
+        orderBy: 'id ASC',
+      );
+      return rows.map((row) {
+        final copy = Map<String, dynamic>.from(row);
+        final rawSources = copy['sources'];
+        if (rawSources != null && rawSources.toString().isNotEmpty) {
+          try {
+            copy['sources'] = jsonDecode(rawSources.toString());
+          } catch (_) {}
+        }
+        return copy;
+      }).toList();
+    }
+
+    return List<Map<String, dynamic>>.from(
+      _memChatMessages[patientId] ?? const [],
+    )..removeWhere((row) => row['recovery_day'] != recoveryDay);
+  }
+
+  Future<List<int>> getChatDays(String patientId) async {
+    final db = await database;
+    if (db != null) {
+      final rows = await db.rawQuery(
+        'SELECT DISTINCT recovery_day FROM chat_messages WHERE patient_id = ? ORDER BY recovery_day DESC',
+        [patientId],
+      );
+      return rows
+          .map((row) => int.tryParse(row['recovery_day'].toString()))
+          .whereType<int>()
+          .toList();
+    }
+
+    final rows = _memChatMessages[patientId] ?? const [];
+    final days = rows
+        .map((row) => row['recovery_day'])
+        .whereType<int>()
+        .toSet()
+        .toList();
+    days.sort((a, b) => b.compareTo(a));
+    return days;
+  }
+
+  Future<List<Map<String, dynamic>>> queryTable(String tableName) async {
+    final db = await database;
+    if (db != null) return await db.query(tableName);
+
+    if (tableName == 'patients') {
+      return _memPatients.values.map((p) => p.toMap()).toList();
+    }
+    if (tableName == 'accounts') {
+      return _memAccounts.values.toList();
+    }
+    if (tableName == 'medical_history') {
+      return _memMedicalHistory.values.map((h) => h.toMap()).toList();
+    }
+    if (tableName == 'recovery_sessions') {
+      return _memRecoveryStarts.entries
+          .map(
+            (e) => {
+              'patient_id': e.key,
+              'first_login_at': e.value.toIso8601String(),
+            },
+          )
+          .toList();
+    }
+    if (tableName == 'chat_messages') {
+      return _memChatMessages.values.expand((x) => x).toList();
+    }
+    return [];
   }
 
   Future<void> clearAndReseed() async {
     final db = await database;
     if (db != null) {
+      await db.delete('chat_messages');
+      await db.delete('recovery_sessions');
       await db.delete('medical_history');
       await db.delete('patients');
       await db.delete('accounts');
       await _seedInitialData(db);
-    } else {
-      _memAccounts.clear();
-      _memPatients.clear();
-      _memMedicalHistory.clear();
-      _seedMemoryData();
+      return;
     }
+
+    _memAccounts.clear();
+    _memPatients.clear();
+    _memMedicalHistory.clear();
+    _memRecoveryStarts.clear();
+    _memChatMessages.clear();
+    _seedMemoryData();
   }
 }

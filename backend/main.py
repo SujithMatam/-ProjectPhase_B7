@@ -18,7 +18,13 @@ from lam.orchestrator import LAMOrchestrator
 from lam.schemas import WeightBearingStatus
 from triage.safety_triage import SafetyTriageEngine
 from medication_reminders import reminder_service
-from patient_database import create_patient, get_patient, initialize_database, list_patient_ids
+from patient_database import (
+    authenticate_patient,
+    create_patient,
+    get_patient,
+    initialize_database,
+    list_patient_ids,
+)
 import sqlite3
 
 # NEW: admin PDF report-extraction feature
@@ -155,6 +161,17 @@ def health_check():
             "ReportGenerationAgent",
         ]
     }
+
+
+@app.post("/api/patient-login")
+def patient_login(payload: dict):
+    patient = authenticate_patient(
+        str(payload.get("identifier", "")),
+        str(payload.get("password", "")),
+    )
+    if not patient:
+        raise HTTPException(status_code=401, detail="Invalid patient credentials")
+    return {"patient": patient}
 
 
 @app.get("/api/reports/summary/{patient_id}")

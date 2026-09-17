@@ -201,6 +201,13 @@ class _MainScreenState extends State<MainScreen> {
   bool isTyping = false;
   PatientUser? currentPatient;
 
+  // Day-by-day recovery history. Each patient gets Day 1 at first login,
+  // then the day advances automatically every 24 hours.
+  int currentRecoveryDay = 1;
+  int selectedRecoveryDay = 1;
+  DateTime? recoveryStartAt;
+  Timer? recoveryDayTimer;
+
   List<Message> messages = [];
   List<int> audioLevels = [10, 15, 20, 12, 18, 25, 15, 10];
   Timer? waveTimer;
@@ -243,21 +250,136 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  int _calculateRecoveryDay(DateTime start) {
+    final elapsed = DateTime.now().difference(start);
+    if (elapsed.isNegative) return 1;
+    return (elapsed.inHours ~/ 24) + 1;
+  }
+
+  Future<void> _initializeRecoveryHistory(PatientUser patient) async {
+    recoveryStartAt = await DatabaseHelper.instance.getRecoveryStart(
+      patient.patientId,
+    );
+
+    recoveryStartAt ??= await DatabaseHelper.instance.createRecoveryStart(
+      patient.patientId,
+    );
+
+    final day = _calculateRecoveryDay(recoveryStartAt!);
+
+    if (!mounted) return;
+
+    setState(() {
+      currentRecoveryDay = day;
+      selectedRecoveryDay = day;
+      messages = [];
+    });
+
+    await _loadMessagesForDay(day);
+    _startRecoveryDayTimer();
+  }
+
+  void _startRecoveryDayTimer() {
+    recoveryDayTimer?.cancel();
+    recoveryDayTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
+      final start = recoveryStartAt;
+      if (start == null || currentPatient == null) return;
+
+      final newDay = _calculateRecoveryDay(start);
+      if (newDay != currentRecoveryDay && mounted) {
+        setState(() {
+          currentRecoveryDay = newDay;
+          selectedRecoveryDay = newDay;
+          messages = [];
+        });
+        await _loadMessagesForDay(newDay);
+      }
+    });
+  }
+
+  Future<void> _loadMessagesForDay(int day) async {
+    final patient = currentPatient;
+    if (patient == null) return;
+
+    final rows = await DatabaseHelper.instance.getChatMessages(
+      patient.patientId,
+      day,
+    );
+
+    final loaded = rows.map(_messageFromMap).toList();
+
+    if (!mounted) return;
+
+    setState(() {
+      messages = loaded;
+      selectedRecoveryDay = day;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  Message _messageFromMap(Map<String, dynamic> row) {
+    return Message(
+      sender: row['sender']?.toString() ?? 'bot',
+      text: row['message']?.toString() ?? '',
+      isKey: row['is_key'] == 1,
+      imagePath: row['image_path']?.toString(),
+      triageLevel: row['triage_level']?.toString(),
+      isEscalated: row['is_escalated'] == 1,
+      intent: row['intent']?.toString(),
+      targetAgent: row['target_agent']?.toString(),
+      action: row['action']?.toString(),
+      scopeStatus: row['scope_status']?.toString(),
+      sources: row['sources'],
+    );
+  }
+
+  Future<void> _saveMessage(Message message) async {
+    final patient = currentPatient;
+    if (patient == null) return;
+
+    await DatabaseHelper.instance.insertChatMessage(
+      patientId: patient.patientId,
+      recoveryDay: selectedRecoveryDay,
+      sender: message.sender,
+      message: message.text,
+      timestamp: DateTime.now(),
+      isKey: message.isKey,
+      imagePath: message.imagePath,
+      triageLevel: message.triageLevel,
+      isEscalated: message.isEscalated,
+      intent: message.intent,
+      targetAgent: message.targetAgent,
+      action: message.action,
+      scopeStatus: message.scopeStatus,
+      sources: message.sources,
+    );
+  }
+
+  Future<void> _selectRecoveryDay(int day, bool isDesktop) async {
+    if (!isLoggedIn || currentPatient == null) return;
+
+    _closeMenus();
+    if (!isDesktop) Navigator.pop(context);
+
+    await _loadMessagesForDay(day);
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     setState(() => isPlusMenuOpen = false);
     try {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         setState(() {
-          messages.add(
-            Message(
-              sender: 'user',
-              text: "Uploaded an image",
-              imagePath: image.path,
-            ),
+          final message = Message(
+            sender: 'user',
+            text: "Uploaded an image",
+            imagePath: image.path,
           );
+          messages.add(message);
           isTyping = true;
         });
+        await _saveMessage(messages.last);
         _scrollToBottom();
 
         Future.delayed(const Duration(milliseconds: 1500), () {
@@ -268,6 +390,7 @@ class _MainScreenState extends State<MainScreen> {
                 Message(sender: 'bot', text: 'botAuthReply', isKey: true),
               );
             });
+            _saveMessage(messages.last);
             _scrollToBottom();
           }
         });
@@ -372,6 +495,15 @@ class _MainScreenState extends State<MainScreen> {
     final text = _inputController.text.trim();
 
     if (text.isEmpty) return;
+    if (!isLoggedIn || currentPatient == null) return;
+
+    // Sending is always associated with the currently selected recovery day.
+    // The normal workflow is to chat on the current day; historical days are
+    // still available from the sidebar for review.
+    if (selectedRecoveryDay != currentRecoveryDay) {
+      await _loadMessagesForDay(currentRecoveryDay);
+      return;
+    }
 
     // Build conversation history BEFORE adding the current message so the
     // backend receives only previous turns plus the explicit current message.
@@ -380,18 +512,20 @@ class _MainScreenState extends State<MainScreen> {
         .map(
           (msg) => {
             'role': msg.sender == 'user' ? 'user' : 'assistant',
-            'content': msg.text,
+            'content': msg.isKey ? (t[msg.text] ?? msg.text) : msg.text,
           },
         )
         .toList();
 
-    setState(() {
-      messages.add(Message(sender: 'user', text: text));
+    final userMessage = Message(sender: 'user', text: text);
 
+    setState(() {
+      messages.add(userMessage);
       _inputController.clear();
       isTyping = true;
     });
 
+    await _saveMessage(userMessage);
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
 
     try {
@@ -403,41 +537,41 @@ class _MainScreenState extends State<MainScreen> {
 
       if (!mounted) return;
 
+      final botMessage = Message(
+        sender: 'bot',
+        text:
+            res['reply'] as String? ??
+            'I am analyzing your specific recovery protocols.',
+        triageLevel: res['triage_level'] as String?,
+        isEscalated: res['is_escalated'] == true,
+        intent: res['intent'] as String?,
+        targetAgent: res['target_agent'] as String?,
+        action: res['action'] as String?,
+        scopeStatus: res['scope_status'] as String?,
+        sources: res['sources'],
+      );
+
       setState(() {
         isTyping = false;
-
-        messages.add(
-          Message(
-            sender: 'bot',
-            text:
-                res['reply'] as String? ??
-                'I am analyzing your recovery protocols.',
-            triageLevel: res['triage_level'] as String?,
-            isEscalated: res['is_escalated'] == true,
-            intent: res['intent'] as String?,
-            targetAgent: res['target_agent'] as String?,
-            action: res['action'] as String?,
-            scopeStatus: res['scope_status'] as String?,
-            sources: res['sources'],
-          ),
-        );
+        messages.add(botMessage);
       });
 
+      await _saveMessage(botMessage);
       _scrollToBottom();
     } catch (e) {
       if (!mounted) return;
 
+      final errorMessage = Message(
+        sender: 'bot',
+        text: 'The local AI service is currently unavailable. Please start the backend and try again.',
+      );
+
       setState(() {
         isTyping = false;
-
-        messages.add(
-          Message(
-            sender: 'bot',
-            text: 'The local AI service is currently unavailable. Please start the backend and try again.',
-          ),
-        );
+        messages.add(errorMessage);
       });
 
+      await _saveMessage(errorMessage);
       _scrollToBottom();
     }
   }
@@ -453,11 +587,13 @@ class _MainScreenState extends State<MainScreen> {
 
   void stopRecording() {
     waveTimer?.cancel();
+    final voiceMessage = Message(sender: 'user', text: "[Voice Note Attached]");
     setState(() {
       isRecording = false;
-      messages.add(Message(sender: 'user', text: "[Voice Note Attached]"));
+      messages.add(voiceMessage);
       isTyping = true;
     });
+    _saveMessage(voiceMessage);
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
@@ -466,6 +602,7 @@ class _MainScreenState extends State<MainScreen> {
             Message(sender: 'bot', text: 'botVoiceReply', isKey: true),
           );
         });
+        _saveMessage(messages.last);
         _scrollToBottom();
       }
     });
@@ -488,6 +625,9 @@ class _MainScreenState extends State<MainScreen> {
         messages.clear();
         isMenuOpen = false;
       });
+      if (user != null) {
+        await _initializeRecoveryHistory(user);
+      }
     }
   }
 
@@ -508,10 +648,16 @@ class _MainScreenState extends State<MainScreen> {
         messages.clear();
         isMenuOpen = false;
       });
+      if (user != null) {
+        await _initializeRecoveryHistory(user);
+      }
     }
   }
 
   void handleLogout() {
+    recoveryDayTimer?.cancel();
+    recoveryDayTimer = null;
+    recoveryStartAt = null;
     AuthService().logout();
     setState(() {
       isLoggedIn = false;
@@ -519,6 +665,16 @@ class _MainScreenState extends State<MainScreen> {
       isMenuOpen = false;
       messages.clear();
     });
+  }
+
+  @override
+  void dispose() {
+    recoveryDayTimer?.cancel();
+    waveTimer?.cancel();
+    _inputController.dispose();
+    _scrollController.dispose();
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   void _closeMenus() {
@@ -675,64 +831,49 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ElevatedButton.icon(
-                // --- FUNCTIONAL NEW CHECK-IN ---
-                onPressed: () {
-                  setState(() {
-                    messages.clear();
-                    messages.add(
-                      Message(
-                        sender: 'bot',
-                        text: 'newCheckinPrompt',
-                        isKey: true,
-                      ),
-                    );
-                  });
-                  if (!isDesktop) Navigator.pop(context);
-                },
-                icon: const Icon(Icons.add),
-                label: Text(t['newCheckin'] ?? 'New Check-in'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: textColor,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  side: BorderSide(color: theme.dividerColor),
-                  minimumSize: const Size(double.infinity, 45),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
             Expanded(
               child: isLoggedIn
                   ? ListView(
                       padding: const EdgeInsets.all(16),
                       children: [
-                        Text(
-                          t['recent'] ?? 'Recent',
-                          style: const TextStyle(
+                        const Text(
+                          'Recovery History',
+                          style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 10),
-                        ListTile(
-                          title: const Text("Post-op Day 3"),
-                          selectedTileColor: theme.dividerColor,
-                          selected: true,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        for (int day = currentRecoveryDay; day >= 1; day--)
+                          ListTile(
+                            leading: Icon(
+                              day == currentRecoveryDay
+                                  ? Icons.today_rounded
+                                  : Icons.history_rounded,
+                              size: 20,
+                              color: day == selectedRecoveryDay
+                                  ? theme.primaryColor
+                                  : Colors.grey,
+                            ),
+                            title: Text(
+                              'Day $day',
+                              style: TextStyle(
+                                fontWeight: day == selectedRecoveryDay
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            subtitle: day == currentRecoveryDay
+                                ? const Text('Current day')
+                                : null,
+                            selected: day == selectedRecoveryDay,
+                            selectedTileColor: theme.dividerColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            onTap: () => _selectRecoveryDay(day, isDesktop),
                           ),
-                        ),
-                        ListTile(
-                          title: const Text("Post-op Day 2"),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
                         const Divider(height: 24),
                         // ── Clinical Report shortcut ──────────────────────
                         ListTile(
