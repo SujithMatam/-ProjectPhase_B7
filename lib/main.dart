@@ -495,7 +495,6 @@ class _MainScreenState extends State<MainScreen> {
     final text = _inputController.text.trim();
 
     if (text.isEmpty) return;
-    if (!isLoggedIn || currentPatient == null) return;
 
     // Sending is always associated with the currently selected recovery day.
     // The normal workflow is to chat on the current day; historical days are
