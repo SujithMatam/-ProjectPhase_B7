@@ -79,6 +79,25 @@ CREATE TABLE IF NOT EXISTS patient_credentials (
     username TEXT NOT NULL,
     password_hash TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS symptom_assessments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id TEXT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    postop_day INTEGER,
+    pain_score REAL,
+    pain_severity_category TEXT,
+    onset TEXT,
+    location TEXT,
+    worsening_or_improving TEXT,
+    pain_characteristics TEXT,
+    swelling TEXT,
+    warmth_or_redness TEXT,
+    stiffness TEXT,
+    numbness_or_weakness TEXT,
+    fever_or_temperature TEXT,
+    temperature_c REAL,
+    triage_level TEXT
+);
 """
 
 
@@ -103,9 +122,32 @@ def connection_scope(path: Optional[str] = None) -> Iterator[sqlite3.Connection]
         connection.close()
 
 
+def _ensure_symptom_assessment_columns(connection: sqlite3.Connection) -> None:
+    """
+    Additive migration for a symptom_assessments table created by an OLDER
+    version of SCHEMA (before pain_severity_category existed) -- adds the
+    column in place, without dropping or rewriting any existing row, so an
+    already-existing local SQLite database keeps every historical
+    assessment. A brand-new database already gets the column straight from
+    SCHEMA above; this is a no-op for it (the column already exists).
+    """
+    existing_columns = {
+        row["name"] for row in connection.execute("PRAGMA table_info(symptom_assessments)")
+    }
+    if not existing_columns:
+        # Table doesn't exist yet -- SCHEMA above (already executed this
+        # same call) will have just created it with the column present.
+        return
+    if "pain_severity_category" not in existing_columns:
+        connection.execute(
+            "ALTER TABLE symptom_assessments ADD COLUMN pain_severity_category TEXT"
+        )
+
+
 def initialize_database(path: Optional[str] = None) -> None:
     with connection_scope(path) as connection:
         connection.executescript(SCHEMA)
+        _ensure_symptom_assessment_columns(connection)
         connection.execute(
             """INSERT OR IGNORE INTO patient_credentials
                (patient_id, username, password_hash)
@@ -279,3 +321,69 @@ def save_source_report(patient_id: Optional[str], filename: str, extraction: Dic
             (patient_id, filename, extraction.get("extraction_method"),
              extraction.get("raw_text_preview"), json.dumps(extraction)),
         )
+
+
+_SYMPTOM_ASSESSMENT_FIELDS = (
+    "postop_day", "pain_score", "pain_severity_category", "onset", "location",
+    "worsening_or_improving", "pain_characteristics", "swelling", "warmth_or_redness",
+    "stiffness", "numbness_or_weakness", "fever_or_temperature", "temperature_c",
+    "triage_level",
+)
+
+
+def save_symptom_assessment(patient_id: str, assessment: Dict[str, Any],
+                             path: Optional[str] = None) -> None:
+    """
+    Persist ONE completed Pain & Symptoms assessment for `patient_id`, reusing
+    this same patient database (no second, competing persistence mechanism).
+
+    `assessment` may supply any subset of _SYMPTOM_ASSESSMENT_FIELDS -- missing
+    fields are stored as NULL, never guessed.
+
+    `pain_score` (REAL) and `pain_severity_category` (TEXT) are mutually
+    exclusive, never both populated by the same assessment: an exact 0-10
+    score (e.g. 7) is stored in `pain_score`, leaving `pain_severity_category`
+    NULL; a patient-described category only ("mild"/"moderate"/"severe", with
+    no exact number ever given, even after a simplified rephrase) is stored
+    in `pain_severity_category`, leaving `pain_score` NULL -- never coerced
+    into a fabricated exact numeric score (see
+    agents/pain_integration.py::build_persistable_record, which is what
+    decides which of the two columns a given assessment's pain_score value
+    belongs in before calling this function).
+
+    Raises sqlite3.IntegrityError if
+    `patient_id` does not exist in the `patients` table (e.g. a generic/unknown
+    patient_id that was never seeded/created) -- callers must treat persistence
+    as best-effort and never let a failure here interrupt the patient-facing
+    conversation (see agents/specialized_agents.py::PainSymptomsAgent).
+    """
+    initialize_database(path)
+    clean_id = str(patient_id or "").strip().upper()
+    with connection_scope(path) as connection:
+        connection.execute(
+            f"""INSERT INTO symptom_assessments
+                (patient_id, {", ".join(_SYMPTOM_ASSESSMENT_FIELDS)})
+                VALUES (?, {", ".join(["?"] * len(_SYMPTOM_ASSESSMENT_FIELDS))})""",
+            (clean_id, *(assessment.get(field) for field in _SYMPTOM_ASSESSMENT_FIELDS)),
+        )
+
+
+def get_recent_symptom_assessments(patient_id: str, limit: int = 5,
+                                    path: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Most recent completed symptom assessments for `patient_id`, oldest first
+    (so callers can read `[-1]` for "the last completed assessment"). Returns
+    an empty list for a patient with no prior assessments -- never raises for
+    an unknown patient_id, so a fresh conversation always works with no
+    history available.
+    """
+    initialize_database(path)
+    clean_id = str(patient_id or "").strip().upper()
+    with connection_scope(path) as connection:
+        rows = connection.execute(
+            f"""SELECT created_at, {", ".join(_SYMPTOM_ASSESSMENT_FIELDS)}
+                FROM symptom_assessments WHERE patient_id = ?
+                ORDER BY id DESC LIMIT ?""",
+            (clean_id, limit),
+        ).fetchall()
+        return [dict(row) for row in rows][::-1]
