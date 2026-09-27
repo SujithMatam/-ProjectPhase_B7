@@ -50,12 +50,15 @@ class AuthService {
       final patientUser = PatientUser(
         patientId: backendPatient['patient_id']?.toString() ?? '',
         fullName: backendPatient['full_name']?.toString() ?? identifier.trim(),
-        email: '${(backendPatient['patient_id'] ?? 'patient').toString().toLowerCase()}@orthosync.local',
+        email:
+            '${(backendPatient['patient_id'] ?? 'patient').toString().toLowerCase()}@orthosync.local',
         phoneNumber: backendPatient['phone_number']?.toString() ?? '',
-        surgeryType: backendPatient['surgery_type']?.toString() ??
+        surgeryType:
+            backendPatient['surgery_type']?.toString() ??
             'Total Knee Arthroplasty (TKA)',
         affectedLimb: backendPatient['affected_limb']?.toString() ?? 'Right',
-        surgeryDate: DateTime.tryParse(
+        surgeryDate:
+            DateTime.tryParse(
               backendPatient['surgery_date']?.toString() ?? '',
             ) ??
             DateTime.now(),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +13,7 @@ class AiBackendService {
 
   static const String baseUrl = 'http://127.0.0.1:8000';
 
-  /// Check if Python agent service is running
+  /// Check if Python agent service is running.
   Future<bool> isBackendOnline() async {
     try {
       final response = await http
@@ -22,9 +23,9 @@ class AiBackendService {
     } catch (e) {
       return false;
     }
-
   }
 
+  /// Login against the Python backend.
   Future<Map<String, dynamic>?> patientLogin({
     required String identifier,
     required String password,
@@ -34,18 +35,24 @@ class AiBackendService {
           .post(
             Uri.parse('$baseUrl/api/patient-login'),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'identifier': identifier,
-              'password': password,
-            }),
+            body: jsonEncode({'identifier': identifier, 'password': password}),
           )
           .timeout(const Duration(seconds: 8));
+
       if (response.statusCode == 200) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
       }
+
+      debugPrint(
+        'Patient backend login failed: ${response.statusCode} ${response.body}',
+      );
     } catch (e) {
       debugPrint('Patient backend login unavailable: $e');
     }
+
     return null;
   }
 
@@ -66,6 +73,7 @@ class AiBackendService {
     };
 
     Object? lastError;
+
     for (var attempt = 0; attempt < 2; attempt++) {
       try {
         final response = await http
@@ -77,7 +85,11 @@ class AiBackendService {
             .timeout(const Duration(seconds: 15));
 
         if (response.statusCode == 200) {
-          return jsonDecode(response.body) as Map<String, dynamic>;
+          final decoded = jsonDecode(response.body);
+          if (decoded is Map<String, dynamic>) {
+            return decoded;
+          }
+          throw Exception('Invalid chatbot response from backend.');
         }
 
         final detail = response.body.trim();
@@ -97,7 +109,7 @@ class AiBackendService {
     throw lastError ?? Exception('AI chatbot request failed');
   }
 
-  /// Send patient symptoms to Python Agentic Backend for assessment
+  /// Send patient symptoms to Python Agentic Backend for assessment.
   Future<Map<String, dynamic>> assessSymptoms({
     required PatientUser patient,
     required String symptoms,
@@ -124,32 +136,103 @@ class AiBackendService {
           .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
-      } else {
-        throw Exception('Server returned status: ${response.statusCode}');
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+        throw Exception('Invalid symptom assessment response.');
       }
+
+      throw Exception('Server returned status: ${response.statusCode}');
     } catch (e) {
       debugPrint('AI Backend offline ($e). Using local safety fallback.');
       return _localSafetyFallback(patient, symptoms, painScore);
     }
   }
 
-  /// Fetch the structured JSON clinical summary for a patient (last [days] days).
+  /// Analyze an actual uploaded wound image using the current
+  /// deterministic classical-computer-vision backend.
+  ///
+  /// This is deliberately separate from the future trained medical model.
+  /// When the trained model is ready, this method can be changed to call
+  /// the model-backed endpoint without changing the rest of the UI contract.
+  Future<Map<String, dynamic>> analyzeWoundImage({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    if (bytes.isEmpty) {
+      throw Exception('The selected image is empty.');
+    }
+
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl/api/wound-image/analyze'),
+    );
+
+    request.files.add(
+      http.MultipartFile.fromBytes('file', bytes, filename: fileName),
+    );
+
+    try {
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 30),
+      );
+
+      final response = await http.Response.fromStream(streamedResponse);
+
+      Map<String, dynamic>? decoded;
+      try {
+        final body = jsonDecode(response.body);
+        if (body is Map<String, dynamic>) {
+          decoded = body;
+        }
+      } catch (_) {
+        // Handled below with a friendly error.
+      }
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (decoded != null) {
+          return decoded;
+        }
+        throw Exception('The image analysis returned an invalid response.');
+      }
+
+      final detail = decoded?['detail']?.toString();
+      throw Exception(
+        detail?.isNotEmpty == true
+            ? detail!
+            : 'The image could not be analyzed (HTTP ${response.statusCode}).',
+      );
+    } catch (e) {
+      debugPrint('Wound image analysis failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Fetch the structured JSON clinical summary for a patient.
   Future<Map<String, dynamic>> getReportSummary({
     required String patientId,
     int days = 7,
   }) async {
     try {
       final response = await http
-          .get(Uri.parse('$baseUrl/api/reports/summary/$patientId?days=$days'))
+          .get(
+            Uri.parse(
+              '$baseUrl/api/reports/summary/'
+              '${Uri.encodeComponent(patientId)}?days=$days',
+            ),
+          )
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
-      } else {
-        throw Exception('Report summary failed: ${response.statusCode}');
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+        throw Exception('Invalid report summary response.');
       }
 
+      throw Exception('Report summary failed: ${response.statusCode}');
     } catch (e) {
       debugPrint('Report summary unavailable: $e');
       rethrow;
@@ -160,43 +243,77 @@ class AiBackendService {
   Future<Map<String, dynamic>> getMedicationSchedule({
     required String patientId,
   }) async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/api/medications/schedule/$patientId'))
-        .timeout(const Duration(seconds: 15));
-    if (response.statusCode != 200) {
-      throw Exception('Medication schedule failed: ${response.statusCode}');
+    try {
+      final response = await http
+          .get(
+            Uri.parse(
+              '$baseUrl/api/medications/schedule/'
+              '${Uri.encodeComponent(patientId)}',
+            ),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        throw Exception('Medication schedule failed: ${response.statusCode}');
+      }
+
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+
+      throw Exception('Invalid medication schedule response.');
+    } catch (e) {
+      debugPrint('Medication schedule unavailable: $e');
+      rethrow;
     }
-    return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
   /// Fetch reminder delivery configuration/status from the running backend.
   Future<Map<String, dynamic>> getMedicationReminderStatus() async {
-    final response = await http
-        .get(Uri.parse('$baseUrl/api/medications/reminders/status'))
-        .timeout(const Duration(seconds: 5));
-    if (response.statusCode != 200) {
-      throw Exception('Medication reminder status failed: ${response.statusCode}');
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/api/medications/reminders/status'))
+          .timeout(const Duration(seconds: 5));
+
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Medication reminder status failed: ${response.statusCode}',
+        );
+      }
+
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+
+      throw Exception('Invalid medication reminder response.');
+    } catch (e) {
+      debugPrint('Medication reminder status unavailable: $e');
+      rethrow;
     }
-    return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
-  /// Download the PDF clinical report as raw bytes.  The caller can open or
-  /// save the bytes using url_launcher / universal_html on web, or
-  /// path_provider on mobile.
+  /// Download the PDF clinical report as raw bytes.
   Future<Uint8List> downloadPdfReport({
     required String patientId,
     int days = 7,
   }) async {
     try {
       final response = await http
-          .get(Uri.parse('$baseUrl/api/reports/pdf/$patientId?days=$days'))
+          .get(
+            Uri.parse(
+              '$baseUrl/api/reports/pdf/'
+              '${Uri.encodeComponent(patientId)}?days=$days',
+            ),
+          )
           .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         return response.bodyBytes;
-      } else {
-        throw Exception('PDF export failed: ${response.statusCode}');
       }
+
+      throw Exception('PDF export failed: ${response.statusCode}');
     } catch (e) {
       debugPrint('PDF download unavailable: $e');
       rethrow;
@@ -248,9 +365,9 @@ class AiBackendService {
         if (isRed)
           'Contact your surgical clinic emergency line immediately.'
         else if (isYellow)
-          'Elevate limb and apply ice pack; report persistent swelling to nursing team.'
+          'Report persistent or worsening symptoms to your surgical team.'
         else
-          'Continue Day ${patient.postopDayCount} physical therapy rehabilitation exercises.',
+          'Continue your prescribed rehabilitation plan.',
       ],
       'retrieved_protocols': [],
     };

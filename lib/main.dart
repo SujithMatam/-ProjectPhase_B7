@@ -447,6 +447,9 @@ class _MainScreenState extends State<MainScreen> {
     await _loadMessagesForDay(day);
   }
 
+  // Actually calls the backend wound image analysis endpoint
+  // (AiBackendService.analyzeWoundImage) instead of the old hardcoded
+  // 1.5s-timer-then-canned-reply mock.
   Future<void> _pickImage(ImageSource source) async {
     setState(() => isPlusMenuOpen = false);
 
@@ -460,31 +463,67 @@ class _MainScreenState extends State<MainScreen> {
 
     try {
       final XFile? image = await _picker.pickImage(source: source);
-      if (image != null) {
-        setState(() {
-          final message = Message(
-            sender: 'user',
-            text: "Uploaded an image",
-            imagePath: image.path,
-          );
-          messages.add(message);
-          isTyping = true;
-        });
-        await _saveMessage(messages.last);
-        _scrollToBottom();
+      if (image == null) return;
 
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          if (mounted) {
-            setState(() {
-              isTyping = false;
-              messages.add(
-                Message(sender: 'bot', text: 'botAuthReply', isKey: true),
-              );
-            });
-            _saveMessage(messages.last);
-            _scrollToBottom();
-          }
+      final userMessage = Message(
+        sender: 'user',
+        text: "Uploaded an image",
+        imagePath: image.path,
+      );
+
+      setState(() {
+        messages.add(userMessage);
+        isTyping = true;
+      });
+      await _saveMessage(userMessage);
+      _scrollToBottom();
+
+      try {
+        final bytes = await image.readAsBytes();
+
+        final result = await AiBackendService.instance.analyzeWoundImage(
+          fileName: image.name.isNotEmpty ? image.name : 'wound_photo.jpg',
+          bytes: bytes,
+        );
+
+        final analysis = result['analysis'] as Map<String, dynamic>?;
+
+        final friendlySummary = (analysis?['friendly_summary'] as String?)
+            ?.trim();
+
+        final replyText =
+            (friendlySummary != null && friendlySummary.isNotEmpty)
+            ? friendlySummary
+            : (analysis?['disclaimer'] as String? ??
+                  "I've looked at the photo, but I couldn't generate a summary for it.");
+
+        if (!mounted) return;
+
+        final botMessage = Message(sender: 'bot', text: replyText);
+
+        setState(() {
+          isTyping = false;
+          messages.add(botMessage);
         });
+        await _saveMessage(botMessage);
+        _scrollToBottom();
+      } catch (e) {
+        if (!mounted) return;
+
+        final errorMessage = Message(
+          sender: 'bot',
+          text:
+              "I wasn't able to analyze that photo -- the image analysis "
+              "service might be offline. Please make sure the backend is "
+              "running and try again.",
+        );
+
+        setState(() {
+          isTyping = false;
+          messages.add(errorMessage);
+        });
+        await _saveMessage(errorMessage);
+        _scrollToBottom();
       }
     } catch (e) {
       showModal("Camera Error", "Ensure camera permissions are granted.");
