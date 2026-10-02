@@ -30,6 +30,7 @@ import sqlite3
 # NEW: admin PDF report-extraction feature
 from admin_report_routes import router as admin_report_router
 from wound_image_routes import router as wound_image_router
+from voice_routes import router as voice_router
 
 app = FastAPI(
     title="OrthoSync Agentic AI Backend",
@@ -49,6 +50,7 @@ app.add_middleware(
 # NEW: mounts POST /api/admin/extract-report
 app.include_router(admin_report_router)
 app.include_router(wound_image_router)
+app.include_router(voice_router)
 
 
 @app.on_event("startup")

@@ -4,3 +4,6 @@ pydantic>=2.6.0
 requests>=2.31.0
 sentence-transformers>=2.7.0
 chromadb>=0.5.0
+faster-whisper>=1.1.0
+python-multipart>=0.0.9
+pytest>=8.0.0

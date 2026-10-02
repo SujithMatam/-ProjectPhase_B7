@@ -209,6 +209,85 @@ class AiBackendService {
     }
   }
 
+  /// Send a recorded voice message to the Python voice pipeline.
+  ///
+  /// The Flutter client sends a WAV file created from the recorder's PCM16
+  /// stream. The backend transcribes it with faster-whisper and then feeds the
+  /// transcript into the exact same safety-first LAM pipeline used by typed
+  /// chat.
+  Future<Map<String, dynamic>> sendVoiceMessage({
+    required PatientUser? patient,
+    required Uint8List audioBytes,
+    required String fileName,
+    List<Map<String, String>> chatHistory = const [],
+  }) async {
+    if (audioBytes.isEmpty) {
+      throw Exception('The recorded voice message is empty.');
+    }
+
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl/api/voice/chat'),
+    );
+
+    request.fields['patient_id'] = patient?.patientId ?? 'PT-DEMO';
+    request.fields['surgery_type'] =
+        patient?.surgeryType ?? 'Total Knee Arthroplasty (TKA)';
+    request.fields['affected_limb'] = patient?.affectedLimb ?? 'Right';
+    request.fields['postop_day'] = (patient?.postopDayCount ?? 3).toString();
+
+    final surgeryDate = patient?.surgeryDate;
+    if (surgeryDate != null) {
+      request.fields['surgery_date'] = surgeryDate.toIso8601String();
+    }
+
+    if (chatHistory.isNotEmpty) {
+      request.fields['chat_history'] = jsonEncode(chatHistory);
+    }
+
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        audioBytes,
+        filename: fileName.isNotEmpty ? fileName : 'voice_message.wav',
+      ),
+    );
+
+    try {
+      final streamedResponse = await request.send().timeout(
+        const Duration(minutes: 3),
+      );
+
+      final response = await http.Response.fromStream(streamedResponse);
+
+      Map<String, dynamic>? decoded;
+      try {
+        final body = jsonDecode(response.body);
+        if (body is Map<String, dynamic>) {
+          decoded = body;
+        }
+      } catch (_) {}
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (decoded != null) {
+          return decoded;
+        }
+        throw Exception('The voice service returned an invalid response.');
+      }
+
+      final detail = decoded?['detail']?.toString();
+      throw Exception(
+        detail?.isNotEmpty == true
+            ? detail!
+            : 'The voice message could not be processed '
+                  '(HTTP ${response.statusCode}).',
+      );
+    } catch (e) {
+      debugPrint('Voice message processing failed: $e');
+      rethrow;
+    }
+  }
+
   /// Fetch the structured JSON clinical summary for a patient.
   Future<Map<String, dynamic>> getReportSummary({
     required String patientId,

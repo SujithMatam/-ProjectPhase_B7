@@ -1,9 +1,13 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:record/record.dart';
+import 'package:super_clipboard/super_clipboard.dart';
 
 import 'models/patient_user.dart';
 import 'services/auth_service.dart';
@@ -154,6 +158,10 @@ class Message {
   final String text;
   final bool isKey;
   final String? imagePath;
+  final Uint8List? imageBytes;
+  final Uint8List? audioBytes;
+  final String? transcript;
+  final double? audioDurationSeconds;
 
   final String? triageLevel;
   final bool isEscalated;
@@ -168,6 +176,10 @@ class Message {
     required this.text,
     this.isKey = false,
     this.imagePath,
+    this.imageBytes,
+    this.audioBytes,
+    this.transcript,
+    this.audioDurationSeconds,
     this.triageLevel,
     this.isEscalated = false,
     this.intent,
@@ -211,13 +223,20 @@ class _MainScreenState extends State<MainScreen> {
   Timer? recoveryDayTimer;
 
   List<Message> messages = [];
-  List<int> audioLevels = [10, 15, 20, 12, 18, 25, 15, 10];
-  Timer? waveTimer;
+  List<int> audioLevels = [8, 12, 16, 12, 18, 14, 10, 15];
 
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final AudioPlayer _audioPlayer = AudioPlayer();
   final ImagePicker _picker = ImagePicker();
+  final AudioRecorder _voiceRecorder = AudioRecorder();
+
+  StreamSubscription<Uint8List>? _voiceAudioSubscription;
+  Timer? _voiceAmplitudeTimer;
+  BytesBuilder? _voiceBytesBuilder;
+  DateTime? _voiceStartedAt;
+  Timer? _voiceMaxDurationTimer;
+  bool _stoppingRecording = false;
 
   Map<String, String> get t => uiText[lang] ?? uiText['English']!;
 
@@ -225,6 +244,10 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _playStartupSound();
+
+    // Listen for Ctrl+V / browser paste events so images copied from
+    // screenshots, browsers, Photos, etc. can be pasted directly into chat.
+    ClipboardEvents.instance?.registerPasteEventListener(_onClipboardPaste);
 
     // Smooth splash screen timer
     Future.delayed(const Duration(milliseconds: 2500), () {
@@ -447,9 +470,6 @@ class _MainScreenState extends State<MainScreen> {
     await _loadMessagesForDay(day);
   }
 
-  // Actually calls the backend wound image analysis endpoint
-  // (AiBackendService.analyzeWoundImage) instead of the old hardcoded
-  // 1.5s-timer-then-canned-reply mock.
   Future<void> _pickImage(ImageSource source) async {
     setState(() => isPlusMenuOpen = false);
 
@@ -465,69 +485,213 @@ class _MainScreenState extends State<MainScreen> {
       final XFile? image = await _picker.pickImage(source: source);
       if (image == null) return;
 
-      final userMessage = Message(
-        sender: 'user',
-        text: "Uploaded an image",
+      final bytes = await image.readAsBytes();
+      await _handleImageBytes(
+        bytes,
+        displayText: 'Uploaded an image',
         imagePath: image.path,
+        fileName: image.name.isNotEmpty ? image.name : 'wound_image.png',
+      );
+    } catch (e) {
+      showModal(
+        'Image Error',
+        'The image could not be opened. Please try another image or check the file permissions.',
+      );
+    }
+  }
+
+  Future<void> _onClipboardPaste(ClipboardReadEvent event) async {
+    try {
+      final reader = await event.getClipboardReader();
+
+      // Image paste: this is the important path for Ctrl+V in Chrome.
+      if (reader.canProvide(Formats.png)) {
+        reader.getFile(
+          Formats.png,
+          (file) async {
+            try {
+              final bytes = await file.readAll();
+              if (bytes.isEmpty) return;
+
+              await _handleImageBytes(
+                bytes,
+                displayText: 'Pasted an image',
+                fileName: file.fileName ?? 'pasted_image.png',
+              );
+            } catch (e) {
+              if (mounted) {
+                showModal(
+                  'Paste Error',
+                  'The image was copied, but OrthoSync AI could not read it from the clipboard. Please try copying the image again.',
+                );
+              }
+            }
+          },
+          onError: (error) {
+            if (mounted) {
+              showModal(
+                'Paste Error',
+                'The image could not be read from the clipboard. Please try copying it again.',
+              );
+            }
+          },
+        );
+        return;
+      }
+
+      // If the clipboard contains text instead of an image, preserve normal
+      // Ctrl+V behaviour by inserting that text into the current TextField.
+      if (reader.canProvide(Formats.plainText)) {
+        final text = await reader.readValue(Formats.plainText);
+        if (text != null && text.isNotEmpty && mounted) {
+          _insertPastedText(text);
+        }
+      }
+    } catch (e) {
+      debugPrint('Clipboard paste handling failed: $e');
+    }
+  }
+
+  void _insertPastedText(String pastedText) {
+    final value = _inputController.value;
+    final selection = value.selection;
+
+    if (!selection.isValid) {
+      _inputController.text += pastedText;
+      _inputController.selection = TextSelection.collapsed(
+        offset: _inputController.text.length,
+      );
+      return;
+    }
+
+    final start = selection.start;
+    final end = selection.end;
+    final newText = value.text.replaceRange(start, end, pastedText);
+    final newOffset = start + pastedText.length;
+
+    _inputController.value = value.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newOffset),
+      composing: TextRange.empty,
+    );
+  }
+
+  Future<void> _handleImageBytes(
+    Uint8List bytes, {
+    required String displayText,
+    String? imagePath,
+    required String fileName,
+  }) async {
+    if (!isLoggedIn || currentPatient == null) {
+      showModal(
+        'Login Required',
+        'Please log in to use OrthoSync AI. Your recovery information is needed to provide personalized postoperative guidance.',
+      );
+      return;
+    }
+
+    if (bytes.isEmpty) return;
+
+    final userMessage = Message(
+      sender: 'user',
+      text: displayText,
+      imagePath: imagePath,
+      imageBytes: bytes,
+    );
+
+    setState(() {
+      messages.add(userMessage);
+      isTyping = true;
+      isPlusMenuOpen = false;
+    });
+
+    // Keep existing database behaviour. The raw pasted bytes are intentionally
+    // kept in memory for the current chat instead of putting large binary data
+    // into the SQLite text column.
+    await _saveMessage(userMessage);
+    _scrollToBottom();
+
+    try {
+      final result = await AiBackendService.instance.analyzeWoundImage(
+        bytes: bytes,
+        fileName: fileName,
+      );
+
+      if (!mounted) return;
+
+      final analysis = result['analysis'];
+      final reply = _friendlyImageAnalysisReply(analysis);
+
+      final botMessage = Message(
+        sender: 'bot',
+        text: reply,
+        targetAgent: 'WoundCareAgent',
       );
 
       setState(() {
-        messages.add(userMessage);
-        isTyping = true;
+        isTyping = false;
+        messages.add(botMessage);
       });
-      await _saveMessage(userMessage);
+
+      await _saveMessage(botMessage);
       _scrollToBottom();
-
-      try {
-        final bytes = await image.readAsBytes();
-
-        final result = await AiBackendService.instance.analyzeWoundImage(
-          fileName: image.name.isNotEmpty ? image.name : 'wound_photo.jpg',
-          bytes: bytes,
-        );
-
-        final analysis = result['analysis'] as Map<String, dynamic>?;
-
-        final friendlySummary = (analysis?['friendly_summary'] as String?)
-            ?.trim();
-
-        final replyText =
-            (friendlySummary != null && friendlySummary.isNotEmpty)
-            ? friendlySummary
-            : (analysis?['disclaimer'] as String? ??
-                  "I've looked at the photo, but I couldn't generate a summary for it.");
-
-        if (!mounted) return;
-
-        final botMessage = Message(sender: 'bot', text: replyText);
-
-        setState(() {
-          isTyping = false;
-          messages.add(botMessage);
-        });
-        await _saveMessage(botMessage);
-        _scrollToBottom();
-      } catch (e) {
-        if (!mounted) return;
-
-        final errorMessage = Message(
-          sender: 'bot',
-          text:
-              "I wasn't able to analyze that photo -- the image analysis "
-              "service might be offline. Please make sure the backend is "
-              "running and try again.",
-        );
-
-        setState(() {
-          isTyping = false;
-          messages.add(errorMessage);
-        });
-        await _saveMessage(errorMessage);
-        _scrollToBottom();
-      }
     } catch (e) {
-      showModal("Camera Error", "Ensure camera permissions are granted.");
+      if (!mounted) return;
+
+      final errorMessage = Message(
+        sender: 'bot',
+        text: 'I received your image, but I could not complete the visual analysis right now. The image itself does not provide a diagnosis. Please try again, and if you have concerning symptoms, contact your surgical team.',
+        targetAgent: 'WoundCareAgent',
+      );
+
+      setState(() {
+        isTyping = false;
+        messages.add(errorMessage);
+      });
+
+      await _saveMessage(errorMessage);
+      _scrollToBottom();
     }
+  }
+
+  String _friendlyImageAnalysisReply(dynamic rawAnalysis) {
+    if (rawAnalysis is! Map) {
+      return 'I received your image, but I could not interpret the visual-analysis result. This image analysis is only a supplementary signal and is not a medical diagnosis.';
+    }
+
+    final flag = rawAnalysis['visual_flag']?.toString();
+    final warnings = rawAnalysis['warnings'];
+
+    final buffer = StringBuffer();
+    buffer.write(
+      'I checked the image using our current classical computer-vision analysis. ',
+    );
+
+    if (flag == 'elevated_redness_detected') {
+      buffer.write(
+        'It detected a redness-like color signal in part of the image. ',
+      );
+      buffer.write(
+        'This does NOT mean the wound is infected or that there is a complication. ',
+      );
+    } else {
+      buffer.write(
+        'It did not detect a strong redness-like color signal in the image. ',
+      );
+    }
+
+    if (warnings is List && warnings.isNotEmpty) {
+      buffer.write(
+        '\n\nImage-quality note: ${warnings.map((e) => e.toString()).join(' ')}',
+      );
+    }
+
+    buffer.write(
+      '\n\nThis is an experimental visual signal based on pixel color and brightness. '
+      'It is not a trained or clinically validated wound-diagnosis model and should not replace your symptoms or a clinician\'s assessment.',
+    );
+
+    return buffer.toString();
   }
 
   void _handleGoogleDrive() {
@@ -729,7 +893,7 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  void startRecording() {
+  Future<void> startRecording() async {
     if (!isLoggedIn || currentPatient == null) {
       showModal(
         'Login Required',
@@ -738,41 +902,379 @@ class _MainScreenState extends State<MainScreen> {
       return;
     }
 
-    setState(() => isRecording = true);
-    waveTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    if (isRecording || _stoppingRecording) return;
+
+    try {
+      final hasPermission = await _voiceRecorder.hasPermission();
+      if (!hasPermission) {
+        showModal(
+          'Microphone Permission',
+          'Microphone access is required to record a voice message. Please allow microphone access in your browser or device settings and try again.',
+        );
+        return;
+      }
+
+      _voiceStartedAt = DateTime.now();
+      _stoppingRecording = false;
+
+      if (kIsWeb) {
+        // Chrome/web: let the record package create the WAV file directly.
+        // This avoids manually rebuilding a WAV header around browser PCM
+        // chunks, which can result in audio that exists but is not usable by
+        // the speech-to-text engine.
+        const config = RecordConfig(
+          encoder: AudioEncoder.wav,
+          sampleRate: 16000,
+          numChannels: 1,
+          autoGain: true,
+          echoCancel: true,
+          noiseSuppress: true,
+        );
+
+        await _voiceRecorder.start(config, path: '');
+      } else {
+        // Native platforms: keep the PCM16 streaming path.
+        const config = RecordConfig(
+          encoder: AudioEncoder.pcm16bits,
+          sampleRate: 16000,
+          numChannels: 1,
+          autoGain: true,
+          echoCancel: true,
+          noiseSuppress: true,
+        );
+
+        final audioStream = await _voiceRecorder.startStream(config);
+
+        _voiceBytesBuilder = BytesBuilder(copy: false);
+
+        await _voiceAudioSubscription?.cancel();
+        _voiceAudioSubscription = audioStream.listen(
+          (chunk) {
+            _voiceBytesBuilder?.add(chunk);
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            debugPrint('Voice recorder stream error: $error');
+          },
+        );
+      }
+
+      if (!mounted) return;
+
       setState(() {
-        audioLevels = List.generate(10, (index) => Random().nextInt(20) + 5);
+        isRecording = true;
+        isTyping = false;
       });
-    });
+
+      _voiceAmplitudeTimer?.cancel();
+      _voiceAmplitudeTimer = Timer.periodic(const Duration(milliseconds: 100), (
+        _,
+      ) {
+        if (!mounted || !isRecording) return;
+
+        final phase = DateTime.now().millisecondsSinceEpoch ~/ 100;
+        final heights = <int>[
+          8 + ((phase + 0) % 5) * 3,
+          8 + ((phase + 1) % 5) * 3,
+          8 + ((phase + 2) % 5) * 3,
+          8 + ((phase + 3) % 5) * 3,
+          8 + ((phase + 4) % 5) * 3,
+          8 + ((phase + 2) % 5) * 3,
+          8 + ((phase + 1) % 5) * 3,
+          8 + ((phase + 0) % 5) * 3,
+        ];
+
+        setState(() {
+          audioLevels = heights;
+        });
+      });
+
+      _voiceMaxDurationTimer?.cancel();
+      _voiceMaxDurationTimer = Timer(const Duration(seconds: 120), () {
+        if (isRecording && !_stoppingRecording) {
+          unawaited(stopRecording());
+        }
+      });
+    } catch (e) {
+      debugPrint('Could not start voice recording: $e');
+
+      _voiceAmplitudeTimer?.cancel();
+      _voiceAmplitudeTimer = null;
+      _voiceMaxDurationTimer?.cancel();
+      _voiceMaxDurationTimer = null;
+
+      await _voiceAudioSubscription?.cancel();
+      _voiceAudioSubscription = null;
+      _voiceBytesBuilder = null;
+      _voiceStartedAt = null;
+
+      try {
+        if (await _voiceRecorder.isRecording()) {
+          await _voiceRecorder.stop();
+        }
+      } catch (_) {}
+
+      if (mounted) {
+        setState(() {
+          isRecording = false;
+          audioLevels = [8, 12, 16, 12, 18, 14, 10, 15];
+        });
+        showModal(
+          'Recording Error',
+          'I could not access the microphone. Please check the browser microphone permission and try again.',
+        );
+      }
+    }
   }
 
-  void stopRecording() {
-    waveTimer?.cancel();
+  Future<void> stopRecording() async {
+    if (!isRecording || _stoppingRecording) return;
 
+    _stoppingRecording = true;
+    _voiceAmplitudeTimer?.cancel();
+    _voiceAmplitudeTimer = null;
+    _voiceMaxDurationTimer?.cancel();
+    _voiceMaxDurationTimer = null;
+
+    Uint8List? audioBytes;
+    final startedAt = _voiceStartedAt;
+
+    try {
+      if (kIsWeb) {
+        // On web, stop() returns the browser blob URL for the WAV recording.
+        final recordingPath = await _voiceRecorder.stop();
+
+        if (recordingPath == null || recordingPath.isEmpty) {
+          throw Exception('The browser did not return a recording.');
+        }
+
+        audioBytes = await XFile(recordingPath).readAsBytes();
+      } else {
+        // Native platforms still provide raw PCM16 through startStream().
+        await _voiceRecorder.stop();
+        await _voiceAudioSubscription?.cancel();
+        _voiceAudioSubscription = null;
+
+        final pcmBytes = _voiceBytesBuilder?.takeBytes();
+        if (pcmBytes != null && pcmBytes.isNotEmpty) {
+          audioBytes = _pcm16ToWav(pcmBytes, sampleRate: 16000, channels: 1);
+        }
+      }
+    } catch (e) {
+      debugPrint('Could not stop/read voice recording: $e');
+    } finally {
+      _voiceBytesBuilder = null;
+      _voiceStartedAt = null;
+
+      if (mounted) {
+        setState(() {
+          isRecording = false;
+          audioLevels = [8, 12, 16, 12, 18, 14, 10, 15];
+        });
+      }
+    }
+
+    try {
+      if (audioBytes == null || audioBytes!.isEmpty) {
+        if (mounted) {
+          showModal(
+            'No Audio Captured',
+            'I did not receive any microphone audio. Please try recording again.',
+          );
+        }
+        return;
+      }
+
+      final duration = startedAt == null
+          ? null
+          : DateTime.now().difference(startedAt).inMilliseconds / 1000.0;
+
+      debugPrint(
+        'Voice recording captured: ${audioBytes!.length} bytes, '
+        'duration: ${duration?.toStringAsFixed(2)}s, '
+        'web: $kIsWeb',
+      );
+
+      await _handleVoiceBytes(
+        audioBytes!,
+        fileName: 'voice_message.wav',
+        durationSeconds: duration,
+      );
+    } finally {
+      _stoppingRecording = false;
+    }
+  }
+
+  Uint8List _pcm16ToWav(
+    Uint8List pcmBytes, {
+    required int sampleRate,
+    required int channels,
+  }) {
+    const bitsPerSample = 16;
+    final byteRate = sampleRate * channels * (bitsPerSample ~/ 8);
+    final blockAlign = channels * (bitsPerSample ~/ 8);
+    final dataLength = pcmBytes.length;
+    final fileLength = 36 + dataLength;
+
+    final output = BytesBuilder(copy: false);
+
+    void writeAscii(String value) {
+      output.add(value.codeUnits);
+    }
+
+    void writeUint32(int value) {
+      final data = ByteData(4)..setUint32(0, value, Endian.little);
+      output.add(data.buffer.asUint8List());
+    }
+
+    void writeUint16(int value) {
+      final data = ByteData(2)..setUint16(0, value, Endian.little);
+      output.add(data.buffer.asUint8List());
+    }
+
+    writeAscii('RIFF');
+    writeUint32(fileLength);
+    writeAscii('WAVE');
+    writeAscii('fmt ');
+    writeUint32(16);
+    writeUint16(1);
+    writeUint16(channels);
+    writeUint32(sampleRate);
+    writeUint32(byteRate);
+    writeUint16(blockAlign);
+    writeUint16(bitsPerSample);
+    writeAscii('data');
+    writeUint32(dataLength);
+    output.add(pcmBytes);
+
+    return output.takeBytes();
+  }
+
+  Future<void> _handleVoiceBytes(
+    Uint8List audioBytes, {
+    required String fileName,
+    double? durationSeconds,
+  }) async {
     if (!isLoggedIn || currentPatient == null) {
-      setState(() => isRecording = false);
+      showModal(
+        'Login Required',
+        'Please log in to use OrthoSync AI. Your recovery information is needed to provide personalized postoperative guidance.',
+      );
       return;
     }
 
-    final voiceMessage = Message(sender: 'user', text: "[Voice Note Attached]");
+    final voiceMessage = Message(
+      sender: 'user',
+      text: '[Voice message]',
+      audioBytes: audioBytes,
+      audioDurationSeconds: durationSeconds,
+    );
+
     setState(() {
-      isRecording = false;
       messages.add(voiceMessage);
       isTyping = true;
+      isPlusMenuOpen = false;
     });
-    _saveMessage(voiceMessage);
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          isTyping = false;
-          messages.add(
-            Message(sender: 'bot', text: 'botVoiceReply', isKey: true),
-          );
-        });
-        _saveMessage(messages.last);
-        _scrollToBottom();
+
+    _scrollToBottom();
+
+    try {
+      final previousMessages = messages
+          .where((msg) => !identical(msg, voiceMessage))
+          .toList();
+
+      final historyStart = previousMessages.length > 10
+          ? previousMessages.length - 10
+          : 0;
+
+      final chatHistory = previousMessages
+          .skip(historyStart)
+          .map(
+            (msg) => {
+              'role': msg.sender == 'user' ? 'user' : 'assistant',
+              'content': msg.isKey ? (t[msg.text] ?? msg.text) : msg.text,
+            },
+          )
+          .toList();
+
+      final result = await AiBackendService.instance.sendVoiceMessage(
+        patient: currentPatient,
+        audioBytes: audioBytes,
+        fileName: fileName,
+        chatHistory: chatHistory,
+      );
+
+      if (!mounted) return;
+
+      final transcript = result['transcript']?.toString().trim() ?? '';
+      final transcription = result['transcription'];
+      final lowConfidence =
+          transcription is Map && transcription['low_confidence'] == true;
+      final translated =
+          transcription is Map && transcription['translated'] == true;
+      final botReply =
+          result['reply']?.toString() ??
+          'I received your voice message, but no response was returned by the local AI service.';
+
+      final userDisplayText = transcript.isEmpty
+          ? '[Voice message]'
+          : '[Voice message]\n\nYou said: "$transcript"';
+
+      final updatedUserMessage = Message(
+        sender: 'user',
+        text: userDisplayText,
+        audioBytes: audioBytes,
+        transcript: transcript,
+        audioDurationSeconds: durationSeconds,
+      );
+
+      final botMessage = Message(
+        sender: 'bot',
+        text: botReply,
+        triageLevel: result['triage_level']?.toString(),
+        isEscalated: result['is_escalated'] == true,
+        intent: result['intent']?.toString(),
+        targetAgent: result['target_agent']?.toString(),
+        action: result['action']?.toString(),
+        scopeStatus: result['scope_status']?.toString(),
+        sources: result['sources'],
+      );
+
+      setState(() {
+        final messageIndex = messages.indexOf(voiceMessage);
+        if (messageIndex != -1) {
+          messages[messageIndex] = updatedUserMessage;
+        }
+        isTyping = false;
+        messages.add(botMessage);
+      });
+
+      await _saveMessage(updatedUserMessage);
+      await _saveMessage(botMessage);
+      _scrollToBottom();
+
+      if (lowConfidence) {
+        debugPrint('Voice transcription flagged as low confidence.');
       }
-    });
+      if (translated) {
+        debugPrint('Voice transcription was translated to English.');
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      final errorMessage = Message(
+        sender: 'bot',
+        text: 'I received your voice message, but I could not process it right now. Please try recording again or type your message instead. If you are experiencing an emergency, contact your local emergency service or hospital immediately.',
+      );
+
+      setState(() {
+        isTyping = false;
+        messages.add(errorMessage);
+      });
+
+      await _saveMessage(voiceMessage);
+      await _saveMessage(errorMessage);
+      _scrollToBottom();
+    }
   }
 
   Future<void> handleLogin() async {
@@ -845,10 +1347,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void dispose() {
     recoveryDayTimer?.cancel();
-    waveTimer?.cancel();
+    _voiceAmplitudeTimer?.cancel();
+    _voiceMaxDurationTimer?.cancel();
     _inputController.dispose();
     _scrollController.dispose();
+    ClipboardEvents.instance?.unregisterPasteEventListener(_onClipboardPaste);
     _audioPlayer.dispose();
+    _voiceRecorder.dispose();
     super.dispose();
   }
 
@@ -1408,7 +1913,8 @@ class _MainScreenState extends State<MainScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            if (msg.imagePath != null)
+                                            if (msg.imageBytes != null ||
+                                                msg.imagePath != null)
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                   bottom: 8.0,
@@ -1416,11 +1922,40 @@ class _MainScreenState extends State<MainScreen> {
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(12),
-                                                  child: Image.network(
-                                                    msg.imagePath!,
-                                                    height: 150,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                                  child: msg.imageBytes != null
+                                                      ? Image.memory(
+                                                          msg.imageBytes!,
+                                                          height: 150,
+                                                          width: 220,
+                                                          fit: BoxFit.cover,
+                                                        )
+                                                      : Image.network(
+                                                          msg.imagePath!,
+                                                          height: 150,
+                                                          width: 220,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder:
+                                                              (
+                                                                context,
+                                                                error,
+                                                                stackTrace,
+                                                              ) => Container(
+                                                                height: 150,
+                                                                width: 220,
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                color: Colors
+                                                                    .black12,
+                                                                child: const Icon(
+                                                                  Icons
+                                                                      .broken_image_outlined,
+                                                                  size: 36,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                              ),
+                                                        ),
                                                 ),
                                               ),
 
@@ -1513,6 +2048,81 @@ class _MainScreenState extends State<MainScreen> {
                                                               ),
                                                         ),
                                                       ),
+                                                  ],
+                                                ),
+                                              ),
+
+                                            if (msg.audioBytes != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 8,
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    IconButton(
+                                                      visualDensity:
+                                                          VisualDensity.compact,
+                                                      tooltip:
+                                                          'Play voice message',
+                                                      onPressed: () async {
+                                                        try {
+                                                          await _audioPlayer.play(
+                                                            UrlSource(
+                                                              Uri.dataFromBytes(
+                                                                msg.audioBytes!,
+                                                                mimeType:
+                                                                    'audio/wav',
+                                                              ).toString(),
+                                                            ),
+                                                          );
+                                                        } catch (e) {
+                                                          debugPrint(
+                                                            'Voice playback failed: $e',
+                                                          );
+                                                        }
+                                                      },
+                                                      icon: Icon(
+                                                        Icons.play_circle_fill,
+                                                        color: isUser
+                                                            ? Colors.white
+                                                            : theme
+                                                                  .primaryColor,
+                                                        size: 32,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Voice message',
+                                                          style: TextStyle(
+                                                            color: isUser
+                                                                ? Colors.white
+                                                                : textColor,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 13,
+                                                          ),
+                                                        ),
+                                                        if (msg.audioDurationSeconds !=
+                                                            null)
+                                                          Text(
+                                                            '${msg.audioDurationSeconds!.toStringAsFixed(1)} s',
+                                                            style: TextStyle(
+                                                              color: isUser
+                                                                  ? Colors
+                                                                        .white70
+                                                                  : Colors.grey,
+                                                              fontSize: 11,
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ],
                                                 ),
                                               ),
