@@ -57,9 +57,26 @@ _FAILURES: List[str] = []
 
 
 def _check(condition: bool, message: str) -> None:
+    """A failed check is a REAL failure: it is recorded in _FAILURES (for the
+    main() summary) and raises AssertionError, so pytest marks the test as
+    failed instead of silently passing it. main() catches the AssertionError
+    per test so the script runner still runs every test and prints a summary."""
     if not condition:
         _FAILURES.append(message)
         print(f"    !! FAILED: {message}")
+        raise AssertionError(message)
+
+
+def _run(test_fn) -> None:
+    """main()-only wrapper: keeps the plain-script runner going past a failed
+    test (the failure is already recorded in _FAILURES by _check)."""
+    try:
+        test_fn()
+    except AssertionError as exc:
+        if str(exc) not in _FAILURES:
+            _FAILURES.append(str(exc))
+            print(f"    !! FAILED: {exc}")
+        print()
 
 
 def _section(title: str) -> None:
@@ -1291,24 +1308,24 @@ def test_conversational_style_and_grounding() -> None:
 
 
 def main() -> int:
-    test_postop_day_derivation()
-    test_checkpoint_day_6_7_8_boundary()
-    test_assessment_wording_and_negative_assertions()
-    test_decline_reasons()
-    test_extraction_regressions()
-    test_executor_state_transitions()
-    test_immediate_metric_assessment_end_to_end()
-    test_multi_fact_one_action()
-    test_single_retrieval_per_turn()
-    test_real_keyword_fallback_retrieval()
-    test_continuation_helper()
-    test_real_classifier_bend_misroute_regression()
-    test_safety_and_scope_precedence()
-    test_procedure_isolation()
-    test_client_reported_postop_day_is_diagnostic_only()
-    test_routing_and_response_shape()
-    test_postop_day_procedure_and_chat_history_reach_grounded_guidance()
-    test_conversational_style_and_grounding()
+    _run(test_postop_day_derivation)
+    _run(test_checkpoint_day_6_7_8_boundary)
+    _run(test_assessment_wording_and_negative_assertions)
+    _run(test_decline_reasons)
+    _run(test_extraction_regressions)
+    _run(test_executor_state_transitions)
+    _run(test_immediate_metric_assessment_end_to_end)
+    _run(test_multi_fact_one_action)
+    _run(test_single_retrieval_per_turn)
+    _run(test_real_keyword_fallback_retrieval)
+    _run(test_continuation_helper)
+    _run(test_real_classifier_bend_misroute_regression)
+    _run(test_safety_and_scope_precedence)
+    _run(test_procedure_isolation)
+    _run(test_client_reported_postop_day_is_diagnostic_only)
+    _run(test_routing_and_response_shape)
+    _run(test_postop_day_procedure_and_chat_history_reach_grounded_guidance)
+    _run(test_conversational_style_and_grounding)
 
     print("=" * 78)
     if _FAILURES:

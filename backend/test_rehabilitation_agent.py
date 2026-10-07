@@ -31,9 +31,26 @@ _FAILURES: list[str] = []
 
 
 def _check(condition: bool, message: str) -> None:
+    """A failed check is a REAL failure: it is recorded in _FAILURES (for the
+    main() summary) and raises AssertionError, so pytest marks the test as
+    failed instead of silently passing it. main() catches the AssertionError
+    per test so the script runner still runs every test and prints a summary."""
     if not condition:
         _FAILURES.append(message)
         print(f"    !! FAILED: {message}")
+        raise AssertionError(message)
+
+
+def _run(test_fn) -> None:
+    """main()-only wrapper: keeps the plain-script runner going past a failed
+    test (the failure is already recorded in _FAILURES by _check)."""
+    try:
+        test_fn()
+    except AssertionError as exc:
+        if str(exc) not in _FAILURES:
+            _FAILURES.append(str(exc))
+            print(f"    !! FAILED: {exc}")
+        print()
 
 
 def _stub_answer_question(reply: str = "stub reply", sources: Optional[list] = None):
@@ -351,15 +368,15 @@ def test_no_unsupported_advancement_with_restriction() -> None:
 
 
 def main() -> int:
-    test_routing()
-    test_postop_day_reaches_agent()
-    test_weight_bearing_status_handling()
-    test_rom_context_handling()
-    test_exercise_history_handling()
-    test_backward_compatibility()
-    test_red_bypasses_agent()
-    test_procedure_isolation()
-    test_no_unsupported_advancement_with_restriction()
+    _run(test_routing)
+    _run(test_postop_day_reaches_agent)
+    _run(test_weight_bearing_status_handling)
+    _run(test_rom_context_handling)
+    _run(test_exercise_history_handling)
+    _run(test_backward_compatibility)
+    _run(test_red_bypasses_agent)
+    _run(test_procedure_isolation)
+    _run(test_no_unsupported_advancement_with_restriction)
 
     print("=" * 78)
     if _FAILURES:
