@@ -77,8 +77,7 @@ interview (cached on `RecoverySessionState`, same pattern as
 - a value the request already sent in `current_rom` is seeded as today's
   fact, fed back and never asked;
 - when at least two values exist across the last week (including today's),
-  the comparison ends with a trend: *"Trend: flexion 70 -> 80 -> 85 over the
-  last week."*
+  the comparison ends with a trend: *"improving: 70 -> 80 -> 85"* (see 1i).
 
 `write_today_metrics()` gained `rom_flexion`, `rom_extension` and
 `exercise_completed` (the table already had the columns). Print prefixes
@@ -110,19 +109,19 @@ problem -- I'll leave flexion for now."* and asks about another metric.
 ### 1d. Assessment
 
 Every collected value is compared with the nearest checkpoint at or before
-the current day and the reply **names the checkpoint day and the source**:
-*"your flexion of 85° is within the 70°-90° range stated for the earlier
-Post-Op Day 7 checkpoint (source TKA-03)"*. Categorical values match / are
-"not at that point yet" / "beyond what the checkpoint describes"; a value
-answered as a range that straddles the stated range is reported as *"may fall
-within ... -- a measured number would settle it"*; a words-only checkpoint
-says *"the guidance gives no number; it expects ..."*; hip precautions not
-being followed get *"please check with your surgical team"*.
+the current day and the reply **names the checkpoint day in plain words**:
+*"flexion of 85°, within the day-7 range of 70°-90°"* (the source passage id
+goes into the result's `sources` metadata, never into the text -- see 1i).
+Categorical values match / are "not yet at" / "beyond" the checkpoint; a
+value answered as a range that straddles the stated range is reported as
+*"may fall within ... -- a measured number would settle it"*; a words-only
+checkpoint says *"the guidance gives no number, it expects ..."*; hip
+precautions not being followed get *"please check with your surgical team"*.
 
 - **Before day 7** the day-7 target is given as the thing to work towards
-  (*"the first flexion checkpoint I have is day 7, which looks for 70°-90° of
-  flexion (source TKA-03) -- that's the target to work towards from here"*)
-  instead of "too early to compare".
+  (*"flexion of 60° on day 4; the first flexion checkpoint is day 7, which
+  looks for 70°-90° -- the target to work towards"*) instead of "too early
+  to compare".
 - **After day 84** the long-term entry is used (*"the long-term guidance"*).
 - **Never declines inside day 1-365.** The evidence gates (retrieved chunk
   must be TKA-03 / same procedure / parseable window / day inside the window)
@@ -137,13 +136,15 @@ being followed get *"please check with your surgical team"*.
   logs a WARNING on the `agents.recovery` logger (and prints it), once per
   distinct disagreement per episode.
 
-Mid-interview turns give the comparison for what was just supplied and then
+Mid-interview turns give one short clause per value just supplied and then
 ask the one next question with a progress indicator (reusing
-`pain_integration.progress_indicator`). The final turn, when nothing is left
-to ask, produces the full block: *"Here's how things compare on post-op day
-N:"* + one bullet per metric (+ trend) + metrics with no data + *"Next
-milestone: day 14 -- ..."* + *"Say 'recovery check' at day 14 and I'll
-compare."* ("recovery check" classifies as `recovery_progress`; test 30.)
+`pain_integration.progress_indicator`), all in one paragraph. The final
+turn, when nothing is left to ask, produces the full block: *"Here's how
+things compare on post-op day N, according to the discharge guidance:"* +
+one line per metric (+ trend) + metrics with no data + *"Next milestone:
+day 14 -- ..."* (at most two metrics) + *"Say 'recovery check' at day 14
+and I'll compare."* ("recovery check" classifies as `recovery_progress`;
+test 30.)
 
 ### 1e. Optional LLM explanation on the final turn
 
@@ -206,6 +207,47 @@ the close + LLM guard + routing of "recovery check", and the continuation
 hook's new answer shapes. `test_symptom_assessment_agent.py` (out of scope)
 still passes.
 
+### 1i. Readability pass (follow-up commit, `recovery_integration.py` + tests only)
+
+Patient-facing text no longer contains passage ids (`TKA-03`,
+`EV-TKA-REC-01`, ...) or the phrase *"the earlier Post-Op Day N
+checkpoint"*. The ids stay in the result's `sources` metadata, which the
+agent already collected from every `CheckpointResult` / `MilestoneEntry`
+used; nothing in `specialized_agents.py` changed.
+
+- **Checkpoint naming:** *"the day-7 range of 70°-90°"*, *"the day-21
+  checkpoint"*, *"the long-term guidance"*; single bounds read *"the day-21
+  mark of more than 10 minutes"* / *"the day-42 target of 0°"*.
+- **Citation, at most once per reply, in plain words:** mid-interview, the
+  first comparison of the turn carries *"(according to the discharge
+  guidance)"*; the final block cites once in its header.
+- **Mid-interview acknowledgements** are one short clause each
+  (`comparison_clause()`): *"flexion of 85°, within the day-7 range of
+  70°-90° (according to the discharge guidance), and improving: 70 -> 80 ->
+  85"*, followed by the next question in the same paragraph.
+- **Trend** (`trend_line()` now returns a `TrendNote`): *"improving: 70 ->
+  80 -> 85"* when the last value has moved the right way for the metric
+  since the first (flexion up, extension towards zero), *"steady: 80 -> 80"*
+  when unchanged, otherwise the neutral *"over the week: 85 -> 80"*.
+- **Final block** (`final_comparison_line()`): one line per metric that
+  never repeats the acknowledgement sentence verbatim (*"flexion: 85° --
+  within the day-7 range of 70°-90°; over the week 70 -> 80 -> 85,
+  improving"*).
+- **Next milestone** (`select_milestone_entries()`): at most the two metrics
+  most relevant to the procedure and the next checkpoint day (TKA up to day
+  21: flexion, extension; days 22-42: flexion, walking aid; THA up to day
+  21: walking aid, walking duration; days 22-42: hip precautions, walking
+  aid; both later: daily activities, driving; long term: return to work,
+  daily activities), falling back to the metrics the interview collected.
+  The full entry list still feeds `sources`.
+
+Tests updated with a comment (same count, 93/93): 2, 3, 4, 7, 8, 12, 14,
+18, 21, 23, 24, 26, 27 and 30 now pin the plain-words wording, assert that
+no passage id or "earlier Post-Op Day" appears in any reply, that the
+guidance is cited exactly once in the close, that the next-milestone
+paragraph lists at most two metrics, and that the final line never equals
+the acknowledgement clause.
+
 ---
 
 ## 2. Example conversations
@@ -255,9 +297,7 @@ asking the same question indefinitely.)
 
 **Patient:** it's about 85 now
 
-> Okay -- your flexion of 85° is within the 70°-90° range stated for the earlier Post-Op Day 7 checkpoint (source TKA-03). Trend: flexion 70 -> 80 -> 85 over the last week.
->
-> Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
+> Got it -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
 
 **Patient:** I don't know the number
 
@@ -265,26 +305,25 @@ asking the same question indefinitely.)
 
 **Patient:** almost, there's a small gap
 
-> Got it -- your extension (nearly flat) is within the 0°-5° range stated for the earlier Post-Op Day 7 checkpoint (source TKA-03). Trend: extension 8 -> 5 over the last week.
->
-> How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Got it -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 **Patient:** I'm using a cane and I can walk about 15 minutes
 
-> Okay -- walking aid: a cane -- that matches what the earlier Post-Op Day 7 checkpoint describes: walking with a frame, crutches or cane on a level surface (source EV-TKA-REC-01). walking duration: 15 minutes -- for the earlier Post-Op Day 7 checkpoint the guidance gives no number; it expects walking little and often around the home (source EV-TKA-REC-01).
->
-> How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Thanks for sharing that -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 **Patient:** one step at a time holding the rail
 
-> Here's how things compare on post-op day 10:
-> - your flexion of 85° is within the 70°-90° range stated for the earlier Post-Op Day 7 checkpoint (source TKA-03). Trend: flexion 70 -> 80 -> 85 over the last week.
-> - your extension (nearly flat) is within the 0°-5° range stated for the earlier Post-Op Day 7 checkpoint (source TKA-03). Trend: extension 8 -> 5 over the last week.
-> - walking aid: a cane -- that matches what the earlier Post-Op Day 7 checkpoint describes: walking with a frame, crutches or cane on a level surface (source EV-TKA-REC-01).
-> - walking duration: 15 minutes -- for the earlier Post-Op Day 7 checkpoint the guidance gives no number; it expects walking little and often around the home (source EV-TKA-REC-01).
-> - stairs: one step at a time -- that matches what the earlier Post-Op Day 7 checkpoint describes: managing two or three steps up and down with your aid (source EV-TKA-REC-01).
+> Here's how things compare on post-op day 10, according to the discharge guidance:
+> - flexion: 85° -- within the day-7 range of 70°-90°; over the week 70 -> 80 -> 85, improving
+> - extension: nearly flat -- within the day-7 range of 0°-5°; over the week 8 -> 5, improving
+> - walking aid: a cane -- as the day-7 checkpoint describes (walking with a frame, crutches or cane on a level surface)
+> - walking duration: 15 minutes -- no number in the day-7 guidance; it expects walking little and often around the home
+> - stairs: one step at a time -- as the day-7 checkpoint describes (managing two or three steps up and down with your aid)
 >
-> Next milestone: day 14 -- flexion: about 80 degrees or more of active bending, improving week by week (source EV-TKA-REHAB-02); extension: straightening to within 10 degrees of fully straight (source EV-TKA-REHAB-02); walking aid: a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes (source EV-TKA-REC-02); walking duration: working towards standing and walking for more than ten minutes without leaning on the aid (source EV-TKA-REC-02). Say 'recovery check' at day 14 and I'll compare.
+> Next milestone: day 14 -- flexion: about 80 degrees or more of active bending, improving week by week; extension: straightening to within 10 degrees of fully straight. Say 'recovery check' at day 14 and I'll compare.
+
+Sources metadata on the final turn (never in the text): `TKA-03`,
+`EV-TKA-REC-01`, `EV-TKA-REHAB-02`, `EV-TKA-REC-02`, `EV-TKA-REHAB-03`.
 
 Logged once on the first turn:
 `WARNING agents.recovery: [RECOVERY] postop_day mismatch for patient TR-TKA: client sent 11, server derived 10 from surgery_date -- using the server-derived day`.
@@ -325,31 +364,28 @@ Patient on record with no metrics rows.
 
 **Patient:** I'm still using one crutch
 
-> Okay -- walking aid: crutches -- that matches what the earlier Post-Op Day 21 checkpoint describes: one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid (source EV-THA-REHAB-04).
->
-> Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)
+> Got it -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)
 
 **Patient:** about 20 minutes
 
-> Thanks for sharing that -- your walking duration of 20 minutes meets the more than 10 minutes mark stated for the earlier Post-Op Day 21 checkpoint (source EV-THA-REHAB-04).
->
-> How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
+> Thanks for sharing that -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
 
 **Patient:** foot over foot now
 
-> Okay -- stairs: foot over foot -- that matches what the earlier Post-Op Day 21 checkpoint describes: one step at a time with a handrail at first, foot over foot as you get stronger (source EV-THA-REHAB-04).
->
-> Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
+> Thanks for sharing that -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
 
 **Patient:** yes, still following them
 
-> Here's how things compare on post-op day 30:
-> - walking aid: crutches -- that matches what the earlier Post-Op Day 21 checkpoint describes: one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid (source EV-THA-REHAB-04).
-> - your walking duration of 20 minutes meets the more than 10 minutes mark stated for the earlier Post-Op Day 21 checkpoint (source EV-THA-REHAB-04).
-> - stairs: foot over foot -- that matches what the earlier Post-Op Day 21 checkpoint describes: one step at a time with a handrail at first, foot over foot as you get stronger (source EV-THA-REHAB-04).
-> - hip precautions: keeping to your hip precautions -- that matches what the earlier Post-Op Day 21 checkpoint describes: still following the hip precautions, which usually last about the first six weeks (source EV-THA-REC-02).
+> Here's how things compare on post-op day 30, according to the discharge guidance:
+> - walking aid: crutches -- as the day-21 checkpoint describes (one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid)
+> - walking duration: 20 minutes -- meets the day-21 mark of more than 10 minutes
+> - stairs: foot over foot -- as the day-21 checkpoint describes (one step at a time with a handrail at first, foot over foot as you get stronger)
+> - hip precautions: keeping to your hip precautions -- as the day-21 checkpoint describes (still following the hip precautions, which usually last about the first six weeks)
 >
-> Next milestone: day 42 -- walking aid: reducing or stopping the walking aid when your physiotherapist advises (source EV-THA-REC-03); walking duration: walking distance increasing (source EV-THA-REC-03); stairs: one step at a time with a handrail at first, foot over foot as you get stronger (source EV-THA-REHAB-04); hip precautions: precautions commonly apply for about the first six weeks; wait for your surgeon to confirm they have ended (source EV-THA-REC-03). Say 'recovery check' at day 42 and I'll compare.
+> Next milestone: day 42 -- hip precautions: precautions commonly apply for about the first six weeks; wait for your surgeon to confirm they have ended; walking aid: reducing or stopping the walking aid when your physiotherapist advises. Say 'recovery check' at day 42 and I'll compare.
+
+Sources metadata on the final turn: `EV-THA-REHAB-04`, `EV-THA-REC-02`,
+`EV-THA-REC-03`.
 
 ---
 

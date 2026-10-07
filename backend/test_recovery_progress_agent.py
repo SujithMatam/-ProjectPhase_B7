@@ -284,8 +284,12 @@ def test_checkpoint_day_6_7_8_boundary() -> None:
 
     reply8 = ri.format_assess_message(cp8)
     print(f"    Day 8 reply: {reply8!r}")
-    _check("earlier Post-Op Day 7" in reply8, "Day 8 reply must refer to the EARLIER Post-Op Day 7 checkpoint, not a Day-8 target")
-    _check("Day 8 checkpoint" not in reply8, "Day 8 reply must not invent a Day-8 checkpoint")
+    # UPDATED (readability pass): the checkpoint is named in plain words ("the day-7
+    # range"), never as "the earlier Post-Op Day 7 checkpoint", and no passage id
+    # appears in patient text.
+    _check("day-7" in reply8, "Day 8 reply must refer to the day-7 checkpoint, not a Day-8 target")
+    _check("earlier Post-Op Day" not in reply8 and "TKA-03" not in reply8, "no checkpoint jargon or passage id in patient text")
+    _check("Day 8 checkpoint" not in reply8 and "day-8" not in reply8, "Day 8 reply must not invent a Day-8 checkpoint")
     print()
 
 
@@ -315,7 +319,8 @@ def test_assessment_wording_and_negative_assertions() -> None:
     _check(cp.verdict == rl.CheckpointVerdict.TARGET_NOT_YET_DUE, "Day6 flex60 must be TARGET_NOT_YET_DUE")
     _check("below" not in reply.lower(), "Day6 flex60 (not yet due) must not say 'below'")
     _check("70" in reply and "90" in reply and "day 7" in reply, "Day6 flex60 must state the DAY-7 target to work towards")
-    _check("work towards" in reply and "TKA-03" in reply, "Day6 flex60 must frame the range as the target to work towards and name the source")
+    # UPDATED (readability pass): the source passage id is metadata, never patient text.
+    _check("work towards" in reply and "TKA-03" not in reply, "Day6 flex60 must frame the range as the target to work towards without naming a passage id")
     _check("Day 6 checkpoint" not in reply and "day 6 target" not in reply.lower(), "Day6 flex60 must not invent a day-6 checkpoint")
     _assert_no_forbidden_trajectory_language(reply, "Day6 flex60")
     _assert_no_forbidden_robotic_language(reply, "Day6 flex60")
@@ -326,21 +331,22 @@ def test_assessment_wording_and_negative_assertions() -> None:
     print(f"    Day7 flex80: {reply!r}")
     _check(cp.verdict == rl.CheckpointVerdict.MEETS_STATED_CHECKPOINT, "Day7 flex80 must MEET the checkpoint")
     _check("70" in reply and "90" in reply, "Day7 flex80 must state the 70-90 range")
-    _check("Post-Op Day 7" in reply and "earlier" not in reply, "Day7 flex80: day IS the checkpoint day, must not say 'earlier'")
+    # UPDATED (readability pass): "the day-7 range", never "Post-Op Day 7" / "earlier".
+    _check("day-7" in reply and "earlier" not in reply and "Post-Op Day" not in reply, "Day7 flex80: the checkpoint is named in plain words, never 'earlier'")
     _assert_no_forbidden_trajectory_language(reply, "Day7 flex80")
 
     # Day 8 + flexion 80 -> within range stated for the EARLIER Day-7 checkpoint.
     cp = checkpoint_for(8, rl.ROM_FLEXION_DEGREES, 80)
     reply = ri.format_assess_message(cp)
     print(f"    Day8 flex80: {reply!r}")
-    _check("earlier Post-Op Day 7" in reply, "Day8 flex80 must reference the earlier Post-Op Day 7 checkpoint")
+    _check("day-7" in reply and "earlier Post-Op Day" not in reply, "Day8 flex80 must reference the day-7 checkpoint in plain words")
     _assert_no_forbidden_trajectory_language(reply, "Day8 flex80")
 
     # Day 10 + flexion 80 -> same earlier-Day-7 wording.
     cp = checkpoint_for(10, rl.ROM_FLEXION_DEGREES, 80)
     reply = ri.format_assess_message(cp)
     print(f"    Day10 flex80: {reply!r}")
-    _check("earlier Post-Op Day 7" in reply, "Day10 flex80 must reference the earlier Post-Op Day 7 checkpoint")
+    _check("day-7" in reply and "earlier Post-Op Day" not in reply, "Day10 flex80 must reference the day-7 checkpoint in plain words")
     _assert_no_forbidden_trajectory_language(reply, "Day10 flex80")
 
     # Day 10 + flexion 60 -> below the EARLIER Day-7 checkpoint, never "behind recovery".
@@ -348,7 +354,7 @@ def test_assessment_wording_and_negative_assertions() -> None:
     reply = ri.format_assess_message(cp)
     print(f"    Day10 flex60: {reply!r}")
     _check(cp.verdict == rl.CheckpointVerdict.BELOW_STATED_CHECKPOINT, "Day10 flex60 must be BELOW_STATED_CHECKPOINT")
-    _check("earlier Post-Op Day 7" in reply, "Day10 flex60 must reference the earlier Post-Op Day 7 checkpoint")
+    _check("day-7" in reply and "earlier Post-Op Day" not in reply, "Day10 flex60 must reference the day-7 checkpoint in plain words")
     _check("behind recovery" not in reply.lower(), "Day10 flex60 must not say 'behind recovery'")
     _assert_no_forbidden_trajectory_language(reply, "Day10 flex60")
 
@@ -434,7 +440,8 @@ def test_decline_reasons() -> None:
     _check(cp22.verdict == rl.CheckpointVerdict.STATE_ONLY, f"day-21 flexion entry carries no number -> STATE_ONLY, got {cp22.verdict}")
     reply22 = ri.format_assess_message(cp22)
     print(f"    Day22 flex95: {reply22!r}")
-    _check("gives no number" in reply22 and "EV-TKA-REC-02" in reply22, "a words-only checkpoint must say so and name its source")
+    # UPDATED (readability pass): the source id stays in CheckpointResult.source_id (metadata), never in the text.
+    _check("gives no number" in reply22 and "EV-TKA-REC-02" not in reply22 and "day-21" in reply22, "a words-only checkpoint says so in plain words, no passage id")
     _assert_no_forbidden_trajectory_language(reply22, "Day22 flex95")
 
     # A metric with no entry for the procedure (knee ROM for THA) is the
@@ -684,7 +691,7 @@ def test_immediate_metric_assessment_end_to_end() -> None:
     reply2 = result2["reply"]
     print(f"    Turn 2 reply: {reply2!r}")
     _check(state.is_current(rl.ROM_FLEXION_DEGREES), "flexion must become current after Turn 2")
-    _check("earlier Post-Op Day 7" in reply2, "Turn 2 reply must reference the earlier Day-7 checkpoint")
+    _check("day-7" in reply2 and "earlier Post-Op Day" not in reply2, "Turn 2 reply must reference the day-7 checkpoint in plain words")
     # UPDATED (rework items 3/4): the flexion verdict is given immediately
     # AND the next missing metric (extension) is asked in the same reply --
     # one tracked question per turn, never a second verdict.
@@ -750,7 +757,7 @@ def test_multi_fact_one_action() -> None:
     print(f"    Multi-fact reply: {reply!r}")
     _check(state.is_current(rl.ROM_FLEXION_DEGREES), "flexion fact must be stored and current")
     _check(state.is_current(rl.ROM_EXTENSION_DEGREES), "extension fact must ALSO be stored and current (not lost)")
-    _check("earlier Post-Op Day 7" in reply, "single response must assess against the Day-7 checkpoint")
+    _check("day-7" in reply and "earlier Post-Op Day" not in reply, "single response must assess against the day-7 checkpoint")
     # UPDATED (rework item 3 -- multi-slot): several values VOLUNTEERED in
     # one message are all accepted and all fed back (flexion first, in
     # canonical order), and only what is still missing is asked -- ONE
@@ -946,7 +953,7 @@ def test_real_classifier_bend_misroute_regression() -> None:
     _check(result["intent"] == IntentLabel.RECOVERY_PROGRESS.value, f"continuation must route as recovery_progress, got {result['intent']}")
     _check(result["target_agent"] == TargetAgent.RECOVERY_AGENT.value, f"continuation must dispatch to RecoveryProgressAgent, got {result['target_agent']}")
     _check(state.is_current(rl.ROM_FLEXION_DEGREES), "flexion=80 must actually be stored and current after this real end-to-end turn")
-    _check("earlier Post-Op Day 7" in result["reply"], f"reply must assess flexion against the Day-7 checkpoint: {result['reply']!r}")
+    _check("day-7" in result["reply"], f"reply must assess flexion against the day-7 checkpoint: {result['reply']!r}")
     print("    CONFIRMED: the real classifier's own 'bend'->REHABILITATION rule was correctly PREEMPTED by the continuation hook.")
     print()
 
@@ -1039,7 +1046,7 @@ def test_procedure_isolation() -> None:
         )
     _check(len(chat_calls) == 0, "TKA must never call ChatAgent.answer_question (fully deterministic)")
     _check(result_tka["engine"] == RecoveryProgressAgent.ENGINE_NAME, f"TKA engine: {result_tka['engine']}")
-    _check("earlier Post-Op Day 7" in result_tka["reply"], "TKA must produce a checkpoint-relative verdict")
+    _check("day-7" in result_tka["reply"], "TKA must produce a checkpoint-relative verdict")
 
     # UPDATED (rework items 1/3): THA now HAS sourced checkpoints
     # (EV-THA-REC-*, EV-THA-REHAB-04) and runs the interview loop -- walking
@@ -1248,7 +1255,8 @@ def test_conversational_style_and_grounding() -> None:
     # UPDATED (rework item 4): before day 7 the day-7 range IS given, as the
     # target to work towards (with its source), never as a day-4 target.
     _check("70" in reply_a and "90" in reply_a and "work towards" in reply_a, "A/D: reply must give the day-7 target to work towards")
-    _check("TKA-03" in reply_a, "A/D: the target must be sourced")
+    # UPDATED (readability pass): the source is metadata (result["sources"]), never patient text.
+    _check("TKA-03" not in reply_a and result_a["sources"] == ["TKA-03"], "A/D: the target is sourced in metadata, not in the text")
     _assert_no_forbidden_trajectory_language(reply_a, "A/D Day4 60-degrees")
     _assert_no_forbidden_robotic_language(reply_a, "A/D Day4 60-degrees")
     _check("noted" not in reply_a.lower(), "A/D: acknowledgment must not sound like a database entry ('noted')")
@@ -1328,7 +1336,7 @@ def test_conversational_style_and_grounding() -> None:
     print(f"    E (Day10, flexion 80): {reply_e!r}")
     _check("80" in reply_e, "E: reply must mention the reported 80 degrees")
     _check("70" in reply_e and "90" in reply_e, "E: reply must state the real 70-90 checkpoint range")
-    _check("earlier Post-Op Day 7" in reply_e, "E: reply must reference the real (earlier) Day-7 checkpoint, grounded not invented")
+    _check("day-7" in reply_e and "earlier Post-Op Day" not in reply_e, "E: reply must reference the real day-7 checkpoint in plain words, grounded not invented")
     _assert_no_forbidden_trajectory_language(reply_e, "E Day10 flexion80")
     _assert_no_forbidden_directional_language(reply_e, "E Day10 flexion80")
     _assert_no_forbidden_robotic_language(reply_e, "E Day10 flexion80")
@@ -1378,6 +1386,7 @@ def test_conversational_style_and_grounding() -> None:
 
 import json as _json
 import logging as _logging
+import re as _re
 import os as _os
 import sqlite3 as _sqlite3
 import tempfile as _tempfile
@@ -1591,7 +1600,11 @@ def test_memory_confirms_logged_flexion_and_shows_trend() -> None:
     latest = memory.latest_metric("rom_flexion", within_days=1)
     _check(latest is not None and latest[1] == 80.0 and latest[2] == 1, f"latest_metric must find yesterday's 80, got {latest}")
     _check(ri.confirmation_offer(rl.ROM_FLEXION_DEGREES, memory) == (80.0, 1), "confirmation_offer uses the value logged yesterday")
-    _check(ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 85.0) == "Trend: flexion 70 -> 80 -> 85 over the last week.", f"trend line wording: {ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 85.0)!r}")
+    # UPDATED (readability pass): the trend is one short phrase with a direction word.
+    _check(ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 85.0) == "improving: 70 -> 80 -> 85", f"trend line wording: {ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 85.0)!r}")
+    _check(ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 80.0) == "improving: 70 -> 80 -> 80", "direction compares the first and last values")
+    _check(ri.trend_direction(rl.ROM_EXTENSION_DEGREES, [8, 5]) == "improving" and ri.trend_direction(rl.ROM_FLEXION_DEGREES, [80, 80]) == "steady"
+           and ri.trend_direction(rl.ROM_FLEXION_DEGREES, [85, 80]) == "over the week", "extension improves towards zero; unchanged is steady; the other way is neutral")
     _check(ri.trend_line(rl.WALKING_DURATION_MINUTES, memory, 15.0) is None, "no trend for a metric without a metrics column")
 
     # "yes" keeps the logged value.
@@ -1604,7 +1617,7 @@ def test_memory_confirms_logged_flexion_and_shows_trend() -> None:
     _check(ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES] not in opener, "the plain flexion question is NOT asked when a logged value exists")
     state = recovery_state.peek_state(patient_id="MEM-TKA", surgery_date_raw=surgery_date, procedure="TKA")
     _check(state.is_current(rl.ROM_FLEXION_DEGREES) and state.get_fact(rl.ROM_FLEXION_DEGREES).value == 80.0, "'yes' stores the logged 80")
-    _check("flexion of 80°" in confirmed and "Trend: flexion 70 -> 80 -> 80 over the last week." in confirmed, f"the confirmed value is compared and the trend shown: {confirmed!r}")
+    _check("flexion of 80°" in confirmed and "improving: 70 -> 80 -> 80" in confirmed, f"the confirmed value is compared and the trend shown: {confirmed!r}")
     _check("Your log from yesterday says your extension was 5°" in confirmed, "the next ROM metric logged yesterday is confirmed too")
 
     # A number overrides the logged value; "no" falls back to the plain question.
@@ -1612,7 +1625,7 @@ def test_memory_confirms_logged_flexion_and_shows_trend() -> None:
     results, _ = _run_interview(_handle_tka, "MEM-TKA", ["How is my recovery going?", "it's about 85 now"], surgery_date=surgery_date, day=10)
     state = recovery_state.peek_state(patient_id="MEM-TKA", surgery_date_raw=surgery_date, procedure="TKA")
     _check(state.get_fact(rl.ROM_FLEXION_DEGREES).value == 85.0, "a number overrides the logged value")
-    _check("Trend: flexion 70 -> 80 -> 85 over the last week." in results[1]["reply"], f"trend uses today's number: {results[1]['reply']!r}")
+    _check("improving: 70 -> 80 -> 85" in results[1]["reply"], f"trend uses today's number: {results[1]['reply']!r}")
     _reset_recovery_store()
     results, _ = _run_interview(_handle_tka, "MEM-TKA", ["How is my recovery going?", "no"], surgery_date=surgery_date, day=10)
     print(f"    after 'no': {results[1]['reply']!r}")
@@ -1676,17 +1689,18 @@ def test_simpler_extension_question_maps_to_range() -> None:
     _check("can you get the knee fully flat on the bed?" in results[1]["reply"].lower(), "wording as specified")
     value = state.get_fact(rl.ROM_EXTENSION_DEGREES).value
     _check(isinstance(value, rl.ValueRange) and value.is_point and value.low == 0.0, f"'yes' -> fully flat = 0°, got {value}")
-    _check("extension (fully flat on the bed) is within the 0°-5° range" in results[2]["reply"], f"'yes' compares within 0-5: {results[2]['reply']!r}")
+    # UPDATED (readability pass): the comparison is one short clause ("..., within the day-7 range of 0°-5°").
+    _check("extension (fully flat on the bed), within the day-7 range of 0°-5°" in results[2]["reply"], f"'yes' compares within 0-5: {results[2]['reply']!r}")
 
     results, state = _answer_flat("FLAT-ALMOST", "almost, there's a small gap")
     value = state.get_fact(rl.ROM_EXTENSION_DEGREES).value
     _check(value == rl.EXTENSION_FLAT_ANSWERS["near_full"], f"'almost' -> near-full 0-5 range, got {value}")
-    _check("(nearly flat) is within the 0°-5° range" in results[2]["reply"], f"'almost' compares within 0-5: {results[2]['reply']!r}")
+    _check("(nearly flat), within the day-7 range of 0°-5°" in results[2]["reply"], f"'almost' compares within 0-5: {results[2]['reply']!r}")
 
     results, state = _answer_flat("FLAT-NO", "no")
     value = state.get_fact(rl.ROM_EXTENSION_DEGREES).value
     _check(value == rl.EXTENSION_FLAT_ANSWERS["not_full"], f"'no' -> more than near-full, got {value}")
-    _check("(not yet flat) is outside the 0°-5° range" in results[2]["reply"], f"'no' compares outside 0-5, neutrally: {results[2]['reply']!r}")
+    _check("(not yet flat), outside the day-7 range of 0°-5°" in results[2]["reply"], f"'no' compares outside 0-5, neutrally: {results[2]['reply']!r}")
     _assert_no_forbidden_directional_language(results[2]["reply"].split("\n\n")[0], "flat 'no'")
 
     # Day 14 (range 0-10): "nearly flat" (0-5) is fully inside; "not yet
@@ -1734,6 +1748,10 @@ def test_walking_duration_stairs_precaution_questions_both_procedures() -> None:
     _check(state.get_fact(rl.STAIRS).value == "foot_over_foot", "'foot over foot now' -> foot_over_foot")
     _check(state.get_fact(rl.HIP_PRECAUTIONS).value == "following", "'yes, still following them' -> following")
     _check("hip precautions: keeping to your hip precautions" in results[-1]["reply"], "precautions are compared in the THA assessment")
+    # UPDATED (readability pass): THA day 30 -> next milestone day 42 names hip
+    # precautions and the walking aid (the two most relevant), nothing else.
+    tha_milestone = [p for p in results[-1]["reply"].split("\n\n") if p.startswith("Next milestone")][0]
+    _check("hip precautions:" in tha_milestone and "walking aid:" in tha_milestone and "stairs:" not in tha_milestone, f"THA next milestone lists precautions + walking aid only: {tha_milestone!r}")
 
     # TKA asks the same three walking questions after ROM.
     surgery_date_tka = _dynamic_surgery_date(9)
@@ -1809,13 +1827,15 @@ def test_assessment_names_checkpoint_and_source() -> None:
         s.set_fact(metric, value, effective_postop_day=day)
         return rl.evaluate_checkpoint(s, procedure=procedure, metric=metric)
 
+    # UPDATED (readability pass): the checkpoint is named "day-N" in plain words; the source
+    # id lives ONLY in CheckpointResult.source_id (-> result["sources"]), never in the text.
     expectations = [
-        (10, 7, "TKA-03", "earlier Post-Op Day 7 checkpoint"),
-        (14, 14, "EV-TKA-REHAB-02", "Post-Op Day 14"),
-        (30, 21, "EV-TKA-REC-02", "earlier Post-Op Day 21 checkpoint"),
-        (42, 42, "EV-TKA-REC-03", "Post-Op Day 42"),
-        (60, 42, "EV-TKA-REC-03", "earlier Post-Op Day 42 checkpoint"),
-        (84, 84, "EV-TKA-REC-05", "Post-Op Day 84"),
+        (10, 7, "TKA-03", "day-7"),
+        (14, 14, "EV-TKA-REHAB-02", "day-14"),
+        (30, 21, "EV-TKA-REC-02", "day-21"),
+        (42, 42, "EV-TKA-REC-03", "day-42"),
+        (60, 42, "EV-TKA-REC-03", "day-42"),
+        (84, 84, "EV-TKA-REC-05", "day-84"),
         (100, None, "EV-TKA-REC-06", "the long-term guidance"),
     ]
     for day, checkpoint_day, source, phrase in expectations:
@@ -1823,29 +1843,32 @@ def test_assessment_names_checkpoint_and_source() -> None:
         text = ri.format_assess_message(cp)
         print(f"    TKA flexion day {day}: {text!r}")
         _check(cp.checkpoint_day == checkpoint_day and cp.source_id == source, f"day {day}: expected checkpoint {checkpoint_day}/{source}, got {cp.checkpoint_day}/{cp.source_id}")
-        _check(phrase in text and source in text, f"day {day}: reply must name the checkpoint and the source")
+        _check(phrase in text and source not in text and "earlier Post-Op Day" not in text, f"day {day}: reply names the checkpoint in plain words and no passage id: {text!r}")
+        _check(ri.final_comparison_line(cp) != ri.comparison_clause(cp) and source not in ri.final_comparison_line(cp), f"day {day}: the final line never repeats the acknowledgement clause verbatim")
         _assert_no_forbidden_trajectory_language(text, f"TKA flexion day {day}")
         _assert_no_forbidden_robotic_language(text, f"TKA flexion day {day}")
 
     cp = _cp("TKA", rl.ROM_FLEXION_DEGREES, 42, 95)
-    _check(cp.verdict == rl.CheckpointVerdict.BELOW_STATED_CHECKPOINT and "below the more than 110° mark" in ri.format_assess_message(cp), f"day 42 flexion 95 is below the >110 mark: {ri.format_assess_message(cp)!r}")
+    _check(cp.verdict == rl.CheckpointVerdict.BELOW_STATED_CHECKPOINT and "below the day-42 mark of more than 110°" in ri.format_assess_message(cp), f"day 42 flexion 95 is below the >110 mark: {ri.format_assess_message(cp)!r}")
     cp = _cp("TKA", rl.ROM_FLEXION_DEGREES, 42, 115)
     _check(cp.verdict == rl.CheckpointVerdict.MEETS_STATED_CHECKPOINT, "day 42 flexion 115 meets the >110 mark")
     cp = _cp("TKA", rl.ROM_EXTENSION_DEGREES, 42, 2)
-    _check(cp.verdict == rl.CheckpointVerdict.OUTSIDE_STATED_RANGE and "outside the 0° mark" in ri.format_assess_message(cp), "day 42 extension 2 is outside 'fully straight', phrased neutrally")
+    _check(cp.verdict == rl.CheckpointVerdict.OUTSIDE_STATED_RANGE and "outside the day-42 target of 0°" in ri.format_assess_message(cp), "day 42 extension 2 is outside 'fully straight', phrased neutrally")
 
     # Categorical verdicts: match / not yet / beyond; precautions review.
     cp = _cp("TKA", rl.MOBILITY_STATUS, 21, "cane")
-    _check(cp.verdict == rl.CheckpointVerdict.MATCHES_STATED_STATE and "EV-TKA-REHAB-03" in ri.format_assess_message(cp), "cane at day 21 matches")
+    _check(cp.verdict == rl.CheckpointVerdict.MATCHES_STATED_STATE and cp.source_id == "EV-TKA-REHAB-03" and "EV-TKA-REHAB-03" not in ri.format_assess_message(cp), "cane at day 21 matches; source in metadata only")
     cp = _cp("TKA", rl.MOBILITY_STATUS, 21, "walker")
     text = ri.format_assess_message(cp)
-    _check(cp.verdict == rl.CheckpointVerdict.NOT_YET_AT_STATED_STATE and "not at that point yet" in text, f"walker at day 21 is 'not yet': {text!r}")
+    # UPDATED (readability pass): "not yet at the day-21 checkpoint: ..." is the one-clause form.
+    _check(cp.verdict == rl.CheckpointVerdict.NOT_YET_AT_STATED_STATE and "not yet at the day-21 checkpoint" in text, f"walker at day 21 is 'not yet': {text!r}")
     _assert_no_forbidden_directional_language(text, "walker day 21")
     cp = _cp("TKA", rl.MOBILITY_STATUS, 21, "independent")
-    _check(cp.verdict == rl.CheckpointVerdict.BEYOND_STATED_STATE and "beyond what" in ri.format_assess_message(cp), "independent at day 21 is 'beyond'")
+    # UPDATED (readability pass): "beyond the day-21 checkpoint: ..." is the one-clause form.
+    _check(cp.verdict == rl.CheckpointVerdict.BEYOND_STATED_STATE and "beyond the day-21 checkpoint" in ri.format_assess_message(cp), "independent at day 21 is 'beyond'")
     cp = _cp("THA", rl.HIP_PRECAUTIONS, 14, "not_following")
     text = ri.format_assess_message(cp)
-    _check(cp.verdict == rl.CheckpointVerdict.NEEDS_REVIEW and "check with your surgical team" in text and "EV-THA-REC-02" in text, f"precautions not followed -> review: {text!r}")
+    _check(cp.verdict == rl.CheckpointVerdict.NEEDS_REVIEW and "check with your surgical team" in text and cp.source_id == "EV-THA-REC-02" and "EV-THA-REC-02" not in text, f"precautions not followed -> review: {text!r}")
     cp = _cp("THA", rl.MOBILITY_STATUS, 30, "crutches")
     _check(cp.checkpoint_day == 21 and cp.source_id == "EV-THA-REHAB-04", f"THA day 30 uses the day-21 THA entry: {cp}")
     print()
@@ -1870,7 +1893,8 @@ def test_never_declines_inside_day_range_and_names_missing_data() -> None:
         if day == 1:
             _check("target to work towards" in final, "day 1 gives the day-7 target to work towards")
         if day > 84:
-            _check("EV-TKA-REC-06" in final and "Longer term" in final, f"day {day}: the long-term entry is used and offered")
+            # UPDATED (readability pass): the long-term passage id is in the sources metadata, not the text.
+            _check("EV-TKA-REC-06" in results[-1]["sources"] and "EV-TKA-REC-06" not in final and "Longer term" in final, f"day {day}: the long-term entry is used and offered")
 
     # Two misses on flexion: the agent says so, moves on, and the final
     # assessment names the missing metric instead of declining.
@@ -1890,7 +1914,7 @@ def test_never_declines_inside_day_range_and_names_missing_data() -> None:
     final = results[-1]["reply"]
     print(f"    final: {final!r}")
     _check("flexion: I don't have a value from you for this one" in final, "the final assessment names the metric with no data")
-    _check("extension of 3°" in final and "walking aid: a walker/frame" in final, "the other metrics are still compared")
+    _check("extension: 3°" in final and "walking aid: a walker/frame" in final, "the other metrics are still compared")
     print()
 
 
@@ -1995,6 +2019,17 @@ def test_final_turn_next_milestone_offer_and_llm_guard() -> None:
     final = results[-1]
     print(f"    deterministic close: {final['reply']!r}")
     _check("Next milestone: day 14 --" in final["reply"], "the close names the next milestone and its day")
+    # UPDATED (readability pass): the next-milestone paragraph lists at most the two
+    # metrics most relevant to the procedure and day; the guidance is cited once, in
+    # plain words; no passage id and no "earlier Post-Op Day" wording anywhere.
+    milestone_paragraph = [p for p in final["reply"].split("\n\n") if p.startswith("Next milestone")][0]
+    _check(milestone_paragraph.split("Say 'recovery check'")[0].count(";") <= 1, f"at most two metrics in the next-milestone paragraph: {milestone_paragraph!r}")
+    _check("flexion:" in milestone_paragraph and "extension:" in milestone_paragraph, "TKA day 14: knee bend and straightening are the two most relevant metrics")
+    _check(final["reply"].count(ri.CITATION) == 1, f"the discharge guidance is cited exactly once: {final['reply']!r}")
+    _check(not _re.search(r"\b(?:EV-[A-Z]+-[A-Z]+-\d+|TKA-\d+|THA-\d+)\b", final["reply"]) and "earlier Post-Op Day" not in final["reply"], "no passage id or checkpoint jargon in the close")
+    _check(all(s in final["sources"] for s in ("TKA-03", "EV-TKA-REC-01", "EV-TKA-REHAB-02")), f"passage ids travel in sources: {final['sources']}")
+    for mid in results[:-1]:
+        _check(mid["reply"].count(ri.CITATION) <= 1 and not _re.search(r"\b(?:EV-[A-Z]+-[A-Z]+-\d+|TKA-\d+)\b", mid["reply"]), f"mid-interview: at most one citation, no passage id: {mid['reply']!r}")
     _check(final["reply"].rstrip().endswith("Say 'recovery check' at day 14 and I'll compare."), "the close ends with the follow-up offer")
     _check(final["engine"] == RecoveryProgressAgent.ENGINE_NAME, "empty LLM reply -> deterministic engine")
     _check(final["triage_level"] == "YELLOW" and final["is_escalated"] is True, "triage copied from the upstream result")

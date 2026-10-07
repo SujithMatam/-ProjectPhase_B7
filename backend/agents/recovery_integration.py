@@ -8,11 +8,14 @@ This module owns:
       (never trusting the client-supplied postop_day for a comparison), and
       the warning logged when the two disagree
     - the deterministic patient-facing wording: questions (primary, simpler
-      rephrase, confirmation of a logged value), per-metric comparisons
-      that name the checkpoint and its source, the final assessment block
-      (comparisons -> metrics with no data -> next milestone -> check-in
-      offer), and the fenced domain instruction for the optional LLM
-      explanation on the final turn
+      rephrase, confirmation of a logged value), per-metric comparisons as
+      ONE short clause naming the checkpoint in plain words ("the day-7
+      range"), the final assessment block (header citing the discharge
+      guidance once -> one line per metric -> metrics with no data -> next
+      milestone with at most two metrics -> check-in offer), and the
+      fenced domain instruction for the optional LLM explanation on the
+      final turn. Passage ids never appear in patient text -- they are
+      carried in the result's `sources` metadata by the agent.
     - the narrow Recovery continuation check used by the orchestrator hook
     - memory helpers (trend line, confirmation offer) and persistence of
       the collected ROM / exercise values via agents/patient_memory.py
@@ -489,106 +492,185 @@ def _range_text(entry: "recovery_logic.MilestoneEntry") -> str:
     return f"up to {_fmt_num(high)}{unit}"
 
 
-def _source_text(entry: "recovery_logic.MilestoneEntry") -> str:
-    return f"source {entry.source_id}"
+def _range_phrase(entry: "recovery_logic.MilestoneEntry") -> str:
+    """"range of 70°-90°" / "target of 0°" / "mark of more than 10 minutes"."""
+    low, high = entry.range_low, entry.range_high
+    text = _range_text(entry)
+    if low is not None and high is not None:
+        return f"target of {text}" if low == high else f"range of {text}"
+    return f"mark of {text}"
 
 
-def _day_clause(checkpoint: "recovery_logic.CheckpointResult") -> str:
+# READABILITY CONTRACT (patient-facing text):
+#   - passage ids (TKA-03, EV-TKA-REC-01, ...) never appear in chat text;
+#     they travel in the result's `sources` metadata, which the agent
+#     already collects from CheckpointResult.source_id / MilestoneEntry;
+#   - the checkpoint is named in plain words ("the day-7 range",
+#     "the day-21 checkpoint", "the long-term guidance") -- never "the
+#     earlier Post-Op Day N checkpoint";
+#   - the discharge guidance is cited at most ONCE per reply, in plain
+#     words (CITATION below): on the first comparison of a mid-interview
+#     turn, and in the header of the final block.
+CITATION = "according to the discharge guidance"
+
+
+def _checkpoint_word(checkpoint: "recovery_logic.CheckpointResult") -> str:
     if checkpoint.is_long_term:
-        return "the long-term guidance"
-    if checkpoint.effective_postop_day == checkpoint.checkpoint_day:
-        return f"Post-Op Day {checkpoint.checkpoint_day}"
-    return f"the earlier Post-Op Day {checkpoint.checkpoint_day} checkpoint"
+        return "long-term"
+    return f"day-{checkpoint.checkpoint_day}"
 
 
-_ASSESS_ACK_NOT_DUE_POOL: Tuple[str, ...] = (
-    "Thanks -- {value} gives me a better picture.",
-    "Okay, {value} -- that helps.",
-    "Got it -- {value} helps me understand where you are.",
-)
 _ASSESS_ACK_DUE_POOL: Tuple[str, ...] = ("Thanks for sharing that --", "Got it --", "Okay --")
 
 
-def format_assess_message(checkpoint: "recovery_logic.CheckpointResult", *, trend: Optional[str] = None, with_ack: bool = True) -> str:
+def _subject(checkpoint: "recovery_logic.CheckpointResult", *, final: bool) -> str:
+    """"flexion of 85°" / "extension (nearly flat)" / "walking aid: a cane"
+    mid-interview; "flexion: 85°" / "walking aid: a cane" in the final block."""
+    label = _metric_label(checkpoint.metric)
+    value_text = format_value(checkpoint.metric, checkpoint.patient_value) if checkpoint.patient_value is not None else "that value"
+    entry = checkpoint.entry
+    if final or entry is None or entry.kind != "numeric":
+        return f"{label}: {value_text}"
+    if isinstance(checkpoint.patient_value, recovery_logic.ValueRange):
+        return f"{label} ({value_text})"
+    return f"{label} of {value_text}"
+
+
+def _numeric_relation(checkpoint: "recovery_logic.CheckpointResult") -> Optional[str]:
+    """"within the day-7 range of 70°-90°" and friends; None for a
+    numeric entry whose verdict carries no comparison (STATE_ONLY)."""
+    CV = recovery_logic.CheckpointVerdict
+    entry = checkpoint.entry
+    word = _checkpoint_word(checkpoint)
+    phrase = _range_phrase(entry)
+    is_range = entry.range_low is not None and entry.range_high is not None and entry.range_low != entry.range_high
+    if checkpoint.verdict == CV.OVERLAPS_STATED_RANGE:
+        return f"may fall within the {word} {phrase} -- a measured number would settle it"
+    relation = {
+        CV.MEETS_STATED_CHECKPOINT: "within" if is_range else "meets",
+        CV.BELOW_STATED_CHECKPOINT: "below",
+        CV.EXCEEDS_STATED_RANGE: "beyond",
+        CV.OUTSIDE_STATED_RANGE: "outside",
+    }.get(checkpoint.verdict)
+    if relation is None:
+        return None
+    return f"{relation} the {word} {phrase}"
+
+
+def comparison_clause(checkpoint: "recovery_logic.CheckpointResult", *, trend: Optional[str] = None, cite: bool = False) -> str:
     """
-    Checkpoint-relative comparison for ONE metric, phrased conversationally,
-    always naming the checkpoint day and the source passage. Keeps the
-    distinction between the checkpoint day and the patient's own day
-    explicit ("the earlier Post-Op Day 7 checkpoint"). Before the first
-    checkpoint the target is given as the thing to work towards. Never uses
-    "on track" / "ahead" / "behind" / "normal recovery" or any other
-    trajectory language.
+    ONE short clause for a mid-interview acknowledgement, e.g.
+    "flexion of 85°, within the day-7 range of 70°-90° (according to the
+    discharge guidance), and improving: 70 -> 80 -> 85". No passage id, no
+    "earlier Post-Op Day N checkpoint"; before the first checkpoint the
+    day-7 target is given as the thing to work towards. Never uses "on
+    track" / "ahead" / "behind" / "normal recovery" or any other trajectory
+    language.
     """
     CV = recovery_logic.CheckpointVerdict
     entry = checkpoint.entry
     if entry is None or checkpoint.verdict is None:
-        return "I don't have a supported way to phrase this result yet."
+        return "I don't have a supported way to phrase this result yet"
 
     label = _metric_label(checkpoint.metric)
-    value_text = format_value(checkpoint.metric, checkpoint.patient_value) if checkpoint.patient_value is not None else "that value"
-    seed = int((checkpoint.effective_postop_day or 0) + (abs(hash(str(checkpoint.patient_value))) % 7))
-    source = _source_text(entry)
-    trend_text = f" {trend}" if trend else ""
+    subject = _subject(checkpoint, final=False)
+    word = _checkpoint_word(checkpoint)
+    citation = f" ({CITATION})" if cite else ""
+    trend_text = f", and {trend}" if trend else ""
 
     if checkpoint.verdict == CV.TARGET_NOT_YET_DUE:
-        ack = _pick(_ASSESS_ACK_NOT_DUE_POOL, seed).format(value=value_text) if with_ack else ""
-        if entry.kind == "numeric":
-            target = f"looks for {_range_text(entry)} of {label}" if checkpoint.metric in recovery_logic.ROM_FIELDS else f"looks for {_range_text(entry)}"
-        else:
-            target = f"describes {entry.expected_state}"
-        body = (
-            f"You're on post-op day {checkpoint.effective_postop_day}, and the first {label} checkpoint I have is "
-            f"day {checkpoint.checkpoint_day}, which {target} ({source}) -- that's the target to work towards from here."
+        target = f"looks for {_range_text(entry)}" if entry.kind == "numeric" else f"describes {entry.expected_state}"
+        return (
+            f"{subject} on day {checkpoint.effective_postop_day}; the first {label} checkpoint is day "
+            f"{checkpoint.checkpoint_day}, which {target}{citation} -- the target to work towards{trend_text}"
         )
-        return f"{ack} {body}{trend_text}".strip()
-
-    day_clause = _day_clause(checkpoint)
-    ack = _pick(_ASSESS_ACK_DUE_POOL, seed) if with_ack else ""
 
     if entry.kind == "numeric":
-        range_text = _range_text(entry)
-        range_kind = "range" if (entry.range_low is not None and entry.range_high is not None and entry.range_low != entry.range_high) else "mark"
-        relation = {
-            CV.MEETS_STATED_CHECKPOINT: "is within" if range_kind == "range" else "meets",
-            CV.BELOW_STATED_CHECKPOINT: "is below",
-            CV.EXCEEDS_STATED_RANGE: "exceeds",
-            CV.OUTSIDE_STATED_RANGE: "is outside",
-        }.get(checkpoint.verdict)
-        is_range_answer = isinstance(checkpoint.patient_value, recovery_logic.ValueRange)
-        subject = f"your {label} ({value_text})" if is_range_answer else f"your {label} of {value_text}"
-        if checkpoint.verdict == CV.OVERLAPS_STATED_RANGE:
-            body = (
-                f"{subject} may fall within the {range_text} {range_kind} stated for {day_clause} "
-                f"({source}) -- a measured number would settle it."
-            )
-        elif relation is None:
-            body = f"{subject}: {day_clause} describes {entry.expected_state} ({source})."
-        else:
-            body = f"{subject} {relation} the {range_text} {range_kind} stated for {day_clause} ({source})."
-        return f"{ack} {body}{trend_text}".strip()
+        relation = _numeric_relation(checkpoint)
+        if relation is None:
+            return f"{subject}; the {word} guidance{citation} gives no number, it expects {entry.expected_state}{trend_text}"
+        return f"{subject}, {relation}{citation}{trend_text}"
 
     if entry.kind == "categorical":
         if checkpoint.verdict == CV.MATCHES_STATED_STATE:
-            body = f"{label}: {value_text} -- that matches what {day_clause} describes: {entry.expected_state} ({source})."
-        elif checkpoint.verdict == CV.NOT_YET_AT_STATED_STATE:
-            body = f"{label}: {value_text} -- {day_clause} describes {entry.expected_state} ({source}); you're not at that point yet."
-        elif checkpoint.verdict == CV.BEYOND_STATED_STATE:
-            body = f"{label}: {value_text} -- that's beyond what {day_clause} describes ({entry.expected_state}; {source})."
-        elif checkpoint.verdict == CV.NEEDS_REVIEW:
-            body = (
-                f"{label}: {value_text} -- {day_clause} expects {entry.expected_state} ({source}); "
-                "please check with your surgical team about which precautions still apply to you."
+            return f"{subject}, matches the {word} checkpoint{citation}: {entry.expected_state}{trend_text}"
+        if checkpoint.verdict == CV.NOT_YET_AT_STATED_STATE:
+            return f"{subject}, not yet at the {word} checkpoint{citation}: {entry.expected_state}{trend_text}"
+        if checkpoint.verdict == CV.BEYOND_STATED_STATE:
+            return f"{subject}, beyond the {word} checkpoint{citation}: {entry.expected_state}{trend_text}"
+        if checkpoint.verdict == CV.NEEDS_REVIEW:
+            return (
+                f"{subject}; the {word} checkpoint{citation} expects {entry.expected_state} -- please check with "
+                f"your surgical team about which precautions still apply to you{trend_text}"
             )
-        else:
-            body = f"{label}: {value_text} -- {day_clause} describes {entry.expected_state} ({source})."
-        return f"{ack} {body}{trend_text}".strip()
+        return f"{subject}; the {word} checkpoint{citation} describes {entry.expected_state}{trend_text}"
 
     # kind == "state": the source gives words, not a comparable number.
-    body = (
-        f"{label}: {value_text} -- for {day_clause} the guidance gives no number; it expects "
-        f"{entry.expected_state} ({source})."
-    )
-    return f"{ack} {body}{trend_text}".strip()
+    return f"{subject}; the {word} guidance{citation} gives no number, it expects {entry.expected_state}{trend_text}"
+
+
+def format_assess_message(checkpoint: "recovery_logic.CheckpointResult", *, trend: Optional[str] = None, with_ack: bool = True) -> str:
+    """
+    Mid-interview acknowledgement for ONE metric: a short lead-in (only on
+    the first comparison of a turn, `with_ack`) + ONE short clause from
+    comparison_clause() + a full stop. The first comparison of a turn also
+    carries the single plain-words citation.
+    """
+    if checkpoint.entry is None or checkpoint.verdict is None:
+        return "I don't have a supported way to phrase this result yet."
+    seed = int((checkpoint.effective_postop_day or 0) + (abs(hash(str(checkpoint.patient_value))) % 7))
+    ack = _pick(_ASSESS_ACK_DUE_POOL, seed) if with_ack else ""
+    clause = comparison_clause(checkpoint, trend=trend, cite=with_ack)
+    return f"{ack} {clause}.".strip()
+
+
+def final_comparison_line(checkpoint: "recovery_logic.CheckpointResult", *, trend: Optional[str] = None) -> str:
+    """
+    One line per metric for the final block -- the same facts as the
+    acknowledgement but never its sentence verbatim, and no citation (the
+    block header cites once), e.g.
+    "flexion: 85° -- within the day-7 range of 70°-90°; over the week
+    70 -> 80 -> 85, improving".
+    """
+    CV = recovery_logic.CheckpointVerdict
+    entry = checkpoint.entry
+    if entry is None or checkpoint.verdict is None:
+        return "I don't have a supported way to phrase this result yet"
+
+    label = _metric_label(checkpoint.metric)
+    subject = _subject(checkpoint, final=True)
+    word = _checkpoint_word(checkpoint)
+    trend_text = ""
+    if trend:
+        series = getattr(trend, "series", None)
+        direction = getattr(trend, "direction", None)
+        trend_text = f"; over the week {series}, {direction}" if series and direction else f"; {trend}"
+
+    if checkpoint.verdict == CV.TARGET_NOT_YET_DUE:
+        target = f"looks for {_range_text(entry)}" if entry.kind == "numeric" else f"describes {entry.expected_state}"
+        return f"{subject} -- the first {label} checkpoint is day {checkpoint.checkpoint_day}, which {target}; the target to work towards{trend_text}"
+
+    if entry.kind == "numeric":
+        relation = _numeric_relation(checkpoint)
+        if relation is None:
+            return f"{subject} -- no number in the {word} guidance; it expects {entry.expected_state}{trend_text}"
+        return f"{subject} -- {relation}{trend_text}"
+
+    if entry.kind == "categorical":
+        if checkpoint.verdict == CV.MATCHES_STATED_STATE:
+            return f"{subject} -- as the {word} checkpoint describes ({entry.expected_state}){trend_text}"
+        if checkpoint.verdict == CV.NOT_YET_AT_STATED_STATE:
+            return f"{subject} -- not yet at what the {word} checkpoint describes ({entry.expected_state}){trend_text}"
+        if checkpoint.verdict == CV.BEYOND_STATED_STATE:
+            return f"{subject} -- beyond what the {word} checkpoint describes ({entry.expected_state}){trend_text}"
+        if checkpoint.verdict == CV.NEEDS_REVIEW:
+            return (
+                f"{subject} -- the {word} checkpoint expects {entry.expected_state}; please check with your "
+                f"surgical team about which precautions still apply to you{trend_text}"
+            )
+        return f"{subject} -- the {word} checkpoint describes {entry.expected_state}{trend_text}"
+
+    return f"{subject} -- no number in the {word} guidance; it expects {entry.expected_state}{trend_text}"
 
 
 def format_no_data_line(metric: str) -> str:
@@ -613,10 +695,37 @@ def metric_column(metric: str) -> Optional[str]:
     return _METRIC_COLUMNS.get(metric)
 
 
-def trend_line(metric: str, memory, today_value: Any) -> Optional[str]:
-    """"flexion 70 -> 80 -> 85 over the last week" when at least two values
-    exist across the last 7 days of `metrics` plus today's collected value.
-    None otherwise. Only exact numbers take part."""
+class TrendNote(str):
+    """The trend as ONE short phrase ("improving: 70 -> 80 -> 85",
+    "steady: 80 -> 80", "over the week: 85 -> 80") that also carries its
+    parts, so the final block can render the same facts in different
+    words without the agent having to know about either rendering."""
+
+    series: str = ""
+    direction: str = ""
+
+    def __new__(cls, text: str, *, series: str = "", direction: str = ""):
+        note = super().__new__(cls, text)
+        note.series = series
+        note.direction = direction
+        return note
+
+
+def trend_direction(metric: str, values: Sequence[float]) -> str:
+    """"improving" when the last value has moved the right way for the
+    metric since the first (flexion up, extension towards zero), "steady"
+    when unchanged, otherwise the neutral "over the week"."""
+    first, last = float(values[0]), float(values[-1])
+    if first == last:
+        return "steady"
+    better = last < first if metric == recovery_logic.ROM_EXTENSION_DEGREES else last > first
+    return "improving" if better else "over the week"
+
+
+def trend_line(metric: str, memory, today_value: Any) -> Optional[TrendNote]:
+    """"improving: 70 -> 80 -> 85" when at least two values exist across the
+    last 7 days of `metrics` plus today's collected value. None otherwise.
+    Only exact numbers take part."""
     column = metric_column(metric)
     if memory is None or column is None:
         return None
@@ -632,7 +741,9 @@ def trend_line(metric: str, memory, today_value: Any) -> Optional[str]:
         values.append(float(today_value.low))
     if len(values) < 2:
         return None
-    return f"Trend: {_metric_label(metric)} {' -> '.join(_fmt_num(v) for v in values)} over the last week."
+    series_text = " -> ".join(_fmt_num(v) for v in values)
+    direction = trend_direction(metric, values)
+    return TrendNote(f"{direction}: {series_text}", series=series_text, direction=direction)
 
 
 def confirmation_offer(metric: str, memory) -> Optional[Tuple[float, int]]:
@@ -659,15 +770,64 @@ def check_in_offer(next_checkpoint: Any) -> str:
     return f"Say 'recovery check' at day {next_checkpoint} and I'll compare."
 
 
+# Which metrics matter most at the NEXT checkpoint, per procedure, keyed by
+# the last checkpoint day of each phase (None = long term). At most two
+# are named in the next-milestone paragraph; the full entry list still
+# feeds the sources metadata.
+_MILESTONE_PRIORITY: Dict[str, Tuple[Tuple[Optional[int], Tuple[str, ...]], ...]] = {
+    "TKA": (
+        (21, (recovery_logic.ROM_FLEXION_DEGREES, recovery_logic.ROM_EXTENSION_DEGREES, recovery_logic.MOBILITY_STATUS)),
+        (42, (recovery_logic.ROM_FLEXION_DEGREES, recovery_logic.MOBILITY_STATUS, recovery_logic.STAIRS)),
+        (84, (recovery_logic.DAILY_ACTIVITIES, recovery_logic.DRIVING, recovery_logic.RETURN_TO_WORK)),
+        (None, (recovery_logic.RETURN_TO_WORK, recovery_logic.DAILY_ACTIVITIES)),
+    ),
+    "THA": (
+        (21, (recovery_logic.MOBILITY_STATUS, recovery_logic.WALKING_DURATION_MINUTES, recovery_logic.STAIRS)),
+        (42, (recovery_logic.HIP_PRECAUTIONS, recovery_logic.MOBILITY_STATUS, recovery_logic.STAIRS)),
+        (84, (recovery_logic.DAILY_ACTIVITIES, recovery_logic.DRIVING, recovery_logic.RETURN_TO_WORK)),
+        (None, (recovery_logic.RETURN_TO_WORK, recovery_logic.DAILY_ACTIVITIES)),
+    ),
+}
+MAX_NEXT_MILESTONE_METRICS = 2
+
+
+def select_milestone_entries(
+    next_checkpoint: Any,
+    entries: Sequence["recovery_logic.MilestoneEntry"],
+    *,
+    procedure: Optional[str] = None,
+    metrics_of_interest: Iterable[str] = (),
+    limit: int = MAX_NEXT_MILESTONE_METRICS,
+) -> List["recovery_logic.MilestoneEntry"]:
+    """The (at most `limit`) entries most relevant to the procedure and the
+    next checkpoint day: the procedure's priority list for that phase
+    first, then the metrics the interview collected, then anything left."""
+    by_metric = {e.metric: e for e in entries}
+    phases = _MILESTONE_PRIORITY.get(str(procedure or "").upper(), ())
+    priority: Tuple[str, ...] = ()
+    if next_checkpoint == recovery_logic.LONG_TERM:
+        priority = next((metrics for bound, metrics in phases if bound is None), ())
+    else:
+        for bound, metrics in phases:
+            if bound is not None and int(next_checkpoint) <= bound:
+                priority = metrics
+                break
+    ordered: List[str] = []
+    for metric in list(priority) + list(metrics_of_interest) + [e.metric for e in entries]:
+        if metric in by_metric and metric not in ordered:
+            ordered.append(metric)
+    return [by_metric[m] for m in ordered[:max(limit, 0)]]
+
+
 def format_next_milestone(
     next_checkpoint: Any,
     entries: Sequence["recovery_logic.MilestoneEntry"],
     *,
     metrics_of_interest: Iterable[str],
+    procedure: Optional[str] = None,
 ) -> str:
-    interest = list(metrics_of_interest)
-    chosen = [e for e in entries if e.metric in interest] or list(entries)
-    parts = [f"{_metric_label(e.metric)}: {e.expected_state} ({_source_text(e)})" for e in chosen[:4]]
+    chosen = select_milestone_entries(next_checkpoint, entries, procedure=procedure, metrics_of_interest=metrics_of_interest)
+    parts = [f"{_metric_label(e.metric)}: {e.expected_state}" for e in chosen]
     if next_checkpoint == recovery_logic.LONG_TERM:
         head = "Longer term, the guidance describes"
     else:
@@ -685,17 +845,21 @@ def format_final_assessment(
     next_entries: Sequence["recovery_logic.MilestoneEntry"],
     metrics_of_interest: Iterable[str],
 ) -> str:
-    """comparisons (one bullet per collected metric) -> metrics with no
-    data -> next milestone and its day -> check-in offer."""
-    lines: List[str] = [f"Here's how things compare on post-op day {postop_day}:"]
+    """header (cites the guidance once) -> one line per collected metric
+    (never the acknowledgement sentence verbatim) -> metrics with no data
+    -> next milestone (at most two metrics) -> check-in offer. No passage
+    id anywhere: those are in the result's sources metadata."""
+    lines: List[str] = [f"Here's how things compare on post-op day {postop_day}, {CITATION}:"]
     for checkpoint, trend in comparisons:
-        lines.append(f"- {format_assess_message(checkpoint, trend=trend, with_ack=False)}")
+        lines.append(f"- {final_comparison_line(checkpoint, trend=trend)}")
     for metric in missing_metrics:
         lines.append(f"- {format_no_data_line(metric)}")
     if not comparisons:
         lines.append("- I don't have any measures from you yet, so there's nothing to compare today.")
     body = "\n".join(lines)
-    milestone = format_next_milestone(next_checkpoint, next_entries, metrics_of_interest=metrics_of_interest)
+    milestone = format_next_milestone(
+        next_checkpoint, next_entries, metrics_of_interest=metrics_of_interest, procedure=procedure,
+    )
     return collapse_blank_lines(f"{body}\n\n{milestone} {check_in_offer(next_checkpoint)}")
 
 
@@ -719,13 +883,14 @@ def format_turn_reply(
     indicator: str,
     opener: Optional[str] = None,
 ) -> str:
-    """Mid-interview reply: immediate feedback on what was just supplied,
-    then the ONE next question with a short progress indicator."""
+    """Mid-interview reply, one short paragraph: the acknowledgement
+    clause(s) for what was just supplied, then the ONE next question with
+    a short progress indicator."""
     lead = " ".join(part.strip() for part in list(comparisons) + list(moving_on) if part and part.strip())
     tail = f"{question} {indicator}".strip() if indicator else question
     if opener and not lead:
         return collapse_blank_lines(f"{opener} {tail}")
-    return collapse_blank_lines(f"{lead}\n\n{tail}" if lead else tail)
+    return collapse_blank_lines(f"{lead} {tail}" if lead else tail)
 
 
 # ============================================================================
