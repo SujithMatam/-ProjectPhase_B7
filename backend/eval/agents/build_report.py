@@ -118,7 +118,7 @@ def main() -> int:
     w(f"| This branch, via `LAMOrchestrator.process` | {pct(total(aao, 'passed'), total(aao, 'total'))} | {total(aao, 'clean')}/24 |")
     w("")
     w(f"Through the orchestrator, **{total(aao, 'misrouted')} of {total(aao, 'turns')} turns on this branch are misrouted** "
-      f"({total(aao, 'continuation')} are answers to a question the agent had just asked -- the continuation-hook gap -- "
+      f"({total(aao, 'continuation')} {'is an answer' if total(aao, 'continuation') == 1 else 'are answers'} to a question the agent had just asked -- the remaining continuation-hook gap -- "
       f"and {total(aao, 'fresh')} are fresh-classification misses), plus {total(aao, 'red')} turn pre-empted by the "
       f"cumulative RED safety path (correct behaviour, counted separately). Baseline: {total(bao, 'misrouted')} misrouted "
       f"({total(bao, 'continuation')} pending-answer, {total(bao, 'fresh')} fresh), {total(bao, 'red')} RED pre-empted. "
@@ -202,10 +202,14 @@ def main() -> int:
     w("")
     w("What the list shows:")
     w("")
-    w("- **Rehabilitation has no continuation hook.** Every answer to its safety, done-today or barrier question "
-      "is re-classified from scratch: a bare \"no\" / \"not yet\" goes to Recovery (low-confidence fallback) and "
-      "\"no, nothing hurts\" / \"too sore\" goes to Pain. Through `/api/chat` the two-question flow never completes "
-      "(Rehab shared change 1).")
+    w(f"- **Rehabilitation now has a continuation hook** (`lam/orchestrator.py::check_rehab_continuation`, run after "
+      f"the Wound, Pain and Recovery checks). An answer to its safety, done-today, weight-bearing or barrier "
+      f"question comes back to the agent while that question is pending: a bare \"no\" / \"not yet\", \"no, nothing "
+      f"hurts\", \"the evenings are too sore to face them\" or \"partial weight bearing\" is routed to "
+      f"RehabilitationAgent instead of being re-classified from scratch, so the two-question flow completes through "
+      f"`/api/chat`. {aao['rehab']['continuation']} Rehab answers to a pending question are misrouted now (7 before "
+      f"the hook). c05 is still lost at its first turn (\"Can I go up and down the stairs yet?\" goes to Daily "
+      f"Activity, so no Rehabilitation question is pending and \"no, nothing sharp\" is classified fresh).")
     w("- **Recovery's hook misses some answer shapes**: \"one step at a time\" goes to Daily Activity while a "
       "Recovery question is pending (Recovery shared changes 2 and 5). `current_rom` is not forwarded by the router "
       "either, so c15 asks for the flexion the request already carried (Recovery shared change 1); its \"about 20 "
@@ -313,8 +317,10 @@ def main() -> int:
     w("")
     w("Merged from the three `*_CHANGES.md` files; *measured here* marks items this eval puts a number on.")
     w("")
-    w(f"1. **`lam/orchestrator.py` -- Rehabilitation continuation hook** (Rehab 1). *Measured here:* "
-      f"{aao['rehab']['continuation']} Rehab answers to a pending question misrouted, {aao['rehab']['misrouted']} Rehab turns misrouted in all.")
+    w(f"1. **`lam/orchestrator.py` -- Rehabilitation continuation hook** (Rehab 1). *Done on this branch* "
+      f"(`check_rehab_continuation`, modelled on `check_recovery_continuation`; test_rehabilitation_agent.py section 22). "
+      f"*Measured here:* {aao['rehab']['continuation']} Rehab answers to a pending question misrouted (7 before the hook), "
+      f"{aao['rehab']['misrouted']} Rehab turns misrouted in all (9 before), both remaining ones in c05 (fresh classification).")
     w(f"2. **`lam/orchestrator.py` -- Recovery continuation coverage and precedence** (Recovery 2, 5): answer shapes "
       f"such as \"I use a walker\" / \"one step at a time\", and Pain's hook running first for a bare \"yes\". "
       f"*Measured here:* {aao['recovery']['continuation']} Recovery "

@@ -15,6 +15,8 @@ Execution order:
      - genuine Wound context owns this turn -> WOUND_CARE
      - otherwise, narrow Recovery continuation check
        (check_recovery_continuation) -> RECOVERY_PROGRESS on match
+     - otherwise, narrow Rehabilitation continuation check
+       (check_rehab_continuation) -> REHABILITATION on match
      - otherwise, fresh IntentClassifier
 5. Agent/action routing
 6. Specialized agent execution
@@ -40,6 +42,20 @@ Important Recovery behaviour:
   "I don't know.", "Same as yesterday." while flexion is pending).
 - Recovery continuation never overrides RED safety, OUT_OF_SCOPE, an
   explicit/active Wound Care conversation, or a genuine topic switch.
+
+Important Rehabilitation behaviour:
+
+- Rehabilitation continuation uses check_rehab_continuation() (below),
+  modelled on check_recovery_continuation: it reads existing Rehabilitation
+  state via rehab_state.peek_state() ONLY (never creates state) and
+  matches ONLY when a real pending_field exists and the message is a
+  yes/no, a weight-bearing-shaped answer, or short enough to be an answer
+  (e.g. "no", "not yet", "no, nothing hurts", "partial weight bearing",
+  "the evenings are too sore to face them" while the safety, done-today,
+  weight-bearing or barrier question is pending).
+- It runs AFTER the Wound, Pain and Recovery checks and never overrides
+  RED safety, OUT_OF_SCOPE, a question, or an explicit switch to another
+  domain (medication, daily activity, ...).
 """
 
 from __future__ import annotations
@@ -52,6 +68,9 @@ from agents.agent_router import AgentRouter
 from agents.recovery_integration import check_recovery_continuation
 from agents import pain_logic
 from agents import pain_state
+from agents import rehab_agent
+from agents import rehab_state
+from agents.patient_memory import normalize_weight_bearing_status
 from doctor_alert import doctor_alert_notifier
 from agents.report_agent import ReportGenerationAgent
 
@@ -430,6 +449,113 @@ def _has_active_pain_followup(
         return False
 
     return True
+
+
+# ============================================================================
+# REHABILITATION CONTINUATION
+#
+# Modelled exactly on agents.recovery_integration.check_recovery_continuation:
+# the ONLY Rehabilitation continuation entry point for the orchestrator.
+# True only when an EXISTING Rehabilitation session (rehab_state.peek_state,
+# never created here, None once stale) has a real pending_field -- the
+# agent's safety, done-today, weight-bearing or barrier question -- and the
+# message plausibly answers it:
+#
+#   - a yes/no ("no", "not yet", "yes, heel slides give me a sharp pain",
+#     "no sharp pain and no swelling", "I don't know"),
+#   - a weight-bearing-shaped answer ("partial weight bearing", "as
+#     tolerated", "NWB", "none"),
+#   - or a message short enough to be an answer ("hmm, let me think about
+#     that", "the evenings are too sore to face them").
+#
+# A question ("Can I shower tomorrow?") or an explicit switch to another
+# domain ("I need my tablets") is never a continuation, so fresh intent
+# classification runs for it exactly as before. Never uses "Rehabilitation
+# was the last active agent" as a signal; never mutates state.
+# ============================================================================
+
+_REHAB_SHORT_ANSWER_MAX_WORDS = 8
+
+# Leading yes/no shapes the Rehabilitation questions get ("not yet", "no,
+# nothing hurts", "yes, heel slides give me a sharp pain"); the bare forms
+# ("i did", "i haven't", "none", ...) come from pain_logic's answer lists.
+_REHAB_YES_NO_PATTERN = re.compile(
+    r"^(?:yes|yeah|yep|yup|no|nope|nah|none|nothing|never|not really|not quite|not yet|"
+    r"not today|haven'?t yet|all done|done)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_rehab_yes_no_answer(
+    lower: str,
+) -> bool:
+
+    return bool(
+        _REHAB_YES_NO_PATTERN.match(lower)
+        or pain_logic._is_affirmative_answer(lower)
+        or pain_logic._is_negative_answer(lower)
+        or pain_logic._is_uncertain_answer(lower)
+    )
+
+
+def _is_weight_bearing_shaped_answer(
+    lower: str,
+) -> bool:
+
+    if any(cue in lower for cue in rehab_agent._WEIGHT_CUES):
+        return True
+
+    short = lower.strip(" .!")
+
+    if any(
+        short == answer or short.startswith(answer + " ")
+        for answer in rehab_agent._WB_SHORT_ANSWERS
+    ):
+        return True
+
+    return normalize_weight_bearing_status(lower) is not None
+
+
+def check_rehab_continuation(
+    *,
+    patient_id: str,
+    user_message: str,
+) -> bool:
+
+    state = rehab_state.peek_state(patient_id)
+
+    if state is None or state.pending_field is None:
+        return False
+
+    lower = _normalise(user_message)
+
+    if not lower:
+        return False
+
+    # A question is never an answer: it goes to fresh classification (the
+    # same way "Can I climb stairs?" leaves an active Wound conversation).
+    if pain_logic._is_offtopic_question(lower):
+        return False
+
+    if _is_rehab_yes_no_answer(lower):
+        return True
+
+    if _is_weight_bearing_shaped_answer(lower):
+        return True
+
+    # An explicit switch to a non-Rehabilitation domain ("I need my
+    # tablets") is a topic switch, not a short answer; a Rehabilitation
+    # term in the message ("I did my exercises", "heel slides hurt") is
+    # the agent's own vocabulary and stays eligible.
+    if (
+        _has_explicit_different_domain(lower)
+        and rehab_agent.detect_topic(lower) is None
+        and not any(cue in lower for cue in rehab_agent._GENERAL_CUES)
+    ):
+        return False
+
+    return len(lower.split()) <= _REHAB_SHORT_ANSWER_MAX_WORDS
+
 
 # ============================================================================
 # SHORT ANSWER DETECTION
@@ -1119,7 +1245,16 @@ class LAMOrchestrator:
         #      agent" as a signal, and never bypasses fresh classification
         #      for an unrelated topic (wound, medication, etc.) even while
         #      a Recovery field is pending.
-        #   3. Otherwise, fresh IntentClassifier.
+        #   3. Otherwise, the narrow Rehabilitation continuation check --
+        #      matches ONLY when an existing Rehabilitation session (found
+        #      via rehab_state.peek_state(), never created here) has a real
+        #      pending_field and this message is a yes/no, a weight-
+        #      bearing-shaped answer, or short enough to be an answer. See
+        #      check_rehab_continuation() above for the full contract.
+        #      Same guarantees as the Recovery check: never "Rehab was the
+        #      last agent", never a question or an explicit other-domain
+        #      switch.
+        #   4. Otherwise, fresh IntentClassifier.
         #
         # This ordering is what keeps both directions safe:
         #   - "My wound is red and leaking." while a Recovery flexion
@@ -1176,6 +1311,21 @@ class LAMOrchestrator:
                     f"query={user_message!r} "
                     "matched a pending Recovery field -- routing directly to "
                     "RecoveryProgressAgent without fresh intent classification."
+                )
+
+            elif check_rehab_continuation(
+                patient_id=patient_id,
+                user_message=user_message,
+            ):
+
+                intent_label = IntentLabel.REHABILITATION
+                applicable_intents = (intent_label,)
+
+                print(
+                    "[LAM][CONTINUATION] "
+                    f"query={user_message!r} "
+                    "matched a pending Rehabilitation field -- routing directly to "
+                    "RehabilitationAgent without fresh intent classification."
                 )
 
             else:

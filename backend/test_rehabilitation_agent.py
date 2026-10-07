@@ -148,9 +148,9 @@ def _handle(patient_id: str, message: str, *, surgery_type="Total Knee Arthropla
 def _interview(patient_id: str, messages: List[str], *, stub_reply: str = "", stub_engine: str = "Clinical Synthesis Engine",
                stub_sources: Optional[list] = None, **extra):
     """Drive several turns through handle() directly with a stubbed LLM.
-    (The orchestrator has no Rehabilitation continuation hook, so a bare
-    'no' is not guaranteed to come back to this agent through it -- see
-    REHAB_AGENT_CHANGES.md, shared changes needed.)"""
+    (The orchestrator's Rehabilitation continuation hook -- the way a bare
+    'no' comes back to this agent through LAMOrchestrator.process -- is
+    covered separately by test_orchestrator_continuation_two_question_flow.)"""
     fn, calls = _stub_answer_question(reply=stub_reply, engine=stub_engine, sources=stub_sources)
     results = []
     history: List[Dict[str, str]] = []
@@ -1042,6 +1042,93 @@ def test_number_guard_and_status_negation() -> None:
     print()
 
 
+# ---------------------------------------------------------------------------
+# 22. Orchestrator continuation hook: the two-question flow through
+#     LAMOrchestrator.process (lam/orchestrator.py::check_rehab_continuation).
+# ---------------------------------------------------------------------------
+
+def _process(patient_id: str, message: str, history: List[Dict[str, str]], *, day: int = 5,
+             surgery_type: str = "Total Knee Arthroplasty (TKA)") -> Dict[str, Any]:
+    return LAMOrchestrator.process(
+        patient_id=patient_id, surgery_type=surgery_type, affected_limb="Right", postop_day=day,
+        user_message=message, chat_history=list(history),
+    )
+
+
+def _orchestrated(patient_id: str, messages: List[str], *, day: int = 5):
+    """Drive several turns through LAMOrchestrator.process with a stubbed
+    LLM, replaying the growing chat history exactly as /api/chat would."""
+    fn, calls = _stub_answer_question()
+    results = []
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        for message in messages:
+            result = _process(patient_id, message, history, day=day)
+            results.append(result)
+            history += [{"role": "user", "content": message}, {"role": "assistant", "content": result["reply"]}]
+    return results, calls
+
+
+def test_orchestrator_continuation_two_question_flow() -> None:
+    _section("22 -- Orchestrator continuation hook: safety + done-today answers come back to RehabilitationAgent through LAMOrchestrator.process [REAL-INTEGRATION + stubbed LLM]")
+    from lam.orchestrator import check_rehab_continuation
+
+    # The two-question flow: question, "no", question, "yes", answer -- every
+    # turn through the orchestrator, every turn owned by Rehabilitation.
+    _reset()
+    results, calls = _orchestrated("ORCH-REHAB", ["What exercises should I be doing now?", "no", "yes"], day=5)
+    replies = [r["reply"] for r in results]
+    for r in results:
+        print(f"    {r['intent']:>20s} -> {r['target_agent']:<22s} {r['reply'][:90]!r}")
+    _check(all(r["intent"] == IntentLabel.REHABILITATION.value and r["target_agent"] == TargetAgent.REHAB_AGENT.value for r in results),
+           f"all three turns route to RehabilitationAgent: {[(r['intent'], r['target_agent']) for r in results]}")
+    _check(ra.QUESTIONS[ra.EXERCISE_SAFETY] in replies[0] and replies[0].count("?") == 1, "turn 1 asks the safety question")
+    _check(ra.QUESTIONS[ra.EXERCISES_DONE_TODAY] in replies[1] and replies[1].count("?") == 1, f"turn 2 ('no') continues with the done-today question: {replies[1]!r}")
+    _check("no sharp pain or lasting swelling" in replies[1], "turn 2 acknowledges the safety answer")
+    _check(len(calls) == 1 and "Next session:" in replies[2] and replies[2].count("?") == 0, f"turn 3 ('yes') is the answer (one LLM call): {replies[2][:80]!r}")
+    state = rehab_state.peek_state("ORCH-REHAB")
+    _check(state.get_fact(ra.EXERCISE_SAFETY) is False and state.get_fact(ra.EXERCISES_DONE_TODAY) is True and state.pending_field is None,
+           "both answers are stored and nothing is left pending")
+
+    # The hook itself: peek-only, pending-gated, answer-shaped.
+    _reset()
+    _check(not check_rehab_continuation(patient_id="ORCH-NONE", user_message="no") and rehab_state.peek_state("ORCH-NONE") is None,
+           "no session -> no continuation, and the peek creates no state")
+    state = rehab_state.get_or_create_state("ORCH-NONE")
+    _check(not check_rehab_continuation(patient_id="ORCH-NONE", user_message="no"), "a session with nothing pending -> no continuation")
+    state.mark_pending(ra.EXERCISE_SAFETY)
+    for answer in ("no", "not yet", "no, nothing hurts", "no sharp pain and no swelling", "yes, heel slides give me a sharp pain",
+                   "I don't know", "hmm, let me think about that", "the evenings are too sore to face them",
+                   "partial weight bearing", "as tolerated", "haven't done them yet"):
+        _check(check_rehab_continuation(patient_id="ORCH-NONE", user_message=answer), f"answer-shaped reply continues: {answer!r}")
+    for other in ("Can I shower tomorrow?", "Can I take ibuprofen?", "I need my tablets", "What exercises should I be doing now?",
+                  "I have been doing all of my exercises every single day without any problems at all", ""):
+        _check(not check_rehab_continuation(patient_id="ORCH-NONE", user_message=other), f"not an answer -> fresh classification: {other!r}")
+    _check(rehab_state.peek_state("ORCH-NONE").pending_field == ra.EXERCISE_SAFETY, "the hook never mutates state")
+
+    # Through the orchestrator a question while the safety answer is pending
+    # leaves Rehabilitation; "rehab" wording still comes back to it.
+    _reset()
+    fn, calls = _stub_answer_question()
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        first = _process("ORCH-SWITCH", "What exercises should I be doing now?", history, day=5)
+        history += [{"role": "user", "content": "What exercises should I be doing now?"}, {"role": "assistant", "content": first["reply"]}]
+        switched = _process("ORCH-SWITCH", "Can I take ibuprofen with my blood thinner?", history, day=5)
+    _check(ra.QUESTIONS[ra.EXERCISE_SAFETY] in first["reply"], "the safety question is pending")
+    _check(switched["intent"] != IntentLabel.REHABILITATION.value, f"a medication question is not a continuation: {switched['intent']}")
+    _check(rehab_state.peek_state("ORCH-SWITCH").pending_field == ra.EXERCISE_SAFETY, "the pending question is untouched by the detour")
+
+    # A fresh "no" with no Rehabilitation session is classified as before.
+    _reset()
+    fn, calls = _stub_answer_question()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        bare = _process("ORCH-FRESH", "no", [], day=5)
+    _check(bare["intent"] != IntentLabel.REHABILITATION.value and rehab_state.peek_state("ORCH-FRESH") is None,
+           f"a bare 'no' with nothing pending never reaches Rehabilitation: {bare['intent']}")
+    print()
+
+
 def main() -> int:
     _run(test_routing)
     _run(test_postop_day_reaches_agent)
@@ -1064,6 +1151,7 @@ def main() -> int:
     _run(test_close_and_rehab_check_routing)
     _run(test_state_ttl_llm_guard_and_reexport)
     _run(test_number_guard_and_status_negation)
+    _run(test_orchestrator_continuation_two_question_flow)
 
     print("=" * 78)
     if _FAILURES:

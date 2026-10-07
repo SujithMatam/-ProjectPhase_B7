@@ -1,8 +1,8 @@
 # Agent conversation eval -- head_orchestrator
 
-- backend: this checkout (commit `02b99ea`)
+- backend: this checkout (commit `fcfa3bb`)
 - mode: via LAMOrchestrator.process; LLM: stubbed
-- run at 2026-10-08 03:39:17, 19.3s
+- run at 2026-10-08 04:32:33, 40.3s
 
 ## Summary
 
@@ -13,7 +13,7 @@
 | c03_recovery_tka_day10 | recovery | 15/15 | 5 | 0 · 1 · 0 · 1 · 2 · 1 (=5) | 2/2 | 1 | - |
 | c04_recovery_tha_day30 | recovery | 12/12 | 4 | 0 · 1 · 1 · 1 · 1 (=4) | 0/0 | 0 | - |
 | c05_rehab_tka_stairs | rehab | 6/10 | 0 | 0 · 0 (=0) | 0/1 | 0 | 1 (fresh), 2 (fresh) |
-| c06_rehab_tha_missed_days | rehab | 5/12 | 3 | 0 · 0 · 0 (=0) | 1/1 | 0 | 2 (pending answer), 3 (pending answer) |
+| c06_rehab_tha_missed_days | rehab | 12/12 | 2 | 0 · 1 · 1 (=2) | 1/1 | 0 | - |
 | c07_rehab_safety_hold | rehab | 11/11 | 1 | 0 · 3 (=3) | 0/0 | 0 | - |
 | c08_pain_bug_nonnumeric_score | pain | 16/16 | 5 | 1 · 0 · 1 · 1 · 1 · 1 (=5) | 1/1 | 2 | - |
 | c09_pain_bug_offtopic_reply | pain | 15/15 | 4 | 0 · 1 · 0 · 1 · 1 · 1 (=4) | 1/1 | 2 | - |
@@ -27,11 +27,11 @@
 | c17_recovery_abandoned | recovery | 7/7 | 2 | 0 · 1 (=1) | 0/0 | 0 | - |
 | c18_recovery_tka_day90_longterm | recovery | 14/14 | 5 | 0 · 1 · 1 · 1 · 1 · 1 (=5) | 0/0 | 1 | - |
 | c19_recovery_unknown_twice | recovery | 15/15 | 6 | 0 · 0 · 0 · 1 · 1 · 1 · 1 (=4) | 0/0 | 1 | - |
-| c20_rehab_direct_question | rehab | 4/10 | 2 | 0 · 0 (=0) | 0/1 | 0 | 2 (pending answer) |
-| c21_rehab_status_unknown | rehab | 4/12 | 3 | 0 · 0 · 0 (=0) | 0/0 | 0 | 2 (pending answer), 3 (pending answer) |
+| c20_rehab_direct_question | rehab | 10/10 | 1 | 0 · 1 (=1) | 1/1 | 0 | - |
+| c21_rehab_status_unknown | rehab | 12/12 | 2 | 0 · 1 · 1 (=2) | 0/0 | 1 | - |
 | c22_rehab_multislot | rehab | 12/12 | 0 | 2 (=2) | 1/1 | 1 | - |
-| c23_rehab_abandoned | rehab | 7/8 | 2 | 0 · 0 (=0) | 0/0 | 0 | 2 (pending answer) |
-| c24_rehab_request_nwb_override | rehab | 5/11 | 2 | 0 · 0 (=0) | 0/1 | 0 | 2 (pending answer) |
+| c23_rehab_abandoned | rehab | 8/8 | 2 | 0 · 0 (=0) | 0/0 | 0 | - |
+| c24_rehab_request_nwb_override | rehab | 11/11 | 1 | 0 · 1 (=1) | 1/1 | 0 | - |
 
 ## Properties
 
@@ -216,7 +216,7 @@
 
 **Patient (2):** it's about 85 now
 
-> Thanks for sharing that -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
+> Got it -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
 
@@ -228,13 +228,13 @@
 
 **Patient (4):** almost, there's a small gap
 
-> Got it -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Thanks for sharing that -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (5):** I'm using a cane and I can walk about 15 minutes
 
-> Thanks for sharing that -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Got it -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields mobility_status, walking_duration_minutes [routed to RecoveryProgressAgent]*
 
@@ -280,7 +280,7 @@
 
 **Patient (2):** I'm still using one crutch
 
-> Okay -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)
+> Thanks for sharing that -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status [routed to RecoveryProgressAgent]*
 
@@ -292,7 +292,7 @@
 
 **Patient (4):** foot over foot now
 
-> Okay -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
+> Thanks for sharing that -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked hip_precautions; new fields stairs [routed to RecoveryProgressAgent]*
 
@@ -352,18 +352,18 @@
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
-| 2 | collects_field | **FAIL** | exercise_barrier -> not collected |
-| 3 | collects_field | **FAIL** | exercise_safety -> not collected |
+| 2 | collects_field | PASS | exercise_barrier -> the evenings are too sore to face them |
+| 3 | collects_field | PASS | exercise_safety -> False |
 | 3 | reply_does_not_match | PASS | /(?i)knee flexion\|seated knee extension\|swelling .* is normal/ |
 | - | no_reask_of_collected_field | PASS |  |
-| - | max_questions | **FAIL** | 3 asked, max 2 |
+| - | max_questions | PASS | 2 asked, max 2 |
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
-| - | final_turn_closes_interview | **FAIL** | final turn still asks exercise_barrier |
-| - | final_has_trend_or_checkpoint | **FAIL** | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
-| - | final_has_next_step | **FAIL** | /Next session:/ |
+| - | final_turn_closes_interview | PASS | no question pending |
+| - | final_has_trend_or_checkpoint | PASS | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
+| - | final_has_next_step | PASS | /Next session:/ |
 | - | weight_bearing_record_unchanged | PASS | None -> None |
-| - | routed_to_expected_agent | **FAIL** | turn 2: PainSymptomsAgent (continuation, expected RehabilitationAgent); turn 3: PainSymptomsAgent (continuation, expected RehabilitationAgent) |
+| - | routed_to_expected_agent | PASS |  |
 
 <details><summary>Transcript</summary>
 
@@ -375,15 +375,28 @@
 
 **Patient (2):** the evenings are too sore to face them
 
-> Thanks for telling me -- I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now? (one or two more questions)
+> Thanks -- that helps me understand what's making them hard. Does any exercise cause sharp pain, or swelling that lasts into the next day? (last question)
 
-*engine Pain & Symptoms Agent - Multi-turn Assessment; triage GREEN (engine GREEN); asked exercise_barrier; new fields - [routed to PainSymptomsAgent, continuation]*
+*engine Rehabilitation Agent - Exercise Check; triage GREEN (engine GREEN); asked exercise_safety; new fields exercise_barrier [routed to RehabilitationAgent]*
 
 **Patient (3):** no sharp pain and no swelling
 
-> So far: sharp, swelling: no. Sorry, I didn't catch a number there. Would you put it roughly in the mild range (1-3), moderate range (4-6), or severe range (7-10)? (one or two more questions)
+> Here's the discharge guidance I have for your exercises on day 20 after your hip replacement:
+> • Do standing exercises while holding on to something firm and stable, such as a sturdy chair, a bar or a wall, so you are well supported.
+> • Standing knee raises: lift the operated leg towards your chest, but not higher than your waist, hold for two or three counts and lower it again.
+> • Standing hip abduction: with the hip, knee and foot pointing straight forward and your body upright, lift the leg out to the side with the knee straight, then slowly lower it so the foot is back on the floor.
+> • Standing hip extension: slowly lift the operated leg backwards while keeping your back straight, hold for two or three counts, and return.
+> • Each is usually repeated about ten times in three or four sessions a day; keep every movement slow and controlled rather than swinging the leg.
+> • As strength improves, your physiotherapist may add resistance using elastic tubing, bringing the leg forward, out to the side and backwards against the band; these exercises help your balance and walking.
+> • Continue to follow your hip precautions while exercising -- keep the knee below waist height during knee raises -- and stop and tell your physiotherapist if an exercise causes sharp pain in the hip or groin, or if you feel unsteady doing it.
+> 
+> I don't have your weight-bearing status, so don't put more weight through the leg than your team has told you until they confirm it.
+> 
+> You said "the evenings are too sore to face them" is making the exercises hard -- tell your physiotherapist so the programme can be adjusted.
+> 
+> Next session: the three standing exercises (knee raises, hip abduction, hip extension), about ten times each, holding on to something firm. Say 'rehab check' tomorrow and I'll see how it went.
 
-*engine Pain & Symptoms Agent - Multi-turn Assessment; triage GREEN (engine GREEN); asked exercise_barrier; new fields - [routed to PainSymptomsAgent, continuation]*
+*engine Rehabilitation Agent - Sourced Fallback; triage GREEN (engine GREEN); asked -; new fields exercise_safety [routed to RehabilitationAgent]*
 
 </details>
 
@@ -413,15 +426,11 @@
 
 **Patient (2):** yes, heel slides give me a sharp pain
 
-> **PainSymptomsAgent**
-> Thanks for telling me -- I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now? (one or two more questions)
-> 
-> **RehabilitationAgent**
 > Please pause heel slides for now and tell your physiotherapist about the sharp pain before your next session, so they can check it and adjust your programme. Keep to the rest of the programme as your physiotherapist set it.
 > 
 > Next session: wait for your physiotherapist's advice before repeating heel slides. Say 'rehab check' tomorrow and I'll see how it went.
 
-*engine Deterministic Multi-Agent Coordinator; triage GREEN (engine GREEN); asked -; new fields exercise_safety, exercise_safety_exercise, exercise_safety_kind [routed to PainSymptomsAgent,RehabilitationAgent]*
+*engine Rehabilitation Agent - Safety Hold; triage GREEN (engine GREEN); asked -; new fields exercise_safety, exercise_safety_exercise, exercise_safety_kind [routed to RehabilitationAgent]*
 
 </details>
 
@@ -805,25 +814,25 @@
 
 **Patient (2):** about 60 degrees
 
-> Okay -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Got it -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (3):** about 10 degrees off straight
 
-> Thanks for sharing that -- extension of 10° on day 4; the first extension checkpoint is day 7, which looks for 0°-5° (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Got it -- extension of 10° on day 4; the first extension checkpoint is day 7, which looks for 0°-5° (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (4):** I use a walker
 
-> Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Thanks for sharing that -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status [routed to RecoveryProgressAgent]*
 
 **Patient (5):** about 5 minutes
 
-> Okay -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Got it -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes [routed to RecoveryProgressAgent]*
 
@@ -870,7 +879,7 @@
 
 **Patient (2):** a cane
 
-> Thanks for sharing that -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)
+> Got it -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_flexion_degrees; new fields mobility_status [routed to RecoveryProgressAgent]*
 
@@ -921,13 +930,13 @@
 > Before I answer: Does any exercise cause sharp pain, or swelling that lasts into the next day? (last question)
 > 
 > **RecoveryProgressAgent**
-> Okay -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. flexion of 95°, meets the day-14 mark of more than 80°. walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes. Do you know your current knee extension measurement in degrees (how close to fully straight)? (one more question after this)
+> Thanks for sharing that -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. flexion of 95°, meets the day-14 mark of more than 80°. walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes. Do you know your current knee extension measurement in degrees (how close to fully straight)? (one more question after this)
 
 *engine Deterministic Multi-Agent Coordinator; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields mobility_status, rom_flexion_degrees, walking_duration_minutes [routed to RehabilitationAgent,RecoveryProgressAgent]*
 
 **Patient (2):** about 3 degrees
 
-> Thanks for sharing that -- extension of 3°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Okay -- extension of 3°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
@@ -968,7 +977,7 @@
 
 **Patient (2):** about 90 degrees
 
-> Okay -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Thanks for sharing that -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
 
@@ -1015,13 +1024,13 @@
 
 **Patient (4):** walking without any aid now
 
-> Thanks for sharing that -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Got it -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status [routed to RecoveryProgressAgent]*
 
 **Patient (5):** about 60 minutes
 
-> Got it -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Thanks for sharing that -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes [routed to RecoveryProgressAgent]*
 
@@ -1082,19 +1091,19 @@
 
 **Patient (4):** about 5 degrees
 
-> Thanks for sharing that -- extension of 5°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Okay -- extension of 5°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (5):** a walker
 
-> Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Got it -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status [routed to RecoveryProgressAgent]*
 
 **Patient (6):** 10 minutes
 
-> Got it -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Okay -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes [routed to RecoveryProgressAgent]*
 
@@ -1117,16 +1126,16 @@
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
-| 2 | collects_field | **FAIL** | exercise_safety -> not collected |
+| 2 | collects_field | PASS | exercise_safety -> False |
 | - | no_question_for_record_data | PASS | never asked: weight_bearing_status, exercises_done_today |
 | - | no_reask_of_collected_field | PASS |  |
-| - | max_questions | **FAIL** | 2 asked, max 1 |
+| - | max_questions | PASS | 1 asked, max 1 |
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
-| - | final_turn_closes_interview | **FAIL** | final turn still asks exercise_safety |
-| - | final_has_trend_or_checkpoint | **FAIL** | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
-| - | final_has_next_step | **FAIL** | /Next session:/ |
-| - | routed_to_expected_agent | **FAIL** | turn 2: PainSymptomsAgent (continuation, expected RehabilitationAgent) |
+| - | final_turn_closes_interview | PASS | no question pending |
+| - | final_has_trend_or_checkpoint | PASS | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
+| - | final_has_next_step | PASS | /Next session:/ |
+| - | routed_to_expected_agent | PASS |  |
 
 <details><summary>Transcript</summary>
 
@@ -1138,9 +1147,17 @@
 
 **Patient (2):** no, nothing hurts
 
-> Thanks for telling me -- I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now? (one or two more questions)
+> Here's the discharge guidance I have for heel slides on day 8 after your knee replacement:
+> • Heel slides (bed-supported knee bends): slide the heel towards the buttock to bend the knee, hold, and then straighten.
+> • Sitting knee bends: sit in a chair and bend the knee back as far as you can, using the other leg for support if needed.
+> • Repeat each exercise until the muscles feel tired, and follow the number of repetitions and sessions your own physiotherapist sets, because programmes differ.
+> • The exercises can feel uncomfortable at first; avoid pushing into severe pain, and tell your physiotherapist if an exercise hurts a lot.
+> 
+> Your weight-bearing status on record is weight-bearing as tolerated, so nothing here should take you beyond it.
+> 
+> Next session: the first-week set (quad sets, straight leg raises, ankle pumps, knee straightening, heel slides and sitting knee bends), each repeated until the muscles feel tired. Say 'rehab check' tomorrow and I'll see how it went.
 
-*engine Pain & Symptoms Agent - Multi-turn Assessment; triage GREEN (engine GREEN); asked exercise_safety; new fields - [routed to PainSymptomsAgent, continuation]*
+*engine Rehabilitation Agent - Sourced Fallback; triage GREEN (engine GREEN); asked -; new fields exercise_safety [routed to RehabilitationAgent]*
 
 </details>
 
@@ -1148,18 +1165,18 @@
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
-| 2 | collects_field | **FAIL** | exercise_safety -> not collected |
-| 3 | collects_field | **FAIL** | exercises_done_today -> not collected |
+| 2 | collects_field | PASS | exercise_safety -> False |
+| 3 | collects_field | PASS | exercises_done_today -> False |
 | - | no_reask_of_collected_field | PASS |  |
-| - | max_questions | **FAIL** | 3 asked, max 2 |
+| - | max_questions | PASS | 2 asked, max 2 |
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
-| - | final_turn_closes_interview | **FAIL** | final turn still asks exercise_safety |
-| - | final_has_trend_or_checkpoint | **FAIL** | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
-| - | final_has_next_step | **FAIL** | /Next session:/ |
-| - | persists_on_completion | **FAIL** | 0 row(s) written, expected >= 1 |
+| - | final_turn_closes_interview | PASS | no question pending |
+| - | final_has_trend_or_checkpoint | PASS | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
+| - | final_has_next_step | PASS | /Next session:/ |
+| - | persists_on_completion | PASS | 1 row(s) written, expected >= 1 |
 | - | weight_bearing_record_unchanged | PASS | None -> None |
-| - | routed_to_expected_agent | **FAIL** | turn 2: RecoveryProgressAgent (continuation, expected RehabilitationAgent); turn 3: RecoveryProgressAgent (continuation, expected RehabilitationAgent) |
+| - | routed_to_expected_agent | PASS |  |
 
 <details><summary>Transcript</summary>
 
@@ -1171,15 +1188,27 @@
 
 **Patient (2):** no
 
-> Let's see where you are on post-op day 10. About how many degrees can you currently bend your knee? (a few more questions)
+> Thanks -- no sharp pain or lasting swelling. Have you done today's exercises yet? (last question)
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked exercise_safety; new fields - [routed to RecoveryProgressAgent, continuation]*
+*engine Rehabilitation Agent - Exercise Check; triage GREEN (engine GREEN); asked exercises_done_today; new fields exercise_safety [routed to RehabilitationAgent]*
 
 **Patient (3):** not yet
 
-> Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)
+> Here's the discharge guidance I have for your exercises on day 10 after your knee replacement:
+> • Walking practice that focuses on landing on the heel, a normal step pattern and equal weight on both legs.
+> • Stretching of the front thigh, hamstring and calf muscles, and strengthening that prioritises the quadriceps, hip and hamstring muscles.
+> • Straight leg raises in several directions once the knee can fully straighten.
+> • Repeated sit-to-stands from a chair.
+> • Small step-ups and step-downs, starting on a low step of about two to four inches.
+> • Balance work that progresses from standing on both legs to standing on one.
+> • Light ankle weights can usually be added to the basic exercises from about four to six weeks after surgery, increasing gradually as strength returns.
+> • Avoid long periods of sitting, and avoid any exercise that causes severe pain or a marked increase in swelling; your physiotherapist will adapt the programme to your progress.
+> 
+> I don't have your weight-bearing status, so don't put more weight through the leg than your team has told you until they confirm it.
+> 
+> Next session: walking practice landing on the heel, sit-to-stands from a chair and small step-ups on a low step, as your physiotherapist set. Say 'rehab check' tomorrow and I'll see how it went.
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked exercise_safety; new fields - [routed to RecoveryProgressAgent, continuation]*
+*engine Rehabilitation Agent - Sourced Fallback; triage GREEN (engine GREEN); asked -; new fields exercises_done_today [routed to RehabilitationAgent]*
 
 </details>
 
@@ -1237,7 +1266,7 @@
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
 | - | abandoned_persists_nothing | PASS | 0 row(s) written |
-| - | routed_to_expected_agent | **FAIL** | turn 2: RecoveryProgressAgent (continuation, expected RehabilitationAgent) |
+| - | routed_to_expected_agent | PASS |  |
 
 <details><summary>Transcript</summary>
 
@@ -1249,9 +1278,9 @@
 
 **Patient (2):** hmm, let me think about that
 
-> Let's see where you are on post-op day 6. About how many degrees can you currently bend your knee? (a few more questions)
+> Sorry, I didn't catch that -- a simple yes or no is fine. Is any exercise leaving you with sharp pain, or a joint that is still more swollen the next morning? (one more question after this)
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked exercise_safety; new fields - [routed to RecoveryProgressAgent, continuation]*
+*engine Rehabilitation Agent - Exercise Check; triage GREEN (engine GREEN); asked exercise_safety; new fields - [routed to RehabilitationAgent]*
 
 </details>
 
@@ -1259,17 +1288,17 @@
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
-| 2 | collects_field | **FAIL** | exercise_safety -> not collected |
+| 2 | collects_field | PASS | exercise_safety -> False |
 | 2 | reply_does_not_match | PASS | /(?i)\b(put (your )?(full )?weight\|bear (your )?full weight\|try (a )?squat)/ |
 | - | no_question_for_record_data | PASS | never asked: weight_bearing_status |
 | - | no_reask_of_collected_field | PASS |  |
-| - | max_questions | **FAIL** | 2 asked, max 1 |
+| - | max_questions | PASS | 1 asked, max 1 |
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
-| - | final_turn_closes_interview | **FAIL** | final turn still asks exercise_safety |
-| - | final_has_trend_or_checkpoint | **FAIL** | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
-| - | final_has_next_step | **FAIL** | /Next session:/ |
-| - | routed_to_expected_agent | **FAIL** | turn 2: RecoveryProgressAgent (continuation, expected RehabilitationAgent) |
+| - | final_turn_closes_interview | PASS | no question pending |
+| - | final_has_trend_or_checkpoint | PASS | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
+| - | final_has_next_step | PASS | /Next session:/ |
+| - | routed_to_expected_agent | PASS |  |
 
 <details><summary>Transcript</summary>
 
@@ -1281,8 +1310,12 @@
 
 **Patient (2):** no
 
-> Let's see where you are on post-op day 3. About how many degrees can you currently bend your knee? (a few more questions)
+> I don't have discharge guidance on squats for day 3 after your knee replacement, so please check with your surgeon or physiotherapist before trying it.
+> 
+> Your weight-bearing status from this request is non-weight-bearing, so nothing here should take you beyond it.
+> 
+> Next session: keep to the exercises your physiotherapist has already set until they have advised on this. Say 'rehab check' tomorrow and I'll see how it went.
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked exercise_safety; new fields - [routed to RecoveryProgressAgent, continuation]*
+*engine Rehabilitation Agent - Sourced Fallback; triage GREEN (engine GREEN); asked -; new fields exercise_safety [routed to RehabilitationAgent]*
 
 </details>
