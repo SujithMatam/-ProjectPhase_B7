@@ -183,6 +183,139 @@ class PatientMemory:
             return None
         return _as_float(self.today_metrics.get(column))
 
+    def note_today(self, column: str, value: Any) -> None:
+        """Keep the cached snapshot in step with a value the agent has just
+        written to today's `metrics` row (the DB stays the source of
+        truth; this only avoids re-reading it within the same session)."""
+        row = dict(self.today_metrics or {})
+        row.setdefault("date", self.today)
+        row[column] = value
+        self.today_metrics = row
+        replaced = False
+        for existing in self.recent_metrics:
+            if str(existing.get("date") or "").strip() == self.today:
+                existing[column] = value
+                replaced = True
+        if not replaced:
+            self.recent_metrics.append(dict(row))
+
+    # ------------------------------------------------------------------
+    # Rehabilitation helpers -- weight-bearing status, the exercise log,
+    # and short ROM / pain summaries for the domain instruction.
+    # ------------------------------------------------------------------
+
+    @property
+    def weight_bearing_code(self) -> Optional[str]:
+        """The surgeries.weight_bearing_status value normalised to
+        NWB / PWB / WBAT / FWB, or None when the record has none or it
+        cannot be mapped to one of the four codes."""
+        return normalize_weight_bearing_status(self.weight_bearing_status)
+
+    @property
+    def today_exercise_completed(self) -> Optional[bool]:
+        """Today's logged exercise_completed as a bool, or None when today
+        has no row / no value."""
+        if not self.today_metrics:
+            return None
+        value = self.today_metrics.get("exercise_completed")
+        if value is None:
+            return None
+        return bool(int(value)) if str(value).strip() in ("0", "1") else bool(value)
+
+    def exercise_log(self, *, days: int = 7) -> Tuple[int, int]:
+        """(done, missed) day counts over the last `days` days -- one entry
+        per date, from the logged exercise_completed values only (a day
+        with no row is neither done nor missed)."""
+        done = missed = 0
+        for _, value in self.metric_series("exercise_completed", days=days):
+            if value:
+                done += 1
+            else:
+                missed += 1
+        return done, missed
+
+    def missed_exercise_days(self, *, days: int = 7) -> int:
+        return self.exercise_log(days=days)[1]
+
+    def exercise_log_summary(self, *, days: int = 7) -> Optional[str]:
+        done, missed = self.exercise_log(days=days)
+        if done == 0 and missed == 0:
+            return None
+        return f"exercises logged as done on {done} and missed on {missed} of the last {days} days"
+
+    def _latest_within(self, column: str, days: int) -> Optional[Tuple[float, int]]:
+        latest = self.latest_metric(column, within_days=max(days - 1, 0))
+        if latest is None:
+            return None
+        _, value, days_ago = latest
+        return value, days_ago
+
+    @staticmethod
+    def _when(days_ago: int) -> str:
+        if days_ago <= 0:
+            return "today"
+        if days_ago == 1:
+            return "yesterday"
+        return f"{days_ago} days ago"
+
+    def rom_summary(self, *, days: int = 7) -> Optional[str]:
+        """"flexion 80° (yesterday), extension 5° (yesterday)" from the
+        last `days` days of metrics; None when nothing is logged."""
+        parts: List[str] = []
+        for column, label in (("rom_flexion", "flexion"), ("rom_extension", "extension")):
+            latest = self._latest_within(column, days)
+            if latest is None:
+                continue
+            value, days_ago = latest
+            number = int(value) if float(value).is_integer() else value
+            parts.append(f"{label} {number}° ({self._when(days_ago)})")
+        return ", ".join(parts) if parts else None
+
+    def pain_summary(self, *, days: int = 7) -> Optional[str]:
+        latest = self._latest_within("pain_score", days)
+        if latest is None:
+            return None
+        value, days_ago = latest
+        number = int(round(value))
+        if not 0 <= number <= 10:
+            return None
+        return f"pain {number}/10 ({self._when(days_ago)})"
+
+
+WEIGHT_BEARING_CODES: Tuple[str, ...] = ("NWB", "PWB", "WBAT", "FWB")
+
+# Order matters: the most restrictive wording is tested first, and a text
+# matching more than one code is ambiguous (None) rather than guessed.
+_WEIGHT_BEARING_PATTERNS: Tuple[Tuple[str, re.Pattern], ...] = (
+    ("NWB", re.compile(
+        r"\bnwb\b|non[- ]?weight|\bno weight\b|not (?:allowed |supposed )?(?:to )?(?:put|bear|take)(?: any)? weight"
+        r"|keep (?:all )?(?:the |my )?weight off|\bnone\b|toe[- ]?touch", re.IGNORECASE)),
+    ("PWB", re.compile(r"\bpwb\b|\bpartial", re.IGNORECASE)),
+    ("WBAT", re.compile(r"\bwbat\b|as tolerated|as much as (?:i|you) can (?:tolerate|manage|stand)|tolerat", re.IGNORECASE)),
+    ("FWB", re.compile(r"\bfwb\b|\bfull(?:y)?(?:[- ]weight)?\b|no restriction", re.IGNORECASE)),
+)
+
+
+def normalize_weight_bearing_status(text: Any) -> Optional[str]:
+    """Map a recorded or patient-stated weight-bearing description to one
+    of NWB / PWB / WBAT / FWB. Returns None when nothing matches or when
+    the text names more than one status (never guesses)."""
+    if text is None:
+        return None
+    raw = str(getattr(text, "value", text) or "").strip()
+    if not raw:
+        return None
+    upper = raw.upper()
+    if upper in WEIGHT_BEARING_CODES:
+        return upper
+    matched = [code for code, pattern in _WEIGHT_BEARING_PATTERNS if pattern.search(raw)]
+    if "WBAT" in matched and "FWB" in matched:
+        # "full weight bearing as tolerated" -> the tolerated form.
+        matched.remove("FWB")
+    if len(matched) != 1:
+        return None
+    return matched[0]
+
 
 def empty_memory(patient_id: str, today: Optional[str] = None) -> PatientMemory:
     return PatientMemory(patient_id=str(patient_id or "").strip().upper(), today=today_iso(today))
