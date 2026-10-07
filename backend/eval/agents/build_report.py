@@ -206,15 +206,17 @@ def main() -> int:
       "is re-classified from scratch: a bare \"no\" / \"not yet\" goes to Recovery (low-confidence fallback) and "
       "\"no, nothing hurts\" / \"too sore\" goes to Pain. Through `/api/chat` the two-question flow never completes "
       "(Rehab shared change 1).")
-    w("- **Recovery's hook misses some answer shapes**: \"I use a walker\" goes to Rehabilitation and \"one step at a "
-      "time\" to Daily Activity while a Recovery question is pending (Recovery shared changes 2 and 5). `current_rom` "
-      "is not forwarded by the router either, so c15 asks for flexion and extension the request already carried "
-      "(Recovery shared change 1).")
+    w("- **Recovery's hook misses some answer shapes**: \"one step at a time\" goes to Daily Activity while a "
+      "Recovery question is pending (Recovery shared changes 2 and 5). `current_rom` is not forwarded by the router "
+      "either, so c15 asks for the flexion the request already carried (Recovery shared change 1); its \"about 20 "
+      "minutes\" now gets the clarifying question instead of being stored as *flexion of 20°*. \"I use a walker\" "
+      "(c14) is no longer misrouted: c14's second message, \"about 60 degrees\", is now kept as the opening value, "
+      "so the rest of the conversation lines up with the questions again.")
     w("- **Fresh classification of opening turns**: \"It's about a 5 out of 10, it came on gradually, and it's "
-      "behind the knee.\", \"My knee aches a little, I took my painkillers an hour ago.\" and \"Am I on track with "
-      "my knee?\" go to IntakeContextAgent, and \"Can I go up and down the stairs yet?\" to Daily Activity; the "
-      "conversation never reaches the agent, so its later answers are classified fresh too (c11, c13). This is "
-      "the intent classifier, outside this branch, and new information from this eval.")
+      "behind the knee.\" and \"Am I on track with my knee?\" go to IntakeContextAgent, \"My knee aches a little, I "
+      "took paracetamol an hour ago.\" to MedicationAgent, and \"Can I go up and down the stairs yet?\" to Daily "
+      "Activity; the conversation never reaches the agent, so its later answers are classified fresh too (c11, "
+      "c13). This is the intent classifier, outside this branch.")
     w("- **c01 turn 4 is RED by design**: the orchestrator's cumulative Pain triage combines 7/10, sudden onset "
       "and calf into a RED result, and the safety path answers. The `triage_equals_engine` property accepts this "
       "(the engine's own, more severe decision) and lists it in the detail.")
@@ -224,22 +226,36 @@ def main() -> int:
     w("")
     L.extend(failures(after) or ["- none"])
     w("")
-    w("- c18: past day 84 the Recovery close has no next milestone. It ends with \"Longer term, the guidance "
-      "describes ...\" and the 'recovery check' offer, with no explicit next step. Left failing on purpose: it is "
-      "a real gap in the close, not a scripting problem.")
+    w("## Fixed since the first version of this report")
     w("")
-    w("Two Recovery defects showed up in the orchestrator run of c14, where routing shifted the answers by one "
-      "turn. Both reproduce with direct calls on this branch:")
+    w("The first version (agents at `86c40ab`) found four problems; all four are fixed in `02b99ea` with tests "
+      "(Recovery section 32, Pain section 54), and the numbers above are from the re-run:")
     w("")
-    w("- **A unit-less match on the pending field**: with flexion pending, \"about 5 minutes\" is stored as "
-      "*flexion of 5°* and compared with the day-7 range. The loose-number rule for the pending numeric field "
-      "does not reject a number with a different unit.")
-    w("- **A volunteered value in the opening message is ignored**: \"about 60 degrees\" as the first message gets "
-      "\"About how many degrees can you currently bend your knee?\", so the patient has to repeat it.")
+    w("- **Recovery, unit-less match on the pending field.** With flexion pending, \"about 5 minutes\" was stored as "
+      "*flexion of 5°*. A flexion/extension answer is now accepted only with a degrees unit, as a unit-less number in "
+      "0-150, or as a mapped phrase; anything else is a non-fit, nothing is stored, and the agent asks \"Sorry, I "
+      "didn't quite catch that as an angle. How far can you bend your knee, in degrees ...?\". Through the "
+      "orchestrator this now shows in c15 (\"about 20 minutes\" while flexion is pending).")
+    w("- **Recovery, volunteered value in the opening message.** \"about 60 degrees\" as the first message is read "
+      "as flexion, confirmed back with its comparison (\"Okay -- flexion of 60° on day 4; ...\") and not asked again.")
+    w("- **Recovery, no next step past day 84.** The long-term close now ends with one next step built from the "
+      "long-term entry, then the check-in offer: \"Next milestone: longer term -- daily activities: back to many "
+      "previous activities, preferring low-impact ones. Say 'recovery check' any time and I'll compare with "
+      "today.\" c18 passes with its original expectation (`Next milestone:`).")
+    w("- **Pain, drug names.** `mentions_medication()` now recognises paracetamol, acetaminophen, Dolo, ibuprofen, "
+      "Brufen, diclofenac, tramadol, Ultracet and painkiller(s) / tablet(s) as whole words. It only triggers the "
+      "medication-effect question; the agent adds no dosing text. c13 is back to \"I took paracetamol an hour "
+      "ago\": 12/12 on this branch, 7/12 on the baseline, which never asks about the medication.")
     w("")
-    w("Other observation from building the scripts: `pain_logic.mentions_medication()` knows generic words "
-      "(\"medication\", \"painkillers\") but not drug names. \"I took paracetamol an hour ago\" never triggers the "
-      "medication-effect question, in either version. c13 says \"painkillers\" so that it tests the branch.")
+    w("| Run | First version | Now |")
+    w("|---|---|---|")
+    w(f"| Baseline, direct calls | 173/282 | {total(ba, 'passed')}/{total(ba, 'total')} |")
+    w(f"| This branch, direct calls | 281/282 (23/24 clean) | {total(aa, 'passed')}/{total(aa, 'total')} ({total(aa, 'clean')}/24 clean) |")
+    w(f"| Baseline, via the orchestrator | 160/306 | {total(bao, 'passed')}/{total(bao, 'total')} |")
+    w(f"| This branch, via the orchestrator | 233/306, 19 misrouted | {total(aao, 'passed')}/{total(aao, 'total')}, {total(aao, 'misrouted')} misrouted |")
+    w("")
+    w("The baseline moved only because c13 now says \"paracetamol\" instead of \"painkillers\", which the "
+      "baseline does not recognise.")
     w("")
 
     w("## What is checked")
@@ -287,7 +303,8 @@ def main() -> int:
     w("- The LLM is stubbed by default, the same way as for the `*_CHANGES.md` transcripts: Pain and Recovery get an "
       "empty `ChatAgent` reply (so the deterministic close is measured), and Rehab gets the local LLM offline "
       "(`_query_llama` returns None, so ChatAgent's real retrieval and fallback run). `--live` uses Ollama "
-      "instead. The numbers above are from stubbed runs; no live run is included.")
+      "instead. The numbers above are from stubbed runs; no live run is included (Ollama was not running for the "
+      "re-run either).")
     w("- The c10 detour turn (\"Can I climb stairs?\") is played with a scripted Daily Activity reply in direct "
       "mode. Through the orchestrator it is really routed, and Daily Activity is the expected agent.")
     w("")
@@ -308,7 +325,8 @@ def main() -> int:
     w("5. **Intent classifier** (Pain 5, Recovery 5, Rehab 5): keep \"pain\" / \"recovery\" / \"rehab\" so the "
       "check-in offers route back; \"safe\" sends exercise questions to Medication first. *Measured here:* "
       f"{total(aao, 'fresh')} fresh-classification misses on this branch, among them opening turns sent to "
-      "IntakeContextAgent (c11, c13, c14) and \"Can I go up and down the stairs yet?\" sent to Daily Activity (c05).")
+      "IntakeContextAgent (c11, c14) or MedicationAgent (c13) and \"Can I go up and down the stairs yet?\" sent to "
+      "Daily Activity (c05).")
     w("6. **`agents/chat_agent.py` -- token budget** (Pain 1, Recovery 3, Rehab 3): "
       "`answer_question(..., max_tokens=None)` passed through to `num_predict`.")
     w("7. **`agents/chat_agent.py` -- generic exercise fallback** (Rehab 2): the knee-only exercise text and "

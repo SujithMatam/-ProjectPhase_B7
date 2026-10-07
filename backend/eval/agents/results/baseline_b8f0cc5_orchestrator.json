@@ -5,8 +5,8 @@
     "commit": "b8f0cc5",
     "live": false,
     "via_orchestrator": true,
-    "started": "2026-10-08 03:22:33",
-    "seconds": 19.5
+    "started": "2026-10-08 03:38:22",
+    "seconds": 22.0
   },
   "runs": [
     {
@@ -46,7 +46,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.03
         },
         {
           "index": 2,
@@ -74,7 +74,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 10.92
+          "seconds": 12.62
         },
         {
           "index": 3,
@@ -273,7 +273,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -519,7 +519,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 3,
@@ -633,7 +633,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -808,7 +808,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 6.52
+          "seconds": 6.93
         },
         {
           "index": 2,
@@ -836,7 +836,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.05
         },
         {
           "index": 3,
@@ -864,7 +864,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 4,
@@ -892,7 +892,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.05
         },
         {
           "index": 5,
@@ -924,7 +924,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.05
         },
         {
           "index": 6,
@@ -956,7 +956,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.05
         }
       ],
       "rows_persisted": {
@@ -1177,7 +1177,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.03
         },
         {
           "index": 4,
@@ -1205,7 +1205,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 5,
@@ -1233,7 +1233,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         }
       ],
       "rows_persisted": {
@@ -1385,7 +1385,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -1413,7 +1413,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.05
         }
       ],
       "rows_persisted": {
@@ -1785,7 +1785,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.07
         }
       ],
       "rows_persisted": {
@@ -1990,7 +1990,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 4,
@@ -2027,7 +2027,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 5,
@@ -2275,7 +2275,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -2445,7 +2445,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -2639,7 +2639,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 3,
@@ -2705,7 +2705,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 5,
@@ -2737,7 +2737,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 6,
@@ -2772,7 +2772,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -2955,7 +2955,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         }
       ],
       "rows_persisted": {
@@ -3183,7 +3183,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -3268,7 +3268,7 @@
     {
       "id": "c13_pain_mild_medication",
       "agent": "pain",
-      "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+      "title": "Mild pain after paracetamol: short joint branch plus the medication-effect question",
       "tags": [
         "memory"
       ],
@@ -3276,13 +3276,13 @@
       "turns": [
         {
           "index": 1,
-          "patient": "My knee aches a little, I took my painkillers an hour ago.",
-          "reply": "",
-          "engine": "Clinical Synthesis Engine",
+          "patient": "My knee aches a little, I took paracetamol an hour ago.",
+          "reply": "I can help explain a medication in your postoperative record. Tell me its name, or ask about its purpose, prescribed dose, timing, or a possible side effect.",
+          "engine": "Medication Proactive Information Engine",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
-          "routed_to": "IntakeContextAgent",
+          "routed_to": "MedicationAgent",
           "expected_agent": "PainSymptomsAgent",
           "misroute_kind": "fresh_classification",
           "pending_before": null,
@@ -3300,7 +3300,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -3328,7 +3328,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         },
         {
           "index": 3,
@@ -3356,7 +3356,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         },
         {
           "index": 4,
@@ -3384,13 +3384,13 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 5,
           "patient": "yes it helped",
-          "reply": "Thanks. Do you know the name of the medication and the prescribed dose?",
-          "engine": "Medication Proactive Adherence Engine",
+          "reply": "",
+          "engine": "Medication Proactive + Clinical Synthesis",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
@@ -3500,7 +3500,7 @@
           "name": "routed_to_expected_agent",
           "turn": null,
           "passed": false,
-          "detail": "turn 1: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent)"
+          "detail": "turn 1: MedicationAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent)"
         }
       ],
       "summary": {
@@ -3599,7 +3599,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.03
         },
         {
           "index": 3,
@@ -3633,7 +3633,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 4,
@@ -3697,7 +3697,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.04
         },
         {
           "index": 6,
@@ -3729,7 +3729,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         }
       ],
       "rows_persisted": {
@@ -3892,7 +3892,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -3924,7 +3924,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.03
         },
         {
           "index": 3,
@@ -3956,7 +3956,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.04
         },
         {
           "index": 4,
@@ -4148,7 +4148,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -4216,7 +4216,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         }
       ],
       "rows_persisted": {
@@ -4369,7 +4369,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -4403,7 +4403,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -4577,7 +4577,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         },
         {
           "index": 4,
@@ -4650,7 +4650,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         },
         {
           "index": 6,
@@ -4686,7 +4686,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         }
       ],
       "rows_persisted": {
@@ -4840,7 +4840,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -4868,7 +4868,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 3,
@@ -4930,7 +4930,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 5,
@@ -4994,7 +4994,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.03
         },
         {
           "index": 7,
@@ -5026,7 +5026,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.04
         }
       ],
       "rows_persisted": {
@@ -5195,7 +5195,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -5383,7 +5383,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 3,
@@ -5411,7 +5411,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         }
       ],
       "rows_persisted": {
@@ -5558,7 +5558,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -5697,7 +5697,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,

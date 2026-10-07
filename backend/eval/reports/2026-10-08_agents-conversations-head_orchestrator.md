@@ -1,8 +1,8 @@
 # Agent conversation eval -- head_orchestrator
 
-- backend: this checkout (commit `86c40ab`)
+- backend: this checkout (commit `02b99ea`)
 - mode: via LAMOrchestrator.process; LLM: stubbed
-- run at 2026-10-08 03:22:13, 19.1s
+- run at 2026-10-08 03:39:17, 19.3s
 
 ## Summary
 
@@ -21,11 +21,11 @@
 | c11_pain_multislot_opening | pain | 5/13 | 0 | 0 · 0 (=0) | 0/1 | 0 | 1 (fresh), 2 (fresh) |
 | c12_pain_abandoned | pain | 8/8 | 3 | 1 · 1 · 1 (=3) | 0/0 | 0 | - |
 | c13_pain_mild_medication | pain | 5/13 | 0 | 0 · 0 · 0 · 0 · 0 (=0) | 0/1 | 0 | 1 (fresh), 2 (fresh), 3 (fresh), 4 (fresh), 5 (fresh) |
-| c14_recovery_tka_day4_target | recovery | 5/14 | 5 | 0 · 0 · 1 · 0 · 1 · 0 (=2) | 0/0 | 0 | 4 (pending answer), 1 (fresh) |
-| c15_recovery_request_current_rom | recovery | 6/13 | 3 | 0 · 1 · 1 · 0 (=2) | 0/2 | 0 | 4 (pending answer) |
+| c14_recovery_tka_day4_target | recovery | 13/14 | 4 | 0 · 1 · 1 · 1 · 1 · 1 (=5) | 0/0 | 1 | 1 (fresh) |
+| c15_recovery_request_current_rom | recovery | 6/13 | 3 | 0 · 1 · 0 · 0 (=1) | 0/2 | 0 | 4 (pending answer) |
 | c16_recovery_multislot | recovery | 14/14 | 2 | 3 · 1 · 1 (=5) | 0/0 | 1 | - |
 | c17_recovery_abandoned | recovery | 7/7 | 2 | 0 · 1 (=1) | 0/0 | 0 | - |
-| c18_recovery_tka_day90_longterm | recovery | 13/14 | 5 | 0 · 1 · 1 · 1 · 1 · 1 (=5) | 0/0 | 1 | - |
+| c18_recovery_tka_day90_longterm | recovery | 14/14 | 5 | 0 · 1 · 1 · 1 · 1 · 1 (=5) | 0/0 | 1 | - |
 | c19_recovery_unknown_twice | recovery | 15/15 | 6 | 0 · 0 · 0 · 1 · 1 · 1 · 1 (=4) | 0/0 | 1 | - |
 | c20_rehab_direct_question | rehab | 4/10 | 2 | 0 · 0 (=0) | 0/1 | 0 | 2 (pending answer) |
 | c21_rehab_status_unknown | rehab | 4/12 | 3 | 0 · 0 · 0 (=0) | 0/0 | 0 | 2 (pending answer), 3 (pending answer) |
@@ -216,7 +216,7 @@
 
 **Patient (2):** it's about 85 now
 
-> Okay -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
+> Thanks for sharing that -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
 
@@ -292,7 +292,7 @@
 
 **Patient (4):** foot over foot now
 
-> Thanks for sharing that -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
+> Okay -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked hip_precautions; new fields stairs [routed to RecoveryProgressAgent]*
 
@@ -724,7 +724,7 @@
 
 </details>
 
-### c13_pain_mild_medication -- Mild pain after painkillers: short joint branch plus the medication-effect question
+### c13_pain_mild_medication -- Mild pain after paracetamol: short joint branch plus the medication-effect question
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
@@ -740,15 +740,15 @@
 | - | final_has_trend_or_checkpoint | **FAIL** | /Compared with last time/ |
 | - | final_has_next_step | **FAIL** | /Next step:/ |
 | - | persists_on_completion | **FAIL** | 0 row(s) written, expected >= 1 |
-| - | routed_to_expected_agent | **FAIL** | turn 1: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent) |
+| - | routed_to_expected_agent | **FAIL** | turn 1: MedicationAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent) |
 
 <details><summary>Transcript</summary>
 
-**Patient (1):** My knee aches a little, I took my painkillers an hour ago.
+**Patient (1):** My knee aches a little, I took paracetamol an hour ago.
 
-> *(empty reply)*
+> I can help explain a medication in your postoperative record. Tell me its name, or ask about its purpose, prescribed dose, timing, or a possible side effect.
 
-*engine Clinical Synthesis Engine; triage GREEN (engine GREEN); asked -; new fields - [routed to IntakeContextAgent, fresh_classification]*
+*engine Medication Proactive Information Engine; triage GREEN (engine GREEN); asked -; new fields - [routed to MedicationAgent, fresh_classification]*
 
 **Patient (2):** 3
 
@@ -770,9 +770,9 @@
 
 **Patient (5):** yes it helped
 
-> Thanks. Do you know the name of the medication and the prescribed dose?
+> *(empty reply)*
 
-*engine Medication Proactive Adherence Engine; triage GREEN (engine GREEN); asked -; new fields - [routed to MedicationAgent, fresh_classification]*
+*engine Medication Proactive + Clinical Synthesis; triage GREEN (engine GREEN); asked -; new fields - [routed to MedicationAgent, fresh_classification]*
 
 </details>
 
@@ -780,20 +780,20 @@
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
-| 2 | collects_field | **FAIL** | rom_flexion_degrees -> not collected |
+| 2 | collects_field | PASS | rom_flexion_degrees -> 60.0 |
 | 3 | collects_field | PASS | rom_extension_degrees -> 10.0 |
-| 4 | collects_field | **FAIL** | mobility_status -> not collected |
-| 5 | collects_field | **FAIL** | walking_duration_minutes -> not collected |
-| 6 | collects_field | **FAIL** | stairs -> not collected |
+| 4 | collects_field | PASS | mobility_status -> walker |
+| 5 | collects_field | PASS | walking_duration_minutes -> 5.0 |
+| 6 | collects_field | PASS | stairs -> not_yet |
 | - | no_reask_of_collected_field | PASS |  |
-| - | max_questions | PASS | 5 asked, max 5 |
+| - | max_questions | PASS | 4 asked, max 5 |
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
-| - | final_turn_closes_interview | **FAIL** | final turn still asks mobility_status |
-| - | final_has_trend_or_checkpoint | **FAIL** | /day-\d+ (range\|checkpoint\|mark\|target\|guidance)\|long-term guidance\|checkpoint is day \d+/ |
-| - | final_has_next_step | **FAIL** | /Next milestone:/ |
-| - | persists_on_completion | **FAIL** | 0 row(s) written, expected >= 1 |
-| - | routed_to_expected_agent | **FAIL** | turn 1: IntakeContextAgent (fresh_classification, expected RecoveryProgressAgent); turn 4: RehabilitationAgent (continuation, expected RecoveryProgressAgent) |
+| - | final_turn_closes_interview | PASS | no question pending |
+| - | final_has_trend_or_checkpoint | PASS | /day-\d+ (range\|checkpoint\|mark\|target\|guidance)\|long-term guidance\|checkpoint is day \d+/ |
+| - | final_has_next_step | PASS | /Next milestone:/ |
+| - | persists_on_completion | PASS | 1 row(s) written, expected >= 1 |
+| - | routed_to_expected_agent | **FAIL** | turn 1: IntakeContextAgent (fresh_classification, expected RecoveryProgressAgent) |
 
 <details><summary>Transcript</summary>
 
@@ -805,33 +805,40 @@
 
 **Patient (2):** about 60 degrees
 
-> Let's see where you are on post-op day 4. About how many degrees can you currently bend your knee? (a few more questions)
+> Okay -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_flexion_degrees; new fields - [routed to RecoveryProgressAgent]*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (3):** about 10 degrees off straight
 
-> Got it -- extension of 10° on day 4; the first extension checkpoint is day 7, which looks for 0°-5° (according to the discharge guidance) -- the target to work towards. Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)
+> Thanks for sharing that -- extension of 10° on day 4; the first extension checkpoint is day 7, which looks for 0°-5° (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_flexion_degrees; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (4):** I use a walker
 
-> Before I answer: Does any exercise cause sharp pain, or swelling that lasts into the next day? (last question)
+> Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
-*engine Rehabilitation Agent - Exercise Check; triage GREEN (engine GREEN); asked rom_flexion_degrees; new fields - [routed to RehabilitationAgent, continuation]*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status [routed to RecoveryProgressAgent]*
 
 **Patient (5):** about 5 minutes
 
-> Thanks for sharing that -- flexion of 5° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Okay -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes [routed to RecoveryProgressAgent]*
 
 **Patient (6):** not yet
 
-> Just circling back to this -- How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Here's how things compare on post-op day 4, according to the discharge guidance:
+> - flexion: 60° -- the first flexion checkpoint is day 7, which looks for 70°-90°; the target to work towards
+> - extension: 10° -- the first extension checkpoint is day 7, which looks for 0°-5°; the target to work towards
+> - walking aid: a walker/frame -- the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface; the target to work towards
+> - walking duration: 5 minutes -- the first walking duration checkpoint is day 7, which describes walking little and often around the home; the target to work towards
+> - stairs: not yet -- the first stairs checkpoint is day 7, which describes managing two or three steps up and down with your aid; the target to work towards
+> 
+> Next milestone: day 7 -- flexion: 70-90 degrees of passive flexion; extension: near-full extension (0-5 degrees). Say 'recovery check' at day 7 and I'll compare.
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields - [routed to RecoveryProgressAgent]*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked -; new fields stairs [routed to RecoveryProgressAgent]*
 
 </details>
 
@@ -842,7 +849,7 @@
 | 2 | collects_field | PASS | mobility_status -> cane |
 | 3 | collects_field | **FAIL** | walking_duration_minutes -> not collected |
 | 4 | collects_field | **FAIL** | stairs -> not collected |
-| - | no_question_for_record_data | **FAIL** | turn 1: rom_flexion_degrees; turn 2: rom_flexion_degrees; turn 3: rom_extension_degrees |
+| - | no_question_for_record_data | **FAIL** | turn 1: rom_flexion_degrees; turn 2: rom_flexion_degrees; turn 3: rom_flexion_degrees |
 | - | no_reask_of_collected_field | PASS |  |
 | - | max_questions | PASS | 3 asked, max 3 |
 | - | triage_equals_engine | PASS |  |
@@ -869,9 +876,9 @@
 
 **Patient (3):** about 20 minutes
 
-> Okay -- flexion of 20°, below the day-14 mark of more than 80° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (one or two more questions)
+> Sorry, I didn't quite catch that as an angle. How far can you bend your knee, in degrees -- for example about 60, or about 90? (a few more questions)
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_flexion_degrees; new fields - [routed to RecoveryProgressAgent]*
 
 **Patient (4):** one step at a time
 
@@ -961,7 +968,7 @@
 
 **Patient (2):** about 90 degrees
 
-> Got it -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Okay -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees [routed to RecoveryProgressAgent]*
 
@@ -982,7 +989,7 @@
 | - | no_passage_id_in_text | PASS |  |
 | - | final_turn_closes_interview | PASS | no question pending |
 | - | final_has_trend_or_checkpoint | PASS | /day-\d+ (range\|checkpoint\|mark\|target\|guidance)\|long-term guidance\|checkpoint is day \d+/ |
-| - | final_has_next_step | **FAIL** | /Next milestone:/ |
+| - | final_has_next_step | PASS | /Next milestone:/ |
 | - | persists_on_completion | PASS | 1 row(s) written, expected >= 1 |
 | - | routed_to_expected_agent | PASS |  |
 
@@ -1002,7 +1009,7 @@
 
 **Patient (3):** 0 degrees, it goes fully straight
 
-> Got it -- extension of 0°, meets the day-84 target of 0° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Okay -- extension of 0°, meets the day-84 target of 0° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
@@ -1014,7 +1021,7 @@
 
 **Patient (5):** about 60 minutes
 
-> Thanks for sharing that -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Got it -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes [routed to RecoveryProgressAgent]*
 
@@ -1027,7 +1034,7 @@
 > - walking duration: 60 minutes -- no number in the long-term guidance; it expects regular walking as a preferred low-impact activity
 > - stairs: foot over foot -- as the day-84 checkpoint describes (climbing stairs step over step with little pain)
 > 
-> Longer term, the guidance describes daily activities: back to many previous activities, preferring low-impact ones; flexion: some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Say 'recovery check' any time and I'll compare with today.
+> Next milestone: longer term -- daily activities: back to many previous activities, preferring low-impact ones. Say 'recovery check' any time and I'll compare with today.
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked -; new fields stairs [routed to RecoveryProgressAgent]*
 
@@ -1075,19 +1082,19 @@
 
 **Patient (4):** about 5 degrees
 
-> Got it -- extension of 5°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Thanks for sharing that -- extension of 5°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees [routed to RecoveryProgressAgent]*
 
 **Patient (5):** a walker
 
-> Thanks for sharing that -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status [routed to RecoveryProgressAgent]*
 
 **Patient (6):** 10 minutes
 
-> Okay -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Got it -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes [routed to RecoveryProgressAgent]*
 

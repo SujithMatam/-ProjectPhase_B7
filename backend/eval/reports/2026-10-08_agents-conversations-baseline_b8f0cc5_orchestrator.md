@@ -2,7 +2,7 @@
 
 - backend: git worktree at b8f0cc5 (commit `b8f0cc5`)
 - mode: via LAMOrchestrator.process; LLM: stubbed
-- run at 2026-10-08 03:22:33, 19.5s
+- run at 2026-10-08 03:38:22, 22.0s
 
 ## Summary
 
@@ -680,7 +680,7 @@
 
 </details>
 
-### c13_pain_mild_medication -- Mild pain after painkillers: short joint branch plus the medication-effect question
+### c13_pain_mild_medication -- Mild pain after paracetamol: short joint branch plus the medication-effect question
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
@@ -696,15 +696,15 @@
 | - | final_has_trend_or_checkpoint | **FAIL** | /Compared with last time/ |
 | - | final_has_next_step | **FAIL** | /Next step:/ |
 | - | persists_on_completion | **FAIL** | 0 row(s) written, expected >= 1 |
-| - | routed_to_expected_agent | **FAIL** | turn 1: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent) |
+| - | routed_to_expected_agent | **FAIL** | turn 1: MedicationAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent) |
 
 <details><summary>Transcript</summary>
 
-**Patient (1):** My knee aches a little, I took my painkillers an hour ago.
+**Patient (1):** My knee aches a little, I took paracetamol an hour ago.
 
-> *(empty reply)*
+> I can help explain a medication in your postoperative record. Tell me its name, or ask about its purpose, prescribed dose, timing, or a possible side effect.
 
-*engine Clinical Synthesis Engine; triage GREEN (engine GREEN); asked -; new fields - [routed to IntakeContextAgent, fresh_classification]*
+*engine Medication Proactive Information Engine; triage GREEN (engine GREEN); asked -; new fields - [routed to MedicationAgent, fresh_classification]*
 
 **Patient (2):** 3
 
@@ -726,9 +726,9 @@
 
 **Patient (5):** yes it helped
 
-> Thanks. Do you know the name of the medication and the prescribed dose?
+> *(empty reply)*
 
-*engine Medication Proactive Adherence Engine; triage GREEN (engine GREEN); asked -; new fields - [routed to MedicationAgent, fresh_classification]*
+*engine Medication Proactive + Clinical Synthesis; triage GREEN (engine GREEN); asked -; new fields - [routed to MedicationAgent, fresh_classification]*
 
 </details>
 

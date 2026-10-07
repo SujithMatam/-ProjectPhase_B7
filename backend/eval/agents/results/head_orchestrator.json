@@ -2,11 +2,11 @@
   "meta": {
     "label": "head_orchestrator",
     "backend_dir": "this checkout",
-    "commit": "86c40ab",
+    "commit": "02b99ea",
     "live": false,
     "via_orchestrator": true,
-    "started": "2026-10-08 03:22:13",
-    "seconds": 19.1
+    "started": "2026-10-08 03:39:17",
+    "seconds": 19.3
   },
   "runs": [
     {
@@ -78,7 +78,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 11.04
+          "seconds": 10.85
         },
         {
           "index": 3,
@@ -254,7 +254,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 8,
@@ -291,7 +291,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         }
       ],
       "rows_persisted": {
@@ -566,7 +566,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 4,
@@ -814,12 +814,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
           "patient": "it's about 85 now",
-          "reply": "Okay -- flexion of 85\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5\u00b0 -- still about that? (a few more questions)",
+          "reply": "Thanks for sharing that -- flexion of 85\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5\u00b0 -- still about that? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -880,7 +880,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 4,
@@ -1171,7 +1171,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -1205,7 +1205,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 3,
@@ -1247,7 +1247,7 @@
         {
           "index": 4,
           "patient": "foot over foot now",
-          "reply": "Thanks for sharing that -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)",
+          "reply": "Okay -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-THA-REHAB-04"
@@ -1324,7 +1324,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1470,7 +1470,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 6.47
+          "seconds": 6.84
         },
         {
           "index": 2,
@@ -1498,7 +1498,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         }
       ],
       "rows_persisted": {
@@ -1634,7 +1634,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -1662,7 +1662,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 3,
@@ -1840,7 +1840,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -2118,7 +2118,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 5,
@@ -2198,7 +2198,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -2467,7 +2467,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -2543,7 +2543,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -2707,7 +2707,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -2739,7 +2739,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 3,
@@ -2771,7 +2771,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 4,
@@ -2843,7 +2843,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 6,
@@ -3223,7 +3223,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -3380,7 +3380,7 @@
     {
       "id": "c13_pain_mild_medication",
       "agent": "pain",
-      "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+      "title": "Mild pain after paracetamol: short joint branch plus the medication-effect question",
       "tags": [
         "memory"
       ],
@@ -3388,13 +3388,13 @@
       "turns": [
         {
           "index": 1,
-          "patient": "My knee aches a little, I took my painkillers an hour ago.",
-          "reply": "",
-          "engine": "Clinical Synthesis Engine",
+          "patient": "My knee aches a little, I took paracetamol an hour ago.",
+          "reply": "I can help explain a medication in your postoperative record. Tell me its name, or ask about its purpose, prescribed dose, timing, or a possible side effect.",
+          "engine": "Medication Proactive Information Engine",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
-          "routed_to": "IntakeContextAgent",
+          "routed_to": "MedicationAgent",
           "expected_agent": "PainSymptomsAgent",
           "misroute_kind": "fresh_classification",
           "pending_before": null,
@@ -3412,7 +3412,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -3440,7 +3440,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 3,
@@ -3496,13 +3496,13 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.03
         },
         {
           "index": 5,
           "patient": "yes it helped",
-          "reply": "Thanks. Do you know the name of the medication and the prescribed dose?",
-          "engine": "Medication Proactive Adherence Engine",
+          "reply": "",
+          "engine": "Medication Proactive + Clinical Synthesis",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
@@ -3612,7 +3612,7 @@
           "name": "routed_to_expected_agent",
           "turn": null,
           "passed": false,
-          "detail": "turn 1: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent)"
+          "detail": "turn 1: MedicationAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent)"
         }
       ],
       "summary": {
@@ -3683,40 +3683,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.02
         },
         {
           "index": 2,
           "patient": "about 60 degrees",
-          "reply": "Let's see where you are on post-op day 4. About how many degrees can you currently bend your knee? (a few more questions)",
-          "engine": "Recovery Deterministic Assessment Engine",
-          "sources": [],
-          "triage_level": "GREEN",
-          "engine_triage_level": "GREEN",
-          "routed_to": "RecoveryProgressAgent",
-          "expected_agent": "RecoveryProgressAgent",
-          "misroute_kind": null,
-          "pending_before": null,
-          "is_agent_turn": true,
-          "asked_field": "rom_flexion_degrees",
-          "is_confirm": false,
-          "questions": 1,
-          "collected": {},
-          "collected_before": {},
-          "new_fields": [],
-          "rows_written": {
-            "symptom_assessments": 0,
-            "metrics_inserted": 0,
-            "metrics_updated": 0,
-            "total": 0
-          },
-          "error": null,
-          "seconds": 0.03
-        },
-        {
-          "index": 3,
-          "patient": "about 10 degrees off straight",
-          "reply": "Got it -- extension of 10\u00b0 on day 4; the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0 (according to the discharge guidance) -- the target to work towards. Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)",
+          "reply": "Okay -- flexion of 60\u00b0 on day 4; the first flexion checkpoint is day 7, which looks for 70\u00b0-90\u00b0 (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -3726,17 +3698,17 @@
           "routed_to": "RecoveryProgressAgent",
           "expected_agent": "RecoveryProgressAgent",
           "misroute_kind": null,
-          "pending_before": "rom_flexion_degrees",
+          "pending_before": null,
           "is_agent_turn": true,
-          "asked_field": "rom_flexion_degrees",
+          "asked_field": "rom_extension_degrees",
           "is_confirm": false,
           "questions": 1,
           "collected": {
-            "rom_extension_degrees": "10.0"
+            "rom_flexion_degrees": "60.0"
           },
           "collected_before": {},
           "new_fields": [
-            "rom_extension_degrees"
+            "rom_flexion_degrees"
           ],
           "rows_written": {
             "symptom_assessments": 0,
@@ -3748,28 +3720,72 @@
           "seconds": 0.02
         },
         {
-          "index": 4,
-          "patient": "I use a walker",
-          "reply": "Before I answer: Does any exercise cause sharp pain, or swelling that lasts into the next day? (last question)",
-          "engine": "Rehabilitation Agent - Exercise Check",
-          "sources": [],
+          "index": 3,
+          "patient": "about 10 degrees off straight",
+          "reply": "Thanks for sharing that -- extension of 10\u00b0 on day 4; the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0 (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
-          "routed_to": "RehabilitationAgent",
+          "routed_to": "RecoveryProgressAgent",
           "expected_agent": "RecoveryProgressAgent",
-          "misroute_kind": "continuation",
-          "pending_before": "rom_flexion_degrees",
+          "misroute_kind": null,
+          "pending_before": "rom_extension_degrees",
           "is_agent_turn": true,
-          "asked_field": "rom_flexion_degrees",
+          "asked_field": "mobility_status",
           "is_confirm": false,
           "questions": 1,
           "collected": {
+            "rom_flexion_degrees": "60.0",
             "rom_extension_degrees": "10.0"
           },
           "collected_before": {
+            "rom_flexion_degrees": "60.0"
+          },
+          "new_fields": [
+            "rom_extension_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 4,
+          "patient": "I use a walker",
+          "reply": "Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "EV-TKA-REC-01"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "mobility_status",
+          "is_agent_turn": true,
+          "asked_field": "walking_duration_minutes",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "60.0",
             "rom_extension_degrees": "10.0"
           },
-          "new_fields": [],
+          "new_fields": [
+            "mobility_status"
+          ],
           "rows_written": {
             "symptom_assessments": 0,
             "metrics_inserted": 0,
@@ -3782,30 +3798,34 @@
         {
           "index": 5,
           "patient": "about 5 minutes",
-          "reply": "Thanks for sharing that -- flexion of 5\u00b0 on day 4; the first flexion checkpoint is day 7, which looks for 70\u00b0-90\u00b0 (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Okay -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
-            "TKA-03"
+            "EV-TKA-REC-01"
           ],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
           "routed_to": "RecoveryProgressAgent",
           "expected_agent": "RecoveryProgressAgent",
           "misroute_kind": null,
-          "pending_before": "rom_flexion_degrees",
+          "pending_before": "walking_duration_minutes",
           "is_agent_turn": true,
-          "asked_field": "mobility_status",
+          "asked_field": "stairs",
           "is_confirm": false,
           "questions": 1,
           "collected": {
+            "rom_flexion_degrees": "60.0",
             "rom_extension_degrees": "10.0",
-            "rom_flexion_degrees": "5.0"
+            "mobility_status": "walker",
+            "walking_duration_minutes": "5.0"
           },
           "collected_before": {
-            "rom_extension_degrees": "10.0"
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
           },
           "new_fields": [
-            "rom_flexion_degrees"
+            "walking_duration_minutes"
           ],
           "rows_written": {
             "symptom_assessments": 0,
@@ -3819,33 +3839,43 @@
         {
           "index": 6,
           "patient": "not yet",
-          "reply": "Just circling back to this -- How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Here's how things compare on post-op day 4, according to the discharge guidance:\n- flexion: 60\u00b0 -- the first flexion checkpoint is day 7, which looks for 70\u00b0-90\u00b0; the target to work towards\n- extension: 10\u00b0 -- the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0; the target to work towards\n- walking aid: a walker/frame -- the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface; the target to work towards\n- walking duration: 5 minutes -- the first walking duration checkpoint is day 7, which describes walking little and often around the home; the target to work towards\n- stairs: not yet -- the first stairs checkpoint is day 7, which describes managing two or three steps up and down with your aid; the target to work towards\n\nNext milestone: day 7 -- flexion: 70-90 degrees of passive flexion; extension: near-full extension (0-5 degrees). Say 'recovery check' at day 7 and I'll compare.",
           "engine": "Recovery Deterministic Assessment Engine",
-          "sources": [],
+          "sources": [
+            "TKA-03",
+            "EV-TKA-REC-01"
+          ],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
           "routed_to": "RecoveryProgressAgent",
           "expected_agent": "RecoveryProgressAgent",
           "misroute_kind": null,
-          "pending_before": "mobility_status",
+          "pending_before": "stairs",
           "is_agent_turn": true,
-          "asked_field": "mobility_status",
+          "asked_field": null,
           "is_confirm": false,
-          "questions": 1,
+          "questions": 0,
           "collected": {
+            "rom_flexion_degrees": "60.0",
             "rom_extension_degrees": "10.0",
-            "rom_flexion_degrees": "5.0"
+            "mobility_status": "walker",
+            "walking_duration_minutes": "5.0",
+            "stairs": "not_yet"
           },
           "collected_before": {
+            "rom_flexion_degrees": "60.0",
             "rom_extension_degrees": "10.0",
-            "rom_flexion_degrees": "5.0"
+            "mobility_status": "walker",
+            "walking_duration_minutes": "5.0"
           },
-          "new_fields": [],
+          "new_fields": [
+            "stairs"
+          ],
           "rows_written": {
             "symptom_assessments": 0,
-            "metrics_inserted": 0,
+            "metrics_inserted": 1,
             "metrics_updated": 0,
-            "total": 0
+            "total": 1
           },
           "error": null,
           "seconds": 0.02
@@ -3853,9 +3883,9 @@
       ],
       "rows_persisted": {
         "symptom_assessments": 0,
-        "metrics_inserted": 0,
+        "metrics_inserted": 1,
         "metrics_updated": 0,
-        "total": 0
+        "total": 1
       },
       "wb_before": "Weight Bearing as Tolerated (WBAT)",
       "wb_after": "Weight Bearing as Tolerated (WBAT)",
@@ -3863,8 +3893,8 @@
         {
           "name": "collects_field",
           "turn": 2,
-          "passed": false,
-          "detail": "rom_flexion_degrees -> not collected"
+          "passed": true,
+          "detail": "rom_flexion_degrees -> 60.0"
         },
         {
           "name": "collects_field",
@@ -3875,20 +3905,20 @@
         {
           "name": "collects_field",
           "turn": 4,
-          "passed": false,
-          "detail": "mobility_status -> not collected"
+          "passed": true,
+          "detail": "mobility_status -> walker"
         },
         {
           "name": "collects_field",
           "turn": 5,
-          "passed": false,
-          "detail": "walking_duration_minutes -> not collected"
+          "passed": true,
+          "detail": "walking_duration_minutes -> 5.0"
         },
         {
           "name": "collects_field",
           "turn": 6,
-          "passed": false,
-          "detail": "stairs -> not collected"
+          "passed": true,
+          "detail": "stairs -> not_yet"
         },
         {
           "name": "no_reask_of_collected_field",
@@ -3900,7 +3930,7 @@
           "name": "max_questions",
           "turn": null,
           "passed": true,
-          "detail": "5 asked, max 5"
+          "detail": "4 asked, max 5"
         },
         {
           "name": "triage_equals_engine",
@@ -3917,62 +3947,59 @@
         {
           "name": "final_turn_closes_interview",
           "turn": null,
-          "passed": false,
-          "detail": "final turn still asks mobility_status"
+          "passed": true,
+          "detail": "no question pending"
         },
         {
           "name": "final_has_trend_or_checkpoint",
           "turn": null,
-          "passed": false,
+          "passed": true,
           "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
         },
         {
           "name": "final_has_next_step",
           "turn": null,
-          "passed": false,
+          "passed": true,
           "detail": "/Next milestone:/"
         },
         {
           "name": "persists_on_completion",
           "turn": null,
-          "passed": false,
-          "detail": "0 row(s) written, expected >= 1"
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
         },
         {
           "name": "routed_to_expected_agent",
           "turn": null,
           "passed": false,
-          "detail": "turn 1: IntakeContextAgent (fresh_classification, expected RecoveryProgressAgent); turn 4: RehabilitationAgent (continuation, expected RecoveryProgressAgent)"
+          "detail": "turn 1: IntakeContextAgent (fresh_classification, expected RecoveryProgressAgent)"
         }
       ],
       "summary": {
-        "questions": 5,
+        "questions": 4,
         "fields_per_turn": [
           0,
-          0,
           1,
-          0,
           1,
-          0
+          1,
+          1,
+          1
         ],
-        "fields_total": 2,
+        "fields_total": 5,
         "record_fields_reused": 0,
         "record_fields_offered": 0,
         "record_fields_reused_sources": [],
         "record_fields_asked": [],
-        "rows_persisted": 0,
+        "rows_persisted": 1,
         "misrouted_turns": [
-          1,
-          4
+          1
         ],
-        "misrouted_continuation": [
-          4
-        ],
+        "misrouted_continuation": [],
         "misrouted_fresh": [
           1
         ],
         "red_preempted_turns": [],
-        "properties_passed": 5,
+        "properties_passed": 13,
         "properties_total": 14
       }
     },
@@ -4051,11 +4078,9 @@
         {
           "index": 3,
           "patient": "about 20 minutes",
-          "reply": "Okay -- flexion of 20\u00b0, below the day-14 mark of more than 80\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (one or two more questions)",
+          "reply": "Sorry, I didn't quite catch that as an angle. How far can you bend your knee, in degrees -- for example about 60, or about 90? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
-          "sources": [
-            "EV-TKA-REHAB-02"
-          ],
+          "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
           "routed_to": "RecoveryProgressAgent",
@@ -4063,19 +4088,16 @@
           "misroute_kind": null,
           "pending_before": "rom_flexion_degrees",
           "is_agent_turn": true,
-          "asked_field": "rom_extension_degrees",
+          "asked_field": "rom_flexion_degrees",
           "is_confirm": false,
           "questions": 1,
           "collected": {
-            "mobility_status": "cane",
-            "rom_flexion_degrees": "20.0"
+            "mobility_status": "cane"
           },
           "collected_before": {
             "mobility_status": "cane"
           },
-          "new_fields": [
-            "rom_flexion_degrees"
-          ],
+          "new_fields": [],
           "rows_written": {
             "symptom_assessments": 0,
             "metrics_inserted": 0,
@@ -4096,18 +4118,16 @@
           "routed_to": "DailyActivityAgent",
           "expected_agent": "RecoveryProgressAgent",
           "misroute_kind": "continuation",
-          "pending_before": "rom_extension_degrees",
+          "pending_before": "rom_flexion_degrees",
           "is_agent_turn": true,
           "asked_field": null,
           "is_confirm": false,
           "questions": 0,
           "collected": {
-            "mobility_status": "cane",
-            "rom_flexion_degrees": "20.0"
+            "mobility_status": "cane"
           },
           "collected_before": {
-            "mobility_status": "cane",
-            "rom_flexion_degrees": "20.0"
+            "mobility_status": "cane"
           },
           "new_fields": [],
           "rows_written": {
@@ -4151,7 +4171,7 @@
           "name": "no_question_for_record_data",
           "turn": null,
           "passed": false,
-          "detail": "turn 1: rom_flexion_degrees; turn 2: rom_flexion_degrees; turn 3: rom_extension_degrees"
+          "detail": "turn 1: rom_flexion_degrees; turn 2: rom_flexion_degrees; turn 3: rom_flexion_degrees"
         },
         {
           "name": "no_reask_of_collected_field",
@@ -4213,15 +4233,14 @@
         "fields_per_turn": [
           0,
           1,
-          1,
+          0,
           0
         ],
-        "fields_total": 2,
+        "fields_total": 1,
         "record_fields_reused": 0,
         "record_fields_offered": 2,
         "record_fields_reused_sources": [],
         "record_fields_asked": [
-          "rom_extension_degrees",
           "rom_flexion_degrees"
         ],
         "rows_persisted": 0,
@@ -4321,7 +4340,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -4366,7 +4385,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -4524,7 +4543,7 @@
         {
           "index": 2,
           "patient": "about 90 degrees",
-          "reply": "Got it -- flexion of 90\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
+          "reply": "Okay -- flexion of 90\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -4553,7 +4572,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -4700,7 +4719,7 @@
         {
           "index": 3,
           "patient": "0 degrees, it goes fully straight",
-          "reply": "Got it -- extension of 0\u00b0, meets the day-84 target of 0\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Okay -- extension of 0\u00b0, meets the day-84 target of 0\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-05"
@@ -4732,7 +4751,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 4,
@@ -4776,7 +4795,7 @@
         {
           "index": 5,
           "patient": "about 60 minutes",
-          "reply": "Thanks for sharing that -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-06"
@@ -4817,7 +4836,7 @@
         {
           "index": 6,
           "patient": "foot over foot",
-          "reply": "Here's how things compare on post-op day 90, according to the discharge guidance:\n- flexion: 115\u00b0 -- no number in the long-term guidance; it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises\n- extension: 0\u00b0 -- meets the day-84 target of 0\u00b0\n- walking aid: walking without an aid -- as the day-84 checkpoint describes (walking further and more steadily, with less need for a walking aid)\n- walking duration: 60 minutes -- no number in the long-term guidance; it expects regular walking as a preferred low-impact activity\n- stairs: foot over foot -- as the day-84 checkpoint describes (climbing stairs step over step with little pain)\n\nLonger term, the guidance describes daily activities: back to many previous activities, preferring low-impact ones; flexion: some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Say 'recovery check' any time and I'll compare with today.",
+          "reply": "Here's how things compare on post-op day 90, according to the discharge guidance:\n- flexion: 115\u00b0 -- no number in the long-term guidance; it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises\n- extension: 0\u00b0 -- meets the day-84 target of 0\u00b0\n- walking aid: walking without an aid -- as the day-84 checkpoint describes (walking further and more steadily, with less need for a walking aid)\n- walking duration: 60 minutes -- no number in the long-term guidance; it expects regular walking as a preferred low-impact activity\n- stairs: foot over foot -- as the day-84 checkpoint describes (climbing stairs step over step with little pain)\n\nNext milestone: longer term -- daily activities: back to many previous activities, preferring low-impact ones. Say 'recovery check' any time and I'll compare with today.",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-06",
@@ -4938,7 +4957,7 @@
         {
           "name": "final_has_next_step",
           "turn": null,
-          "passed": false,
+          "passed": true,
           "detail": "/Next milestone:/"
         },
         {
@@ -4974,7 +4993,7 @@
         "misrouted_continuation": [],
         "misrouted_fresh": [],
         "red_preempted_turns": [],
-        "properties_passed": 13,
+        "properties_passed": 14,
         "properties_total": 14
       }
     },
@@ -5067,12 +5086,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 4,
           "patient": "about 5 degrees",
-          "reply": "Got it -- extension of 5\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Thanks for sharing that -- extension of 5\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REHAB-02"
@@ -5106,7 +5125,7 @@
         {
           "index": 5,
           "patient": "a walker",
-          "reply": "Thanks for sharing that -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -5143,7 +5162,7 @@
         {
           "index": 6,
           "patient": "10 minutes",
-          "reply": "Okay -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -5383,7 +5402,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -5893,7 +5912,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,

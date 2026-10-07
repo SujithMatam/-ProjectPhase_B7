@@ -2,7 +2,7 @@
 
 - backend: git worktree at b8f0cc5 (commit `b8f0cc5`)
 - mode: direct agent calls; LLM: stubbed
-- run at 2026-10-08 03:22:00, 12.5s
+- run at 2026-10-08 03:38:22, 14.7s
 
 ## Summary
 
@@ -20,7 +20,7 @@
 | c10_pain_bug_detour_resume | pain | 6/13 | 5 | 0 · 1 · 1 · 0 · 1 (=3) | 0/1 | 0 |
 | c11_pain_multislot_opening | pain | 10/12 | 1 | 3 · 1 (=4) | 1/1 | 1 |
 | c12_pain_abandoned | pain | 7/7 | 3 | 1 · 1 · 1 (=3) | 0/0 | 0 |
-| c13_pain_mild_medication | pain | 10/12 | 4 | 0 · 1 · 1 · 1 · 1 (=4) | 0/1 | 1 |
+| c13_pain_mild_medication | pain | 7/12 | 4 | 0 · 1 · 1 · 1 · 0 (=3) | 0/1 | 1 |
 | c14_recovery_tka_day4_target | recovery | 8/13 | 1 | 0 · 1 · 1 · 1 · 0 · 0 (=3) | 0/0 | 0 |
 | c15_recovery_request_current_rom | recovery | 4/12 | 4 | 0 · 1 · 0 · 0 (=1) | 0/2 | 0 |
 | c16_recovery_multislot | recovery | 6/13 | 2 | 2 · 0 · 0 (=2) | 0/0 | 0 |
@@ -662,26 +662,26 @@
 
 </details>
 
-### c13_pain_mild_medication -- Mild pain after painkillers: short joint branch plus the medication-effect question
+### c13_pain_mild_medication -- Mild pain after paracetamol: short joint branch plus the medication-effect question
 
 | Turn | Property | Result | Detail |
 |---|---|---|---|
 | 2 | collects_field | PASS | pain_score -> 3 |
 | 3 | collects_field | PASS | onset -> gradual |
 | 4 | collects_field | PASS | location -> around the kneecap |
-| 5 | collects_field | PASS | medication_effect -> yes it helped |
-| - | no_reask_of_collected_field | PASS |  |
+| 5 | collects_field | **FAIL** | medication_effect -> not collected |
+| - | no_reask_of_collected_field | **FAIL** | turn 5: pain_score |
 | - | max_questions | PASS | 4 asked, max 4 |
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
-| - | final_turn_closes_interview | PASS | no question pending |
+| - | final_turn_closes_interview | **FAIL** | final turn still asks pain_score |
 | - | final_has_trend_or_checkpoint | **FAIL** | /Compared with last time/ |
 | - | final_has_next_step | **FAIL** | /Next step:/ |
 | - | persists_on_completion | PASS | 1 row(s) written, expected >= 1 |
 
 <details><summary>Transcript</summary>
 
-**Patient (1):** My knee aches a little, I took my painkillers an hour ago.
+**Patient (1):** My knee aches a little, I took paracetamol an hour ago.
 
 > Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?
 
@@ -701,23 +701,22 @@
 
 **Patient (4):** around the kneecap
 
-> Got it. Did taking your pain medication help, or not really?
-
-*engine Pain & Symptoms Agent - Multi-turn Assessment; triage GREEN (engine GREEN); asked medication_effect; new fields location*
-
-**Patient (5):** yes it helped
-
 > Thanks for going through that with me. Based on what you've told me:
 > - pain score: 3/10
 > - how it started: gradual
 > - where it's felt: around the kneecap
-> - effect of medication: yes it helped
 > 
 > Following your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's lower than the pain score of 5/10 recorded last time.
 > 
 > This is a preliminary read based on what you've described and isn't a diagnosis.
 
-*engine Pain & Symptoms Agent - Safe Conclusion Fallback; triage GREEN (engine GREEN); asked -; new fields medication_effect*
+*engine Pain & Symptoms Agent - Safe Conclusion Fallback; triage GREEN (engine GREEN); asked -; new fields location*
+
+**Patient (5):** yes it helped
+
+> Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?
+
+*engine Pain & Symptoms Agent - Multi-turn Assessment; triage GREEN (engine GREEN); asked pain_score; new fields -*
 
 </details>
 

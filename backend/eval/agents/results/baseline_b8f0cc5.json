@@ -5,8 +5,8 @@
     "commit": "b8f0cc5",
     "live": false,
     "via_orchestrator": false,
-    "started": "2026-10-08 03:22:00",
-    "seconds": 12.5
+    "started": "2026-10-08 03:38:22",
+    "seconds": 14.7
   },
   "runs": [
     {
@@ -46,7 +46,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.03
         },
         {
           "index": 2,
@@ -306,7 +306,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -822,7 +822,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 11.48
+          "seconds": 13.55
         },
         {
           "index": 2,
@@ -878,7 +878,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 4,
@@ -906,7 +906,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 5,
@@ -970,7 +970,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1381,7 +1381,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -1409,7 +1409,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1535,7 +1535,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -1563,7 +1563,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 3,
@@ -1594,7 +1594,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1732,7 +1732,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -2078,7 +2078,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -2307,7 +2307,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 4,
@@ -3234,7 +3234,7 @@
     {
       "id": "c13_pain_mild_medication",
       "agent": "pain",
-      "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+      "title": "Mild pain after paracetamol: short joint branch plus the medication-effect question",
       "tags": [
         "memory"
       ],
@@ -3242,7 +3242,7 @@
       "turns": [
         {
           "index": 1,
-          "patient": "My knee aches a little, I took my painkillers an hour ago.",
+          "patient": "My knee aches a little, I took paracetamol an hour ago.",
           "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
           "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
           "sources": [],
@@ -3338,8 +3338,8 @@
         {
           "index": 4,
           "patient": "around the kneecap",
-          "reply": "Got it. Did taking your pain medication help, or not really?",
-          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 3/10\n- how it started: gradual\n- where it's felt: around the kneecap\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's lower than the pain score of 5/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
@@ -3348,9 +3348,9 @@
           "misroute_kind": null,
           "pending_before": "location",
           "is_agent_turn": true,
-          "asked_field": "medication_effect",
+          "asked_field": null,
           "is_confirm": false,
-          "questions": 1,
+          "questions": 0,
           "collected": {
             "onset": "gradual",
             "pain_score": "3",
@@ -3364,45 +3364,6 @@
             "location"
           ],
           "rows_written": {
-            "symptom_assessments": 0,
-            "metrics_inserted": 0,
-            "metrics_updated": 0,
-            "total": 0
-          },
-          "error": null,
-          "seconds": 0.0
-        },
-        {
-          "index": 5,
-          "patient": "yes it helped",
-          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 3/10\n- how it started: gradual\n- where it's felt: around the kneecap\n- effect of medication: yes it helped\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's lower than the pain score of 5/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
-          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
-          "sources": [],
-          "triage_level": "GREEN",
-          "engine_triage_level": "GREEN",
-          "routed_to": "PainSymptomsAgent",
-          "expected_agent": "PainSymptomsAgent",
-          "misroute_kind": null,
-          "pending_before": "medication_effect",
-          "is_agent_turn": true,
-          "asked_field": null,
-          "is_confirm": false,
-          "questions": 0,
-          "collected": {
-            "onset": "gradual",
-            "pain_score": "3",
-            "location": "around the kneecap",
-            "medication_effect": "yes it helped"
-          },
-          "collected_before": {
-            "onset": "gradual",
-            "pain_score": "3",
-            "location": "around the kneecap"
-          },
-          "new_fields": [
-            "medication_effect"
-          ],
-          "rows_written": {
             "symptom_assessments": 1,
             "metrics_inserted": 0,
             "metrics_updated": 0,
@@ -3410,6 +3371,38 @@
           },
           "error": null,
           "seconds": 0.01
+        },
+        {
+          "index": 5,
+          "patient": "yes it helped",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {
+            "onset": "gradual",
+            "pain_score": "3",
+            "location": "around the kneecap"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
         }
       ],
       "rows_persisted": {
@@ -3442,14 +3435,14 @@
         {
           "name": "collects_field",
           "turn": 5,
-          "passed": true,
-          "detail": "medication_effect -> yes it helped"
+          "passed": false,
+          "detail": "medication_effect -> not collected"
         },
         {
           "name": "no_reask_of_collected_field",
           "turn": null,
-          "passed": true,
-          "detail": ""
+          "passed": false,
+          "detail": "turn 5: pain_score"
         },
         {
           "name": "max_questions",
@@ -3472,8 +3465,8 @@
         {
           "name": "final_turn_closes_interview",
           "turn": null,
-          "passed": true,
-          "detail": "no question pending"
+          "passed": false,
+          "detail": "final turn still asks pain_score"
         },
         {
           "name": "final_has_trend_or_checkpoint",
@@ -3501,9 +3494,9 @@
           1,
           1,
           1,
-          1
+          0
         ],
-        "fields_total": 4,
+        "fields_total": 3,
         "record_fields_reused": 0,
         "record_fields_offered": 1,
         "record_fields_reused_sources": [],
@@ -3513,7 +3506,7 @@
         "misrouted_continuation": [],
         "misrouted_fresh": [],
         "red_preempted_turns": [],
-        "properties_passed": 10,
+        "properties_passed": 7,
         "properties_total": 12
       }
     },
@@ -3621,7 +3614,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 4,
@@ -3736,7 +3729,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -4135,7 +4128,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -4350,7 +4343,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -4488,7 +4481,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -4518,7 +4511,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -4589,7 +4582,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -4661,7 +4654,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -4809,7 +4802,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -5161,7 +5154,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -5367,7 +5360,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -5505,7 +5498,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         }
       ],
       "rows_persisted": {
@@ -5666,7 +5659,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {

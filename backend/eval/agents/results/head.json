@@ -2,11 +2,11 @@
   "meta": {
     "label": "head",
     "backend_dir": "this checkout",
-    "commit": "86c40ab",
+    "commit": "02b99ea",
     "live": false,
     "via_orchestrator": false,
-    "started": "2026-10-08 03:21:45",
-    "seconds": 13.0
+    "started": "2026-10-08 03:39:17",
+    "seconds": 12.1
   },
   "runs": [
     {
@@ -46,7 +46,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -516,7 +516,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -620,7 +620,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -825,7 +825,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -933,7 +933,7 @@
         {
           "index": 5,
           "patient": "I'm using a cane and I can walk about 15 minutes",
-          "reply": "Thanks for sharing that -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-01"
@@ -1176,12 +1176,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
           "patient": "I'm still using one crutch",
-          "reply": "Thanks for sharing that -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)",
+          "reply": "Got it -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-THA-REHAB-04"
@@ -1215,7 +1215,7 @@
         {
           "index": 3,
           "patient": "about 20 minutes",
-          "reply": "Okay -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)",
+          "reply": "Thanks for sharing that -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-THA-REHAB-04"
@@ -1501,7 +1501,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 12.31
+          "seconds": 11.43
         }
       ],
       "rows_persisted": {
@@ -1696,7 +1696,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -2106,7 +2106,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -2350,7 +2350,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -2525,7 +2525,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -3353,7 +3353,7 @@
     {
       "id": "c13_pain_mild_medication",
       "agent": "pain",
-      "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+      "title": "Mild pain after paracetamol: short joint branch plus the medication-effect question",
       "tags": [
         "memory"
       ],
@@ -3361,7 +3361,7 @@
       "turns": [
         {
           "index": 1,
-          "patient": "My knee aches a little, I took my painkillers an hour ago.",
+          "patient": "My knee aches a little, I took paracetamol an hour ago.",
           "reply": "Last time you had 5/10 around the kneecap and it was getting better -- let's see where things are now. On a scale from 0 to 10, how bad is the pain right now? (a few more questions)",
           "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
           "sources": [],
@@ -3489,7 +3489,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 5,
@@ -3676,7 +3676,7 @@
         {
           "index": 2,
           "patient": "about 60 degrees",
-          "reply": "Thanks for sharing that -- flexion of 60\u00b0 on day 4; the first flexion checkpoint is day 7, which looks for 70\u00b0-90\u00b0 (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
+          "reply": "Okay -- flexion of 60\u00b0 on day 4; the first flexion checkpoint is day 7, which looks for 70\u00b0-90\u00b0 (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -3710,7 +3710,7 @@
         {
           "index": 3,
           "patient": "about 10 degrees off straight",
-          "reply": "Got it -- extension of 10\u00b0 on day 4; the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0 (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Okay -- extension of 10\u00b0 on day 4; the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0 (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -3747,7 +3747,7 @@
         {
           "index": 4,
           "patient": "I use a walker",
-          "reply": "Okay -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-01"
@@ -3786,7 +3786,7 @@
         {
           "index": 5,
           "patient": "about 5 minutes",
-          "reply": "Thanks for sharing that -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-01"
@@ -3822,7 +3822,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 6,
@@ -3866,7 +3866,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.0
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -3994,7 +3994,7 @@
         {
           "index": 1,
           "patient": "How's my progress looking?",
-          "reply": "Thanks for sharing that -- flexion of 95\u00b0, meets the day-14 mark of more than 80\u00b0 (according to the discharge guidance). extension of 2\u00b0, within the day-14 range of 0\u00b0-10\u00b0. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Okay -- flexion of 95\u00b0, meets the day-14 mark of more than 80\u00b0 (according to the discharge guidance). extension of 2\u00b0, within the day-14 range of 0\u00b0-10\u00b0. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REHAB-02"
@@ -4030,7 +4030,7 @@
         {
           "index": 2,
           "patient": "a cane",
-          "reply": "Thanks for sharing that -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Got it -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -4069,7 +4069,7 @@
         {
           "index": 3,
           "patient": "about 20 minutes",
-          "reply": "Thanks for sharing that -- walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -4272,7 +4272,7 @@
         {
           "index": 1,
           "patient": "I can bend my knee to 95 degrees and walk with a cane for about 20 minutes. How am I doing?",
-          "reply": "Okay -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. flexion of 95\u00b0, meets the day-14 mark of more than 80\u00b0. walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes. Do you know your current knee extension measurement in degrees (how close to fully straight)? (one more question after this)",
+          "reply": "Thanks for sharing that -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. flexion of 95\u00b0, meets the day-14 mark of more than 80\u00b0. walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes. Do you know your current knee extension measurement in degrees (how close to fully straight)? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02",
@@ -4311,7 +4311,7 @@
         {
           "index": 2,
           "patient": "about 3 degrees",
-          "reply": "Okay -- extension of 3\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- extension of 3\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REHAB-02"
@@ -4544,7 +4544,7 @@
         {
           "index": 2,
           "patient": "about 90 degrees",
-          "reply": "Thanks for sharing that -- flexion of 90\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
+          "reply": "Got it -- flexion of 90\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -4675,12 +4675,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 2,
           "patient": "115 degrees",
-          "reply": "Got it -- flexion: 115\u00b0; the long-term guidance (according to the discharge guidance) gives no number, it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
+          "reply": "Thanks for sharing that -- flexion: 115\u00b0; the long-term guidance (according to the discharge guidance) gives no number, it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-06"
@@ -4714,7 +4714,7 @@
         {
           "index": 3,
           "patient": "0 degrees, it goes fully straight",
-          "reply": "Thanks for sharing that -- extension of 0\u00b0, meets the day-84 target of 0\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Got it -- extension of 0\u00b0, meets the day-84 target of 0\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-05"
@@ -4751,7 +4751,7 @@
         {
           "index": 4,
           "patient": "walking without any aid now",
-          "reply": "Okay -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Got it -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-05"
@@ -4790,7 +4790,7 @@
         {
           "index": 5,
           "patient": "about 60 minutes",
-          "reply": "Okay -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-06"
@@ -4831,7 +4831,7 @@
         {
           "index": 6,
           "patient": "foot over foot",
-          "reply": "Here's how things compare on post-op day 90, according to the discharge guidance:\n- flexion: 115\u00b0 -- no number in the long-term guidance; it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises\n- extension: 0\u00b0 -- meets the day-84 target of 0\u00b0\n- walking aid: walking without an aid -- as the day-84 checkpoint describes (walking further and more steadily, with less need for a walking aid)\n- walking duration: 60 minutes -- no number in the long-term guidance; it expects regular walking as a preferred low-impact activity\n- stairs: foot over foot -- as the day-84 checkpoint describes (climbing stairs step over step with little pain)\n\nLonger term, the guidance describes daily activities: back to many previous activities, preferring low-impact ones; flexion: some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Say 'recovery check' any time and I'll compare with today.",
+          "reply": "Here's how things compare on post-op day 90, according to the discharge guidance:\n- flexion: 115\u00b0 -- no number in the long-term guidance; it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises\n- extension: 0\u00b0 -- meets the day-84 target of 0\u00b0\n- walking aid: walking without an aid -- as the day-84 checkpoint describes (walking further and more steadily, with less need for a walking aid)\n- walking duration: 60 minutes -- no number in the long-term guidance; it expects regular walking as a preferred low-impact activity\n- stairs: foot over foot -- as the day-84 checkpoint describes (climbing stairs step over step with little pain)\n\nNext milestone: longer term -- daily activities: back to many previous activities, preferring low-impact ones. Say 'recovery check' any time and I'll compare with today.",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-06",
@@ -4952,7 +4952,7 @@
         {
           "name": "final_has_next_step",
           "turn": null,
-          "passed": false,
+          "passed": true,
           "detail": "/Next milestone:/"
         },
         {
@@ -4982,7 +4982,7 @@
         "misrouted_continuation": [],
         "misrouted_fresh": [],
         "red_preempted_turns": [],
-        "properties_passed": 12,
+        "properties_passed": 13,
         "properties_total": 13
       }
     },
@@ -5080,7 +5080,7 @@
         {
           "index": 4,
           "patient": "about 5 degrees",
-          "reply": "Got it -- extension of 5\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Okay -- extension of 5\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REHAB-02"
@@ -5109,12 +5109,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 5,
           "patient": "a walker",
-          "reply": "Thanks for sharing that -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -5151,7 +5151,7 @@
         {
           "index": 6,
           "patient": "10 minutes",
-          "reply": "Okay -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Thanks for sharing that -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -6060,7 +6060,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
