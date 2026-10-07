@@ -107,6 +107,11 @@ MAX_ASKS_PER_FIELD = 2
 _ROM_STRUCTURAL_MAX_DEGREES = 180.0
 # Same idea for a walking duration in minutes: a day has 1440.
 _MINUTES_STRUCTURAL_MAX = 1440.0
+# ENGINEERING INPUT-PLAUSIBILITY GUARD (NOT a clinical threshold): a reply
+# to the flexion/extension question that carries NO degrees unit is only
+# read as an angle when the number is in 0-150. Anything else ("about 5
+# minutes", "200") is a non-fit and gets the clarifying question.
+_ROM_UNITLESS_MAX_DEGREES = 150.0
 
 # The milestone file covers post-op days 1-365 (its long-term passages are
 # tagged 43-365). Inside that window the agent never declines to assess.
@@ -184,6 +189,10 @@ class ExtractionResult:
     # Fields whose confirmation offer was declined this turn ("no" to
     # "still about 80 degrees?") -- the plain question follows.
     confirm_declined_fields: Tuple[str, ...] = ()
+    # The pending field got a reply carrying a number that does not fit it
+    # ("about 5 minutes" while waiting for flexion). Nothing is stored; the
+    # agent asks the clarifying question instead of the plain re-ask.
+    unfit_fields: Tuple[str, ...] = ()
 
 
 # ============================================================================
@@ -292,17 +301,40 @@ _LOOSE_NUMBER_RE = re.compile(r"(?<![\d./])(\d{1,3}(?:\.\d+)?)(?![\d./%])")
 
 _LOOSE_FILLER_WORDS = frozenset((
     "it's", "its", "it", "is", "about", "around", "roughly", "maybe", "more", "like", "now", "i", "think",
-    "probably", "say", "i'd", "d", "degrees", "degree", "deg", "minutes", "minute", "mins", "min", "or", "so",
+    "probably", "say", "i'd", "d", "or", "so",
     "still", "today", "currently", "the", "number", "a", "bit", "over", "under", "just", "nearly", "almost",
     "yes", "no", "well", "hmm", "um", "closer", "to", "than", "that", "this", "morning", "at", "moment",
 ))
+_DEGREE_UNIT_WORDS = frozenset(("degrees", "degree", "deg"))
+_MINUTE_UNIT_WORDS = frozenset(("minutes", "minute", "mins", "min"))
+# The few words of an angle answer that carry no unit ("I can bend to 95",
+# "it gets up to 100").
+_ROM_PHRASE_WORDS = frozenset((
+    "can", "could", "bend", "bends", "bent", "bending", "straighten", "straightens", "straight",
+    "flexion", "extension", "get", "gets", "go", "goes", "up", "my", "knee", "off", "from",
+))
 
 
-def loose_number(lower: str) -> Optional[float]:
+def _unit_words_for(field_name: Optional[str]) -> frozenset:
+    """The one unit a loose number may carry for `field_name`: degrees for
+    flexion/extension, minutes for walking duration. Any other unit word
+    makes the reply a non-fit for that field. With no field (the
+    continuation hook: "is this a short numeric answer at all?") either
+    unit is allowed and the agent decides whether it fits."""
+    if field_name in ROM_FIELDS:
+        return _DEGREE_UNIT_WORDS | _ROM_PHRASE_WORDS
+    if field_name == WALKING_DURATION_MINUTES:
+        return _MINUTE_UNIT_WORDS
+    return _DEGREE_UNIT_WORDS | _MINUTE_UNIT_WORDS
+
+
+def loose_number(lower: str, field_name: Optional[str] = None) -> Optional[float]:
     """A short reply whose only content is ONE number plus filler words
-    ("it's about 85 now", "more like 90 I think"). Anything carrying other
-    words ("I took 2 tablets") is NOT a loose number -- it may belong to
-    another domain and must never be read as the pending measurement."""
+    ("it's about 85 now", "more like 90 I think"), optionally with the
+    unit of `field_name`. Anything carrying other words ("I took 2
+    tablets") or another unit ("about 5 minutes" for flexion) is NOT a
+    loose number -- it may belong to another domain and must never be read
+    as the pending measurement."""
     if "/10" in lower or "out of 10" in lower:
         return None
     tokens = re.findall(r"[a-z']+|\d+(?:\.\d+)?", lower)
@@ -311,12 +343,27 @@ def loose_number(lower: str) -> Optional[float]:
     numbers = [t for t in tokens if re.fullmatch(r"\d+(?:\.\d+)?", t)]
     if len(numbers) != 1:
         return None
-    if any(t not in _LOOSE_FILLER_WORDS for t in tokens if t not in numbers):
+    allowed = _LOOSE_FILLER_WORDS | _unit_words_for(field_name)
+    if any(t not in allowed for t in tokens if t not in numbers):
         return None
     return float(numbers[0])
 
 
-def _classify_rom_target(lower: str, pending_field: Optional[str]) -> Optional[str]:
+def pending_number(lower: str, field_name: str) -> Optional[float]:
+    """A bare or loose number attributable to the pending numeric field.
+    For flexion/extension a unit-less number must also be in the plausible
+    0-150 range; with a degrees unit the structural check downstream
+    applies instead."""
+    bare = _BARE_NUMBER_RE.match(lower)
+    value = float(bare.group(1)) if bare is not None else loose_number(lower, field_name)
+    if value is None:
+        return None
+    if field_name in ROM_FIELDS and not _DEGREE_NUM_RE.search(lower) and not (0.0 <= value <= _ROM_UNITLESS_MAX_DEGREES):
+        return None
+    return value
+
+
+def _classify_rom_target(lower: str, pending_field: Optional[str], default_target: Optional[str] = None) -> Optional[str]:
     has_flexion_cue = any(c in lower for c in _FLEXION_CUES)
     has_extension_cue = any(c in lower for c in _EXTENSION_CUES)
     if has_flexion_cue and not has_extension_cue:
@@ -325,11 +372,13 @@ def _classify_rom_target(lower: str, pending_field: Optional[str]) -> Optional[s
         return ROM_EXTENSION_DEGREES
     if pending_field in ROM_FIELDS:
         return pending_field
+    if pending_field is None and not (has_flexion_cue or has_extension_cue):
+        return default_target
     return None
 
 
 def _extract_rom(
-    text: str, lower: str, pending_field: Optional[str]
+    text: str, lower: str, pending_field: Optional[str], default_target: Optional[str] = None,
 ) -> Tuple[List[ExtractedFact], List[AmbiguousField]]:
     facts: List[ExtractedFact] = []
     ambiguous: List[AmbiguousField] = []
@@ -337,7 +386,7 @@ def _extract_rom(
     correction = _CORRECTION_RE.search(lower)
     if correction:
         corrected_value = float(correction.group(1))
-        target = _classify_rom_target(lower, pending_field)
+        target = _classify_rom_target(lower, pending_field, default_target)
         if target is not None:
             facts.append(ExtractedFact(target, corrected_value))
         else:
@@ -355,7 +404,7 @@ def _extract_rom(
         elif local_extension and not local_flexion:
             facts.append(ExtractedFact(ROM_EXTENSION_DEGREES, value))
         else:
-            target = _classify_rom_target(lower, pending_field)
+            target = _classify_rom_target(lower, pending_field, default_target)
             if target is not None:
                 facts.append(ExtractedFact(target, value))
 
@@ -665,7 +714,17 @@ def extract_and_apply(message: str, state: RecoverySessionState) -> ExtractionRe
     if mobility_ambiguous is not None:
         ambiguous.append(mobility_ambiguous)
 
-    rom_facts, rom_ambiguous = _extract_rom(text, lower, pending)
+    # A degrees value with no bend/straighten cue and nothing pending (the
+    # opening message: "about 60 degrees") is the bend angle -- the first
+    # thing the interview would ask -- as long as that is still open.
+    default_rom_target = None
+    if (
+        pending is None
+        and ROM_FLEXION_DEGREES in asked_metrics_for(state.procedure)
+        and not state.is_current(ROM_FLEXION_DEGREES)
+    ):
+        default_rom_target = ROM_FLEXION_DEGREES
+    rom_facts, rom_ambiguous = _extract_rom(text, lower, pending, default_rom_target)
     applied.extend(rom_facts)
     ambiguous.extend(rom_ambiguous)
 
@@ -702,13 +761,18 @@ def extract_and_apply(message: str, state: RecoverySessionState) -> ExtractionRe
     if exercise is not None:
         applied.append(ExtractedFact(EXERCISE_COMPLETED, exercise))
 
-    # A bare (or short, single, unit-less) number answers whichever numeric
-    # field is pending -- and only that field.
+    # A bare (or short, single) number answers whichever numeric field is
+    # pending -- and only that field, only in that field's own unit, and
+    # for flexion/extension only in the plausible range. A number that does
+    # not fit ("about 5 minutes" while waiting for flexion) is a non-fit:
+    # nothing is stored and the clarifying question follows.
+    unfit: List[str] = []
     if not applied and pending in NUMERIC_FIELDS:
-        bare = _BARE_NUMBER_RE.match(lower)
-        loose = float(bare.group(1)) if bare is not None else loose_number(lower)
-        if loose is not None:
-            applied.append(ExtractedFact(pending, loose))
+        value = pending_number(lower, pending)
+        if value is not None:
+            applied.append(ExtractedFact(pending, value))
+        elif pending in ROM_FIELDS and has_digit and not _PAIN_RE.search(lower):
+            unfit.append(pending)
 
     pain_match = _PAIN_RE.search(lower)
     if pain_match:
@@ -718,7 +782,7 @@ def extract_and_apply(message: str, state: RecoverySessionState) -> ExtractionRe
     # number: treat it as "don't know the number" so the simpler flat-on-
     # the-bed rephrase is asked next.
     if (
-        not applied and pending == ROM_EXTENSION_DEGREES and pending_variant == "primary"
+        not applied and not unfit and pending == ROM_EXTENSION_DEGREES and pending_variant == "primary"
         and (_AFFIRMATIVE_RE.match(lower) or _NEGATIVE_RE.match(lower))
     ):
         state.mark_unknown(pending)
@@ -728,7 +792,9 @@ def extract_and_apply(message: str, state: RecoverySessionState) -> ExtractionRe
     for fact in applied:
         state.set_fact(fact.field_name, fact.value, effective_postop_day=tag_day)
 
-    return ExtractionResult(tuple(applied), tuple(ambiguous), tuple(marked_unknown), tuple(confirm_declined))
+    return ExtractionResult(
+        tuple(applied), tuple(ambiguous), tuple(marked_unknown), tuple(confirm_declined), tuple(unfit),
+    )
 
 
 # ============================================================================
@@ -1208,6 +1274,7 @@ class DecisionReasonCode:
     RETRY_EXHAUSTED = "retry_exhausted"
     FIELD_AMBIGUOUS = "field_ambiguous"
     CONFIRM_DECLINED = "confirm_declined"
+    FIELD_UNFIT = "field_unfit"  # the pending field got a number that does not fit it
     INVALID_METRIC_VALUE = "invalid_metric_value"
     ALL_GATES_PASSED = "all_gates_passed"
 
@@ -1363,6 +1430,8 @@ def plan_turn(
         next_reason = decide_progress_verdict_action(
             state, procedure=procedure, metric=next_metric, ambiguous_fields=ambiguous_fields, table=table,
         ).reason_code
+        if next_reason == DecisionReasonCode.FIELD_PENDING and next_metric in extraction.unfit_fields:
+            next_reason = DecisionReasonCode.FIELD_UNFIT
 
     remaining_after_next = max(len(open_metrics) - (1 if next_metric else 0), 0)
     return TurnPlan(

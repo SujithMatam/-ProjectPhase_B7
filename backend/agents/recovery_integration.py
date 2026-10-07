@@ -320,6 +320,15 @@ _ALT_QUESTIONS: Dict[str, str] = {
     recovery_logic.HIP_PRECAUTIONS: "For example, are you avoiding bending the hip past 90 degrees and crossing your legs?",
 }
 
+# Clarifying question when the pending field got a number that does not
+# fit it ("about 5 minutes" while waiting for the bend angle).
+_CLARIFY_QUESTIONS: Dict[str, str] = {
+    recovery_logic.ROM_FLEXION_DEGREES:
+        "Sorry, I didn't quite catch that as an angle. How far can you bend your knee, in degrees -- for example about 60, or about 90?",
+    recovery_logic.ROM_EXTENSION_DEGREES:
+        "Sorry, I didn't quite catch that as an angle. How close to fully straight can you get your knee, in degrees -- for example 0 for fully straight, or about 10?",
+}
+
 _METRIC_LABELS: Dict[str, str] = {
     recovery_logic.ROM_FLEXION_DEGREES: "flexion",
     recovery_logic.ROM_EXTENSION_DEGREES: "extension",
@@ -381,9 +390,12 @@ def format_ask_question(
     gets no acknowledgment; a retry / clarification / return-to-pending /
     declined confirmation gets a short, natural lead-in rotated by
     `variation_seed`."""
+    DRC = recovery_logic.DecisionReasonCode
+    if reason_code == DRC.FIELD_UNFIT and metric in _CLARIFY_QUESTIONS:
+        return _CLARIFY_QUESTIONS[metric]
+
     question = question_text(metric, variant=variant, confirm_value=confirm_value, confirm_days_ago=confirm_days_ago)
 
-    DRC = recovery_logic.DecisionReasonCode
     if reason_code == DRC.FIELD_UNKNOWN_RETRY_REMAINING:
         ack = _pick(_RETRY_ACK_POOL, variation_seed)
     elif reason_code == DRC.FIELD_AMBIGUOUS:
@@ -798,10 +810,13 @@ def select_milestone_entries(
     procedure: Optional[str] = None,
     metrics_of_interest: Iterable[str] = (),
     limit: int = MAX_NEXT_MILESTONE_METRICS,
+    already_met: Iterable[str] = (),
 ) -> List["recovery_logic.MilestoneEntry"]:
     """The (at most `limit`) entries most relevant to the procedure and the
     next checkpoint day: the procedure's priority list for that phase
-    first, then the metrics the interview collected, then anything left."""
+    first, then the metrics the interview collected, then anything left.
+    Metrics in `already_met` go last, so a next step is something still
+    ahead whenever the guidance has one."""
     by_metric = {e.metric: e for e in entries}
     phases = _MILESTONE_PRIORITY.get(str(procedure or "").upper(), ())
     priority: Tuple[str, ...] = ()
@@ -816,6 +831,8 @@ def select_milestone_entries(
     for metric in list(priority) + list(metrics_of_interest) + [e.metric for e in entries]:
         if metric in by_metric and metric not in ordered:
             ordered.append(metric)
+    met = set(already_met)
+    ordered = [m for m in ordered if m not in met] + [m for m in ordered if m in met]
     return [by_metric[m] for m in ordered[:max(limit, 0)]]
 
 
@@ -825,11 +842,19 @@ def format_next_milestone(
     *,
     metrics_of_interest: Iterable[str],
     procedure: Optional[str] = None,
+    already_met: Iterable[str] = (),
 ) -> str:
-    chosen = select_milestone_entries(next_checkpoint, entries, procedure=procedure, metrics_of_interest=metrics_of_interest)
+    """Past the last numbered checkpoint (day 84) there is no next day to
+    name, so the next step is ONE long-term entry -- the first one the
+    patient has not already reached -- instead of a day's list."""
+    long_term = next_checkpoint == recovery_logic.LONG_TERM
+    chosen = select_milestone_entries(
+        next_checkpoint, entries, procedure=procedure, metrics_of_interest=metrics_of_interest,
+        limit=1 if long_term else MAX_NEXT_MILESTONE_METRICS, already_met=already_met if long_term else (),
+    )
     parts = [f"{_metric_label(e.metric)}: {e.expected_state}" for e in chosen]
-    if next_checkpoint == recovery_logic.LONG_TERM:
-        head = "Longer term, the guidance describes"
+    if long_term:
+        head = "Next milestone: longer term --"
     else:
         head = f"Next milestone: day {next_checkpoint} --"
     return f"{head} " + "; ".join(parts) + "."
@@ -857,8 +882,15 @@ def format_final_assessment(
     if not comparisons:
         lines.append("- I don't have any measures from you yet, so there's nothing to compare today.")
     body = "\n".join(lines)
+    reached = (
+        recovery_logic.CheckpointVerdict.MEETS_STATED_CHECKPOINT,
+        recovery_logic.CheckpointVerdict.MATCHES_STATED_STATE,
+        recovery_logic.CheckpointVerdict.EXCEEDS_STATED_RANGE,
+        recovery_logic.CheckpointVerdict.BEYOND_STATED_STATE,
+    )
     milestone = format_next_milestone(
         next_checkpoint, next_entries, metrics_of_interest=metrics_of_interest, procedure=procedure,
+        already_met=[checkpoint.metric for checkpoint, _ in comparisons if checkpoint.verdict in reached],
     )
     return collapse_blank_lines(f"{body}\n\n{milestone} {check_in_offer(next_checkpoint)}")
 

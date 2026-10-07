@@ -1894,7 +1894,8 @@ def test_never_declines_inside_day_range_and_names_missing_data() -> None:
             _check("target to work towards" in final, "day 1 gives the day-7 target to work towards")
         if day > 84:
             # UPDATED (readability pass): the long-term passage id is in the sources metadata, not the text.
-            _check("EV-TKA-REC-06" in results[-1]["sources"] and "EV-TKA-REC-06" not in final and "Longer term" in final, f"day {day}: the long-term entry is used and offered")
+            # UPDATED (eval REPORT.md, c18): the long-term entry is the close's one next step.
+            _check("EV-TKA-REC-06" in results[-1]["sources"] and "EV-TKA-REC-06" not in final and "Next milestone: longer term --" in final, f"day {day}: the long-term entry is used and offered")
 
     # Two misses on flexion: the agent says so, moves on, and the final
     # assessment names the missing metric instead of declining.
@@ -2059,7 +2060,8 @@ def test_final_turn_next_milestone_offer_and_llm_guard() -> None:
     surgery_date_long = _dynamic_surgery_date(99)
     _reset_recovery_store()
     results, _ = _run_interview(_handle_tka, "CLOSE-LONG", _TKA_FULL_INTERVIEW, surgery_date=surgery_date_long, day=100)
-    _check("Longer term, the guidance describes" in results[-1]["reply"] and "Say 'recovery check' any time and I'll compare with today." in results[-1]["reply"], f"long-term close: {results[-1]['reply'][-200:]!r}")
+    # UPDATED (eval REPORT.md, c18): past day 84 the close still names ONE next step.
+    _check("Next milestone: longer term --" in results[-1]["reply"] and "Say 'recovery check' any time and I'll compare with today." in results[-1]["reply"], f"long-term close: {results[-1]['reply'][-200:]!r}")
 
     # 'recovery check' routes to the Recovery agent.
     _reset_recovery_store()
@@ -2124,6 +2126,99 @@ def test_continuation_accepts_new_answer_shapes() -> None:
     print()
 
 
+# ----------------------------------------------------------------------------
+# 32. Regressions from the conversation eval (eval/agents/REPORT.md):
+#     a number in another unit is not an angle, an opening value is kept,
+#     and the long-term close still ends with one next step.
+# ----------------------------------------------------------------------------
+
+def test_eval_report_regressions() -> None:
+    _section("32 -- Eval regressions: 'about 5 minutes' is not flexion; opening 'about 60 degrees' kept; long-term next step [REAL-INTEGRATION + stubbed LLM]")
+
+    surgery_date = _dynamic_surgery_date(3)
+
+    # (a) "about 5 minutes" while waiting for flexion: a non-fit, nothing
+    # stored, and the clarifying question -- never "flexion of 5°".
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "EVAL-UNIT", ["Am I on track with my knee?", "about 5 minutes"], surgery_date=surgery_date, day=4)
+    opening, unfit = results
+    _check("how many degrees can you currently bend" in opening["reply"], f"the opening asks for flexion: {opening['reply']!r}")
+    state = recovery_state.get_or_create_state(patient_id="EVAL-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(not state.is_current(rl.ROM_FLEXION_DEGREES), f"'about 5 minutes' is not stored as flexion: {state.get_fact(rl.ROM_FLEXION_DEGREES)}")
+    _check(not state.is_current(rl.WALKING_DURATION_MINUTES), "...nor as a walking duration nobody asked about")
+    _check("5°" not in unfit["reply"] and "flexion: 5" not in unfit["reply"], f"no 5-degree comparison: {unfit['reply']!r}")
+    _check(unfit["reply"].startswith("Sorry, I didn't quite catch that as an angle.") and "in degrees" in unfit["reply"], f"the clarifying question follows: {unfit['reply']!r}")
+    _check(state.pending_field == rl.ROM_FLEXION_DEGREES, "flexion is still the open question")
+
+    # What the pending flexion question accepts: a degrees unit, a bare
+    # number in 0-150, or a cued phrase; nothing else.
+    accepted = {"about 60 degrees": 60.0, "75": 75.0, "it's about 85 now": 85.0, "I can bend to 95": 95.0, "120 deg": 120.0}
+    for message, expected in accepted.items():
+        _reset_recovery_store()
+        s = recovery_state.get_or_create_state(patient_id="EVAL-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+        s.mark_pending(rl.ROM_FLEXION_DEGREES)
+        result = rl.extract_and_apply(message, s)
+        _check(s.get_fact(rl.ROM_FLEXION_DEGREES) is not None and s.get_fact(rl.ROM_FLEXION_DEGREES).value == expected and not result.unfit_fields, f"pending flexion + {message!r} -> {expected}")
+    for message in ("about 5 minutes", "5 mins", "200", "about 3 hours", "10 steps"):
+        _reset_recovery_store()
+        s = recovery_state.get_or_create_state(patient_id="EVAL-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+        s.mark_pending(rl.ROM_FLEXION_DEGREES)
+        result = rl.extract_and_apply(message, s)
+        _check(s.get_fact(rl.ROM_FLEXION_DEGREES) is None and result.unfit_fields == (rl.ROM_FLEXION_DEGREES,), f"pending flexion + {message!r} is a non-fit")
+    _reset_recovery_store()
+    s = recovery_state.get_or_create_state(patient_id="EVAL-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+    s.mark_pending(rl.ROM_EXTENSION_DEGREES)
+    rl.extract_and_apply("about 5 minutes", s)
+    _check(s.get_fact(rl.ROM_EXTENSION_DEGREES) is None, "the same rule holds for extension")
+    _reset_recovery_store()
+    s = recovery_state.get_or_create_state(patient_id="EVAL-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+    s.mark_pending(rl.WALKING_DURATION_MINUTES)
+    rl.extract_and_apply("about 15 minutes", s)
+    _check(s.get_fact(rl.WALKING_DURATION_MINUTES) is not None and s.get_fact(rl.WALKING_DURATION_MINUTES).value == 15.0, "a minutes answer still fits the walking question")
+    _reset_recovery_store()
+    s = recovery_state.get_or_create_state(patient_id="EVAL-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+    s.mark_pending(rl.WALKING_DURATION_MINUTES)
+    rl.extract_and_apply("about 60 degrees", s)
+    _check(s.get_fact(rl.WALKING_DURATION_MINUTES) is None, "...and a degrees answer does not fit it")
+    _pending_reset = recovery_state.get_or_create_state(patient_id="CT-UNIT", surgery_date_raw=surgery_date, procedure="TKA")
+    _pending_reset.mark_pending(rl.ROM_FLEXION_DEGREES)
+    _check(ri.check_recovery_continuation(patient_id="CT-UNIT", surgery_date_raw=surgery_date, procedure="TKA", user_message="about 5 minutes") is True, "the continuation hook still keeps the reply with Recovery, so the clarifying question is asked")
+
+    # (b) A value volunteered in the opening message is extracted and
+    # confirmed back, not re-asked.
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "EVAL-OPEN", ["about 60 degrees"], surgery_date=surgery_date, day=4)
+    reply = results[0]["reply"]
+    state = recovery_state.get_or_create_state(patient_id="EVAL-OPEN", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(state.is_current(rl.ROM_FLEXION_DEGREES) and state.get_fact(rl.ROM_FLEXION_DEGREES).value == 60.0, f"opening 'about 60 degrees' is stored as flexion: {state.get_fact(rl.ROM_FLEXION_DEGREES)}")
+    _check("flexion of 60°" in reply, f"the value is confirmed back: {reply!r}")
+    _check("how many degrees can you currently bend" not in reply and state.pending_field != rl.ROM_FLEXION_DEGREES, f"flexion is not re-asked: {reply!r}")
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tha, "EVAL-OPEN-THA", ["I keep it under 90 degrees"], surgery_date=surgery_date, day=4)
+    tha_state = recovery_state.get_or_create_state(patient_id="EVAL-OPEN-THA", surgery_date_raw=surgery_date, procedure="THA")
+    _check(tha_state.get_fact(rl.ROM_FLEXION_DEGREES) is None, "a THA opening with degrees is never read as knee flexion")
+
+    # (c) After day 84: one concrete next step from the long-term entry,
+    # then the check-in offer.
+    _reset_recovery_store()
+    _seed_recovery_patient("EVAL-LONG", surgery_type="Total Knee Arthroplasty (TKA)", surgery_date=_dynamic_surgery_date(89))
+    results, _ = _run_interview(
+        _handle_tka, "EVAL-LONG",
+        ["Is my recovery on track now?", "115 degrees", "0 degrees, it goes fully straight", "walking without any aid now", "about 60 minutes", "foot over foot"],
+        surgery_date=_dynamic_surgery_date(89), day=90,
+    )
+    final = results[-1]["reply"]
+    paragraph = [p for p in final.split("\n\n") if p.startswith("Next milestone")]
+    _check(len(paragraph) == 1, f"the long-term close has a next-milestone paragraph: {final!r}")
+    if paragraph:
+        step = paragraph[0].split("Say 'recovery check'")[0]
+        _check(step.startswith("Next milestone: longer term -- daily activities: back to many previous activities"), f"built from the TKA long-term entry: {step!r}")
+        _check(";" not in step, f"exactly one next step: {step!r}")
+    _check(final.rstrip().endswith("Say 'recovery check' any time and I'll compare with today."), "the close ends with the check-in offer")
+    _check("Longer term, the guidance describes" not in final, "the old step-less wording is gone")
+    print()
+
+
 def main() -> int:
     _run(test_postop_day_derivation)
     _run(test_checkpoint_day_6_7_8_boundary)
@@ -2156,6 +2251,7 @@ def main() -> int:
     _run(test_final_turn_persists_metrics_and_abandoned_persists_nothing)
     _run(test_final_turn_next_milestone_offer_and_llm_guard)
     _run(test_continuation_accepts_new_answer_shapes)
+    _run(test_eval_report_regressions)
 
     print("=" * 78)
     if _FAILURES:

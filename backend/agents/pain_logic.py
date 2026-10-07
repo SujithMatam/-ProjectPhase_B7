@@ -557,6 +557,15 @@ _STIFFNESS_WORDS = ("stiff", "stiffness", "hard to bend", "hard to move", "tight
 _NUMBNESS_WORDS = ("numb", "numbness", "tingling", "tingly", "weak", "weakness")
 _FEVER_WORDS = ("fever", "feverish", "temperature", "chills", "sweaty", "hot and cold")
 _MEDICATION_WORDS = ("medication", "medicine", "tablet", "pill", "dose", "painkiller")
+# Common pain-relief names patients use instead of "medication". Only a
+# trigger for the medication-effect QUESTION (did it help?) -- the agent
+# never says anything about which drug, how much or how often.
+_MEDICATION_NAMES = (
+    "paracetamol", "acetaminophen", "dolo", "ibuprofen", "brufen", "diclofenac", "tramadol", "ultracet",
+)
+_MEDICATION_RE = re.compile(
+    r"\b(?:" + "|".join(_MEDICATION_WORDS + _MEDICATION_NAMES) + r"|pain ?killer|meds)(?:e?s)?\b"
+)
 _PAIN_CHARACTER_WORDS = ("sharp", "dull", "throbbing", "burning", "aching", "shooting", "stabbing")
 
 
@@ -855,8 +864,10 @@ def _direct_extraction_for_message(text: str) -> Dict[str, Any]:
 
 
 def mentions_medication(text: str) -> bool:
-    normalised = _normalise(text)
-    return any(word in normalised for word in _MEDICATION_WORDS)
+    """Generic words ("painkillers", "tablets") or a common drug name
+    ("paracetamol", "Dolo 650"), matched as whole words so "pillow" never
+    counts."""
+    return _MEDICATION_RE.search(_normalise(text)) is not None
 
 
 # ============================================================================

@@ -2976,6 +2976,54 @@ def test_pain_check_phrase_routes_to_pain() -> None:
     print()
 
 
+# ---------------------------------------------------------------------------
+# 54. Drug names trigger the medication-effect question (eval REPORT.md):
+# "I took paracetamol" is a medication mention like "painkillers". The
+# agent only ASKS whether it helped -- no dosing text anywhere.
+# ---------------------------------------------------------------------------
+
+import re as _re_dosing
+
+_DOSING_RE = _re_dosing.compile(
+    r"\b\d+\s*(?:mg|milligrams?|ml|g)\b|\bdos(?:e|es|age|ing)\b|\bevery\s+\d+\s+hours?\b|"
+    r"\b(?:once|twice|three times)\s+(?:a|per)\s+day\b|\bmaximum\b|\bmax\b",
+    _re_dosing.IGNORECASE,
+)
+
+
+def test_medication_names_trigger_effect_question() -> None:
+    print("=" * 78)
+    print("54 -- Drug names (paracetamol, Dolo, ibuprofen ...) trigger the medication-effect question; no dosing text")
+    print("=" * 78)
+    names = [
+        "I took paracetamol", "had a Dolo 650", "some acetaminophen", "an ibuprofen", "Brufen",
+        "diclofenac gel", "tramadol", "Ultracet", "my painkiller", "two painkillers", "a tablet", "the tablets",
+    ]
+    for text in names:
+        _check(pain_logic.mentions_medication(text), f"{text!r} is a medication mention")
+    for text in ("a pillow under my knee", "it hurts when I stand", "my knee aches"):
+        _check(not pain_logic.mentions_medication(text), f"{text!r} is not a medication mention")
+
+    pain_state._clear_all_state_for_tests()
+    results = _converse("MEDNAME-PT", [
+        "My knee aches a little, I took paracetamol an hour ago.", "3", "gradually", "around the kneecap", "yes it helped",
+    ])
+    for turn, result in enumerate(results, start=1):
+        print(f"    turn {turn}: {result['reply']!r}")
+    asked = [i for i, r in enumerate(results) if pain_logic.QUESTIONS[pain_logic.MEDICATION_EFFECT] in r["reply"]]
+    _check(len(asked) == 1, f"the medication-effect question is asked exactly once after 'paracetamol': turns {asked}")
+    final = results[-1]["reply"]
+    state = pain_state.peek_state("MEDNAME-PT")
+    _check(pain_logic.QUESTIONS[pain_logic.MEDICATION_EFFECT] not in final and (state is None or state.pending_field is None), f"the answer closes the interview: {final!r}")
+    for result in results:
+        _check(not _DOSING_RE.search(result["reply"]), f"no dosing text in any reply: {result['reply']!r}")
+    for question_set in (pain_logic.QUESTIONS, pain_logic.ALT_QUESTIONS, pain_logic.CLARIFY_QUESTIONS,
+                         pain_logic.QUESTIONS_THA, pain_logic.ALT_QUESTIONS_THA, pain_logic.CLARIFY_QUESTIONS_THA):
+        text = question_set.get(pain_logic.MEDICATION_EFFECT, "")
+        _check(not _DOSING_RE.search(text), f"the medication-effect wording has no dosing text: {text!r}")
+    print()
+
+
 def main() -> int:
     _run(test_fresh_independent_prompt_works)
     _run(test_multiple_facts_extracted_from_one_sentence)
@@ -3030,6 +3078,7 @@ def main() -> int:
     _run(test_clarify_questions_identify_field_and_second_ask)
     _run(test_patient_memory_roundtrip_and_best_effort)
     _run(test_pain_check_phrase_routes_to_pain)
+    _run(test_medication_names_trigger_effect_question)
 
     print("=" * 78)
     if _FAILURES:

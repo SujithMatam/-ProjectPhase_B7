@@ -1,7 +1,7 @@
 {
   "id": "c13_pain_mild_medication",
   "agent": "pain",
-  "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+  "title": "Mild pain after paracetamol: short joint branch plus the medication-effect question",
   "tags": [
     "memory"
   ],
@@ -41,7 +41,7 @@
   },
   "turns": [
     {
-      "patient": "My knee aches a little, I took my painkillers an hour ago."
+      "patient": "My knee aches a little, I took paracetamol an hour ago."
     },
     {
       "patient": "3",
