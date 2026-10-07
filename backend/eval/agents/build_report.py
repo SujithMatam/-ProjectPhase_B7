@@ -317,7 +317,8 @@ def main() -> int:
       f"{aao['rehab']['continuation']} Rehab answers to a pending question misrouted, {aao['rehab']['misrouted']} Rehab turns misrouted in all.")
     w(f"2. **`lam/orchestrator.py` -- Recovery continuation coverage and precedence** (Recovery 2, 5): answer shapes "
       f"such as \"I use a walker\" / \"one step at a time\", and Pain's hook running first for a bare \"yes\". "
-      f"*Measured here:* {aao['recovery']['continuation']} Recovery answers misrouted.")
+      f"*Measured here:* {aao['recovery']['continuation']} Recovery "
+      f"answer{'' if aao['recovery']['continuation'] == 1 else 's'} to a pending question misrouted.")
     w("3. **`lam/orchestrator.py` -- cumulative safety after a detour** (Pain 2): pass `user_message` to "
       "`is_active_assessment_continuation()` so the resumed turn's accumulated facts are triaged too.")
     w("4. **`agents/agent_router.py` -- forward `current_rom` to the Recovery agent** (Recovery 1). *Measured here:* "

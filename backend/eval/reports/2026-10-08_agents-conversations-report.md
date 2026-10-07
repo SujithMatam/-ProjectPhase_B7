@@ -186,7 +186,7 @@ git worktree add --detach <tmp>/baseline_b8f0cc5 b8f0cc5
 Merged from the three `*_CHANGES.md` files; *measured here* marks items this eval puts a number on.
 
 1. **`lam/orchestrator.py` -- Rehabilitation continuation hook** (Rehab 1). *Measured here:* 7 Rehab answers to a pending question misrouted, 9 Rehab turns misrouted in all.
-2. **`lam/orchestrator.py` -- Recovery continuation coverage and precedence** (Recovery 2, 5): answer shapes such as "I use a walker" / "one step at a time", and Pain's hook running first for a bare "yes". *Measured here:* 1 Recovery answers misrouted.
+2. **`lam/orchestrator.py` -- Recovery continuation coverage and precedence** (Recovery 2, 5): answer shapes such as "I use a walker" / "one step at a time", and Pain's hook running first for a bare "yes". *Measured here:* 1 Recovery answer to a pending question misrouted.
 3. **`lam/orchestrator.py` -- cumulative safety after a detour** (Pain 2): pass `user_message` to `is_active_assessment_continuation()` so the resumed turn's accumulated facts are triaged too.
 4. **`agents/agent_router.py` -- forward `current_rom` to the Recovery agent** (Recovery 1). *Measured here:* c15 reuses 2/2 request values in direct calls, 0/2 through the orchestrator.
 5. **Intent classifier** (Pain 5, Recovery 5, Rehab 5): keep "pain" / "recovery" / "rehab" so the check-in offers route back; "safe" sends exercise questions to Medication first. *Measured here:* 10 fresh-classification misses on this branch, among them opening turns sent to IntakeContextAgent (c11, c14) or MedicationAgent (c13) and "Can I go up and down the stairs yet?" sent to Daily Activity (c05).
