@@ -1,36 +1,33 @@
 """
-Recovery Progress Agent test suite -- Pass 3 (repository tests + regression
-review) rewrite.
+Recovery Progress Agent test suite.
 
-This file previously tested a SIMPLER RecoveryProgressAgent that always
-called ChatAgent.answer_question() with a RAG-enriched domain_instruction.
-That architecture no longer exists: TKA now runs a fully deterministic
-OBSERVE -> DECIDE -> ACT -> UPDATE loop (recovery_state.py / recovery_logic.py
-/ recovery_integration.py, wired together in
-agents.specialized_agents.RecoveryProgressAgent) and never calls ChatAgent at
-all. Only THA/GEN (no sourced quantitative milestone in the corpus) still
-fall through to the original, unmodified ChatAgent/RAG grounded-guidance
-path. Every test below was re-derived from that approved architecture, not
-patched to "happen to pass" -- see the Pass-3 report for the full old-test
-migration table.
+Architecture under test (feature/agents-proactive rework, see
+agents/RECOVERY_AGENT_CHANGES.md): TKA and THA run a deterministic
+OBSERVE -> PLAN -> ACT -> UPDATE interview (recovery_state.py /
+recovery_logic.py / recovery_integration.py, wired together in
+agents.specialized_agents.RecoveryProgressAgent). Milestones come from
+agents/data/recovery_milestones.json (every entry sourced from a passage of
+eval/eval_corpus.json, plus the retained TKA-03 day-7 ROM entries); memory
+comes from agents/patient_memory.py. Each mid-interview turn gives
+immediate feedback on what was just supplied and asks exactly ONE question;
+the final turn compares every collected value with the nearest checkpoint
+at or before the current day, names the next milestone, offers a 'recovery
+check', optionally adds an LLM explanation (ChatAgent) and persists the
+collected ROM into today's metrics row. GEN (no sourced checkpoint) keeps
+the unmodified ChatAgent grounded-guidance path.
 
-Every test function is labeled MOCKED-BOUNDARY or REAL-INTEGRATION in its
-docstring/print header (see Pass-3 instructions Section 3):
+Every test function is labeled MOCKED-BOUNDARY or REAL-INTEGRATION:
 
     MOCKED-BOUNDARY -- mocks ClinicalKnowledgeBase.retrieve_detailed and/or
-        ChatAgent.answer_question to prove ONE exact invariant (call count,
-        forced evidence shape, state transition) without depending on which
-        optional RAG backend happens to be installed.
+        ChatAgent.answer_question to prove ONE exact invariant without
+        depending on which optional RAG backend happens to be installed.
     REAL-INTEGRATION -- exercises the actual recovery_state / recovery_logic
         / recovery_integration / orchestrator / classifier code, including
-        (where noted) the REAL keyword-fallback RAG corpus. This environment
-        has no chromadb / sentence-transformers installed, so "REAL
-        keyword-fallback retrieval" is the most of the RAG stack these tests
-        can honestly claim to exercise -- semantic_chroma is never reached
-        here, and no test claims otherwise.
+        (where noted) the real RAG retrieval, on whichever path (semantic
+        chroma or keyword fallback) this environment provides.
 
-Plain-Python script (no pytest dependency), consistent with
-test_phase2_intent.py / test_phase3_rag.py / test_phase4_agents.py.
+Plain-Python script (no pytest dependency), also runnable under pytest via
+backend/run_agent_tests.py.
 
 Run directly (from backend/):
     python test_recovery_progress_agent.py
@@ -308,12 +305,18 @@ def test_assessment_wording_and_negative_assertions() -> None:
         return rl.evaluate_checkpoint(s, procedure="TKA", metric=metric, evidence=TKA03_EVIDENCE)
 
     # Day 6 + flexion 60 -> not yet due, must NOT say "below checkpoint".
+    # UPDATED (rework item 4): before day 7 the agent now GIVES the day-7
+    # target as the thing to work towards instead of "too early", so the
+    # 70-90 range IS stated -- explicitly as the day-7 checkpoint's range,
+    # with its source, never as a day-6 target.
     cp = checkpoint_for(6, rl.ROM_FLEXION_DEGREES, 60)
     reply = ri.format_assess_message(cp)
     print(f"    Day6 flex60: {reply!r}")
     _check(cp.verdict == rl.CheckpointVerdict.TARGET_NOT_YET_DUE, "Day6 flex60 must be TARGET_NOT_YET_DUE")
     _check("below" not in reply.lower(), "Day6 flex60 (not yet due) must not say 'below'")
-    _check("70" not in reply and "90" not in reply, "Day6 flex60 (not yet due) must not invent the Day-7 range as a Day-6 target")
+    _check("70" in reply and "90" in reply and "day 7" in reply, "Day6 flex60 must state the DAY-7 target to work towards")
+    _check("work towards" in reply and "TKA-03" in reply, "Day6 flex60 must frame the range as the target to work towards and name the source")
+    _check("Day 6 checkpoint" not in reply and "day 6 target" not in reply.lower(), "Day6 flex60 must not invent a day-6 checkpoint")
     _assert_no_forbidden_trajectory_language(reply, "Day6 flex60")
     _assert_no_forbidden_robotic_language(reply, "Day6 flex60")
 
@@ -403,38 +406,44 @@ def test_decline_reasons() -> None:
     d = rl.decide_progress_verdict_action(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=TKA03_EVIDENCE)
     _check(d.action == rl.RecoveryAction.DECLINE_TO_ASSESS and d.reason_code == rl.DecisionReasonCode.DAY_UNVERIFIED, f"unverified day: {d}")
 
-    # Missing evidence.
-    s = fresh_verified("D-missing-evidence")
+    # UPDATED (rework item 4): the milestone FILE is now the comparison
+    # source, so the retrieval-evidence gates (missing / wrong source /
+    # wrong procedure / malformed window / day outside window) no longer
+    # exist -- inside day 1-365 the agent never declines to assess. A
+    # retrieved chunk passed as `evidence` is attribution only and never
+    # changes the decision.
+    s = fresh_verified("D-no-evidence-still-asks")
     d = rl.decide_progress_verdict_action(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=None)
-    _check(d.reason_code == rl.DecisionReasonCode.EVIDENCE_MISSING, f"missing evidence: {d}")
-    reply = ri.format_decline_message(d.reason_code, metric=rl.ROM_FLEXION_DEGREES, evidence=None)
-    _check("supported evidence" in reply, "missing-evidence decline text must not claim a clinical abnormality")
-    _assert_no_forbidden_robotic_language(reply, "missing evidence decline")
-
-    # Wrong evidence source.
-    s = fresh_verified("D-wrong-source")
-    wrong_source = rl.RecoveryEvidence(source_id="TKA-99", procedure="TKA", days_raw="1-21")
+    _check(d.action == rl.RecoveryAction.ASK_FOR_INFORMATION, f"no evidence must not block the interview: {d}")
+    wrong_source = rl.RecoveryEvidence(source_id="TKA-99", procedure="THA", days_raw="not-a-range")
+    s.set_fact(rl.ROM_FLEXION_DEGREES, 80, effective_postop_day=10)
     d = rl.decide_progress_verdict_action(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=wrong_source)
-    _check(d.reason_code == rl.DecisionReasonCode.EVIDENCE_SOURCE_MISMATCH, f"wrong source: {d}")
+    _check(d.action == rl.RecoveryAction.ASSESS_SUPPORTED_METRIC, f"a mismatched retrieved chunk must not block the assessment: {d}")
 
-    # Wrong evidence procedure.
-    s = fresh_verified("D-wrong-procedure")
-    wrong_proc = rl.RecoveryEvidence(source_id="TKA-03", procedure="THA", days_raw="1-21")
-    d = rl.decide_progress_verdict_action(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=wrong_proc)
-    _check(d.reason_code == rl.DecisionReasonCode.EVIDENCE_PROCEDURE_MISMATCH, f"wrong procedure: {d}")
-
-    # Malformed applicability window.
-    s = fresh_verified("D-malformed-window")
-    malformed = rl.RecoveryEvidence(source_id="TKA-03", procedure="TKA", days_raw="not-a-range")
-    d = rl.decide_progress_verdict_action(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=malformed)
-    _check(d.reason_code == rl.DecisionReasonCode.MALFORMED_APPLICABILITY_WINDOW, f"malformed window: {d}")
-
-    # Day 22 outside TKA-03's 1-21 window.
+    # Day 22 was outside TKA-03's 1-21 window and used to decline; it now
+    # compares against the nearest checkpoint at or before day 22 (day 21,
+    # EV-TKA-REC-02 -- words only, no number, so the verdict is STATE_ONLY).
     _reset_recovery_store()
     s = recovery_state.get_or_create_state(patient_id="D-day22", surgery_date_raw="2026-08-01T00:00:00.000", procedure="TKA")
     s.apply_verified_day(22)
+    s.set_fact(rl.ROM_FLEXION_DEGREES, 95, effective_postop_day=22)
     d = rl.decide_progress_verdict_action(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=TKA03_EVIDENCE)
-    _check(d.reason_code == rl.DecisionReasonCode.DAY_OUTSIDE_APPLICABILITY_WINDOW, f"day 22: {d}")
+    _check(d.action == rl.RecoveryAction.ASSESS_SUPPORTED_METRIC, f"day 22 must be assessed, not declined: {d}")
+    cp22 = rl.evaluate_checkpoint(s, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES)
+    _check(cp22.checkpoint_day == 21 and cp22.source_id == "EV-TKA-REC-02", f"day 22 must use the day-21 checkpoint: {cp22}")
+    _check(cp22.verdict == rl.CheckpointVerdict.STATE_ONLY, f"day-21 flexion entry carries no number -> STATE_ONLY, got {cp22.verdict}")
+    reply22 = ri.format_assess_message(cp22)
+    print(f"    Day22 flex95: {reply22!r}")
+    _check("gives no number" in reply22 and "EV-TKA-REC-02" in reply22, "a words-only checkpoint must say so and name its source")
+    _assert_no_forbidden_trajectory_language(reply22, "Day22 flex95")
+
+    # A metric with no entry for the procedure (knee ROM for THA) is the
+    # only "unsupported" decline left.
+    _reset_recovery_store()
+    s = recovery_state.get_or_create_state(patient_id="D-tha-rom", surgery_date_raw="2026-09-02T00:00:00.000", procedure="THA")
+    s.apply_verified_day(10)
+    d = rl.decide_progress_verdict_action(s, procedure="THA", metric=rl.ROM_FLEXION_DEGREES)
+    _check(d.reason_code == rl.DecisionReasonCode.NO_SUPPORTED_METRIC_FOR_PROCEDURE, f"THA knee ROM: {d}")
 
     # Invalid metric values: negative, absurdly large, non-numeric.
     for bad_value, label in ((-5, "negative"), (999, "absurdly large"), ("not-a-number", "non-numeric")):
@@ -614,17 +623,22 @@ def test_executor_state_transitions() -> None:
     d = rl.decide_progress_verdict_action(state2, procedure="TKA", metric=rl.ROM_FLEXION_DEGREES, evidence=TKA03_EVIDENCE)
     _check(d.reason_code == rl.DecisionReasonCode.FIELD_UNAVAILABLE, f"post-exhaustion decision must be FIELD_UNAVAILABLE, got {d.reason_code}")
 
-    # ASSESS_SUPPORTED_METRIC must not mutate an UNRELATED metric's state.
+    # UPDATED (rework items 3/4): an assessed metric is fed back AND the next
+    # missing metric is asked in the SAME turn, so after a flexion-only
+    # message extension is now PENDING (asked), while every metric that was
+    # neither supplied nor asked stays untouched.
     _reset_recovery_store()
     s3 = recovery_state.get_or_create_state(patient_id="EX-3", surgery_date_raw=surgery_date, procedure="TKA")
     s3.apply_verified_day(10)
-    extension_status_before = s3.status_of(rl.ROM_EXTENSION_DEGREES)
     with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy):
         RecoveryProgressAgent.handle(
             patient_id="EX-3", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
             postop_day=10, user_message="I can bend to about 80 degrees.", procedure="TKA", surgery_date=surgery_date,
         )
-    _check(s3.status_of(rl.ROM_EXTENSION_DEGREES) == extension_status_before, "ASSESS on flexion must not mutate extension's status")
+    _check(s3.status_of(rl.ROM_EXTENSION_DEGREES) == recovery_state.FieldStatus.PENDING, "flexion assessed -> extension is asked next (PENDING)")
+    _check(s3.pending_field == rl.ROM_EXTENSION_DEGREES, "exactly one pending question after the flexion turn")
+    for untouched in (rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES, rl.STAIRS):
+        _check(s3.status_of(untouched) == recovery_state.FieldStatus.NEVER_ASKED, f"ASSESS on flexion must not mutate {untouched}")
 
     # Evidence/day decline must perform NO interview mutation.
     _reset_recovery_store()
@@ -671,8 +685,12 @@ def test_immediate_metric_assessment_end_to_end() -> None:
     print(f"    Turn 2 reply: {reply2!r}")
     _check(state.is_current(rl.ROM_FLEXION_DEGREES), "flexion must become current after Turn 2")
     _check("earlier Post-Op Day 7" in reply2, "Turn 2 reply must reference the earlier Day-7 checkpoint")
-    _check("extension" not in reply2.lower(), "Turn 2 reply must NOT ask about extension in the same response")
-    _check(state.status_of(rl.ROM_EXTENSION_DEGREES) == recovery_state.FieldStatus.NEVER_ASKED, "extension must remain NEVER_ASKED after Turn 2")
+    # UPDATED (rework items 3/4): the flexion verdict is given immediately
+    # AND the next missing metric (extension) is asked in the same reply --
+    # one tracked question per turn, never a second verdict.
+    _check(reply2.count("?") == 1, f"Turn 2 must ask exactly ONE question, got {reply2!r}")
+    _check(state.pending_field == rl.ROM_EXTENSION_DEGREES, "Turn 2 must leave extension as the one pending question")
+    _check(state.status_of(rl.ROM_EXTENSION_DEGREES) == recovery_state.FieldStatus.PENDING, "extension must be PENDING after Turn 2")
     _assert_no_forbidden_trajectory_language(reply2, "Turn 2 (flexion assess)")
 
     # A LATER appropriate progress-verdict turn (nothing new supplied) may
@@ -699,8 +717,12 @@ def test_immediate_metric_assessment_end_to_end() -> None:
     reply_sym = result_sym["reply"]
     print(f"    Extension-symmetry reply: {reply_sym!r}")
     _check(s_sym.is_current(rl.ROM_EXTENSION_DEGREES), "extension must become current")
-    _check("bend" not in reply_sym.lower() and "flexion" not in reply_sym.lower(), "extension-assess reply must not ask about flexion")
-    _check(s_sym.status_of(rl.ROM_FLEXION_DEGREES) == recovery_state.FieldStatus.NEVER_ASKED, "flexion must remain NEVER_ASKED")
+    # UPDATED (rework items 3/4): the extension verdict comes first, then
+    # the one missing ROM metric (flexion) is asked -- a verdict for
+    # extension, a QUESTION for flexion, never a flexion verdict.
+    _check("extension of 3°" in reply_sym and "0°-5°" in reply_sym, "extension-assess reply must state the extension verdict")
+    _check(reply_sym.count("?") == 1 and s_sym.pending_field == rl.ROM_FLEXION_DEGREES, "then exactly one question, about flexion")
+    _check("flexion of" not in reply_sym.lower(), "no flexion verdict may be invented from nothing")
     print()
 
 
@@ -728,9 +750,15 @@ def test_multi_fact_one_action() -> None:
     print(f"    Multi-fact reply: {reply!r}")
     _check(state.is_current(rl.ROM_FLEXION_DEGREES), "flexion fact must be stored and current")
     _check(state.is_current(rl.ROM_EXTENSION_DEGREES), "extension fact must ALSO be stored and current (not lost)")
-    _check("earlier Post-Op Day 7" in reply, "single response must assess flexion (canonical TKA order: flexion first)")
-    _check("extension" not in reply.lower(), "response must not ALSO mix in an extension verdict/question")
-    print("    CONFIRMED: canonical TKA order (flexion, then extension) selects exactly one verdict; the other fact is preserved for a later turn.")
+    _check("earlier Post-Op Day 7" in reply, "single response must assess against the Day-7 checkpoint")
+    # UPDATED (rework item 3 -- multi-slot): several values VOLUNTEERED in
+    # one message are all accepted and all fed back (flexion first, in
+    # canonical order), and only what is still missing is asked -- ONE
+    # question (walking aid), never a question about either ROM value.
+    _check(reply.index("flexion of 80°") < reply.index("extension of 3°"), "both values are fed back, flexion first")
+    _check(reply.count("?") == 1 and state.pending_field == rl.MOBILITY_STATUS, f"exactly one question, about the next missing metric: {state.pending_field}")
+    _check("how many degrees" not in reply.lower(), "neither ROM value may be asked again")
+    print("    CONFIRMED: both volunteered values accepted and compared in one reply; one question about what is still missing.")
     print()
 
 
@@ -740,45 +768,60 @@ def test_multi_fact_one_action() -> None:
 # ============================================================================
 
 def test_single_retrieval_per_turn() -> None:
-    _section("9 -- Exactly ONE retrieve_detailed() call per progress-verdict turn [MOCKED-BOUNDARY: call-count spy]")
+    _section("9 -- Retrieval budget: no Recovery-owned retrieval on interview turns; ONE ChatAgent call on the final turn [MOCKED-BOUNDARY]")
 
+    # UPDATED (rework item 1): the milestone FILE is the comparison source,
+    # so interview turns no longer retrieve anything themselves -- sources
+    # on an assess turn come from the file's entries. The only retrieval
+    # happens inside ChatAgent on the FINAL turn (exactly one call), where
+    # the model may add an explanation above the deterministic block.
     surgery_date = _dynamic_surgery_date(9)  # Day 10
 
-    # A. ASK turn.
+    # A. ASK turn: no retrieval, no LLM.
     _reset_recovery_store()
     spy_a = _RetrievalSpy()
-    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy_a):
+    chat_fn, chat_calls = _stub_answer_question()
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy_a), \
+         patch("agents.chat_agent.ChatAgent.answer_question", side_effect=chat_fn):
         RecoveryProgressAgent.handle(
             patient_id="RC-A", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
             postop_day=10, user_message="How is my recovery going?", procedure="TKA", surgery_date=surgery_date,
         )
-    _check(spy_a.call_count == 1, f"ASK turn: expected exactly 1 retrieve_detailed() call, got {spy_a.call_count}")
+    _check(spy_a.call_count == 0, f"ASK turn: expected no Recovery-owned retrieve_detailed() call, got {spy_a.call_count}")
+    _check(len(chat_calls) == 0, "ASK turn: no ChatAgent call")
 
-    # B. ASSESS turn.
+    # B. ASSESS turn: sources come from the milestone file (TKA-03 for day-7 flexion).
     _reset_recovery_store()
     state = recovery_state.get_or_create_state(patient_id="RC-B", surgery_date_raw=surgery_date, procedure="TKA")
     state.apply_verified_day(10)
     state.mark_pending(rl.ROM_FLEXION_DEGREES)
     spy_b = _RetrievalSpy()
-    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy_b):
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy_b), \
+         patch("agents.chat_agent.ChatAgent.answer_question", side_effect=chat_fn):
         result_b = RecoveryProgressAgent.handle(
             patient_id="RC-B", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
             postop_day=10, user_message="I can bend to around 80 degrees.", procedure="TKA", surgery_date=surgery_date,
         )
-    _check(spy_b.call_count == 1, f"ASSESS turn: expected exactly 1 retrieve_detailed() call, got {spy_b.call_count}")
-    _check(result_b["sources"] == ["TKA-03"], f"ASSESS turn: the SAME retrieved evidence must be threaded into source attribution, got {result_b['sources']}")
+    _check(spy_b.call_count == 0, f"ASSESS turn: expected no Recovery-owned retrieval, got {spy_b.call_count}")
+    _check(result_b["sources"] == ["TKA-03"], f"ASSESS turn: the milestone entry's source must be attributed, got {result_b['sources']}")
 
-    # C. Evidence/window DECLINE turn (evidence present but wrong procedure -> declines without a second retrieval attempt).
+    # C. FINAL turn: every asked metric already current -> exactly one ChatAgent call.
     _reset_recovery_store()
     state_c = recovery_state.get_or_create_state(patient_id="RC-C", surgery_date_raw=surgery_date, procedure="TKA")
     state_c.apply_verified_day(10)
-    spy_c = _RetrievalSpy(results=[_FakeChunk(doc_id="TKA-03", procedure="THA", days="1-21")])
-    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy_c):
+    for metric, value in ((rl.ROM_FLEXION_DEGREES, 80), (rl.ROM_EXTENSION_DEGREES, 3), (rl.MOBILITY_STATUS, "cane"),
+                          (rl.WALKING_DURATION_MINUTES, 15.0), (rl.STAIRS, "one_at_a_time")):
+        state_c.set_fact(metric, value, effective_postop_day=10)
+    chat_fn_c, chat_calls_c = _stub_answer_question(reply="")
+    with patch.object(ClinicalKnowledgeBase, "retrieve_detailed", side_effect=spy_b), \
+         patch("agents.chat_agent.ChatAgent.answer_question", side_effect=chat_fn_c):
         result_c = RecoveryProgressAgent.handle(
             patient_id="RC-C", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
             postop_day=10, user_message="How is my recovery going?", procedure="TKA", surgery_date=surgery_date,
         )
-    _check(spy_c.call_count == 1, f"DECLINE turn: expected exactly 1 retrieve_detailed() call, got {spy_c.call_count}")
+    _check(len(chat_calls_c) == 1, f"FINAL turn: exactly one ChatAgent call, got {len(chat_calls_c)}")
+    _check("Here's how things compare" in result_c["reply"], "FINAL turn must carry the deterministic comparison block")
+    _check("TKA-03" in result_c["sources"] and "EV-TKA-REC-01" in result_c["sources"], f"FINAL turn sources come from the milestone entries used: {result_c['sources']}")
     print()
 
 
@@ -788,37 +831,36 @@ def test_single_retrieval_per_turn() -> None:
 # ============================================================================
 
 def test_real_keyword_fallback_retrieval() -> None:
-    _section("10 -- Real keyword-fallback retrieval for a bare continuation reply [REAL-INTEGRATION]")
+    _section("10 -- Real retrieval for a bare continuation reply, on whichever path this environment provides [REAL-INTEGRATION]")
 
-    detail_probe = ClinicalKnowledgeBase.retrieve_detailed("probe", procedure="TKA", limit=1)
-    if detail_probe.retrieval_path != "keyword_fallback":
-        print(f"    SKIP-DISCLOSURE: environment has semantic_chroma available (path={detail_probe.retrieval_path}); "
-              "this test only asserts the keyword-fallback contract and does not verify semantic_chroma here.")
-
-    # Bare continuation message carries none of TKA-03's own keywords.
+    # UPDATED: this test used to require retrieval_path == "keyword_fallback"
+    # and failed as soon as chromadb/sentence-transformers were installed
+    # (the path became "semantic_chroma"). The CONTRACT it guards is about
+    # the RESULT, not the path: the hint-augmented query must retrieve
+    # TKA-03 on the real knowledge base. The path is printed as a
+    # disclosure only, so the test passes on both retrieval paths.
     bare_query = "80 degrees"
     bare_detail = ClinicalKnowledgeBase.retrieve_detailed(bare_query, procedure="TKA", limit=2)
     print(f"    bare query {bare_query!r} -> path={bare_detail.retrieval_path} n_results={len(bare_detail.results)}")
-    _check(len(bare_detail.results) == 0, "bare '80 degrees' must retrieve NOTHING via keyword fallback (motivates the hint augmentation)")
+    _check(bare_detail.retrieval_path in ("keyword_fallback", "semantic_chroma"), f"unexpected retrieval path {bare_detail.retrieval_path!r}")
+    if bare_detail.retrieval_path == "keyword_fallback":
+        # Only the keyword path is guaranteed to return nothing for a bare
+        # number; the semantic path may legitimately return nearest chunks.
+        _check(len(bare_detail.results) == 0, "bare '80 degrees' must retrieve NOTHING via keyword fallback (motivates the hint augmentation)")
 
-    # recovery_integration's fix: augment with a metric-specific hint built
-    # from the corpus's OWN vocabulary before the real retrieve_detailed() call.
+    # recovery_integration's hint: augment with a metric-specific phrase
+    # built from the corpus's OWN vocabulary before the real retrieval.
     augmented_query = ri.build_retrieval_query(bare_query, rl.ROM_FLEXION_DEGREES)
     print(f"    augmented query -> {augmented_query!r}")
     augmented_detail = ClinicalKnowledgeBase.retrieve_detailed(augmented_query, procedure="TKA", limit=2)
     print(f"    augmented -> path={augmented_detail.retrieval_path} n_results={len(augmented_detail.results)}")
-    _check(len(augmented_detail.results) >= 1, "augmented query must retrieve at least one chunk via keyword fallback")
+    _check(len(augmented_detail.results) >= 1, "augmented query must retrieve at least one chunk")
     _check(
         any(r.doc_id == "TKA-03" for r in augmented_detail.results),
         f"augmented query must retrieve TKA-03, got {[r.doc_id for r in augmented_detail.results]}",
     )
-    _check(
-        augmented_detail.retrieval_path == "keyword_fallback",
-        f"DISCLOSURE: this environment's retrieval path was {augmented_detail.retrieval_path!r}, not keyword_fallback -- "
-        "chromadb/sentence-transformers may be installed here; re-verify this assertion is still the intended one.",
-    )
-    print("    DEPENDENCY DISCLOSURE: this environment has no chromadb/sentence-transformers installed; "
-          "only the REAL keyword-fallback path was exercised. semantic_chroma was NOT exercised by this test.")
+    _check(all(r.procedure in ("TKA", "All") for r in augmented_detail.results), "procedure isolation must hold on this path too")
+    print(f"    DISCLOSURE: retrieval path exercised here was {augmented_detail.retrieval_path!r}; the assertions are path-independent.")
     print()
 
 
@@ -999,19 +1041,22 @@ def test_procedure_isolation() -> None:
     _check(result_tka["engine"] == RecoveryProgressAgent.ENGINE_NAME, f"TKA engine: {result_tka['engine']}")
     _check("earlier Post-Op Day 7" in result_tka["reply"], "TKA must produce a checkpoint-relative verdict")
 
-    # THA: no supported quantitative milestone -> grounded-guidance path
-    # remains reachable, no Recovery state is created.
+    # UPDATED (rework items 1/3): THA now HAS sourced checkpoints
+    # (EV-THA-REC-*, EV-THA-REHAB-04) and runs the interview loop -- walking
+    # and precaution questions, never knee ROM, no ChatAgent call on an
+    # interview turn, and its own RecoverySessionState.
     _reset_recovery_store()
     fn_tha, calls_tha = _stub_answer_question(reply="THA grounded reply")
     with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn_tha):
-        RecoveryProgressAgent.handle(
+        result_tha = RecoveryProgressAgent.handle(
             patient_id="PI-THA", surgery_type="Total Hip Arthroplasty (THA)", affected_limb="Left",
             postop_day=10, user_message="Am I on track for my hip recovery?", procedure="THA", surgery_date=surgery_date,
         )
-    _check(len(calls_tha) == 1, f"THA must reach the grounded-guidance ChatAgent path exactly once, got {len(calls_tha)}")
-    _check(calls_tha[0].get("domain_instruction") == RecoveryProgressAgent.DOMAIN_FOCUS, "THA domain_instruction must be the plain, unmodified DOMAIN_FOCUS")
+    _check(len(calls_tha) == 0, f"THA interview turn must not call ChatAgent, got {len(calls_tha)}")
+    _check(result_tha["engine"] == RecoveryProgressAgent.ENGINE_NAME, f"THA engine: {result_tha['engine']}")
     proof_tha = recovery_state.peek_state(patient_id="PI-THA", surgery_date_raw=surgery_date, procedure="THA")
-    _check(proof_tha is None, "THA must NOT create a RecoverySessionState (bypasses the deterministic interview loop entirely)")
+    _check(proof_tha is not None and proof_tha.pending_field == rl.MOBILITY_STATUS, "THA must create state and open with the walking-aid question")
+    _check(not any(w in result_tha["reply"].lower() for w in ("knee", "flexion", "extension", "degrees")), f"THA must never ask knee ROM: {result_tha['reply']!r}")
 
     # GEN: same as THA.
     _reset_recovery_store()
@@ -1026,9 +1071,8 @@ def test_procedure_isolation() -> None:
     proof_gen = recovery_state.peek_state(patient_id="PI-GEN", surgery_date_raw=surgery_date, procedure="GEN")
     _check(proof_gen is None, "GEN must NOT create a RecoverySessionState")
 
-    print("    DOCUMENTED (intentional, not a bug): THA/GEN skip the deterministic interview loop entirely because no")
-    print("    sourced quantitative milestone exists for either in the current corpus. If a future pass adds one, this")
-    print("    early return in RecoveryProgressAgent.handle() must be revisited so THA/GEN can join the state/interview loop.")
+    print("    DOCUMENTED: GEN skips the interview loop because no sourced checkpoint exists for it in the milestone file;")
+    print("    TKA and THA both run the loop (THA: walking aid, walking duration, stairs, hip precautions).")
     print()
 
 
@@ -1085,9 +1129,12 @@ def test_routing_and_response_shape() -> None:
         _AGENT_BY_INTENT.get(IntentLabel.RECOVERY_PROGRESS) is RecoveryProgressAgent,
         "agent_router mapping for recovery_progress is not RecoveryProgressAgent",
     )
-    # NEW architecture: TKA is fully deterministic -- no ChatAgent call at all.
+    # TKA interview turns are fully deterministic -- no ChatAgent call, and
+    # (UPDATED, rework item 1) no Recovery-owned retrieval either: the
+    # milestone file is the source.
     _check(result["engine"] == RecoveryProgressAgent.ENGINE_NAME, f"TKA route must use the deterministic engine, got {result['engine']}")
-    _check(spy.call_count == 1, f"exactly one retrieval for this turn, got {spy.call_count}")
+    _check(spy.call_count == 0, f"no Recovery-owned retrieval on an interview turn, got {spy.call_count}")
+    _check(result["reply"].count("?") == 1, "the routed opener asks exactly one question")
     print()
 
 
@@ -1099,32 +1146,47 @@ def test_routing_and_response_shape() -> None:
 # ============================================================================
 
 def test_postop_day_procedure_and_chat_history_reach_grounded_guidance() -> None:
-    _section("17 -- postop_day / procedure / chat_history reach ChatAgent for the THA/GEN grounded-guidance path [MOCKED-BOUNDARY]")
+    _section("17 -- postop_day / procedure / chat_history reach ChatAgent for the GEN grounded-guidance path [MOCKED-BOUNDARY]")
 
+    # UPDATED (rework items 1/3): THA now runs the interview loop, so the
+    # grounded-guidance forwarding contract is exercised with GEN (the one
+    # procedure that still takes that path). A THA request WITHOUT a
+    # surgery_date cannot be placed on a day: it gets the deterministic
+    # "can't verify your surgery date" reply and never reaches ChatAgent.
     fn, calls = _stub_answer_question()
     with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
         RecoveryProgressAgent.handle(
-            patient_id="GG-1", surgery_type="Total Hip Arthroplasty (THA)", affected_limb="Left",
-            postop_day=13, user_message="Am I on track for my hip recovery?", procedure="THA",
+            patient_id="GG-1", surgery_type="Ankle ORIF", affected_limb="Left",
+            postop_day=13, user_message="Am I on track for my ankle recovery?", procedure="GEN",
         )
     _check(len(calls) == 1, f"expected 1 call, got {len(calls)}")
     if calls:
         _check(calls[0].get("postop_day") == 13, f"postop_day not forwarded, got {calls[0].get('postop_day')}")
-        _check(calls[0].get("procedure") == "THA", f"procedure not forwarded, got {calls[0].get('procedure')}")
-        _check(calls[0].get("surgery_type") == "Total Hip Arthroplasty (THA)", "surgery_type not forwarded")
+        _check(calls[0].get("procedure") == "GEN", f"procedure not forwarded, got {calls[0].get('procedure')}")
+        _check(calls[0].get("surgery_type") == "Ankle ORIF", "surgery_type not forwarded")
 
     history = [
-        {"role": "user", "content": "I had my THA five days ago."},
-        {"role": "assistant", "content": "Great, how does your hip feel today?"},
+        {"role": "user", "content": "I had my ankle fixed five days ago."},
+        {"role": "assistant", "content": "Great, how does it feel today?"},
     ]
     fn2, calls2 = _stub_answer_question()
     with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn2):
         RecoveryProgressAgent.handle(
-            patient_id="GG-2", surgery_type="Total Hip Arthroplasty (THA)", affected_limb="Left",
-            postop_day=5, user_message="Is this normal for my hip?", procedure="THA", chat_history=history,
+            patient_id="GG-2", surgery_type="Ankle ORIF", affected_limb="Left",
+            postop_day=5, user_message="Is this normal for my ankle?", procedure="GEN", chat_history=history,
         )
     _check(len(calls2) == 1, f"expected 1 call, got {len(calls2)}")
     _check(calls2 and calls2[0].get("chat_history") == history, "chat_history was not forwarded unmodified")
+
+    _reset_recovery_store()
+    fn3, calls3 = _stub_answer_question()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn3):
+        result_tha = RecoveryProgressAgent.handle(
+            patient_id="GG-THA", surgery_type="Total Hip Arthroplasty (THA)", affected_limb="Left",
+            postop_day=13, user_message="Am I on track for my hip recovery?", procedure="THA",
+        )
+    _check(len(calls3) == 0, "THA without a surgery_date must not reach ChatAgent")
+    _check("can't verify your surgery date" in result_tha["reply"], f"THA without a surgery_date gets the day-unverified reply: {result_tha['reply']!r}")
 
     # By contrast: TKA's deterministic loop does NOT depend on chat_history
     # at all (state, not chat_history, is Recovery's source of truth) --
@@ -1182,17 +1244,18 @@ def test_conversational_style_and_grounding() -> None:
     _check(state_a.is_current(rl.ROM_FLEXION_DEGREES), "A: 60 degrees must be stored as the current flexion value")
     _check(state_a.get_fact(rl.ROM_FLEXION_DEGREES).value == 60.0, "A: stored value must be 60")
     _check("60" in reply_a, "A: reply must mention the reported 60 degrees")
-    _check("4" in reply_a and "7" in reply_a, "A/D: reply must ground the explanation in both the patient's day (4) and the checkpoint day (7)")
-    _check("70" not in reply_a and "90" not in reply_a, "A/D: reply must not invent the Day-7 flexion range as a Day-4 target")
+    _check("day 4" in reply_a and "day 7" in reply_a, "A/D: reply must ground the explanation in both the patient's day (4) and the checkpoint day (7)")
+    # UPDATED (rework item 4): before day 7 the day-7 range IS given, as the
+    # target to work towards (with its source), never as a day-4 target.
+    _check("70" in reply_a and "90" in reply_a and "work towards" in reply_a, "A/D: reply must give the day-7 target to work towards")
+    _check("TKA-03" in reply_a, "A/D: the target must be sourced")
     _assert_no_forbidden_trajectory_language(reply_a, "A/D Day4 60-degrees")
     _assert_no_forbidden_robotic_language(reply_a, "A/D Day4 60-degrees")
     _check("noted" not in reply_a.lower(), "A/D: acknowledgment must not sound like a database entry ('noted')")
-    _check(
-        "?" not in reply_a,
-        f"A/D: a not-yet-due ASSESS reply must contain NO question -- the state machine cannot track or "
-        f"attribute an answer to a free-floating follow-up question (pending_field is already cleared by "
-        f"the time this reply is built), got {reply_a!r}",
-    )
+    # UPDATED (rework item 3): the ONE follow-up question (the next missing
+    # metric, extension) is now asked in the same reply and IS tracked --
+    # pending_field is set to it, so the answer can be attributed.
+    _check(reply_a.count("?") == 1 and state_a.pending_field == rl.ROM_EXTENSION_DEGREES, f"A/D: exactly one tracked question follows the feedback, got {reply_a!r}")
 
     # ------------------------------------------------------------------
     # B: "Same as yesterday." must still be interpreted as an answer to
@@ -1237,12 +1300,14 @@ def test_conversational_style_and_grounding() -> None:
     print(f"    C (\"I don't know.\"): {reply_c!r}")
     state_c = recovery_state.peek_state(patient_id="CS-C", surgery_date_raw=surgery_date_day10, procedure="TKA")
     _check(state_c.ask_count_of(rl.ROM_FLEXION_DEGREES) == 1, "C: 'I don't know' must still be recorded as a retry (state machine untouched)")
-    bare_question = ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES]
-    _check(
-        reply_c.strip() != bare_question and reply_c.endswith(bare_question),
-        f"C: reply must open with a short natural acknowledgment before re-asking the same question, got {reply_c!r}",
-    )
-    _check("degrees" in reply_c.lower() or "bend" in reply_c.lower(), "C: reply must still re-ask the flexion question")
+    # UPDATED (rework item 3): after an uncertain answer the SIMPLER
+    # rephrase is asked (not the identical question), with a short
+    # acknowledgment in front and the progress indicator after it.
+    alt_question = ri._ALT_QUESTIONS[rl.ROM_FLEXION_DEGREES]
+    _check(alt_question in reply_c and not reply_c.startswith(alt_question), f"C: reply must open with a short acknowledgment before the simpler rephrase, got {reply_c!r}")
+    _check(ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES] not in reply_c, "C: the identical question must not simply be repeated")
+    _check("degrees" in reply_c.lower() or "bend" in reply_c.lower(), "C: reply must still ask about flexion")
+    _check(state_c.pending_variant == "alt", "C: the rephrase is tracked as the 'alt' variant")
     _assert_no_forbidden_robotic_language(reply_c, "C don't-know retry")
 
     # ------------------------------------------------------------------
@@ -1307,6 +1372,723 @@ def test_conversational_style_and_grounding() -> None:
     print()
 
 
+# ============================================================================
+# REWORK TESTS (feature/agents-proactive) -- one per item of the rework.
+# ============================================================================
+
+import json as _json
+import logging as _logging
+import os as _os
+import sqlite3 as _sqlite3
+import tempfile as _tempfile
+from pathlib import Path as _Path
+
+from agents import patient_memory as pm
+
+
+def _seed_recovery_patient(patient_id: str, *, surgery_type: str, surgery_date: str, metrics=None) -> None:
+    """A real `patients`/`surgeries` row (plus optional metrics rows) in
+    the isolated test DB so memory reads and persistence actually work."""
+    from patient_database import create_patient, delete_patient
+
+    try:
+        delete_patient(patient_id)
+    except Exception:
+        pass
+    try:
+        create_patient({
+            "patient_id": patient_id, "full_name": f"Recovery {patient_id}", "surgery_type": surgery_type,
+            "affected_limb": "Right", "surgery_date": surgery_date[:10], "postop_day": 1,
+            "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)", "metrics_history": metrics or [],
+        })
+    except _sqlite3.IntegrityError:
+        pass
+
+
+def _days_ago_iso(days: int) -> str:
+    return (date.today() - timedelta(days=days)).isoformat()
+
+
+def _handle_tka(patient_id: str, message: str, *, surgery_date: str, day: int, history=None, **extra):
+    return RecoveryProgressAgent.handle(
+        patient_id=patient_id, surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+        postop_day=day, user_message=message, procedure="TKA", surgery_date=surgery_date,
+        chat_history=history, **extra,
+    )
+
+
+def _handle_tha(patient_id: str, message: str, *, surgery_date: str, day: int, history=None, **extra):
+    return RecoveryProgressAgent.handle(
+        patient_id=patient_id, surgery_type="Total Hip Arthroplasty (THA)", affected_limb="Left",
+        postop_day=day, user_message=message, procedure="THA", surgery_date=surgery_date,
+        chat_history=history, **extra,
+    )
+
+
+def _run_interview(handle_fn, patient_id: str, messages, *, surgery_date: str, day: int, stub_reply: str = "", **extra):
+    """Drive a whole interview with a stubbed LLM; returns (results, chat_fn calls)."""
+    fn, calls = _stub_answer_question(reply=stub_reply)
+    results = []
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        for message in messages:
+            result = handle_fn(patient_id, message, surgery_date=surgery_date, day=day, history=list(history), **extra)
+            results.append(result)
+            history += [{"role": "user", "content": message}, {"role": "assistant", "content": result["reply"]}]
+    return results, calls
+
+
+_TKA_FULL_INTERVIEW = [
+    "How is my recovery going?", "I can bend to about 85 degrees", "yes, fully flat",
+    "I'm using a cane", "about 15 minutes", "one step at a time holding the rail",
+]
+_THA_FULL_INTERVIEW = [
+    "How is my hip recovery going?", "I'm still using one crutch", "about 20 minutes",
+    "foot over foot now", "yes, still following them",
+]
+
+
+# ----------------------------------------------------------------------------
+# 19. Milestone data file: every entry's passage id exists in its corpus,
+#     structure is complete, and the loader rejects malformed data.
+# ----------------------------------------------------------------------------
+
+def test_milestone_file_sources_exist_in_corpus() -> None:
+    _section("19 -- recovery_milestones.json: every entry sourced from the eval corpus (or the retained TKA-03) [REAL-INTEGRATION]")
+
+    table = rl.parse_milestone_file(validate_sources=True)
+    backend_dir = _Path(rl.__file__).resolve().parent.parent
+    eval_corpus = {p["id"]: p for p in _json.loads((backend_dir / "eval" / "eval_corpus.json").read_text(encoding="utf-8"))}
+    seed_corpus = {p["id"]: p for p in _json.loads((backend_dir / "rag" / "data" / "seed_knowledge.json").read_text(encoding="utf-8"))}
+    allowed_eval_prefixes = ("EV-TKA-REC-", "EV-THA-REC-")
+    allowed_eval_exact = {"EV-TKA-REHAB-02", "EV-TKA-REHAB-03", "EV-THA-REHAB-04"}
+
+    print(f"    {len(table.entries)} entries; checkpoint days {table.checkpoint_days}; procedures {table.procedures()}")
+    _check(table.checkpoint_days == (7, 14, 21, 42, 84), f"checkpoint days must be 7/14/21/42/84, got {table.checkpoint_days}")
+    for entry in table.entries:
+        if entry.source_id == "TKA-03":
+            _check(entry.source_corpus == "rag/data/seed_knowledge.json" and "TKA-03" in seed_corpus, "the retained TKA-03 entries cite the seed corpus")
+            _check(entry.checkpoint == 7 and entry.metric in rl.ROM_FIELDS, "TKA-03 is kept ONLY for the day-7 ROM entries")
+            continue
+        _check(entry.source_id in eval_corpus, f"{entry.source_id} must exist in eval/eval_corpus.json")
+        _check(
+            entry.source_id.startswith(allowed_eval_prefixes) or entry.source_id in allowed_eval_exact,
+            f"{entry.source_id} is outside the allowed passage set",
+        )
+        passage = eval_corpus[entry.source_id]
+        _check(passage["procedure"] == entry.procedure, f"{entry.source_id}: passage procedure {passage['procedure']} vs entry {entry.procedure}")
+        _check(entry.source_url == passage["metadata"]["source_url"], f"{entry.source_id}: source_url must be the passage's own URL")
+        for fragment in entry.quote.split(" ... "):
+            _check(fragment in passage["content"], f"{entry.source_id} {entry.metric} day {entry.checkpoint}: quote fragment not in passage: {fragment!r}")
+        if entry.kind == "numeric":
+            # No invented numbers: every bound must appear in the quoted passage text.
+            for bound in (entry.range_low, entry.range_high):
+                if bound is None:
+                    continue
+                token = str(int(bound)) if float(bound).is_integer() else str(bound)
+                words = {"0": ("fully straight", "fully flat", "0"), "10": ("10", "ten")}
+                _check(
+                    any(w in passage["content"] for w in words.get(token, (token,))),
+                    f"{entry.source_id} {entry.metric} day {entry.checkpoint}: bound {bound} not stated by the passage",
+                )
+
+    # Required coverage: both procedures, every checkpoint day + long-term,
+    # the eight metrics of the brief represented, THA without knee ROM.
+    for procedure in ("TKA", "THA"):
+        for day in (7, 14, 21, 42, 84):
+            _check(table.at_checkpoint(procedure, day), f"{procedure} needs entries at day {day}")
+        _check(table.at_checkpoint(procedure, rl.LONG_TERM), f"{procedure} needs a long-term entry")
+    tka_metrics = {e.metric for e in table.entries if e.procedure == "TKA"}
+    _check(tka_metrics >= {rl.ROM_FLEXION_DEGREES, rl.ROM_EXTENSION_DEGREES, rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES,
+                           rl.STAIRS, rl.DAILY_ACTIVITIES, rl.DRIVING, rl.RETURN_TO_WORK}, f"TKA metrics: {tka_metrics}")
+    tha_metrics = {e.metric for e in table.entries if e.procedure == "THA"}
+    _check(not (tha_metrics & set(rl.ROM_FIELDS)), "THA must carry no knee ROM entries")
+    _check({rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES, rl.STAIRS, rl.HIP_PRECAUTIONS, rl.DRIVING, rl.RETURN_TO_WORK} <= tha_metrics, f"THA metrics: {tha_metrics}")
+    _check(rl.load_milestones().entries == table.entries, "the cached production loader returns the same table")
+
+    # Loader validation: tampered copies are rejected with a clear error.
+    raw = _json.loads(_Path(table.source_path).read_text(encoding="utf-8"))
+
+    def _expect_rejection(mutate, label: str) -> None:
+        bad = _json.loads(_json.dumps(raw))
+        mutate(bad)
+        tmp = _Path(_tempfile.mkdtemp(prefix="milestones_")) / "bad.json"
+        tmp.write_text(_json.dumps(bad), encoding="utf-8")
+        try:
+            rl.parse_milestone_file(tmp, validate_sources=True)
+        except rl.MilestoneDataError as exc:
+            print(f"    rejected ({label}): {exc}")
+            return
+        _check(False, f"loader must reject: {label}")
+
+    _expect_rejection(lambda b: b["entries"][0].__setitem__("checkpoint", 9), "a checkpoint day outside 7/14/21/42/84")
+    _expect_rejection(lambda b: b["entries"].append({**b["entries"][0], "procedure": "THA"}), "a THA knee-ROM entry")
+    _expect_rejection(lambda b: b["entries"][0].__setitem__("source_id", "EV-NOPE-99"), "a source id missing from the corpus")
+    _expect_rejection(lambda b: b["entries"][0].pop("unit"), "a numeric entry without a unit")
+    _expect_rejection(
+        lambda b: b.__setitem__("entries", [e for e in b["entries"] if not (e["procedure"] == "TKA" and e["checkpoint"] == "long_term")]),
+        "a procedure without a long-term entry",
+    )
+    _expect_rejection(lambda b: b["entries"].append(dict(b["entries"][0])), "a duplicate (procedure, checkpoint, metric)")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 20. Nearest checkpoint at or before the day; long-term after day 84; the
+#     first checkpoint before day 7; next milestone.
+# ----------------------------------------------------------------------------
+
+def test_select_checkpoint_nearest_at_or_before_and_long_term() -> None:
+    _section("20 -- select_checkpoint(): nearest at-or-before day, first checkpoint before day 7, long-term after 84 [REAL-INTEGRATION]")
+
+    flex = rl.ROM_FLEXION_DEGREES
+    cases = [(1, 7), (4, 7), (7, 7), (10, 7), (14, 14), (20, 14), (21, 21), (30, 21), (42, 42), (60, 42), (84, 84)]
+    for day, expected in cases:
+        entry = rl.select_checkpoint("TKA", flex, day)
+        _check(entry is not None and entry.checkpoint == expected, f"TKA flexion day {day}: expected checkpoint {expected}, got {entry.checkpoint if entry else None}")
+    for day in (85, 100, 200, 365):
+        entry = rl.select_checkpoint("TKA", flex, day)
+        _check(entry is not None and entry.is_long_term and entry.source_id == "EV-TKA-REC-06", f"TKA flexion day {day}: expected the long-term entry, got {entry}")
+    # Extension has no long-term entry -> the nearest dated checkpoint (84) is used after day 84.
+    ext_late = rl.select_checkpoint("TKA", rl.ROM_EXTENSION_DEGREES, 120)
+    _check(ext_late is not None and ext_late.checkpoint == 84, f"TKA extension day 120 falls back to day 84, got {ext_late}")
+    tha_late = rl.select_checkpoint("THA", rl.HIP_PRECAUTIONS, 200)
+    _check(tha_late is not None and tha_late.is_long_term and tha_late.source_id == "EV-THA-REC-06", f"THA precautions day 200: {tha_late}")
+    _check(rl.select_checkpoint("THA", flex, 10) is None, "THA has no knee-ROM checkpoint at all")
+
+    # Never None for a sourced metric anywhere in day 1-365.
+    table = rl.load_milestones()
+    for procedure in ("TKA", "THA"):
+        metrics = {e.metric for e in table.entries if e.procedure == procedure}
+        for metric in metrics:
+            for day in (1, 6, 7, 13, 22, 41, 42, 83, 84, 85, 365):
+                _check(rl.select_checkpoint(procedure, metric, day) is not None, f"{procedure} {metric} day {day} must resolve to an entry")
+
+    _check(rl.next_milestone("TKA", 4)[0] == 7 and rl.next_milestone("TKA", 10)[0] == 14 and rl.next_milestone("TKA", 42)[0] == 84, "next_milestone picks the next checkpoint day")
+    nxt, entries = rl.next_milestone("TKA", 84)
+    _check(nxt == rl.LONG_TERM and entries and all(e.is_long_term for e in entries), "after the last checkpoint the next milestone is the long-term entry")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 21. Memory: a value logged today/yesterday is confirmed rather than asked;
+#     a trend is shown when at least two values exist.
+# ----------------------------------------------------------------------------
+
+def test_memory_confirms_logged_flexion_and_shows_trend() -> None:
+    _section("21 -- Memory before asking: confirm yesterday's flexion, show the 7-day trend [REAL-INTEGRATION + stubbed LLM]")
+
+    surgery_date = _dynamic_surgery_date(9)  # Day 10
+    metrics = [
+        {"day": 7, "date": _days_ago_iso(3), "rom_flexion": 70, "rom_extension": 8},
+        {"day": 9, "date": _days_ago_iso(1), "rom_flexion": 80, "rom_extension": 5},
+    ]
+    _seed_recovery_patient("MEM-TKA", surgery_type="Total Knee Arthroplasty (TKA)", surgery_date=surgery_date, metrics=metrics)
+
+    memory = pm.load_patient_memory("MEM-TKA")
+    series = memory.metric_series("rom_flexion", days=7)
+    _check([v for _, v in series] == [70.0, 80.0], f"metric_series must return the last-7-day values oldest first, got {series}")
+    latest = memory.latest_metric("rom_flexion", within_days=1)
+    _check(latest is not None and latest[1] == 80.0 and latest[2] == 1, f"latest_metric must find yesterday's 80, got {latest}")
+    _check(ri.confirmation_offer(rl.ROM_FLEXION_DEGREES, memory) == (80.0, 1), "confirmation_offer uses the value logged yesterday")
+    _check(ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 85.0) == "Trend: flexion 70 -> 80 -> 85 over the last week.", f"trend line wording: {ri.trend_line(rl.ROM_FLEXION_DEGREES, memory, 85.0)!r}")
+    _check(ri.trend_line(rl.WALKING_DURATION_MINUTES, memory, 15.0) is None, "no trend for a metric without a metrics column")
+
+    # "yes" keeps the logged value.
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "MEM-TKA", ["How is my recovery going?", "yes"], surgery_date=surgery_date, day=10)
+    opener, confirmed = results[0]["reply"], results[1]["reply"]
+    print(f"    opener: {opener!r}")
+    print(f"    after 'yes': {confirmed!r}")
+    _check("Your log from yesterday says you could bend to 80°" in opener and "still about that?" in opener, "the opener confirms yesterday's flexion instead of asking")
+    _check(ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES] not in opener, "the plain flexion question is NOT asked when a logged value exists")
+    state = recovery_state.peek_state(patient_id="MEM-TKA", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(state.is_current(rl.ROM_FLEXION_DEGREES) and state.get_fact(rl.ROM_FLEXION_DEGREES).value == 80.0, "'yes' stores the logged 80")
+    _check("flexion of 80°" in confirmed and "Trend: flexion 70 -> 80 -> 80 over the last week." in confirmed, f"the confirmed value is compared and the trend shown: {confirmed!r}")
+    _check("Your log from yesterday says your extension was 5°" in confirmed, "the next ROM metric logged yesterday is confirmed too")
+
+    # A number overrides the logged value; "no" falls back to the plain question.
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "MEM-TKA", ["How is my recovery going?", "it's about 85 now"], surgery_date=surgery_date, day=10)
+    state = recovery_state.peek_state(patient_id="MEM-TKA", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(state.get_fact(rl.ROM_FLEXION_DEGREES).value == 85.0, "a number overrides the logged value")
+    _check("Trend: flexion 70 -> 80 -> 85 over the last week." in results[1]["reply"], f"trend uses today's number: {results[1]['reply']!r}")
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "MEM-TKA", ["How is my recovery going?", "no"], surgery_date=surgery_date, day=10)
+    print(f"    after 'no': {results[1]['reply']!r}")
+    _check(ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES] in results[1]["reply"], "'no' leads to the plain flexion question")
+    state = recovery_state.peek_state(patient_id="MEM-TKA", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(not state.is_current(rl.ROM_FLEXION_DEGREES) and state.pending_field == rl.ROM_FLEXION_DEGREES, "'no' stores nothing and keeps flexion pending")
+
+    # A value logged THREE days ago is not offered for confirmation.
+    _seed_recovery_patient("MEM-OLD", surgery_type="Total Knee Arthroplasty (TKA)", surgery_date=surgery_date,
+                           metrics=[{"day": 7, "date": _days_ago_iso(3), "rom_flexion": 70}])
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "MEM-OLD", ["How is my recovery going?"], surgery_date=surgery_date, day=10)
+    _check(ri._ASK_QUESTIONS[rl.ROM_FLEXION_DEGREES] in results[0]["reply"] and "still about that" not in results[0]["reply"], "a 3-day-old value is asked afresh, not confirmed")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 22. The request's current_rom is read via patient_memory and never asked.
+# ----------------------------------------------------------------------------
+
+def test_request_current_rom_seeded_and_never_asked() -> None:
+    _section("22 -- current_rom from the request is parsed via patient_memory and never asked again [REAL-INTEGRATION + stubbed LLM]")
+
+    _check(pm.parse_current_rom("flexion 85, extension 3") == {"rom_flexion": 85.0, "rom_extension": 3.0}, "labelled pair")
+    _check(pm.parse_current_rom("85/5") == {"rom_flexion": 85.0, "rom_extension": 5.0}, "slash pair")
+    _check(pm.parse_current_rom("I can bend to 90 degrees") == {"rom_flexion": 90.0}, "bend wording -> flexion only")
+    _check(pm.parse_current_rom("") == {} and pm.parse_current_rom(None) == {}, "empty -> nothing")
+
+    surgery_date = _dynamic_surgery_date(9)
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "ROM-REQ", ["How is my recovery going?"], surgery_date=surgery_date, day=10,
+                                current_rom="flexion 85, extension 3")
+    reply = results[0]["reply"]
+    print(f"    with current_rom: {reply!r}")
+    state = recovery_state.peek_state(patient_id="ROM-REQ", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(state.is_current(rl.ROM_FLEXION_DEGREES) and state.get_fact(rl.ROM_FLEXION_DEGREES).value == 85.0, "request flexion is seeded as today's fact")
+    _check(state.is_current(rl.ROM_EXTENSION_DEGREES) and state.get_fact(rl.ROM_EXTENSION_DEGREES).value == 3.0, "request extension is seeded as today's fact")
+    _check("flexion of 85°" in reply and "extension of 3°" in reply, "seeded values are compared on the opener")
+    _check(state.pending_field == rl.MOBILITY_STATUS and "how many degrees" not in reply.lower(), f"neither ROM value is asked; the walking-aid question comes first: {state.pending_field}")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 23. The simpler extension question maps to degree ranges from TKA-03.
+# ----------------------------------------------------------------------------
+
+def test_simpler_extension_question_maps_to_range() -> None:
+    _section("23 -- 'Can you get the knee fully flat on the bed?' -> degree ranges (TKA-03's 0-5 near-full) [REAL-INTEGRATION + stubbed LLM]")
+
+    surgery_date = _dynamic_surgery_date(9)  # Day 10
+
+    def _answer_flat(patient: str, answer: str):
+        _reset_recovery_store()
+        results, _ = _run_interview(_handle_tka, patient, ["I can bend to 85 degrees", "I don't know", answer], surgery_date=surgery_date, day=10)
+        state = recovery_state.peek_state(patient_id=patient, surgery_date_raw=surgery_date, procedure="TKA")
+        return results, state
+
+    results, state = _answer_flat("FLAT-YES", "yes")
+    print(f"    after 'I don't know': {results[1]['reply']!r}")
+    _check(ri._ALT_QUESTIONS[rl.ROM_EXTENSION_DEGREES] in results[1]["reply"], "the simpler flat-on-the-bed question follows an uncertain answer")
+    _check("can you get the knee fully flat on the bed?" in results[1]["reply"].lower(), "wording as specified")
+    value = state.get_fact(rl.ROM_EXTENSION_DEGREES).value
+    _check(isinstance(value, rl.ValueRange) and value.is_point and value.low == 0.0, f"'yes' -> fully flat = 0°, got {value}")
+    _check("extension (fully flat on the bed) is within the 0°-5° range" in results[2]["reply"], f"'yes' compares within 0-5: {results[2]['reply']!r}")
+
+    results, state = _answer_flat("FLAT-ALMOST", "almost, there's a small gap")
+    value = state.get_fact(rl.ROM_EXTENSION_DEGREES).value
+    _check(value == rl.EXTENSION_FLAT_ANSWERS["near_full"], f"'almost' -> near-full 0-5 range, got {value}")
+    _check("(nearly flat) is within the 0°-5° range" in results[2]["reply"], f"'almost' compares within 0-5: {results[2]['reply']!r}")
+
+    results, state = _answer_flat("FLAT-NO", "no")
+    value = state.get_fact(rl.ROM_EXTENSION_DEGREES).value
+    _check(value == rl.EXTENSION_FLAT_ANSWERS["not_full"], f"'no' -> more than near-full, got {value}")
+    _check("(not yet flat) is outside the 0°-5° range" in results[2]["reply"], f"'no' compares outside 0-5, neutrally: {results[2]['reply']!r}")
+    _assert_no_forbidden_directional_language(results[2]["reply"].split("\n\n")[0], "flat 'no'")
+
+    # Day 14 (range 0-10): "nearly flat" (0-5) is fully inside; "not yet
+    # flat" (5-open) straddles 0-10 -> OVERLAPS, phrased as uncertain.
+    _reset_recovery_store()
+    s = recovery_state.get_or_create_state(patient_id="FLAT-14", surgery_date_raw=surgery_date, procedure="TKA")
+    s.apply_verified_day(14)
+    s.set_fact(rl.ROM_EXTENSION_DEGREES, rl.EXTENSION_FLAT_ANSWERS["not_full"], effective_postop_day=14)
+    cp = rl.evaluate_checkpoint(s, procedure="TKA", metric=rl.ROM_EXTENSION_DEGREES)
+    _check(cp.verdict == rl.CheckpointVerdict.OVERLAPS_STATED_RANGE and cp.checkpoint_day == 14, f"day-14 'not yet flat' overlaps 0-10: {cp.verdict}")
+    _check("a measured number would settle it" in ri.format_assess_message(cp), "overlap wording asks for a number instead of guessing")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 24. Walking-aid, walking-duration and stairs questions for both
+#     procedures; THA gets walking + precautions, never knee ROM.
+# ----------------------------------------------------------------------------
+
+def test_walking_duration_stairs_precaution_questions_both_procedures() -> None:
+    _section("24 -- Walking aid / duration / stairs questions for TKA and THA; THA precautions, no knee ROM [REAL-INTEGRATION + stubbed LLM]")
+
+    _check(rl.asked_metrics_for("TKA") == (rl.ROM_FLEXION_DEGREES, rl.ROM_EXTENSION_DEGREES, rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES, rl.STAIRS), "TKA question order")
+    _check(rl.asked_metrics_for("THA") == (rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES, rl.STAIRS, rl.HIP_PRECAUTIONS), "THA question order")
+    _check(rl.asked_metrics_for("GEN") == (), "GEN asks nothing (grounded guidance)")
+
+    surgery_date = _dynamic_surgery_date(29)  # Day 30
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tha, "Q-THA", _THA_FULL_INTERVIEW, surgery_date=surgery_date, day=30)
+    questions = [r["reply"] for r in results[:-1]]
+    for q in questions:
+        print(f"    THA: {q!r}")
+    _check(ri._ASK_QUESTIONS[rl.MOBILITY_STATUS] in questions[0], "THA opens with the walking-aid question")
+    _check(ri._ASK_QUESTIONS[rl.WALKING_DURATION_MINUTES] in questions[1], "then walking duration")
+    _check(ri._ASK_QUESTIONS[rl.STAIRS] in questions[2], "then stairs")
+    _check(ri._ASK_QUESTIONS[rl.HIP_PRECAUTIONS] in questions[3], "then hip precautions")
+    all_text = " ".join(r["reply"].lower() for r in results)
+    # ("bending the hip past a right angle" is a hip precaution, so the
+    # knee-ROM check looks for knee/flexion/extension/degree wording.)
+    _check(not any(w in all_text for w in ("knee", "flexion", "extension", "degrees")), f"THA never mentions knee ROM: {all_text[:300]!r}")
+    _check(all(q.count("?") == 1 for q in questions), "one tracked question per THA turn")
+    state = recovery_state.peek_state(patient_id="Q-THA", surgery_date_raw=surgery_date, procedure="THA")
+    _check(state.get_fact(rl.MOBILITY_STATUS).value == "crutches", "'one crutch' -> crutches")
+    _check(state.get_fact(rl.WALKING_DURATION_MINUTES).value == 20.0, "'about 20 minutes' -> 20")
+    _check(state.get_fact(rl.STAIRS).value == "foot_over_foot", "'foot over foot now' -> foot_over_foot")
+    _check(state.get_fact(rl.HIP_PRECAUTIONS).value == "following", "'yes, still following them' -> following")
+    _check("hip precautions: keeping to your hip precautions" in results[-1]["reply"], "precautions are compared in the THA assessment")
+
+    # TKA asks the same three walking questions after ROM.
+    surgery_date_tka = _dynamic_surgery_date(9)
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "Q-TKA", _TKA_FULL_INTERVIEW, surgery_date=surgery_date_tka, day=10)
+    joined = [r["reply"] for r in results]
+    _check(ri._ASK_QUESTIONS[rl.MOBILITY_STATUS] in joined[2] and ri._ASK_QUESTIONS[rl.WALKING_DURATION_MINUTES] in joined[3]
+           and ri._ASK_QUESTIONS[rl.STAIRS] in joined[4], "TKA asks walking aid, walking duration, stairs after ROM")
+
+    # Extraction shapes for the new fields.
+    def _extract(text: str, pending=None):
+        _reset_recovery_store()
+        s = recovery_state.get_or_create_state(patient_id="EXTR", surgery_date_raw=surgery_date_tka, procedure="TKA")
+        s.apply_verified_day(10)
+        if pending:
+            s.mark_pending(pending)
+        r = rl.extract_and_apply(text, s)
+        return {f.field_name: f.value for f in r.applied_facts}
+
+    _check(_extract("I can walk for half an hour") == {rl.WALKING_DURATION_MINUTES: 30.0}, "half an hour -> 30")
+    _check(_extract("walking more than ten minutes now")[rl.WALKING_DURATION_MINUTES] == rl.WALKING_DURATION_ANSWERS["more"], "'more than ten minutes' -> range (10, open)")
+    _check(_extract("15", pending=rl.WALKING_DURATION_MINUTES) == {rl.WALKING_DURATION_MINUTES: 15.0}, "bare number answers the pending duration")
+    _check(_extract("I'm doing the stairs one at a time with the rail") == {rl.STAIRS: "one_at_a_time"}, "stairs one at a time")
+    _check(_extract("I go up the stairs foot over foot") == {rl.STAIRS: "foot_over_foot"}, "foot over foot")
+    _check(_extract("haven't tried stairs yet") == {rl.STAIRS: "not_yet"}, "not yet")
+    _check(_extract("I'm using a frame") == {rl.MOBILITY_STATUS: "walker"}, "frame -> walker")
+    _check(_extract("I use a stick now") == {rl.MOBILITY_STATUS: "cane"}, "stick -> cane")
+    _check(_extract("no", pending=rl.HIP_PRECAUTIONS) == {rl.HIP_PRECAUTIONS: "not_following"}, "'no' to the precautions question")
+    _check(_extract("I did my exercises this morning") == {rl.EXERCISE_COMPLETED: True}, "exercises done")
+    _check(_extract("I started driving again and I'm back at work") == {rl.DRIVING: "driving", rl.RETURN_TO_WORK: "returned"}, "driving + work volunteered")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 25. Multi-slot: several values volunteered at once are all accepted; only
+#     what is missing is asked, one question per turn.
+# ----------------------------------------------------------------------------
+
+def test_multi_slot_volunteered_values_ask_only_missing() -> None:
+    _section("25 -- Multi-slot: volunteered values all accepted, only the missing metric is asked [REAL-INTEGRATION + stubbed LLM]")
+
+    surgery_date = _dynamic_surgery_date(9)
+    _reset_recovery_store()
+    results, _ = _run_interview(
+        _handle_tka, "MULTI",
+        ["I can bend to 85 degrees, I'm using a cane, I can walk 15 minutes and I do stairs one at a time"],
+        surgery_date=surgery_date, day=10,
+    )
+    reply = results[0]["reply"]
+    print(f"    reply: {reply!r}")
+    state = recovery_state.peek_state(patient_id="MULTI", surgery_date_raw=surgery_date, procedure="TKA")
+    for metric in (rl.ROM_FLEXION_DEGREES, rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES, rl.STAIRS):
+        _check(state.is_current(metric), f"{metric} must be stored from the one message")
+    _check(state.pending_field == rl.ROM_EXTENSION_DEGREES, f"only extension is missing -> it is the one question, got {state.pending_field}")
+    _check(reply.count("?") == 1, "exactly one question")
+    _check("flexion of 85°" in reply and "walking aid: a cane" in reply and "walking duration: 15 minutes" in reply and "stairs: one step at a time" in reply, "all four values are fed back")
+    _check("(last question)" in reply, "the indicator reflects that only one metric remains")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 26. Assessment names the checkpoint and the source at every checkpoint;
+#     categorical verdicts; precautions needing review.
+# ----------------------------------------------------------------------------
+
+def test_assessment_names_checkpoint_and_source() -> None:
+    _section("26 -- Every comparison names the nearest checkpoint and its source passage [REAL-INTEGRATION]")
+
+    def _cp(procedure: str, metric: str, day: int, value):
+        _reset_recovery_store()
+        s = recovery_state.get_or_create_state(patient_id=f"CPS-{procedure}-{metric}-{day}", surgery_date_raw="2026-01-01T00:00:00.000", procedure=procedure)
+        s.apply_verified_day(day)
+        s.set_fact(metric, value, effective_postop_day=day)
+        return rl.evaluate_checkpoint(s, procedure=procedure, metric=metric)
+
+    expectations = [
+        (10, 7, "TKA-03", "earlier Post-Op Day 7 checkpoint"),
+        (14, 14, "EV-TKA-REHAB-02", "Post-Op Day 14"),
+        (30, 21, "EV-TKA-REC-02", "earlier Post-Op Day 21 checkpoint"),
+        (42, 42, "EV-TKA-REC-03", "Post-Op Day 42"),
+        (60, 42, "EV-TKA-REC-03", "earlier Post-Op Day 42 checkpoint"),
+        (84, 84, "EV-TKA-REC-05", "Post-Op Day 84"),
+        (100, None, "EV-TKA-REC-06", "the long-term guidance"),
+    ]
+    for day, checkpoint_day, source, phrase in expectations:
+        cp = _cp("TKA", rl.ROM_FLEXION_DEGREES, day, 95)
+        text = ri.format_assess_message(cp)
+        print(f"    TKA flexion day {day}: {text!r}")
+        _check(cp.checkpoint_day == checkpoint_day and cp.source_id == source, f"day {day}: expected checkpoint {checkpoint_day}/{source}, got {cp.checkpoint_day}/{cp.source_id}")
+        _check(phrase in text and source in text, f"day {day}: reply must name the checkpoint and the source")
+        _assert_no_forbidden_trajectory_language(text, f"TKA flexion day {day}")
+        _assert_no_forbidden_robotic_language(text, f"TKA flexion day {day}")
+
+    cp = _cp("TKA", rl.ROM_FLEXION_DEGREES, 42, 95)
+    _check(cp.verdict == rl.CheckpointVerdict.BELOW_STATED_CHECKPOINT and "below the more than 110° mark" in ri.format_assess_message(cp), f"day 42 flexion 95 is below the >110 mark: {ri.format_assess_message(cp)!r}")
+    cp = _cp("TKA", rl.ROM_FLEXION_DEGREES, 42, 115)
+    _check(cp.verdict == rl.CheckpointVerdict.MEETS_STATED_CHECKPOINT, "day 42 flexion 115 meets the >110 mark")
+    cp = _cp("TKA", rl.ROM_EXTENSION_DEGREES, 42, 2)
+    _check(cp.verdict == rl.CheckpointVerdict.OUTSIDE_STATED_RANGE and "outside the 0° mark" in ri.format_assess_message(cp), "day 42 extension 2 is outside 'fully straight', phrased neutrally")
+
+    # Categorical verdicts: match / not yet / beyond; precautions review.
+    cp = _cp("TKA", rl.MOBILITY_STATUS, 21, "cane")
+    _check(cp.verdict == rl.CheckpointVerdict.MATCHES_STATED_STATE and "EV-TKA-REHAB-03" in ri.format_assess_message(cp), "cane at day 21 matches")
+    cp = _cp("TKA", rl.MOBILITY_STATUS, 21, "walker")
+    text = ri.format_assess_message(cp)
+    _check(cp.verdict == rl.CheckpointVerdict.NOT_YET_AT_STATED_STATE and "not at that point yet" in text, f"walker at day 21 is 'not yet': {text!r}")
+    _assert_no_forbidden_directional_language(text, "walker day 21")
+    cp = _cp("TKA", rl.MOBILITY_STATUS, 21, "independent")
+    _check(cp.verdict == rl.CheckpointVerdict.BEYOND_STATED_STATE and "beyond what" in ri.format_assess_message(cp), "independent at day 21 is 'beyond'")
+    cp = _cp("THA", rl.HIP_PRECAUTIONS, 14, "not_following")
+    text = ri.format_assess_message(cp)
+    _check(cp.verdict == rl.CheckpointVerdict.NEEDS_REVIEW and "check with your surgical team" in text and "EV-THA-REC-02" in text, f"precautions not followed -> review: {text!r}")
+    cp = _cp("THA", rl.MOBILITY_STATUS, 30, "crutches")
+    _check(cp.checkpoint_day == 21 and cp.source_id == "EV-THA-REHAB-04", f"THA day 30 uses the day-21 THA entry: {cp}")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 27. Never declines inside day 1-365; a metric with no data is named and
+#     the interview moves on to another question.
+# ----------------------------------------------------------------------------
+
+def test_never_declines_inside_day_range_and_names_missing_data() -> None:
+    _section("27 -- Never declines inside day 1-365; 'no data' is said and another metric is asked [REAL-INTEGRATION + stubbed LLM]")
+
+    for day in (1, 7, 22, 84, 200, 365):
+        surgery_date = _dynamic_surgery_date(day - 1)
+        _reset_recovery_store()
+        results, calls = _run_interview(_handle_tka, f"ND-{day}", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=day)
+        final = results[-1]["reply"]
+        _check("Here's how things compare on post-op day" in final, f"day {day}: a full assessment is produced, got {final[:80]!r}")
+        _check("can't give a supported verdict" not in final and "not able to compare" not in final, f"day {day}: never declines")
+        _check(len(calls) == 1, f"day {day}: the final turn calls the LLM exactly once")
+        if day == 1:
+            _check("target to work towards" in final, "day 1 gives the day-7 target to work towards")
+        if day > 84:
+            _check("EV-TKA-REC-06" in final and "Longer term" in final, f"day {day}: the long-term entry is used and offered")
+
+    # Two misses on flexion: the agent says so, moves on, and the final
+    # assessment names the missing metric instead of declining.
+    surgery_date = _dynamic_surgery_date(9)
+    _reset_recovery_store()
+    results, _ = _run_interview(
+        _handle_tka, "ND-MISS",
+        ["How is my recovery going?", "I don't know", "no idea", "3 degrees", "a walker", "10 minutes", "not yet"],
+        surgery_date=surgery_date, day=10,
+    )
+    moved_on = results[2]["reply"]
+    print(f"    after two misses: {moved_on!r}")
+    _check("I'll leave flexion for now" in moved_on, "the agent says it has no data for flexion")
+    _check(ri._ASK_QUESTIONS[rl.ROM_EXTENSION_DEGREES] in moved_on and moved_on.count("?") == 1, "...and asks about another metric")
+    state = recovery_state.peek_state(patient_id="ND-MISS", surgery_date_raw=surgery_date, procedure="TKA")
+    _check(state.status_of(rl.ROM_FLEXION_DEGREES) == recovery_state.FieldStatus.UNAVAILABLE, "flexion is UNAVAILABLE after two misses")
+    final = results[-1]["reply"]
+    print(f"    final: {final!r}")
+    _check("flexion: I don't have a value from you for this one" in final, "the final assessment names the metric with no data")
+    _check("extension of 3°" in final and "walking aid: a walker/frame" in final, "the other metrics are still compared")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 28. Server-derived day kept; a warning is logged when the client's
+#     postop_day disagrees -- once per episode.
+# ----------------------------------------------------------------------------
+
+def test_server_day_kept_and_mismatch_warning_logged() -> None:
+    _section("28 -- Server-derived post-op day is kept; client disagreement logs a WARNING once [REAL-INTEGRATION]")
+
+    class _Capture(_logging.Handler):
+        def __init__(self):
+            super().__init__(level=_logging.WARNING)
+            self.records = []
+
+        def emit(self, record):
+            self.records.append(record)
+
+    logger = _logging.getLogger("agents.recovery")
+    handler = _Capture()
+    logger.addHandler(handler)
+    try:
+        surgery_date = _dynamic_surgery_date(9)  # server day 10
+        _reset_recovery_store()
+        fn, _ = _stub_answer_question()
+        with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+            _handle_tka("MISMATCH", "How is my recovery going?", surgery_date=surgery_date, day=999)
+            _handle_tka("MISMATCH", "80 degrees", surgery_date=surgery_date, day=999)
+        state = recovery_state.peek_state(patient_id="MISMATCH", surgery_date_raw=surgery_date, procedure="TKA")
+        _check(state.effective_postop_day == 10 and state.client_reported_postop_day == 999, "server day 10 kept; client 999 recorded as diagnostic only")
+        warnings = [r for r in handler.records if "postop_day mismatch" in r.getMessage()]
+        _check(len(warnings) == 1, f"exactly one WARNING per distinct disagreement, got {len(warnings)}")
+        _check(warnings and warnings[0].levelno == _logging.WARNING and "client sent 999" in warnings[0].getMessage() and "server derived 10" in warnings[0].getMessage(), f"warning text: {warnings[0].getMessage() if warnings else None}")
+
+        handler.records.clear()
+        _reset_recovery_store()
+        with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+            _handle_tka("AGREE", "How is my recovery going?", surgery_date=surgery_date, day=10)
+        _check(not [r for r in handler.records if "postop_day mismatch" in r.getMessage()], "no warning when client and server agree")
+    finally:
+        logger.removeHandler(handler)
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 29. Persistence: the close writes flexion/extension/exercise into today's
+#     metrics row; an abandoned interview persists nothing.
+# ----------------------------------------------------------------------------
+
+def test_final_turn_persists_metrics_and_abandoned_persists_nothing() -> None:
+    _section("29 -- Close persists flexion/extension/exercise_completed into today's metrics; abandoned interviews persist nothing [REAL-INTEGRATION]")
+    from patient_database import get_patient
+
+    surgery_date = _dynamic_surgery_date(9)
+    _seed_recovery_patient("PERSIST", surgery_type="Total Knee Arthroplasty (TKA)", surgery_date=surgery_date)
+    _reset_recovery_store()
+    messages = ["How is my recovery going?", "I can bend to 85 degrees and I did my exercises", "yes, fully flat",
+                "I'm using a cane", "about 15 minutes", "one step at a time"]
+    _run_interview(_handle_tka, "PERSIST", messages, surgery_date=surgery_date, day=10)
+    rows = [r for r in get_patient("PERSIST")["metrics_history"] if r.get("date") == pm.today_iso()]
+    print(f"    today's rows: {rows}")
+    _check(len(rows) == 1, "exactly one row for today")
+    _check(rows and rows[0]["rom_flexion"] == 85.0 and rows[0]["rom_extension"] == 0.0 and rows[0]["exercise_completed"] == 1 and rows[0]["day"] == 10,
+           f"collected values written: {rows}")
+
+    # A range-only extension ("nearly flat") writes nothing for that column.
+    _seed_recovery_patient("PERSIST-RANGE", surgery_type="Total Knee Arthroplasty (TKA)", surgery_date=surgery_date)
+    _reset_recovery_store()
+    _run_interview(_handle_tka, "PERSIST-RANGE", ["I can bend to 85 degrees", "I don't know", "almost", "a cane", "15 minutes", "one at a time"], surgery_date=surgery_date, day=10)
+    rows = [r for r in get_patient("PERSIST-RANGE")["metrics_history"] if r.get("date") == pm.today_iso()]
+    _check(rows and rows[0]["rom_flexion"] == 85.0 and rows[0]["rom_extension"] is None, f"a range answer never fabricates a number: {rows}")
+
+    # Abandoned after two answers: nothing written.
+    _seed_recovery_patient("ABANDON", surgery_type="Total Knee Arthroplasty (TKA)", surgery_date=surgery_date)
+    _reset_recovery_store()
+    _run_interview(_handle_tka, "ABANDON", ["How is my recovery going?", "I can bend to 85 degrees"], surgery_date=surgery_date, day=10)
+    rows = [r for r in get_patient("ABANDON")["metrics_history"] if r.get("date") == pm.today_iso()]
+    _check(rows == [], f"an abandoned interview must persist nothing, got {rows}")
+
+    # write_today_metrics round trip for the new columns, unknown patient fails softly.
+    _check(pm.write_today_metrics("PERSIST", rom_flexion=90.0, exercise_completed=False) is True, "update of today's row with ROM columns")
+    row = [r for r in get_patient("PERSIST")["metrics_history"] if r.get("date") == pm.today_iso()][0]
+    _check(row["rom_flexion"] == 90.0 and row["exercise_completed"] == 0 and row["rom_extension"] == 0.0, f"update touches only supplied columns: {row}")
+    _check(pm.write_today_metrics("NOBODY-REC", rom_flexion=80.0) is False, "unknown patient fails softly")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 30. The close ends with the next milestone and a 'recovery check' offer;
+#     the LLM explanation is optional, guarded, and never sets triage.
+# ----------------------------------------------------------------------------
+
+def test_final_turn_next_milestone_offer_and_llm_guard() -> None:
+    _section("30 -- Close: next milestone + 'recovery check' offer; LLM explanation guarded; triage authoritative [REAL-INTEGRATION + stubbed LLM]")
+
+    surgery_date = _dynamic_surgery_date(9)
+    yellow = {"triage_level": "YELLOW", "is_escalated": True, "action_protocol": "Contact the orthopedic nursing hotline."}
+
+    _reset_recovery_store()
+    results, calls = _run_interview(_handle_tka, "CLOSE-DET", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=10, precomputed_triage=yellow)
+    final = results[-1]
+    print(f"    deterministic close: {final['reply']!r}")
+    _check("Next milestone: day 14 --" in final["reply"], "the close names the next milestone and its day")
+    _check(final["reply"].rstrip().endswith("Say 'recovery check' at day 14 and I'll compare."), "the close ends with the follow-up offer")
+    _check(final["engine"] == RecoveryProgressAgent.ENGINE_NAME, "empty LLM reply -> deterministic engine")
+    _check(final["triage_level"] == "YELLOW" and final["is_escalated"] is True, "triage copied from the upstream result")
+    _check(len(calls) == 1 and "RECOVERY COMPARISON (untrusted data" in calls[0]["domain_instruction"], "the deterministic block travels fenced in the LLM instruction")
+    _check("say you don't have that information" in calls[0]["domain_instruction"], "the abstention sentence is in the instruction")
+    _check(calls[0]["postop_day"] == 10 and "day 10" in calls[0]["user_message"], "the LLM is given the server day and a retrieval query")
+
+    # Accepted LLM explanation: appears ABOVE the unchanged deterministic block.
+    _reset_recovery_store()
+    good = "Your bend and straightening are both inside the week-one guide, so keep working on the exercises your physiotherapist set."
+    results, _ = _run_interview(_handle_tka, "CLOSE-LLM", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=10, stub_reply=good, precomputed_triage=yellow)
+    final = results[-1]
+    _check(final["reply"].startswith(good) and "Here's how things compare on post-op day 10" in final["reply"], "accepted explanation sits above the deterministic block")
+    _check(final["engine"] == RecoveryProgressAgent.ENGINE_FINAL, "engine reflects the accepted explanation")
+    _check(final["triage_level"] == "YELLOW", "the LLM path never changes the triage level")
+
+    # Rejected: an unsourced number / trajectory language -> deterministic only.
+    for bad in ("You are on track and should reach 130 degrees by next week.", "You are well ahead of schedule."):
+        _reset_recovery_store()
+        results, _ = _run_interview(_handle_tka, "CLOSE-BAD", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=10, stub_reply=bad)
+        final = results[-1]
+        _check(bad not in final["reply"] and final["engine"] == RecoveryProgressAgent.ENGINE_NAME, f"rejected explanation never reaches the patient: {bad!r}")
+    _check(ri.llm_body_is_acceptable("Keep going with the heel slides; 85 degrees is inside the guide.", allowed_numbers=["85"]), "numbers present in the block are allowed")
+    _check(not ri.llm_body_is_acceptable("Aim for 130 degrees.", allowed_numbers=["85"]), "numbers absent from the block are rejected")
+
+    # Long-term close.
+    surgery_date_long = _dynamic_surgery_date(99)
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "CLOSE-LONG", _TKA_FULL_INTERVIEW, surgery_date=surgery_date_long, day=100)
+    _check("Longer term, the guidance describes" in results[-1]["reply"] and "Say 'recovery check' any time and I'll compare with today." in results[-1]["reply"], f"long-term close: {results[-1]['reply'][-200:]!r}")
+
+    # 'recovery check' routes to the Recovery agent.
+    _reset_recovery_store()
+    fn, _ = _stub_answer_question()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        routed = LAMOrchestrator.process(
+            patient_id="RECHECK", surgery_type="Total Knee Arthroplasty (TKA)", affected_limb="Right",
+            postop_day=10, user_message="recovery check", surgery_date=surgery_date,
+        )
+    _check(routed["intent"] == IntentLabel.RECOVERY_PROGRESS.value and routed["target_agent"] == TargetAgent.RECOVERY_AGENT.value, f"'recovery check' routes to RecoveryProgressAgent: {routed['intent']}")
+    _check(routed["reply"].count("?") == 1, "...and opens the interview with one question")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 31. Continuation hook accepts the new answer shapes, still rejects
+#     off-topic messages.
+# ----------------------------------------------------------------------------
+
+def test_continuation_accepts_new_answer_shapes() -> None:
+    _section("31 -- check_recovery_continuation(): new fields and yes/no-shaped answers [REAL-INTEGRATION]")
+
+    surgery_date = "2026-09-02T00:00:00.000"
+
+    def _pending(metric: str, *, variant: str = "primary", confirm_value=None, procedure: str = "TKA") -> None:
+        _reset_recovery_store()
+        s = recovery_state.get_or_create_state(patient_id="CT-NEW", surgery_date_raw=surgery_date, procedure=procedure)
+        s.mark_pending(metric, variant=variant, confirm_value=confirm_value)
+
+    def _matches(message: str, procedure: str = "TKA") -> bool:
+        return ri.check_recovery_continuation(patient_id="CT-NEW", surgery_date_raw=surgery_date, procedure=procedure, user_message=message)
+
+    positive = [
+        (rl.MOBILITY_STATUS, "primary", None, "I'm using a stick"),
+        (rl.WALKING_DURATION_MINUTES, "primary", None, "about 20 minutes"),
+        (rl.WALKING_DURATION_MINUTES, "primary", None, "20"),
+        (rl.WALKING_DURATION_MINUTES, "alt", None, "more than that"),
+        (rl.STAIRS, "primary", None, "one at a time"),
+        (rl.STAIRS, "primary", None, "not yet"),
+        (rl.HIP_PRECAUTIONS, "primary", None, "yes"),
+        (rl.ROM_EXTENSION_DEGREES, "alt", None, "no"),
+        (rl.ROM_FLEXION_DEGREES, "confirm", 80.0, "yes"),
+        (rl.ROM_FLEXION_DEGREES, "confirm", 80.0, "it's about 85 now"),
+        (rl.ROM_FLEXION_DEGREES, "primary", None, "85"),
+    ]
+    for metric, variant, confirm_value, message in positive:
+        _pending(metric, variant=variant, confirm_value=confirm_value, procedure="THA" if metric == rl.HIP_PRECAUTIONS else "TKA")
+        _check(_matches(message, "THA" if metric == rl.HIP_PRECAUTIONS else "TKA") is True, f"pending {metric}/{variant} + {message!r} must continue")
+
+    for metric in (rl.MOBILITY_STATUS, rl.WALKING_DURATION_MINUTES, rl.STAIRS, rl.ROM_FLEXION_DEGREES):
+        for message in ("My wound is red and leaking.", "I forgot to take my medication.", "What should I eat tonight?"):
+            _pending(metric)
+            _check(_matches(message) is False, f"pending {metric} + off-topic {message!r} must NOT continue")
+
+    # A bare "yes" to the PRIMARY flexion question (not yes/no shaped) is not a continuation.
+    _pending(rl.ROM_FLEXION_DEGREES)
+    _check(_matches("yes") is False, "'yes' does not answer 'how many degrees' -- classification runs instead")
+    # A number inside an unrelated sentence is NOT a loose measurement.
+    _pending(rl.ROM_FLEXION_DEGREES)
+    _check(_matches("I took 2 tablets this morning") is False, "a medication message with a number must not be stolen as a measurement")
+    _check(rl.loose_number("i took 2 tablets this morning") is None and rl.loose_number("it's about 85 now") == 85.0, "loose_number accepts filler-only replies")
+    print()
+
+
 def main() -> int:
     _run(test_postop_day_derivation)
     _run(test_checkpoint_day_6_7_8_boundary)
@@ -1326,6 +2108,19 @@ def main() -> int:
     _run(test_routing_and_response_shape)
     _run(test_postop_day_procedure_and_chat_history_reach_grounded_guidance)
     _run(test_conversational_style_and_grounding)
+    _run(test_milestone_file_sources_exist_in_corpus)
+    _run(test_select_checkpoint_nearest_at_or_before_and_long_term)
+    _run(test_memory_confirms_logged_flexion_and_shows_trend)
+    _run(test_request_current_rom_seeded_and_never_asked)
+    _run(test_simpler_extension_question_maps_to_range)
+    _run(test_walking_duration_stairs_precaution_questions_both_procedures)
+    _run(test_multi_slot_volunteered_values_ask_only_missing)
+    _run(test_assessment_names_checkpoint_and_source)
+    _run(test_never_declines_inside_day_range_and_names_missing_data)
+    _run(test_server_day_kept_and_mismatch_warning_logged)
+    _run(test_final_turn_persists_metrics_and_abandoned_persists_nothing)
+    _run(test_final_turn_next_milestone_offer_and_llm_guard)
+    _run(test_continuation_accepts_new_answer_shapes)
 
     print("=" * 78)
     if _FAILURES:

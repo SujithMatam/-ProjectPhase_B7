@@ -34,21 +34,36 @@ from rag.knowledge_base import ClinicalKnowledgeBase
 
 class RecoveryProgressAgent(BaseClinicalAgent):
     """
-    Agentic Recovery Progress Agent -- Pass 2 integration.
+    Agentic Recovery Progress Agent -- memory-aware, multi-slot, proactive.
 
-    Real logic (state, extraction, milestone table, decision function) is
-    owned entirely by the approved recovery_state.py / recovery_logic.py
-    modules; this class is the OBSERVE -> DECIDE -> ACT -> UPDATE executor
-    that wires them together for one turn, plus the deterministic
-    patient-facing templates in recovery_integration.py.
+    Real logic (state, extraction, milestone file, comparisons, turn plan)
+    is owned by recovery_state.py / recovery_logic.py; wording by
+    recovery_integration.py; patient memory by patient_memory.py. This class
+    is the OBSERVE -> PLAN -> ACT -> UPDATE executor for one turn.
 
-    THA/GEN (no supported quantitative milestone in the current corpus) skip
-    the deterministic loop entirely and fall through to the existing,
-    unmodified ChatAgent/RAG grounded-guidance path -- see
-    _grounded_guidance(). TKA always runs the full loop, including for a
-    generic opening message ("How is my recovery going?"), which is exactly
-    what naturally produces an ASK_FOR_INFORMATION turn instead of an
-    immediate guess.
+    Per turn:
+      1. derive the SERVER post-op day from surgery_date (the client-sent
+         day is diagnostic only; a disagreement is logged as a warning);
+      2. load patient memory ONCE per interview (last 7 days of `metrics`
+         plus the request's own current_rom) and seed what is already
+         known, so nothing on record is asked again;
+      3. extract every fact the message volunteers (multi-slot);
+      4. give immediate feedback on what was just supplied -- each value
+         compared with the nearest checkpoint at or before today, naming
+         the checkpoint day and the source passage -- then ask exactly ONE
+         tracked question (confirming a value logged today/yesterday
+         instead of asking from scratch; a simpler rephrase after "I don't
+         know"; "no data for this one, moving on" after two misses);
+      5. when nothing is left to ask: the final assessment (every collected
+         value vs its checkpoint, metrics with no data named, the next
+         milestone and its day, a 'recovery check' offer), an optional
+         LLM explanation grounded in fenced data, and persistence of the
+         collected flexion/extension/exercise into today's metrics row.
+
+    TKA and THA both run the loop (THA gets walking and precaution
+    questions, never knee ROM). GEN has no sourced checkpoint and keeps the
+    unmodified ChatAgent grounded-guidance path. The LLM never sets or
+    lowers the triage level: precomputed_triage is copied onto every reply.
     """
 
     TARGET_AGENT = TargetAgent.RECOVERY_AGENT
@@ -59,6 +74,7 @@ class RecoveryProgressAgent(BaseClinicalAgent):
     )
 
     ENGINE_NAME = "Recovery Deterministic Assessment Engine"
+    ENGINE_FINAL = "Recovery Progress Agent - Grounded Assessment"
 
     @classmethod
     def handle(
@@ -73,21 +89,17 @@ class RecoveryProgressAgent(BaseClinicalAgent):
         chat_history: Optional[List[Dict[str, str]]] = None,
         surgery_date: Optional[str] = None,
         precomputed_triage: Optional[Dict[str, Any]] = None,
+        current_rom: Optional[str] = None,
     ) -> Dict[str, Any]:
-        supported_metrics = recovery_logic.SUPPORTED_METRICS_BY_PROCEDURE.get(procedure, ())
+        from agents import patient_memory
 
-        if not supported_metrics:
-            # THA / GEN: no sourced deterministic progress milestone exists
-            # for either in the current corpus (THA-01 is precautions-only;
-            # no GEN-specific document exists at all) -- preserve the
-            # existing, unmodified grounded-guidance path rather than running
-            # the TKA-only deterministic loop. This is intentional: it means
-            # no RecoverySessionState is created and no interview/
-            # continuation loop runs for THA/GEN today. If a future pass adds
-            # a sourced THA/GEN deterministic milestone, this early return
-            # must be revisited so those procedures can participate in the
-            # state/interview/continuation loop like TKA does. No functional
-            # THA/GEN change in this pass.
+        procedure_code = str(procedure or "").strip().upper()
+        asked_metrics = recovery_logic.asked_metrics_for(procedure_code)
+
+        if not asked_metrics:
+            # GEN (or an unknown code): no sourced checkpoint exists, so the
+            # existing, unmodified grounded-guidance path answers instead.
+            # No RecoverySessionState is created for it.
             return cls._grounded_guidance(
                 patient_id=patient_id, surgery_type=surgery_type, affected_limb=affected_limb,
                 postop_day=postop_day, user_message=user_message, procedure=procedure,
@@ -95,231 +107,255 @@ class RecoveryProgressAgent(BaseClinicalAgent):
             )
 
         # ================================================================
-        # OBSERVE
+        # OBSERVE -- state, server-derived day, memory, extraction
         # ================================================================
         state = recovery_state.get_or_create_state(
-            patient_id=patient_id, surgery_date_raw=surgery_date, procedure=procedure,
+            patient_id=patient_id, surgery_date_raw=surgery_date, procedure=procedure_code,
         )
-        # Diagnostic only -- never authoritative for any comparison. This is
-        # the ONE intentional public field assignment on RecoverySessionState
-        # from outside its own methods (everything else routes through the
-        # approved set_fact/mark_pending/mark_unknown/mark_unavailable/
-        # apply_verified_day/clear_verified_day API). client_reported_postop_day
-        # exists solely so a conflicting client-supplied day can be compared
-        # against effective_postop_day for diagnostics/tests -- see Section 4
-        # smoke case H below. Known API-consistency cleanup item for Pass 3:
-        # consider a dedicated RecoverySessionState mutator for this field so
-        # ALL writes route through a method; not addressed in this pass
-        # because no functional bug requires it.
-        state.client_reported_postop_day = postop_day
+        state.set_client_reported_postop_day(postop_day)
 
         effective_day = recovery_integration.derive_effective_postop_day(surgery_date)
-        if effective_day is not None:
-            state.apply_verified_day(effective_day)
-        else:
+        if effective_day is None:
+            # No verifiable surgery date: the day cannot be placed, so no
+            # comparison is attempted and the interview is not touched.
             state.clear_verified_day()
+            reply = recovery_integration.format_decline_message(
+                recovery_logic.DecisionReasonCode.DAY_UNVERIFIED, metric=asked_metrics[0],
+            )
+            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+
+        recovery_integration.log_postop_day_mismatch(
+            patient_id=patient_id, client_day=postop_day, server_day=effective_day, state=state,
+        )
+        state.apply_verified_day(effective_day)
+
+        memory = state.memory
+        if memory is None:
+            memory = patient_memory.load_patient_memory(patient_id, current_rom=current_rom)
+            state.set_memory(memory)
+        elif current_rom:
+            memory.request_rom = patient_memory.parse_current_rom(current_rom)
+
+        # The request's own current_rom is a value the client already sent:
+        # seed it as today's fact so it is never asked for. A value seeded
+        # THIS turn counts as "just supplied" so it gets the same immediate
+        # feedback a typed answer would.
+        seeded_now: List[recovery_logic.ExtractedFact] = []
+        for column, metric in (
+            ("rom_flexion", recovery_logic.ROM_FLEXION_DEGREES),
+            ("rom_extension", recovery_logic.ROM_EXTENSION_DEGREES),
+        ):
+            if metric in asked_metrics and column in memory.request_rom:
+                value = memory.request_rom[column]
+                fact = state.get_fact(metric)
+                if not state.is_current(metric) or fact is None or fact.value != value:
+                    state.set_fact(metric, value, effective_postop_day=effective_day)
+                    seeded_now.append(recovery_logic.ExtractedFact(metric, value))
 
         extraction = recovery_logic.extract_and_apply(user_message, state)
+        if seeded_now:
+            extraction = recovery_logic.ExtractionResult(
+                applied_facts=tuple(seeded_now) + extraction.applied_facts,
+                ambiguous_fields=extraction.ambiguous_fields,
+                marked_unknown_fields=extraction.marked_unknown_fields,
+                confirm_declined_fields=extraction.confirm_declined_fields,
+            )
         ambiguous_field_names = tuple(a.field_name for a in extraction.ambiguous_fields)
 
-        metric = cls._select_metric_for_turn(
-            state, supported_metrics, extraction, ambiguous_field_names,
+        # ================================================================
+        # PLAN (pure) + UPDATE the one transition the plan asks for
+        # ================================================================
+        plan = recovery_logic.plan_turn(
+            state, procedure=procedure_code, extraction=extraction, ambiguous_fields=ambiguous_field_names,
         )
-
-        # ONE Recovery-owned retrieval for this entire turn -- the same
-        # result feeds the decision function's evidence gate, the full
-        # checkpoint evaluation, and source attribution below. No second,
-        # independent retrieval on the assess branch. The query is the real
-        # user message, augmented with a small metric-specific hint (see
-        # recovery_integration.build_retrieval_query) so a terse
-        # continuation reply ("80 degrees") still retrieves reliably.
-        evidence = cls._retrieve_recovery_evidence(user_message, procedure, metric)
+        for metric in plan.exhausted_this_turn:
+            state.mark_unavailable(metric)
 
         # ================================================================
-        # DECIDE (pure -- see recovery_logic.decide_progress_verdict_action)
+        # ACT
         # ================================================================
-        decision = recovery_logic.decide_progress_verdict_action(
-            state, procedure=procedure, metric=metric, evidence=evidence,
-            ambiguous_fields=ambiguous_field_names,
-        )
-
-        # ================================================================
-        # ACT + UPDATE (state transitions owned here -- see the executor
-        # transition table in the Pass-2 report)
-        # ================================================================
-        return cls._execute_decision(
-            state=state, decision=decision, metric=metric, evidence=evidence,
-            precomputed_triage=precomputed_triage,
+        if plan.complete:
+            return cls._final_assessment(
+                state=state, memory=memory, procedure=procedure_code, patient_id=patient_id,
+                surgery_type=surgery_type, affected_limb=affected_limb, user_message=user_message,
+                chat_history=chat_history, surgery_date=surgery_date, precomputed_triage=precomputed_triage,
+            )
+        return cls._ask_turn(
+            state=state, plan=plan, memory=memory, procedure=procedure_code, precomputed_triage=precomputed_triage,
         )
 
     # ------------------------------------------------------------------
-    # Metric selection -- one metric drives each turn (see Pass-2 report
-    # for why: decide_progress_verdict_action is specified per-metric, and
-    # combining multiple metrics into one response is out of this pass's
-    # scope; see also ONE ACTION PER TURN in the Pass-2-correction report --
-    # this executor already returns exactly one reply per turn, so picking
-    # exactly one metric here is what keeps that true).
-    #
-    # PRIORITY (highest first) -- correction-pass fix: flexion/extension are
-    # INDEPENDENT supported comparisons, so a metric the patient just
-    # answered must never be dropped in favor of asking about the OTHER
-    # metric. Previously this scanned supported_metrics in fixed order and
-    # returned the first not-yet-current one, which meant a just-supplied
-    # flexion value was silently skipped whenever extension also happened to
-    # be not-current (e.g. NEVER_ASKED) -- the patient's answer was stored
-    # but never assessed, and extension was asked instead. Fixed order below:
-    #
-    #   1. a supported metric THIS TURN's extraction applied
-    #      (extraction.applied_facts) AND that is now current
-    #      (state.is_current(metric)) -- assess what was just supplied.
-    #   2. a supported metric THIS TURN was marked UNKNOWN
-    #      (extraction.marked_unknown_fields) -- keep deciding about THAT
-    #      metric ("I don't know" must not silently switch metrics).
-    #   3. a supported metric THIS TURN was reported ambiguous
-    #      (ambiguous_field_names) -- clarification targets that metric.
-    #   4. the existing pending_field, if it names a supported metric --
-    #      an open question is not abandoned just because this turn
-    #      supplied/flagged nothing for it.
-    #   5. the next supported metric that is not yet current (canonical
-    #      SUPPORTED_METRICS_BY_PROCEDURE order -- for TKA that is flexion,
-    #      then extension).
-    #   6. deterministic fallback: the first supported metric, once every
-    #      supported metric is already current and nothing new happened
-    #      this turn.
-    #
-    # MULTI-FACT DETERMINISM (rule C): if one message supplies more than one
-    # supported metric at once (e.g. "I can bend to 80 and straighten to 3
-    # degrees."), extract_and_apply() has already stored BOTH facts via
-    # set_fact() before this runs -- this method still returns exactly ONE
-    # metric for THIS turn's decision/response, chosen by scanning
-    # `supported_metrics` in its canonical order (flexion before extension
-    # for TKA), so flexion wins a tie. The other supplied fact remains
-    # stored and available for selection on a later turn; this pass never
-    # produces two verdicts in one reply.
-    #
-    # Reads only extraction.applied_facts / marked_unknown_fields (the
-    # approved ExtractionResult fields) plus state.is_current() /
-    # state.pending_field (both public) -- never re-scans raw message text
-    # and never reaches into RecoverySessionState's private fields.
+    # Mid-interview turn: immediate feedback + ONE question.
     # ------------------------------------------------------------------
     @classmethod
-    def _select_metric_for_turn(
-        cls,
-        state,
-        supported_metrics,
-        extraction: "recovery_logic.ExtractionResult",
-        ambiguous_field_names: tuple,
-    ) -> str:
-        applied_field_names = tuple(f.field_name for f in extraction.applied_facts)
-
-        # 1. Supplied/updated this turn and now current -- assess it.
-        for metric in supported_metrics:
-            if metric in applied_field_names and state.is_current(metric):
-                return metric
-
-        # 2. Marked UNKNOWN this turn -- keep deciding for that metric.
-        for metric in supported_metrics:
-            if metric in extraction.marked_unknown_fields:
-                return metric
-
-        # 3. Ambiguous this turn -- clarification targets that metric.
-        for metric in supported_metrics:
-            if metric in ambiguous_field_names:
-                return metric
-
-        # 4. An outstanding pending question on a supported metric.
-        if state.pending_field in supported_metrics:
-            return state.pending_field
-
-        # 5. Next supported metric that is not yet current.
-        for metric in supported_metrics:
-            if not state.is_current(metric):
-                return metric
-
-        # 6. Everything current, nothing new this turn -- deterministic
-        # fallback to the first supported metric.
-        return supported_metrics[0]
-
-    # ------------------------------------------------------------------
-    # Single Recovery-owned retrieval per progress-verdict turn.
-    # ------------------------------------------------------------------
-    @classmethod
-    def _retrieve_recovery_evidence(
-        cls, user_message: str, procedure: str, metric: str
-    ) -> Optional["recovery_logic.RecoveryEvidence"]:
-        query = recovery_integration.build_retrieval_query(user_message, metric)
-        try:
-            detail = ClinicalKnowledgeBase.retrieve_detailed(query, procedure=procedure, limit=2)
-        except Exception:
-            return None
-        if not detail.results:
-            return None
-        return recovery_integration.build_recovery_evidence_from_chunk(detail.results[0])
-
-    # ------------------------------------------------------------------
-    # Executor -- owns every state transition the pure decision function
-    # itself does not perform. See the transition table in the Pass-2
-    # report for the exact action -> state-method mapping.
-    # ------------------------------------------------------------------
-    @classmethod
-    def _execute_decision(
-        cls, *, state, decision, metric: str, evidence, precomputed_triage: Optional[Dict[str, Any]],
-    ) -> Dict[str, Any]:
-        RA = recovery_logic.RecoveryAction
+    def _ask_turn(cls, *, state, plan, memory, procedure: str, precomputed_triage: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         DRC = recovery_logic.DecisionReasonCode
+        comparisons: List[str] = []
+        sources: List[str] = []
 
-        if decision.action == RA.ASK_FOR_INFORMATION:
-            # Read the retry count BEFORE mark_pending() -- mark_pending()
-            # doesn't touch ask_count, but reading first keeps this in the
-            # same order regardless, and gives format_ask_question() a
-            # stable seed to rotate its acknowledgment phrase by.
-            variation_seed = state.ask_count_of(metric)
-            state.mark_pending(metric)
-            reply = recovery_integration.format_ask_question(
-                metric, reason_code=decision.reason_code, variation_seed=variation_seed,
+        for metric in plan.just_supplied:
+            checkpoint = recovery_logic.evaluate_checkpoint(state, procedure=procedure, metric=metric)
+            if checkpoint.supported:
+                trend = recovery_integration.trend_line(metric, memory, checkpoint.patient_value)
+                comparisons.append(recovery_integration.format_assess_message(
+                    checkpoint, trend=trend, with_ack=not comparisons,
+                ))
+                if checkpoint.source_id and checkpoint.source_id not in sources:
+                    sources.append(checkpoint.source_id)
+            elif checkpoint.reason_code == recovery_logic.ReasonCode.INVALID_METRIC_VALUE and metric != plan.next_metric:
+                comparisons.append(recovery_integration.format_decline_message(DRC.INVALID_METRIC_VALUE, metric=metric))
+
+        moving_on = [recovery_integration.format_moving_on(m) for m in plan.exhausted_this_turn]
+
+        metric = plan.next_metric
+        reason = plan.next_reason
+        variation_seed = state.ask_count_of(metric)
+        variant = "primary"
+        confirm_value: Any = None
+        confirm_days_ago = 0
+
+        if reason == DRC.FIELD_PENDING:
+            # Still waiting on the same question -- repeat it as asked.
+            variant = state.pending_variant or "primary"
+            confirm_value = state.pending_confirm_value
+            offer = recovery_integration.confirmation_offer(metric, memory)
+            if offer is not None:
+                confirm_days_ago = offer[1]
+        elif reason == DRC.FIELD_UNKNOWN_RETRY_REMAINING:
+            variant = "alt"
+        elif reason == DRC.INVALID_METRIC_VALUE:
+            variant = "primary"
+        elif reason == DRC.FIELD_NEVER_ASKED and not state.confirm_declined(metric):
+            offer = recovery_integration.confirmation_offer(metric, memory)
+            if offer is not None:
+                variant = "confirm"
+                confirm_value, confirm_days_ago = offer
+
+        if reason == DRC.INVALID_METRIC_VALUE:
+            question = recovery_integration.format_decline_message(DRC.INVALID_METRIC_VALUE, metric=metric)
+        else:
+            question = recovery_integration.format_ask_question(
+                metric, reason_code=reason, variation_seed=variation_seed, variant=variant,
+                confirm_value=confirm_value, confirm_days_ago=confirm_days_ago,
             )
-            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+        if reason != DRC.FIELD_PENDING:
+            state.mark_pending(metric, variant=variant, confirm_value=confirm_value)
 
-        if decision.action == RA.AWAIT_INFORMATION:
-            # metric is already the tracked pending_field -- no duplicate
-            # mark_pending(), no state mutation at all.
-            reply = recovery_integration.format_ask_question(
-                metric, reason_code=decision.reason_code, variation_seed=state.ask_count_of(metric),
-            )
-            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+        # Opening line for the very first question of an interview (nothing
+        # collected yet, nothing to feed back): names the day being checked.
+        asked_metrics = recovery_logic.asked_metrics_for(procedure)
+        is_opening = (
+            not comparisons and not moving_on
+            and reason in (DRC.FIELD_NEVER_ASKED,)
+            and not any(state.is_current(m) for m in asked_metrics)
+            and all(state.status_of(m) in (recovery_state.FieldStatus.NEVER_ASKED, recovery_state.FieldStatus.PENDING) for m in asked_metrics)
+            and variation_seed == 0
+        )
+        opener = recovery_integration.opening_line(state.effective_postop_day) if is_opening else None
 
-        if decision.action == RA.DECLINE_TO_ASSESS:
-            if decision.reason_code == DRC.RETRY_EXHAUSTED:
-                # The ONE transition the executor must perform on decline:
-                # retries are exhausted, so the field is now UNAVAILABLE for
-                # the remainder of this interview. Every other decline
-                # reason (FIELD_UNAVAILABLE already, or an evidence/day/
-                # source/window failure) performs NO interview mutation.
-                state.mark_unavailable(metric)
-            reply = recovery_integration.format_decline_message(decision.reason_code, metric=metric, evidence=evidence)
-            sources = [evidence.source_id] if evidence is not None else []
-            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=sources)
+        indicator = recovery_integration.remaining_indicator(plan.remaining_after_next)
+        reply = recovery_integration.format_turn_reply(
+            comparisons=comparisons, moving_on=moving_on, question=question, indicator=indicator, opener=opener,
+        )
+        return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=sources)
 
-        if decision.action == RA.ASSESS_SUPPORTED_METRIC:
-            # No interview mutation merely because an assessment succeeded.
-            checkpoint = recovery_logic.evaluate_checkpoint(
-                state, procedure=decision.procedure, metric=metric, evidence=evidence,
-            )
-            reply = recovery_integration.format_assess_message(checkpoint)
-            sources = [evidence.source_id] if evidence is not None else []
-            return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=sources)
+    # ------------------------------------------------------------------
+    # Final turn: full assessment, optional LLM explanation, persistence.
+    # ------------------------------------------------------------------
+    @classmethod
+    def _final_assessment(
+        cls, *, state, memory, procedure: str, patient_id: str, surgery_type: str, affected_limb: str,
+        user_message: str, chat_history: Optional[List[Dict[str, str]]], surgery_date: Optional[str],
+        precomputed_triage: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        from agents.pain_integration import is_unhelpful_llm_reply
 
-        # Defensive fallback only -- decide_progress_verdict_action() never
-        # returns PROVIDE_GROUNDED_GUIDANCE in this design (THA/GEN are
-        # routed around the decision function entirely, above). Degrades
-        # safely rather than crashing if that ever changes.
-        reply = recovery_integration.format_decline_message("unexpected_action", metric=metric, evidence=evidence)
-        return cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=[])
+        day = int(state.effective_postop_day)
+        asked_metrics = recovery_logic.asked_metrics_for(procedure)
+        metrics = recovery_logic.assessable_metrics(state, procedure)
+
+        comparisons: List[Any] = []
+        sources: List[str] = []
+        for metric in metrics:
+            checkpoint = recovery_logic.evaluate_checkpoint(state, procedure=procedure, metric=metric)
+            if not checkpoint.supported:
+                continue
+            trend = recovery_integration.trend_line(metric, memory, checkpoint.patient_value)
+            comparisons.append((checkpoint, trend))
+            if checkpoint.source_id and checkpoint.source_id not in sources:
+                sources.append(checkpoint.source_id)
+
+        missing = recovery_logic.missing_asked_metrics(state, procedure)
+        next_checkpoint, next_entries = recovery_logic.next_milestone(procedure, day)
+        for entry in next_entries:
+            if entry.metric in asked_metrics and entry.source_id not in sources:
+                sources.append(entry.source_id)
+
+        block = recovery_integration.format_final_assessment(
+            procedure=procedure, postop_day=day, comparisons=comparisons, missing_metrics=missing,
+            next_checkpoint=next_checkpoint, next_entries=next_entries,
+            metrics_of_interest=list(asked_metrics) + list(metrics),
+        )
+
+        # Optional LLM explanation. ChatAgent retrieves with the query it is
+        # given; the deterministic block and the raw patient message travel
+        # fenced inside domain_instruction as untrusted data.
+        retrieval_query = recovery_integration.build_final_retrieval_query(
+            surgery_type=surgery_type, procedure=procedure, postop_day=day, metrics=metrics or asked_metrics,
+        )
+        domain_instruction = recovery_integration.build_final_turn_domain_instruction(
+            cls.DOMAIN_FOCUS, block, user_message,
+        )
+        llm_result: Dict[str, Any] = {}
+        try:
+            llm_result = ChatAgent.answer_question(
+                patient_id=patient_id,
+                surgery_type=surgery_type,
+                affected_limb=affected_limb,
+                postop_day=day,
+                user_message=retrieval_query,
+                chat_history=chat_history,
+                procedure=procedure,
+                domain_instruction=domain_instruction,
+                precomputed_triage=precomputed_triage,
+                surgery_date=surgery_date,
+            ) or {}
+        except Exception as exc:
+            print(f"[RECOVERY] final-turn LLM call failed: {exc}")
+            llm_result = {}
+
+        body = str(llm_result.get("reply", "") or "").strip()
+        allowed_numbers = recovery_integration.numbers_in_text(block) + [day]
+        accepted = (
+            bool(body)
+            and not is_unhelpful_llm_reply(body)
+            and recovery_integration.llm_body_is_acceptable(body, allowed_numbers=allowed_numbers)
+        )
+        if body and not accepted:
+            print("[RECOVERY] rejecting final LLM explanation -- empty, generic, trajectory language or an unsourced number")
+
+        reply = recovery_integration.compose_final_reply(body if accepted else None, block)
+        engine = cls.ENGINE_FINAL if accepted else cls.ENGINE_NAME
+
+        for source in llm_result.get("sources") or []:
+            if source not in sources:
+                sources.append(source)
+
+        # The interview is closed; persistence happens ONLY here.
+        state.clear_pending()
+        recovery_integration.persist_assessment(patient_id, state, postop_day=day)
+
+        result = cls._structured_reply(reply, precomputed_triage=precomputed_triage, sources=sources)
+        result["engine"] = engine
+        return result
 
     @classmethod
     def _structured_reply(
         cls, reply_text: str, *, precomputed_triage: Optional[Dict[str, Any]], sources: List[str],
     ) -> Dict[str, Any]:
+        # AUTHORITATIVE TRIAGE: the level and escalation flag always come
+        # from the upstream SafetyTriageEngine result; nothing here (and no
+        # LLM text) ever sets or lowers them.
         triage_level = precomputed_triage.get("triage_level", "GREEN") if precomputed_triage else "GREEN"
         is_escalated = precomputed_triage.get("is_escalated", False) if precomputed_triage else False
         return {
@@ -331,8 +367,8 @@ class RecoveryProgressAgent(BaseClinicalAgent):
         }
 
     # ------------------------------------------------------------------
-    # Ordinary grounded guidance -- UNCHANGED existing ChatAgent/RAG path.
-    # chat_agent.py is not modified; this is not a duplicate implementation.
+    # Ordinary grounded guidance -- UNCHANGED existing ChatAgent/RAG path
+    # (GEN only). chat_agent.py is not modified.
     # ------------------------------------------------------------------
     @classmethod
     def _grounded_guidance(
