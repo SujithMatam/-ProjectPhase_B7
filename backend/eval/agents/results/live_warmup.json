@@ -1,0 +1,30 @@
+{
+  "purpose": "warm-up before live eval; excluded from all latency figures",
+  "wall_seconds": 4.71,
+  "load_duration_s": 4.4901152,
+  "total_duration_s": 4.6916545,
+  "response": "How can I assist you today?",
+  "api_ps": {
+    "models": [
+      {
+        "name": "llama3.2:latest",
+        "model": "llama3.2:latest",
+        "size": 2554708622,
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "3.2B",
+          "quantization_level": "Q4_K_M"
+        },
+        "expires_at": "2026-10-08T03:51:53.3530548+05:30",
+        "size_vram": 2554708622,
+        "context_length": 4096
+      }
+    ]
+  }
+}

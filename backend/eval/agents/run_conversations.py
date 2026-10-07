@@ -21,6 +21,10 @@ Modes:
                       deterministic close is measured; Rehab: the local LLM
                       offline, so ChatAgent's real retrieval and fallback run).
   --live              no LLM stub: ChatAgent talks to the local Ollama server.
+                      Each turn also records an llm_trace (eval/agents/
+                      llm_trace.py): Ollama prompt/response/done_reason/
+                      latency, each acceptance check, and the deterministic
+                      reply alongside the LLM one. Agent behaviour is unchanged.
   --via-orchestrator  every turn goes through LAMOrchestrator.process();
                       turns the orchestrator sends to another agent are
                       recorded as misrouted (the agent then never sees them).
@@ -429,7 +433,8 @@ def _wb_enum(backend: Backend, value: Optional[str]):
     return enum_cls(value) if enum_cls is not None else value
 
 
-def run_conversation(backend: Backend, conv: Dict[str, Any], *, live: bool, via_orchestrator: bool) -> Dict[str, Any]:
+def run_conversation(backend: Backend, conv: Dict[str, Any], *, live: bool, via_orchestrator: bool,
+                     trace=None) -> Dict[str, Any]:
     agent = conv["agent"]
     record = conv["record"]
     patient_id = record["patient_id"]
@@ -447,8 +452,10 @@ def run_conversation(backend: Backend, conv: Dict[str, Any], *, live: bool, via_
     snapshot = start
     pending_before: Optional[str] = None  # our agent's open question going into the turn
 
-    with llm_mode(backend, mode), no_doctor_alert(backend):
+    with llm_mode(backend, mode), no_doctor_alert(backend), (trace.install(backend) if trace else contextlib.nullcontext()):
         for index, turn in enumerate(conv["turns"], start=1):
+            if trace:
+                trace.take()
             text = turn["patient"]
             engine = backend.engine_triage(text, day)
             detour = turn.get("detour")
@@ -527,6 +534,8 @@ def run_conversation(backend: Backend, conv: Dict[str, Any], *, live: bool, via_
                 "error": error,
                 "seconds": round(elapsed, 2),
             })
+            if trace:
+                turns_out[-1]["llm_trace"] = trace.take()
             history.append({"role": "user", "content": text})
             history.append({"role": "assistant", "content": reply})
             if ours and misroute_kind is None:
@@ -793,9 +802,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     backend = Backend(backend_dir, args.verbose)
     started = time.strftime("%Y-%m-%d %H:%M:%S")
     t0 = time.time()
+    trace = None
+    if args.live:
+        sys.path.insert(0, str(HERE))
+        from llm_trace import LLMTrace
+        trace = LLMTrace()
     runs = []
     for conv in conversations:
-        run = run_conversation(backend, conv, live=args.live, via_orchestrator=args.via_orchestrator)
+        run = run_conversation(backend, conv, live=args.live, via_orchestrator=args.via_orchestrator, trace=trace)
         s = run["summary"]
         print(f"  {conv['id']:<38} {s['properties_passed']:>2}/{s['properties_total']:<2} "
               f"q={s['questions']} fields={s['fields_per_turn']} reused={s['record_fields_reused']}/"
