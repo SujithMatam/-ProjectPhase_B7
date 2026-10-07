@@ -1,0 +1,5901 @@
+{
+  "meta": {
+    "label": "baseline_b8f0cc5",
+    "backend_dir": "git worktree at b8f0cc5",
+    "commit": "b8f0cc5",
+    "live": false,
+    "via_orchestrator": false,
+    "started": "2026-10-08 03:22:00",
+    "seconds": 12.5
+  },
+  "runs": [
+    {
+      "id": "c01_pain_tka_calf",
+      "agent": "pain",
+      "title": "TKA calf case: memory confirm, non-numeric reply, multi-slot correction",
+      "tags": [
+        "transcript",
+        "memory",
+        "bug-nonnumeric"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My knee has been hurting since this morning.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "yes",
+          "reply": "Okay, None pain -- that helps me understand how strong it is. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "it really hurts",
+          "reply": "Okay, None pain -- that helps me understand how strong it is. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 4,
+          "patient": "7 out of 10, started suddenly yesterday in the calf",
+          "reply": "Okay, 7 out of 10 -- that helps me understand how strong the pain is. Have you noticed any swelling in that area?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "swelling",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "location",
+            "onset",
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "yes it's swollen",
+          "reply": "Thanks, that's useful to know. Does the area feel warmer than usual, or look red?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "YELLOW",
+          "engine_triage_level": "YELLOW",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "swelling",
+          "is_agent_turn": true,
+          "asked_field": "warmth_or_redness",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen"
+          },
+          "collected_before": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf"
+          },
+          "new_fields": [
+            "swelling"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 6,
+          "patient": "no",
+          "reply": "Thanks, that's useful to know. Any numbness or weakness in that leg?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "warmth_or_redness",
+          "is_agent_turn": true,
+          "asked_field": "numbness_or_weakness",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen",
+            "warmth_or_redness": "no"
+          },
+          "collected_before": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen"
+          },
+          "new_fields": [
+            "warmth_or_redness"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 7,
+          "patient": "no",
+          "reply": "Thanks, that's useful to know. Have you felt feverish at all, or checked your temperature?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "numbness_or_weakness",
+          "is_agent_turn": true,
+          "asked_field": "fever_or_temperature",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen",
+            "warmth_or_redness": "no",
+            "numbness_or_weakness": "no"
+          },
+          "collected_before": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen",
+            "warmth_or_redness": "no"
+          },
+          "new_fields": [
+            "numbness_or_weakness"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 8,
+          "patient": "no fever",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 7/10\n- how it started: sudden\n- where it's felt: in the calf\n- swelling: yes it's swollen\n- warmth or redness: no\n- numbness or weakness: no\n- fever/temperature: no fever\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's the same as the pain score of 7/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "fever_or_temperature",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen",
+            "fever_or_temperature": "no fever",
+            "warmth_or_redness": "no",
+            "numbness_or_weakness": "no"
+          },
+          "collected_before": {
+            "pain_score": "7",
+            "onset": "sudden",
+            "location": "in the calf",
+            "swelling": "yes it's swollen",
+            "warmth_or_redness": "no",
+            "numbness_or_weakness": "no"
+          },
+          "new_fields": [
+            "fever_or_temperature"
+          ],
+          "rows_written": {
+            "symptom_assessments": 1,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 1
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 1,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 1
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "pain_score -> not collected"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 2,
+          "passed": false,
+          "detail": "/None pain/ hit 'None pain'"
+        },
+        {
+          "name": "does_not_collect",
+          "turn": 3,
+          "passed": true,
+          "detail": "onset -> not collected"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 3,
+          "passed": false,
+          "detail": "/\\bNone\\b/ hit 'None'"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "pain_score -> 7"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "onset -> sudden"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "location -> in the calf"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "swelling -> yes it's swollen"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": true,
+          "detail": "warmth_or_redness -> no"
+        },
+        {
+          "name": "collects_field",
+          "turn": 7,
+          "passed": true,
+          "detail": "numbness_or_weakness -> no"
+        },
+        {
+          "name": "collects_field",
+          "turn": 8,
+          "passed": true,
+          "detail": "fever_or_temperature -> no fever"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 1: pain_score; turn 2: pain_score; turn 3: pain_score"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "7 asked, max 7"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 7,
+        "fields_per_turn": [
+          0,
+          0,
+          0,
+          3,
+          1,
+          1,
+          1,
+          1
+        ],
+        "fields_total": 7,
+        "record_fields_reused": 0,
+        "record_fields_offered": 2,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [
+          "pain_score"
+        ],
+        "rows_persisted": 1,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 14,
+        "properties_total": 20
+      }
+    },
+    {
+      "id": "c02_pain_tha_groin",
+      "agent": "pain",
+      "title": "THA groin case: hip wording, location asked, groin not stored as trend",
+      "tags": [
+        "transcript",
+        "THA",
+        "memory",
+        "bug-offtopic"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My hip is sore today.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "location": "My hip"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "location"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "no, it's more like a 6",
+          "reply": "Okay, 6 out of 10 -- that helps me understand how strong the pain is. Did it come on suddenly, or has it been building up gradually?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "onset",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "location": "My hip",
+            "pain_score": "6"
+          },
+          "collected_before": {
+            "location": "My hip"
+          },
+          "new_fields": [
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "gradually",
+          "reply": "Got it -- that's useful to know. Is it getting worse, getting better, or staying about the same?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": true,
+          "asked_field": "worsening_or_improving",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "location": "My hip",
+            "onset": "gradual",
+            "pain_score": "6"
+          },
+          "collected_before": {
+            "location": "My hip",
+            "pain_score": "6"
+          },
+          "new_fields": [
+            "onset"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 4,
+          "patient": "in the groin",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 6/10\n- how it started: gradual\n- where it's felt: My hip\n- how it's trending: in the groin\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's higher than the pain score of 5/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "worsening_or_improving",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "location": "My hip",
+            "onset": "gradual",
+            "pain_score": "6",
+            "worsening_or_improving": "in the groin"
+          },
+          "collected_before": {
+            "location": "My hip",
+            "onset": "gradual",
+            "pain_score": "6"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 1,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 1
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "about the same",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "worsening_or_improving": "stable"
+          },
+          "collected_before": {
+            "location": "My hip",
+            "onset": "gradual",
+            "pain_score": "6",
+            "worsening_or_improving": "in the groin"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 1,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 1
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "pain_score -> 6"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": true,
+          "detail": "onset -> gradual"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "location -> My hip"
+        },
+        {
+          "name": "does_not_store_unfitting_reply",
+          "turn": 4,
+          "passed": false,
+          "detail": "worsening_or_improving = 'in the groin' must not contain 'groin'"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "worsening_or_improving -> stable"
+        },
+        {
+          "name": "does_not_store_unfitting_reply",
+          "turn": 5,
+          "passed": true,
+          "detail": "location = '' must not contain 'hip'"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 1: pain_score; turn 5: pain_score"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 5: pain_score"
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "4 asked, max 4"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks pain_score"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 4,
+        "fields_per_turn": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "fields_total": 4,
+        "record_fields_reused": 0,
+        "record_fields_offered": 2,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [
+          "pain_score"
+        ],
+        "rows_persisted": 1,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 9,
+        "properties_total": 15
+      }
+    },
+    {
+      "id": "c03_recovery_tka_day10",
+      "agent": "recovery",
+      "title": "TKA day 10: confirm logged ROM, flat-on-the-bed rephrase, walking and stairs",
+      "tags": [
+        "transcript",
+        "memory",
+        "multi-slot"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How is my recovery going?",
+          "reply": "About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 11.48
+        },
+        {
+          "index": 2,
+          "patient": "it's about 85 now",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 3,
+          "patient": "I don't know the number",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 4,
+          "patient": "almost, there's a small gap",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 5,
+          "patient": "I'm using a cane and I can walk about 15 minutes",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "mobility_status"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 6,
+          "patient": "one step at a time holding the rail",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane"
+          },
+          "collected_before": {
+            "mobility_status": "cane"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "rom_flexion_degrees -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": false,
+          "detail": "rom_extension_degrees -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "mobility_status -> cane"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 1: rom_flexion_degrees; turn 2: rom_flexion_degrees; turn 3: rom_flexion_degrees; turn 4: rom_flexion_degrees; turn 5: rom_flexion_degrees; turn 6: rom_flexion_degrees"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": false,
+          "detail": "6 asked, max 5"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks rom_flexion_degrees"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 6,
+        "fields_per_turn": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        "fields_total": 1,
+        "record_fields_reused": 0,
+        "record_fields_offered": 2,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [
+          "rom_flexion_degrees"
+        ],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 4,
+        "properties_total": 14
+      }
+    },
+    {
+      "id": "c04_recovery_tha_day30",
+      "agent": "recovery",
+      "title": "THA day 30: walking aid, duration, stairs, hip precautions",
+      "tags": [
+        "transcript",
+        "THA"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How is my hip recovery going?",
+          "reply": "",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "I'm still using one crutch",
+          "reply": "",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "about 20 minutes",
+          "reply": "",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 4,
+          "patient": "foot over foot now",
+          "reply": "",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "yes, still following them",
+          "reply": "",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "mobility_status -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": false,
+          "detail": "hip_precautions -> not collected"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 4"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 5,
+        "properties_total": 11
+      }
+    },
+    {
+      "id": "c05_rehab_tka_stairs",
+      "agent": "rehab",
+      "title": "TKA day 5 stairs: status from record, one safety question, sourced answer",
+      "tags": [
+        "transcript",
+        "memory"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "Can I go up and down the stairs yet?",
+          "reply": "Go up stairs leading with your non-operated leg, then bring your operated leg and any walking aid up to meet it -- \"up with the good, down with the bad.\" Coming down, lead with your operated leg and walking aid first. Always use the handrail and go at a slow, steady pace, and follow your prescribed weight-bearing status.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Range of Motion & Extension Milestones"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 2,
+          "patient": "no, nothing sharp",
+          "reply": "Hello! On Day 5 of your recovery from Total Knee Arthroplasty (TKA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": true,
+          "detail": "never asked: weight_bearing_status"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 1"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/on day \\d+ after your (knee|hip) replacement|for day \\d+ after your/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 9
+      }
+    },
+    {
+      "id": "c06_rehab_tha_missed_days",
+      "agent": "rehab",
+      "title": "THA day 20: missed-days opener, barrier carried into the close, unknown status",
+      "tags": [
+        "transcript",
+        "THA",
+        "memory"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "What exercises should I be doing now?",
+          "reply": "At Day 20, work on progressing your passive flexion past 90\u00b0, standing calf raises, seated knee extension, and increasing your independent walking endurance as tolerated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Hip Precautions & Dislocation Prevention"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "the evenings are too sore to face them",
+          "reply": "Hello! On Day 20 of your recovery from Total Hip Arthroplasty (THA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 3,
+          "patient": "no sharp pain and no swelling",
+          "reply": "Swelling in your Right hip on Day 20 is normal due to increased circulation during healing. Lie down with your foot elevated above heart level and apply an ice pack for 20 minutes.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Post-Op Multimodal Pain & Anticoagulation Protocols",
+            "Pain Management & Analgesic Titration"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": null,
+      "wb_after": null,
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "exercise_barrier -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 3,
+          "passed": false,
+          "detail": "/(?i)knee flexion|seated knee extension|swelling .* is normal/ hit 'Swelling in your Right hip on Day 20 is normal'"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 2"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/on day \\d+ after your (knee|hip) replacement|for day \\d+ after your/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        },
+        {
+          "name": "weight_bearing_record_unchanged",
+          "turn": null,
+          "passed": true,
+          "detail": "None -> None"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 11
+      }
+    },
+    {
+      "id": "c07_rehab_safety_hold",
+      "agent": "rehab",
+      "title": "TKA day 12 safety hold: sharp pain from heel slides pauses the exercise",
+      "tags": [
+        "transcript",
+        "safety-hold"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How do I do heel slides?",
+          "reply": "Based on your Day 12 protocol for Total Knee Arthroplasty (TKA): Target milestones for Total Knee Arthroplasty: By Post-Op Day 7, patients should aim for 70\u00b0-90\u00b0 of passive flexion and near-full extension (0\u00b0-5\u00b0). Full terminal extension is critical; patients should avoid putting pillows directly under the knee joint, placing pillows under the ankle/calf instead to promote gravity extension.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Range of Motion & Extension Milestones"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "yes, heel slides give me a sharp pain",
+          "reply": "Mild to moderate soreness is typical on Day 12. Take your prescribed pain medication 30-45 minutes before starting physical therapy to keep your discomfort manageable.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Normal Post-Op Edema vs DVT"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "reply_matches",
+          "turn": 2,
+          "passed": false,
+          "detail": "/(?i)pause heel slides/"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 2,
+          "passed": true,
+          "detail": "/(?i)\\b(is normal|nothing to worry|perfectly fine)\\b/"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": true,
+          "detail": "never asked: weight_bearing_status"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 1"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 7,
+        "properties_total": 10
+      }
+    },
+    {
+      "id": "c08_pain_bug_nonnumeric_score",
+      "agent": "pain",
+      "title": "Bug 1a: a non-numeric reply to the score question is clarified, never 'None pain'",
+      "tags": [
+        "bug-nonnumeric"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My knee is aching today.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "aching"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "pain_characteristics"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "it really hurts",
+          "reply": "Okay, None pain -- that helps me understand how strong it is. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "aching"
+          },
+          "collected_before": {
+            "pain_characteristics": "aching"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "about a 5",
+          "reply": "Okay, 5 out of 10 -- that helps me understand how strong the pain is. Did it come on suddenly, or has it been building up gradually?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "onset",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "aching",
+            "pain_score": "5"
+          },
+          "collected_before": {
+            "pain_characteristics": "aching"
+          },
+          "new_fields": [
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 4,
+          "patient": "gradually",
+          "reply": "Got it -- that's useful to know. Where are you feeling it most -- in the knee itself, behind the knee, around the incision, in the calf, or somewhere else?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": true,
+          "asked_field": "location",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "aching",
+            "onset": "gradual",
+            "pain_score": "5"
+          },
+          "collected_before": {
+            "pain_characteristics": "aching",
+            "pain_score": "5"
+          },
+          "new_fields": [
+            "onset"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "around the kneecap",
+          "reply": "Got it. Is it getting worse, getting better, or staying about the same?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "location",
+          "is_agent_turn": true,
+          "asked_field": "worsening_or_improving",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "aching",
+            "onset": "gradual",
+            "pain_score": "5",
+            "location": "around the kneecap"
+          },
+          "collected_before": {
+            "pain_characteristics": "aching",
+            "onset": "gradual",
+            "pain_score": "5"
+          },
+          "new_fields": [
+            "location"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 6,
+          "patient": "getting a bit better",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 5/10\n- how it started: gradual\n- where it's felt: around the kneecap\n- how it's trending: improving\n- what the pain feels like: aching\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's higher than the pain score of 4/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "worsening_or_improving",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "pain_characteristics": "aching",
+            "onset": "gradual",
+            "worsening_or_improving": "improving",
+            "pain_score": "5",
+            "location": "around the kneecap"
+          },
+          "collected_before": {
+            "pain_characteristics": "aching",
+            "onset": "gradual",
+            "pain_score": "5",
+            "location": "around the kneecap"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 1,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 1
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 1,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 1
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "does_not_collect",
+          "turn": 2,
+          "passed": true,
+          "detail": "pain_score -> not collected"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 2,
+          "passed": false,
+          "detail": "/\\bNone\\b/ hit 'None'"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": true,
+          "detail": "pain_score -> 5"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 3,
+          "passed": true,
+          "detail": "/\\bNone\\b/"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "onset -> gradual"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "location -> around the kneecap"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": true,
+          "detail": "worsening_or_improving -> improving"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "5 asked, max 5"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 5,
+        "fields_per_turn": [
+          1,
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "fields_total": 5,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 1,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 12,
+        "properties_total": 15
+      }
+    },
+    {
+      "id": "c09_pain_bug_offtopic_reply",
+      "agent": "pain",
+      "title": "Bug 1b: 'Can I shower tomorrow?' is never stored as the onset",
+      "tags": [
+        "bug-offtopic"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My knee hurts quite a lot today.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "6",
+          "reply": "Okay, 6 out of 10 -- that helps me understand how strong the pain is. Did it come on suddenly, or has it been building up gradually?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "onset",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "6"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "Can I shower tomorrow?",
+          "reply": "Got it -- that's useful to know. Where are you feeling it most -- in the knee itself, behind the knee, around the incision, in the calf, or somewhere else?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "*",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": true,
+          "asked_field": "location",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "6",
+            "onset": "Can I shower tomorrow?"
+          },
+          "collected_before": {
+            "pain_score": "6"
+          },
+          "new_fields": [
+            "onset"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 4,
+          "patient": "it came on gradually",
+          "reply": "Got it. Is it getting worse, getting better, or staying about the same?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "location",
+          "is_agent_turn": true,
+          "asked_field": "worsening_or_improving",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "onset": "Can I shower tomorrow?",
+            "pain_score": "6",
+            "location": "it came on gradually"
+          },
+          "collected_before": {
+            "pain_score": "6",
+            "onset": "Can I shower tomorrow?"
+          },
+          "new_fields": [
+            "location"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "behind the knee",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 6/10\n- how it started: Can I shower tomorrow?\n- where it's felt: it came on gradually\n- how it's trending: behind the knee\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's higher than the pain score of 5/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "worsening_or_improving",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "onset": "Can I shower tomorrow?",
+            "location": "it came on gradually",
+            "pain_score": "6",
+            "worsening_or_improving": "behind the knee"
+          },
+          "collected_before": {
+            "onset": "Can I shower tomorrow?",
+            "pain_score": "6",
+            "location": "it came on gradually"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 1,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 1
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 6,
+          "patient": "getting worse",
+          "reply": "Thanks for telling me -- I'd like to understand this change a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "worsening_or_improving": "worsening"
+          },
+          "collected_before": {
+            "onset": "Can I shower tomorrow?",
+            "location": "it came on gradually",
+            "pain_score": "6",
+            "worsening_or_improving": "behind the knee"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 1,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 1
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "pain_score -> 6"
+        },
+        {
+          "name": "does_not_store_unfitting_reply",
+          "turn": 3,
+          "passed": false,
+          "detail": "onset = 'Can I shower tomorrow?' must not contain 'shower'"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "onset -> Can I shower tomorrow?"
+        },
+        {
+          "name": "does_not_store_unfitting_reply",
+          "turn": 4,
+          "passed": false,
+          "detail": "onset = 'Can I shower tomorrow?' must not contain 'shower'"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "location -> it came on gradually"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": true,
+          "detail": "worsening_or_improving -> worsening"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 6: pain_score"
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "5 asked, max 5"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks pain_score"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 5,
+        "fields_per_turn": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "fields_total": 4,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 1,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 8,
+        "properties_total": 14
+      }
+    },
+    {
+      "id": "c10_pain_bug_detour_resume",
+      "agent": "pain",
+      "title": "Bug 1c: after a stairs detour the open onset question resumes, nothing re-asked",
+      "tags": [
+        "bug-detour"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My knee is really sore today.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "5",
+          "reply": "Okay, 5 out of 10 -- that helps me understand how strong the pain is. Did it come on suddenly, or has it been building up gradually?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "onset",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "5"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "Can I climb stairs?",
+          "reply": "Take stairs one step at a time with the handrail: up with the good leg, down with the operated leg.",
+          "engine": "scripted detour",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "DailyActivityAgent",
+          "expected_agent": "DailyActivityAgent",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": false,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "pain_score": "5"
+          },
+          "collected_before": {
+            "pain_score": "5"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 4,
+          "patient": "gradually",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "onset": "gradual"
+          },
+          "collected_before": {
+            "pain_score": "5"
+          },
+          "new_fields": [
+            "onset"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "on the inside of the knee",
+          "reply": "Okay, None pain -- that helps me understand how strong it is. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "onset": "gradual"
+          },
+          "collected_before": {
+            "onset": "gradual"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 6,
+          "patient": "getting worse",
+          "reply": "Okay, None pain -- that helps me understand how strong it is. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "onset": "gradual",
+            "worsening_or_improving": "worsening"
+          },
+          "collected_before": {
+            "onset": "gradual"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "pain_score -> 5"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": false,
+          "detail": "pain_score -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "onset -> gradual"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": false,
+          "detail": "location -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": true,
+          "detail": "worsening_or_improving -> worsening"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 4: pain_score"
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "5 asked, max 6"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks pain_score"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 5,
+        "fields_per_turn": [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        "fields_total": 3,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 13
+      }
+    },
+    {
+      "id": "c11_pain_multislot_opening",
+      "agent": "pain",
+      "title": "Multi-slot: score, onset and location in the opening message",
+      "tags": [
+        "multi-slot"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "It's about a 5 out of 10, it came on gradually, and it's behind the knee.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. Is it getting worse, getting better, or staying about the same?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "worsening_or_improving",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "5",
+            "onset": "gradual",
+            "location": "behind the knee"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "location",
+            "onset",
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "getting a bit better",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 5/10\n- how it started: gradual\n- where it's felt: behind the knee\n- how it's trending: improving\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's lower than the pain score of 6/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "worsening_or_improving",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "pain_score": "5",
+            "onset": "gradual",
+            "location": "behind the knee",
+            "worsening_or_improving": "improving"
+          },
+          "collected_before": {
+            "pain_score": "5",
+            "onset": "gradual",
+            "location": "behind the knee"
+          },
+          "new_fields": [
+            "worsening_or_improving"
+          ],
+          "rows_written": {
+            "symptom_assessments": 1,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 1
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 1,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 1
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": true,
+          "detail": "pain_score -> 5"
+        },
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": true,
+          "detail": "onset -> gradual"
+        },
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": true,
+          "detail": "location -> behind the knee"
+        },
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "worsening_or_improving -> improving"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "1 asked, max 1"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 1,
+        "fields_per_turn": [
+          3,
+          1
+        ],
+        "fields_total": 4,
+        "record_fields_reused": 1,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [
+          "previous assessment"
+        ],
+        "record_fields_asked": [],
+        "rows_persisted": 1,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 10,
+        "properties_total": 12
+      }
+    },
+    {
+      "id": "c12_pain_abandoned",
+      "agent": "pain",
+      "title": "Abandoned interview: the patient stops after two answers, nothing persisted",
+      "tags": [
+        "abandoned"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My knee is throbbing.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "throbbing"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "pain_characteristics"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "6",
+          "reply": "Okay, 6 out of 10 -- that helps me understand how strong the pain is. Did it come on suddenly, or has it been building up gradually?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "onset",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "throbbing",
+            "pain_score": "6"
+          },
+          "collected_before": {
+            "pain_characteristics": "throbbing"
+          },
+          "new_fields": [
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "it came on suddenly",
+          "reply": "Got it -- that's useful to know. Where are you feeling it most -- in the knee itself, behind the knee, around the incision, in the calf, or somewhere else?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": true,
+          "asked_field": "location",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_characteristics": "throbbing",
+            "onset": "sudden",
+            "pain_score": "6"
+          },
+          "collected_before": {
+            "pain_characteristics": "throbbing",
+            "pain_score": "6"
+          },
+          "new_fields": [
+            "onset"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "pain_score -> 6"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": true,
+          "detail": "onset -> sudden"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "3 asked, max 3"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "abandoned_persists_nothing",
+          "turn": null,
+          "passed": true,
+          "detail": "0 row(s) written"
+        }
+      ],
+      "summary": {
+        "questions": 3,
+        "fields_per_turn": [
+          1,
+          1,
+          1
+        ],
+        "fields_total": 3,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 7,
+        "properties_total": 7
+      }
+    },
+    {
+      "id": "c13_pain_mild_medication",
+      "agent": "pain",
+      "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+      "tags": [
+        "memory"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "My knee aches a little, I took my painkillers an hour ago.",
+          "reply": "Thanks for telling me. I'd like to understand this a little better. On a scale from 0 to 10, how bad is the pain right now?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "pain_score",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "3",
+          "reply": "Okay, 3 out of 10 -- that helps me understand how strong the pain is. Did it come on suddenly, or has it been building up gradually?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "pain_score",
+          "is_agent_turn": true,
+          "asked_field": "onset",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "pain_score": "3"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "pain_score"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 3,
+          "patient": "gradually",
+          "reply": "Got it -- that's useful to know. Where are you feeling it most -- in the knee itself, behind the knee, around the incision, in the calf, or somewhere else?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "onset",
+          "is_agent_turn": true,
+          "asked_field": "location",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "onset": "gradual",
+            "pain_score": "3"
+          },
+          "collected_before": {
+            "pain_score": "3"
+          },
+          "new_fields": [
+            "onset"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 4,
+          "patient": "around the kneecap",
+          "reply": "Got it. Did taking your pain medication help, or not really?",
+          "engine": "Pain & Symptoms Agent - Multi-turn Assessment",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "location",
+          "is_agent_turn": true,
+          "asked_field": "medication_effect",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "onset": "gradual",
+            "pain_score": "3",
+            "location": "around the kneecap"
+          },
+          "collected_before": {
+            "onset": "gradual",
+            "pain_score": "3"
+          },
+          "new_fields": [
+            "location"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 5,
+          "patient": "yes it helped",
+          "reply": "Thanks for going through that with me. Based on what you've told me:\n- pain score: 3/10\n- how it started: gradual\n- where it's felt: around the kneecap\n- effect of medication: yes it helped\n\nFollowing your surgical team's guidance: Continue prescribed home rehabilitation exercises, cryotherapy, elevation, and oral medication schedule. Log next check-in as scheduled. That's lower than the pain score of 5/10 recorded last time.\n\nThis is a preliminary read based on what you've described and isn't a diagnosis.",
+          "engine": "Pain & Symptoms Agent - Safe Conclusion Fallback",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "PainSymptomsAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": null,
+          "pending_before": "medication_effect",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "onset": "gradual",
+            "pain_score": "3",
+            "location": "around the kneecap",
+            "medication_effect": "yes it helped"
+          },
+          "collected_before": {
+            "onset": "gradual",
+            "pain_score": "3",
+            "location": "around the kneecap"
+          },
+          "new_fields": [
+            "medication_effect"
+          ],
+          "rows_written": {
+            "symptom_assessments": 1,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 1
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 1,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 1
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "pain_score -> 3"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": true,
+          "detail": "onset -> gradual"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "location -> around the kneecap"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "medication_effect -> yes it helped"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "4 asked, max 4"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/Compared with last time/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next step:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": true,
+          "detail": "1 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 4,
+        "fields_per_turn": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "fields_total": 4,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 1,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 10,
+        "properties_total": 12
+      }
+    },
+    {
+      "id": "c14_recovery_tka_day4_target",
+      "agent": "recovery",
+      "title": "TKA day 4: before the first checkpoint, the day-7 target is given",
+      "tags": [],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "Am I on track with my knee?",
+          "reply": "About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 2,
+          "patient": "about 60 degrees",
+          "reply": "Okay, 60\u00b0 -- that helps. You're currently on post-op day 4, and the first flexion checkpoint I have is for day 7, so it's a little early to compare you against that target.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "60.0"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "rom_flexion_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 3,
+          "patient": "about 10 degrees off straight",
+          "reply": "Got it -- 10\u00b0 helps me understand where you are. You're currently on post-op day 4, and the first extension checkpoint I have is for day 7, so it's a little early to compare you against that target.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "60.0"
+          },
+          "new_fields": [
+            "rom_extension_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 4,
+          "patient": "I use a walker",
+          "reply": "Okay, 60\u00b0 -- that helps. You're currently on post-op day 4, and the first flexion checkpoint I have is for day 7, so it's a little early to compare you against that target.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0"
+          },
+          "new_fields": [
+            "mobility_status"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 5,
+          "patient": "about 5 minutes",
+          "reply": "Okay, 60\u00b0 -- that helps. You're currently on post-op day 4, and the first flexion checkpoint I have is for day 7, so it's a little early to compare you against that target.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 6,
+          "patient": "not yet",
+          "reply": "Okay, 60\u00b0 -- that helps. You're currently on post-op day 4, and the first flexion checkpoint I have is for day 7, so it's a little early to compare you against that target.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "60.0",
+            "rom_extension_degrees": "10.0",
+            "mobility_status": "walker"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "rom_flexion_degrees -> 60.0"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": true,
+          "detail": "rom_extension_degrees -> 10.0"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "mobility_status -> walker"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "1 asked, max 5"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 1,
+        "fields_per_turn": [
+          0,
+          1,
+          1,
+          1,
+          0,
+          0
+        ],
+        "fields_total": 3,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 8,
+        "properties_total": 13
+      }
+    },
+    {
+      "id": "c15_recovery_request_current_rom",
+      "agent": "recovery",
+      "title": "current_rom in the request: flexion and extension are fed back, never asked",
+      "tags": [
+        "memory",
+        "request-field"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How's my progress looking?",
+          "reply": "About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "a cane",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "mobility_status"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 3,
+          "patient": "about 20 minutes",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane"
+          },
+          "collected_before": {
+            "mobility_status": "cane"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 4,
+          "patient": "one step at a time",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane"
+          },
+          "collected_before": {
+            "mobility_status": "cane"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "mobility_status -> cane"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": false,
+          "detail": "turn 1: rom_flexion_degrees; turn 2: rom_flexion_degrees; turn 3: rom_flexion_degrees; turn 4: rom_flexion_degrees"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": false,
+          "detail": "4 asked, max 3"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks rom_flexion_degrees"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 4,
+        "fields_per_turn": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "fields_total": 1,
+        "record_fields_reused": 0,
+        "record_fields_offered": 2,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [
+          "rom_flexion_degrees"
+        ],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 4,
+        "properties_total": 12
+      }
+    },
+    {
+      "id": "c16_recovery_multislot",
+      "agent": "recovery",
+      "title": "Multi-slot: flexion, walking aid and walking time in one message",
+      "tags": [
+        "multi-slot"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "I can bend my knee to 95 degrees and walk with a cane for about 20 minutes. How am I doing?",
+          "reply": "Okay -- your flexion of 95\u00b0 exceeds the 70\u00b0-90\u00b0 range stated for the earlier Post-Op Day 7 checkpoint.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "mobility_status": "cane",
+            "rom_flexion_degrees": "95.0"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "mobility_status",
+            "rom_flexion_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "about 3 degrees",
+          "reply": "Do you know your current knee extension measurement in degrees (how close to fully straight)?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_extension_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane",
+            "rom_flexion_degrees": "95.0"
+          },
+          "collected_before": {
+            "mobility_status": "cane",
+            "rom_flexion_degrees": "95.0"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 3,
+          "patient": "foot over foot",
+          "reply": "Just circling back to this -- Do you know your current knee extension measurement in degrees (how close to fully straight)?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_extension_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_extension_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "mobility_status": "cane",
+            "rom_flexion_degrees": "95.0"
+          },
+          "collected_before": {
+            "mobility_status": "cane",
+            "rom_flexion_degrees": "95.0"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": true,
+          "detail": "rom_flexion_degrees -> 95.0"
+        },
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": true,
+          "detail": "mobility_status -> cane"
+        },
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "rom_extension_degrees -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "2 asked, max 2"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks rom_extension_degrees"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 2,
+        "fields_per_turn": [
+          2,
+          0,
+          0
+        ],
+        "fields_total": 2,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 13
+      }
+    },
+    {
+      "id": "c17_recovery_abandoned",
+      "agent": "recovery",
+      "title": "Abandoned interview: flexion given, then the patient leaves; nothing persisted",
+      "tags": [
+        "abandoned"
+      ],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How is my knee recovery going?",
+          "reply": "About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 2,
+          "patient": "about 90 degrees",
+          "reply": "Thanks for sharing that -- your flexion of 90\u00b0 is within the 70\u00b0-90\u00b0 range stated for the earlier Post-Op Day 7 checkpoint.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "90.0"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "rom_flexion_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": true,
+          "detail": "rom_flexion_degrees -> 90.0"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "1 asked, max 2"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "abandoned_persists_nothing",
+          "turn": null,
+          "passed": true,
+          "detail": "0 row(s) written"
+        }
+      ],
+      "summary": {
+        "questions": 1,
+        "fields_per_turn": [
+          0,
+          1
+        ],
+        "fields_total": 1,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 6
+      }
+    },
+    {
+      "id": "c18_recovery_tka_day90_longterm",
+      "agent": "recovery",
+      "title": "TKA day 90: compared with the long-term guidance",
+      "tags": [],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "Is my recovery on track now?",
+          "reply": "The source I have only supports comparison within its stated day range, and your current day falls outside that range, so I can't give a supported verdict right now.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "115 degrees",
+          "reply": "The source I have only supports comparison within its stated day range, and your current day falls outside that range, so I can't give a supported verdict right now.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 3,
+          "patient": "0 degrees, it goes fully straight",
+          "reply": "The source I have only supports comparison within its stated day range, and your current day falls outside that range, so I can't give a supported verdict right now.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_extension_degrees": "0.0"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "rom_extension_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 4,
+          "patient": "walking without any aid now",
+          "reply": "The source I have only supports comparison within its stated day range, and your current day falls outside that range, so I can't give a supported verdict right now.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_extension_degrees": "0.0",
+            "mobility_status": "independent"
+          },
+          "collected_before": {
+            "rom_extension_degrees": "0.0"
+          },
+          "new_fields": [
+            "mobility_status"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        },
+        {
+          "index": 5,
+          "patient": "about 60 minutes",
+          "reply": "The source I have only supports comparison within its stated day range, and your current day falls outside that range, so I can't give a supported verdict right now.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_extension_degrees": "0.0",
+            "mobility_status": "independent"
+          },
+          "collected_before": {
+            "rom_extension_degrees": "0.0",
+            "mobility_status": "independent"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 6,
+          "patient": "foot over foot",
+          "reply": "The source I have only supports comparison within its stated day range, and your current day falls outside that range, so I can't give a supported verdict right now.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_extension_degrees": "0.0",
+            "mobility_status": "independent"
+          },
+          "collected_before": {
+            "rom_extension_degrees": "0.0",
+            "mobility_status": "independent"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "rom_flexion_degrees -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": true,
+          "detail": "rom_extension_degrees -> 0.0"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": true,
+          "detail": "mobility_status -> independent"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 5"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0,
+          1,
+          1,
+          0,
+          0
+        ],
+        "fields_total": 2,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 7,
+        "properties_total": 13
+      }
+    },
+    {
+      "id": "c19_recovery_unknown_twice",
+      "agent": "recovery",
+      "title": "Two 'I don't know' answers: flexion is left, the interview moves on and names the gap",
+      "tags": [],
+      "llm_mode": "empty_reply",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How am I doing with my knee?",
+          "reply": "About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "I don't know",
+          "reply": "That's okay. About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 3,
+          "patient": "no idea, sorry",
+          "reply": "Coming back to my last question -- About how many degrees can you currently bend your knee?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_flexion_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 4,
+          "patient": "about 5 degrees",
+          "reply": "Got it -- your flexion of 5\u00b0 is below the 70\u00b0-90\u00b0 range stated for the earlier Post-Op Day 7 checkpoint.",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [
+            "TKA-03"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_flexion_degrees",
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {
+            "rom_flexion_degrees": "5.0"
+          },
+          "collected_before": {},
+          "new_fields": [
+            "rom_flexion_degrees"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 5,
+          "patient": "a walker",
+          "reply": "Do you know your current knee extension measurement in degrees (how close to fully straight)?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": "rom_extension_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "rom_flexion_degrees": "5.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "5.0"
+          },
+          "new_fields": [
+            "mobility_status"
+          ],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 6,
+          "patient": "10 minutes",
+          "reply": "Just circling back to this -- Do you know your current knee extension measurement in degrees (how close to fully straight)?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_extension_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_extension_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "rom_flexion_degrees": "5.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "5.0",
+            "mobility_status": "walker"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 7,
+          "patient": "not yet",
+          "reply": "Just circling back to this -- Do you know your current knee extension measurement in degrees (how close to fully straight)?",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "RecoveryProgressAgent",
+          "misroute_kind": null,
+          "pending_before": "rom_extension_degrees",
+          "is_agent_turn": true,
+          "asked_field": "rom_extension_degrees",
+          "is_confirm": false,
+          "questions": 1,
+          "collected": {
+            "rom_flexion_degrees": "5.0",
+            "mobility_status": "walker"
+          },
+          "collected_before": {
+            "rom_flexion_degrees": "5.0",
+            "mobility_status": "walker"
+          },
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "does_not_collect",
+          "turn": 3,
+          "passed": true,
+          "detail": "rom_flexion_degrees -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 4,
+          "passed": false,
+          "detail": "rom_extension_degrees -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 5,
+          "passed": true,
+          "detail": "mobility_status -> walker"
+        },
+        {
+          "name": "collects_field",
+          "turn": 6,
+          "passed": false,
+          "detail": "walking_duration_minutes -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 7,
+          "passed": false,
+          "detail": "stairs -> not collected"
+        },
+        {
+          "name": "reply_matches",
+          "turn": 7,
+          "passed": false,
+          "detail": "/(?i)flexion: I don't have a value/"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "6 asked, max 6"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": false,
+          "detail": "final turn still asks rom_extension_degrees"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/day-\\d+ (range|checkpoint|mark|target|guidance)|long-term guidance|checkpoint is day \\d+/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next milestone:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 6,
+        "fields_per_turn": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0
+        ],
+        "fields_total": 2,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 14
+      }
+    },
+    {
+      "id": "c20_rehab_direct_question",
+      "agent": "rehab",
+      "title": "Direct question naming an exercise: one question, today's log not re-asked",
+      "tags": [
+        "memory"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "How do I do heel slides?",
+          "reply": "Based on your Day 8 protocol for Total Knee Arthroplasty (TKA): Target milestones for Total Knee Arthroplasty: By Post-Op Day 7, patients should aim for 70\u00b0-90\u00b0 of passive flexion and near-full extension (0\u00b0-5\u00b0). Full terminal extension is critical; patients should avoid putting pillows directly under the knee joint, placing pillows under the ankle/calf instead to promote gravity extension.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Range of Motion & Extension Milestones"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        },
+        {
+          "index": 2,
+          "patient": "no, nothing hurts",
+          "reply": "Mild to moderate soreness is typical on Day 8. Take your prescribed pain medication 30-45 minutes before starting physical therapy to keep your discomfort manageable.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": true,
+          "detail": "never asked: weight_bearing_status, exercises_done_today"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 1"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/on day \\d+ after your (knee|hip) replacement|for day \\d+ after your/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 9
+      }
+    },
+    {
+      "id": "c21_rehab_status_unknown",
+      "agent": "rehab",
+      "title": "No status on record: two questions, 'not yet' persisted, surgeries untouched",
+      "tags": [
+        "memory"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "What exercises should I do today?",
+          "reply": "At Day 10, work on progressing your passive flexion past 90\u00b0, standing calf raises, seated knee extension, and increasing your independent walking endurance as tolerated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "no",
+          "reply": "Hello! On Day 10 of your recovery from Total Knee Arthroplasty (TKA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 3,
+          "patient": "not yet",
+          "reply": "Hello! On Day 10 of your recovery from Total Knee Arthroplasty (TKA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": null,
+      "wb_after": null,
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 3,
+          "passed": false,
+          "detail": "exercises_done_today -> not collected"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 2"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/on day \\d+ after your (knee|hip) replacement|for day \\d+ after your/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        },
+        {
+          "name": "weight_bearing_record_unchanged",
+          "turn": null,
+          "passed": true,
+          "detail": "None -> None"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 11
+      }
+    },
+    {
+      "id": "c22_rehab_multislot",
+      "agent": "rehab",
+      "title": "Multi-slot: done today and no sharp pain in one message, answered at once",
+      "tags": [
+        "multi-slot"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "I did my exercises this morning and nothing hurts, no sharp pain. What exercises should I add next?",
+          "reply": "At Day 9, work on progressing your passive flexion past 90\u00b0, standing calf raises, seated knee extension, and increasing your independent walking endurance as tolerated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [
+            "Post-Op Multimodal Pain & Anticoagulation Protocols",
+            "Pain Management & Analgesic Titration"
+          ],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": false,
+          "detail": "exercises_done_today -> not collected"
+        },
+        {
+          "name": "collects_field",
+          "turn": 1,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": true,
+          "detail": "never asked: weight_bearing_status"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 0"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/on day \\d+ after your (knee|hip) replacement|for day \\d+ after your/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        },
+        {
+          "name": "persists_on_completion",
+          "turn": null,
+          "passed": false,
+          "detail": "0 row(s) written, expected >= 1"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 6,
+        "properties_total": 11
+      }
+    },
+    {
+      "id": "c23_rehab_abandoned",
+      "agent": "rehab",
+      "title": "Abandoned interview: the safety question is never answered; nothing persisted",
+      "tags": [
+        "abandoned"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "What exercises should I be doing?",
+          "reply": "On Day 6, your targets are active-assisted heel slides aiming for 70\u00b0\u201390\u00b0 flexion, straight leg raises to rebuild quadriceps strength, and walking 5\u201310 minutes with your walker every 2 hours.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "hmm, let me think about that",
+          "reply": "Hello! On Day 6 of your recovery from Total Knee Arthroplasty (TKA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.0
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "does_not_collect",
+          "turn": 2,
+          "passed": true,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": true,
+          "detail": "never asked: weight_bearing_status"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 2"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "abandoned_persists_nothing",
+          "turn": null,
+          "passed": true,
+          "detail": "0 row(s) written"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 0,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 7,
+        "properties_total": 7
+      }
+    },
+    {
+      "id": "c24_rehab_request_nwb_override",
+      "agent": "rehab",
+      "title": "Request NWB overrides the WBAT record: squats question, no loading advice",
+      "tags": [
+        "request-field"
+      ],
+      "llm_mode": "offline",
+      "turns": [
+        {
+          "index": 1,
+          "patient": "Can I start doing squats?",
+          "reply": "Hello! On Day 3 of your recovery from Total Knee Arthroplasty (TKA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        },
+        {
+          "index": 2,
+          "patient": "no",
+          "reply": "Hello! On Day 3 of your recovery from Total Knee Arthroplasty (TKA) (Right), make sure to keep up with your daily physical therapy routine, elevate your leg when resting, and stay hydrated.",
+          "engine": "Clinical Synthesis Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RehabilitationAgent",
+          "expected_agent": "RehabilitationAgent",
+          "misroute_kind": null,
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.01
+        }
+      ],
+      "rows_persisted": {
+        "symptom_assessments": 0,
+        "metrics_inserted": 0,
+        "metrics_updated": 0,
+        "total": 0
+      },
+      "wb_before": "Weight Bearing as Tolerated (WBAT)",
+      "wb_after": "Weight Bearing as Tolerated (WBAT)",
+      "properties": [
+        {
+          "name": "collects_field",
+          "turn": 2,
+          "passed": false,
+          "detail": "exercise_safety -> not collected"
+        },
+        {
+          "name": "reply_does_not_match",
+          "turn": 2,
+          "passed": true,
+          "detail": "/(?i)\\b(put (your )?(full )?weight|bear (your )?full weight|try (a )?squat)/"
+        },
+        {
+          "name": "no_question_for_record_data",
+          "turn": null,
+          "passed": true,
+          "detail": "never asked: weight_bearing_status"
+        },
+        {
+          "name": "no_reask_of_collected_field",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "max_questions",
+          "turn": null,
+          "passed": true,
+          "detail": "0 asked, max 1"
+        },
+        {
+          "name": "triage_equals_engine",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "no_passage_id_in_text",
+          "turn": null,
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "final_turn_closes_interview",
+          "turn": null,
+          "passed": true,
+          "detail": "no question pending"
+        },
+        {
+          "name": "final_has_trend_or_checkpoint",
+          "turn": null,
+          "passed": false,
+          "detail": "/on day \\d+ after your (knee|hip) replacement|for day \\d+ after your/"
+        },
+        {
+          "name": "final_has_next_step",
+          "turn": null,
+          "passed": false,
+          "detail": "/Next session:/"
+        }
+      ],
+      "summary": {
+        "questions": 0,
+        "fields_per_turn": [
+          0,
+          0
+        ],
+        "fields_total": 0,
+        "record_fields_reused": 0,
+        "record_fields_offered": 1,
+        "record_fields_reused_sources": [],
+        "record_fields_asked": [],
+        "rows_persisted": 0,
+        "misrouted_turns": [],
+        "misrouted_continuation": [],
+        "misrouted_fresh": [],
+        "red_preempted_turns": [],
+        "properties_passed": 7,
+        "properties_total": 10
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "c13_pain_mild_medication",
+  "agent": "pain",
+  "title": "Mild pain after painkillers: short joint branch plus the medication-effect question",
+  "tags": [
+    "memory"
+  ],
+  "record": {
+    "patient_id": "EVAL-C13",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 13,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": [
+      {
+        "days_ago": 4,
+        "pain_score": 5,
+        "onset": "gradual",
+        "location": "around the kneecap",
+        "worsening_or_improving": "improving",
+        "triage_level": "GREEN"
+      }
+    ]
+  },
+  "request": {
+    "postop_day": 14
+  },
+  "record_fields": [
+    {
+      "field": null,
+      "source": "previous assessment",
+      "evidence": "Last time you had 5/10"
+    }
+  ],
+  "expect": {
+    "max_questions": 4,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "My knee aches a little, I took my painkillers an hour ago."
+    },
+    {
+      "patient": "3",
+      "must_collect": [
+        "pain_score"
+      ]
+    },
+    {
+      "patient": "gradually",
+      "must_collect": [
+        "onset"
+      ]
+    },
+    {
+      "patient": "around the kneecap",
+      "must_collect": [
+        "location"
+      ]
+    },
+    {
+      "patient": "yes it helped",
+      "must_collect": [
+        "medication_effect"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "id": "c08_pain_bug_nonnumeric_score",
+  "agent": "pain",
+  "title": "Bug 1a: a non-numeric reply to the score question is clarified, never 'None pain'",
+  "tags": [
+    "bug-nonnumeric"
+  ],
+  "record": {
+    "patient_id": "EVAL-C08",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 5,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": [
+      {
+        "days_ago": 2,
+        "pain_score": 4,
+        "onset": "gradual",
+        "location": "around the kneecap",
+        "worsening_or_improving": "improving",
+        "triage_level": "GREEN"
+      }
+    ]
+  },
+  "request": {
+    "postop_day": 6
+  },
+  "record_fields": [
+    {
+      "field": null,
+      "source": "previous assessment",
+      "evidence": "Last time you had 4/10"
+    }
+  ],
+  "expect": {
+    "max_questions": 5,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "My knee is aching today."
+    },
+    {
+      "patient": "it really hurts",
+      "must_not_collect": [
+        "pain_score"
+      ],
+      "reply_must_not_match": "\\bNone\\b"
+    },
+    {
+      "patient": "about a 5",
+      "must_collect": [
+        "pain_score"
+      ],
+      "reply_must_not_match": "\\bNone\\b"
+    },
+    {
+      "patient": "gradually",
+      "must_collect": [
+        "onset"
+      ]
+    },
+    {
+      "patient": "around the kneecap",
+      "must_collect": [
+        "location"
+      ]
+    },
+    {
+      "patient": "getting a bit better",
+      "must_collect": [
+        "worsening_or_improving"
+      ]
+    }
+  ]
+}

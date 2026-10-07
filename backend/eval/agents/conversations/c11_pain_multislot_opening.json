@@ -1,0 +1,58 @@
+{
+  "id": "c11_pain_multislot_opening",
+  "agent": "pain",
+  "title": "Multi-slot: score, onset and location in the opening message",
+  "tags": [
+    "multi-slot"
+  ],
+  "record": {
+    "patient_id": "EVAL-C11",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 8,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": [
+      {
+        "days_ago": 3,
+        "pain_score": 6,
+        "onset": "gradual",
+        "location": "behind the knee",
+        "worsening_or_improving": "worsening",
+        "triage_level": "GREEN"
+      }
+    ]
+  },
+  "request": {
+    "postop_day": 9
+  },
+  "record_fields": [
+    {
+      "field": null,
+      "source": "previous assessment",
+      "evidence": "(?i)last time"
+    }
+  ],
+  "expect": {
+    "max_questions": 1,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "It's about a 5 out of 10, it came on gradually, and it's behind the knee.",
+      "must_collect": [
+        "pain_score",
+        "onset",
+        "location"
+      ]
+    },
+    {
+      "patient": "getting a bit better",
+      "must_collect": [
+        "worsening_or_improving"
+      ]
+    }
+  ]
+}

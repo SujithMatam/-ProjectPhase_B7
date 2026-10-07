@@ -1,0 +1,106 @@
+{
+  "id": "c01_pain_tka_calf",
+  "agent": "pain",
+  "title": "TKA calf case: memory confirm, non-numeric reply, multi-slot correction",
+  "source": "PAIN_AGENT_CHANGES.md section 2, TKA calf case",
+  "tags": [
+    "transcript",
+    "memory",
+    "bug-nonnumeric"
+  ],
+  "record": {
+    "patient_id": "EVAL-C01",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 6,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [
+      {
+        "days_ago": 0,
+        "pain_score": 6
+      }
+    ],
+    "prior_assessments": [
+      {
+        "days_ago": 2,
+        "pain_score": 7,
+        "onset": "sudden",
+        "location": "behind the knee",
+        "worsening_or_improving": "worsening",
+        "triage_level": "YELLOW"
+      }
+    ]
+  },
+  "request": {
+    "postop_day": 7
+  },
+  "record_fields": [
+    {
+      "field": "pain_score",
+      "source": "metrics today",
+      "evidence": "Your log says 6/10"
+    },
+    {
+      "field": null,
+      "source": "previous assessment",
+      "evidence": "Last time you had 7/10"
+    }
+  ],
+  "expect": {
+    "max_questions": 7,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "My knee has been hurting since this morning."
+    },
+    {
+      "patient": "yes",
+      "must_collect": [
+        "pain_score"
+      ],
+      "reply_must_not_match": "None pain"
+    },
+    {
+      "patient": "it really hurts",
+      "must_not_collect": [
+        "onset"
+      ],
+      "reply_must_not_match": "\\bNone\\b"
+    },
+    {
+      "patient": "7 out of 10, started suddenly yesterday in the calf",
+      "must_collect": [
+        "pain_score",
+        "onset",
+        "location"
+      ]
+    },
+    {
+      "patient": "yes it's swollen",
+      "must_collect": [
+        "swelling"
+      ]
+    },
+    {
+      "patient": "no",
+      "must_collect": [
+        "warmth_or_redness"
+      ]
+    },
+    {
+      "patient": "no",
+      "must_collect": [
+        "numbness_or_weakness"
+      ]
+    },
+    {
+      "patient": "no fever",
+      "must_collect": [
+        "fever_or_temperature"
+      ]
+    }
+  ]
+}
