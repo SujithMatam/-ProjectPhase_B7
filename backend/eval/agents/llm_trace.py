@@ -24,6 +24,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import re
 import socket
 import sys
 import time
@@ -171,8 +172,10 @@ class LLMTrace:
         def wb_detail(result, reply, weight_bearing):
             if not result:
                 return None
-            lower = (reply or "").lower()
-            hits = [p for p in rehab_agent._LOADING_BREACH_PHRASES.get(weight_bearing or "", ()) if p in lower]
+            lower = (reply or "").lower().replace("’", "'")
+            hits = [p for p in rehab_agent._LOADING_BREACH_PHRASES.get(weight_bearing or "", ())
+                    if any(not rehab_agent._loading_phrase_negated(lower, m.start())
+                           for m in re.finditer(re.escape(p), lower))]
             return f"status {weight_bearing}: {hits}"
 
         wrap_check(pain_integration, "is_unhelpful_llm_reply", "pain/recovery")
@@ -181,6 +184,7 @@ class LLMTrace:
         wrap_check(recovery_integration, "llm_body_is_acceptable", "recovery", recovery_detail)
         wrap_check(rehab_agent, "is_unhelpful_llm_reply", "rehab")
         wrap_check(rehab_agent, "reply_breaches_weight_bearing", "rehab", wb_detail)
+        wrap_check(rehab_agent, "reply_unsourced_numbers", "rehab")
 
         # 4. Deterministic counterparts --------------------------------------
         original_pain_compose = pain_integration.compose_final_reply

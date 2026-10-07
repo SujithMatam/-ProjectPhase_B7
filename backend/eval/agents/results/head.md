@@ -1,8 +1,8 @@
 # Agent conversation eval -- head
 
-- backend: this checkout (commit `02b99ea`)
+- backend: this checkout (commit `8b3908a`)
 - mode: direct agent calls; LLM: stubbed
-- run at 2026-10-08 03:39:17, 12.1s
+- run at 2026-10-08 04:11:09, 29.1s
 
 ## Summary
 
@@ -234,7 +234,7 @@
 
 **Patient (4):** almost, there's a small gap
 
-> Got it -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Thanks for sharing that -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees*
 
@@ -291,13 +291,13 @@
 
 **Patient (3):** about 20 minutes
 
-> Thanks for sharing that -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
+> Okay -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes*
 
 **Patient (4):** foot over foot now
 
-> Okay -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
+> Got it -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked hip_precautions; new fields stairs*
 
@@ -820,7 +820,7 @@
 
 **Patient (2):** about 60 degrees
 
-> Okay -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Got it -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees*
 
@@ -832,7 +832,7 @@
 
 **Patient (4):** I use a walker
 
-> Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Okay -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 
@@ -878,7 +878,7 @@
 
 **Patient (1):** How's my progress looking?
 
-> Okay -- flexion of 95°, meets the day-14 mark of more than 80° (according to the discharge guidance). extension of 2°, within the day-14 range of 0°-10°. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Got it -- flexion of 95°, meets the day-14 mark of more than 80° (according to the discharge guidance). extension of 2°, within the day-14 range of 0°-10°. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees, rom_flexion_degrees*
 
@@ -890,7 +890,7 @@
 
 **Patient (3):** about 20 minutes
 
-> Got it -- walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Thanks for sharing that -- walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes*
 
@@ -937,7 +937,7 @@
 
 **Patient (2):** about 3 degrees
 
-> Got it -- extension of 3°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Thanks for sharing that -- extension of 3°, within the day-14 range of 0°-10° (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields rom_extension_degrees*
 
@@ -977,7 +977,7 @@
 
 **Patient (2):** about 90 degrees
 
-> Got it -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Thanks for sharing that -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees*
 
@@ -1017,19 +1017,19 @@
 
 **Patient (3):** 0 degrees, it goes fully straight
 
-> Got it -- extension of 0°, meets the day-84 target of 0° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Thanks for sharing that -- extension of 0°, meets the day-84 target of 0° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees*
 
 **Patient (4):** walking without any aid now
 
-> Got it -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Thanks for sharing that -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 
 **Patient (5):** about 60 minutes
 
-> Got it -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Thanks for sharing that -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes*
 
@@ -1095,7 +1095,7 @@
 
 **Patient (5):** a walker
 
-> Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Thanks for sharing that -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 

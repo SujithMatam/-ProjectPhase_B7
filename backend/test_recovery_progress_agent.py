@@ -2219,6 +2219,87 @@ def test_eval_report_regressions() -> None:
     print()
 
 
+# ----------------------------------------------------------------------------
+# 33. Prompt boilerplate the model echoes is stripped before the patient
+#     sees the explanation (live-run fixtures, eval/agents/LIVE_REPORT.md).
+# ----------------------------------------------------------------------------
+
+# Verbatim llama3.2 replies that were accepted and shipped with the echo.
+LIVE_C04_DIRECT = (
+    "Here's a friendly answer to the user's question:\n\nYou're making great progress on day 30 after your Total Hip "
+    "Arthroplasty (THA)! You're doing a great job of following your hip precautions, which is helping your hip heal "
+    "properly. Now that you're walking for 20 minutes at a stretch, your next goal is to work on reducing your walking "
+    "aid, which your physiotherapist will advise on. In the meantime, don't forget to take care of your hip by icing "
+    "it after activities and elevating your leg to reduce swelling."
+)
+LIVE_C04_ORCH = (
+    "Here's a friendly answer to the user's question:\n\nYou're doing great on day 30 after your Total Hip Arthroplasty "
+    "(THA)! You're meeting all the milestones, including walking for 20 minutes without any issues and using a crutch "
+    "as needed. For your next step, your surgeon will confirm when the hip precautions have ended, but in the meantime, "
+    "keep up the good work with your physiotherapy, icing, and elevating your leg to help with healing."
+)
+LIVE_C19_DIRECT = (
+    "Here's a friendly answer to the user's question:\n\n\"Hi! On day 20 after your Total Knee Arthroplasty (TKA), your "
+    "knee is making good progress. You're doing great with your walking aid - using a walker is right where you should "
+    "be at this stage. For next steps, focus on bending your knee a bit more each day, aiming to get closer to 110 "
+    "degrees by the end of week six. Don't forget to take care of your knee by icing it after activities and elevating "
+    "your leg to reduce swelling. Keep up the good work!\""
+)
+LIVE_C19_ORCH = (
+    "Here's a friendly answer directly addressing the user's question:\n\nYour knee is making good progress on day 20 "
+    "after Total Knee Arthroplasty (TKA). You're doing great with your walking aid, using a walker, and your walking "
+    "duration is meeting the expected mark. For next steps, focus on improving your knee's range of motion, especially "
+    "flexion, and try to incorporate icing and elevating your leg to help with recovery."
+)
+
+
+def test_llm_prompt_boilerplate_stripped() -> None:
+    _section("33 -- LLM explanation: prompt boilerplate ('Here's a friendly answer...') stripped; nothing left -> block alone [REAL-INTEGRATION + stubbed LLM]")
+
+    block = "Here's how things compare on post-op day 30, according to the discharge guidance:\n- walking duration: 20 minutes"
+    for name, raw, opening in (
+        ("c04 direct", LIVE_C04_DIRECT, "You're making great progress on day 30"),
+        ("c04 orchestrator", LIVE_C04_ORCH, "You're doing great on day 30"),
+        ("c19 direct", LIVE_C19_DIRECT, "Hi! On day 20 after your Total Knee Arthroplasty"),
+        ("c19 orchestrator", LIVE_C19_ORCH, "Your knee is making good progress on day 20"),
+    ):
+        stripped = ri.strip_prompt_boilerplate(raw)
+        _check(stripped.startswith(opening), f"{name}: the answer starts at its first real sentence: {stripped[:60]!r}")
+        _check("friendly answer" not in stripped.lower() and "user's question" not in stripped.lower(), f"{name}: no prompt echo left")
+        _check(not stripped.startswith('"') and not stripped.endswith('"'), f"{name}: quotes around the whole answer removed")
+        composed = ri.compose_final_reply(raw, block)
+        _check(composed.startswith(opening) and composed.endswith(block) and "Here's a friendly" not in composed, f"{name}: the composed reply carries no echo")
+    _check(ri.strip_prompt_boilerplate(LIVE_C19_DIRECT).endswith("Keep up the good work!"), "c19: the closing quote is removed with the opening one")
+
+    # Lead-in variants and instruction restatements.
+    _check(ri.strip_prompt_boilerplate("Here is a friendly, 2-3 sentence answer:\nKeep walking little and often.") == "Keep walking little and often.", "'Here is a friendly...' lead-in")
+    _check(ri.strip_prompt_boilerplate("Sure! Here's a plain-language explanation: Keep walking little and often.") == "Keep walking little and often.", "inline lead-in on the answer's own line")
+    _check(ri.strip_prompt_boilerplate("Keep walking little and often.\nI've written this in plain, everyday language for the user's question.") == "Keep walking little and often.", "a line restating the instruction is dropped")
+    _check(ri.strip_prompt_boilerplate("Here is how your walking compares: it meets the guide.") == "Here is how your walking compares: it meets the guide.", "an ordinary sentence with a colon is kept")
+
+    # Nothing but boilerplate: rejected, and the deterministic block goes alone.
+    echo_only = "Here's a friendly answer to the user's question:\n\n\"\""
+    _check(ri.strip_prompt_boilerplate(echo_only) == "", "an echo with no answer strips to nothing")
+    _check(ri.compose_final_reply(echo_only, block) == block, "nothing left -> the deterministic block alone")
+    _check(not ri.llm_body_is_acceptable(echo_only, allowed_numbers=[]), "an echo-only reply is not accepted")
+
+    # End to end through the agent.
+    surgery_date = _dynamic_surgery_date(9)
+    good = "Your bend and straightening are both inside the week-one guide, so keep working on the exercises your physiotherapist set."
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "ECHO-LLM", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=10,
+                                stub_reply=f"Here's a friendly answer to the user's question:\n\n\"{good}\"")
+    final = results[-1]
+    _check(final["reply"].startswith(good) and "friendly answer" not in final["reply"], f"the patient sees the answer without the echo: {final['reply'][:80]!r}")
+    _check(final["engine"] == RecoveryProgressAgent.ENGINE_FINAL, "the stripped explanation is still the LLM's")
+    _reset_recovery_store()
+    results, _ = _run_interview(_handle_tka, "ECHO-ONLY", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=10, stub_reply=echo_only)
+    final = results[-1]
+    _check(final["reply"].startswith("Here's how things compare on post-op day 10") and final["engine"] == RecoveryProgressAgent.ENGINE_NAME,
+           f"echo only -> the deterministic block alone: {final['reply'][:80]!r}")
+    print()
+
+
 def main() -> int:
     _run(test_postop_day_derivation)
     _run(test_checkpoint_day_6_7_8_boundary)
@@ -2252,6 +2333,7 @@ def main() -> int:
     _run(test_final_turn_next_milestone_offer_and_llm_guard)
     _run(test_continuation_accepts_new_answer_shapes)
     _run(test_eval_report_regressions)
+    _run(test_llm_prompt_boilerplate_stripped)
 
     print("=" * 78)
     if _FAILURES:

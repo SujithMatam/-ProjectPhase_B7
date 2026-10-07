@@ -895,9 +895,47 @@ def format_final_assessment(
     return collapse_blank_lines(f"{body}\n\n{milestone} {check_in_offer(next_checkpoint)}")
 
 
+# Prompt boilerplate the local model echoes around its answer: a lead-in
+# ("Here's a friendly answer to the user's question:") and any line that
+# restates the prompt's own instruction wording.
+_LEAD_IN_RE = re.compile(
+    r"^\s*(?:sure|okay|ok|certainly|of course)?[,!.]?\s*"
+    r"(?:here(?:'s| is| are)|below is|this is)\b[^:\n]{0,160}?"
+    r"\b(?:answers?|responses?|reply|replies|explanations?|summary|version)\b[^:\n]{0,80}:\s*",
+    re.IGNORECASE,
+)
+_LABEL_LINE_RE = re.compile(r"^\s*(?:answer|response|reply|explanation)\s*:\s*", re.IGNORECASE)
+_INSTRUCTION_ECHO_MARKERS: Tuple[str, ...] = (
+    "the user's question", "the user's query", "the user question", "2-3 sentence", "two or three sentence",
+    "two or three plain sentence", "friendly answer", "friendly response", "friendly, 2-3",
+    "plain, everyday language", "without a medical background", "based on the discharge notes and relevant",
+    "relevant conversation context", "in the patient's words", "fenced data", "untrusted data",
+)
+_ENCLOSING_QUOTES: Tuple[Tuple[str, str], ...] = (('"', '"'), ("“", "”"), ("'", "'"))
+
+
+def strip_prompt_boilerplate(text: Optional[str]) -> str:
+    """The model's explanation without the prompt echo: lead-in labels and
+    any line restating the instruction are dropped, and quotes wrapped
+    around the whole remaining answer are removed. "" when nothing is left."""
+    kept: List[str] = []
+    for line in (text or "").replace("’", "'").splitlines():
+        line = _LABEL_LINE_RE.sub("", _LEAD_IN_RE.sub("", line, count=1), count=1)
+        if any(marker in line.lower() for marker in _INSTRUCTION_ECHO_MARKERS):
+            continue
+        kept.append(line)
+    body = "\n".join(kept).strip()
+    for opening, closing in _ENCLOSING_QUOTES:
+        if len(body) > 1 and body.startswith(opening) and body.endswith(closing) and body.count(opening) <= 2:
+            body = body[len(opening):-len(closing)].strip()
+            break
+    return collapse_blank_lines(body).strip()
+
+
 def compose_final_reply(llm_body: Optional[str], deterministic_block: str) -> str:
-    """An accepted LLM explanation (if any) above the deterministic block."""
-    parts = [part for part in ((llm_body or "").strip(), deterministic_block.strip()) if part]
+    """An accepted LLM explanation (if any), stripped of prompt boilerplate,
+    above the deterministic block; the block alone when nothing remains."""
+    parts = [part for part in (strip_prompt_boilerplate(llm_body), deterministic_block.strip()) if part]
     return collapse_blank_lines("\n\n".join(parts))
 
 
@@ -963,8 +1001,10 @@ _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
 def llm_body_is_acceptable(body: Optional[str], *, allowed_numbers: Iterable[Any]) -> bool:
     """Accept the model's explanation only when it is non-empty, carries no
     trajectory language and names no number that is absent from the
-    deterministic data (so it can never introduce a target of its own)."""
-    text = (body or "").strip()
+    deterministic data (so it can never introduce a target of its own).
+    Judged on the text the patient would see, after the prompt boilerplate
+    is stripped, so an echo with no answer under it is rejected."""
+    text = strip_prompt_boilerplate(body)
     if len(text) < 20:
         return False
     lower = text.lower()

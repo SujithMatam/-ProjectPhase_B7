@@ -64,11 +64,13 @@ def classify(turn: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         reasons.append(ollama.get("error", ""))
     truncated = bool(ollama and ollama.get("done_reason") == "length")
     for c in checks:
-        failed = (c["check"] in ("is_unhelpful_llm_reply", "reply_breaches_weight_bearing") and c["result"]) \
+        failed = (c["check"] in ("is_unhelpful_llm_reply", "reply_breaches_weight_bearing", "reply_unsourced_numbers")
+                  and c["result"]) \
             or (c["check"] == "reply_invents_unreported_symptom" and c["result"]) \
             or (c["check"] in ("reply_consistent_with_assessment_and_triage", "llm_body_is_acceptable") and not c["result"])
         if failed:
-            label = {"reply_breaches_weight_bearing": "status guard"}.get(c["check"], "consistency check")
+            label = {"reply_breaches_weight_bearing": "status guard",
+                     "reply_unsourced_numbers": "number guard"}.get(c["check"], "consistency check")
             category = category or label
             detail = c.get("detail") or (c["result"] if c["check"] == "reply_invents_unreported_symptom" else "")
             reasons.append(f"{c['check']} -> {c['result']}" + (f" ({detail})" if detail else ""))
@@ -86,7 +88,7 @@ def classify(turn: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             category = "other"
     if truncated:
         reasons.append(f"Ollama stopped at num_predict={ollama['num_predict']} (done_reason=length, {ollama['eval_count']} tokens)")
-        if category in ("consistency check", "status guard"):
+        if category in ("consistency check", "status guard", "number guard"):
             category = f"150-token cutoff -> {category}"
     return {"category": category, "reasons": reasons, "ollama": ollama, "chat_engine": chat_engine,
             "deterministic": det["reply"], "used_deterministic": det["used"], "truncated": truncated}

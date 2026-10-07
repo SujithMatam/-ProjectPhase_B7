@@ -1,8 +1,8 @@
 # Agent conversation eval -- live_direct
 
-- backend: this checkout (commit `77ab902`)
+- backend: this checkout (commit `8b3908a`)
 - mode: direct agent calls; LLM: live (Ollama)
-- run at 2026-10-08 03:49:39, 52.7s
+- run at 2026-10-08 04:11:43, 97.0s
 
 ## Summary
 
@@ -28,7 +28,7 @@
 | c18_recovery_tka_day90_longterm | recovery | 13/13 | 5 | 0 · 1 · 1 · 1 · 1 · 1 (=5) | 0/0 | 1 |
 | c19_recovery_unknown_twice | recovery | 14/14 | 6 | 0 · 0 · 0 · 1 · 1 · 1 · 1 (=4) | 0/0 | 1 |
 | c20_rehab_direct_question | rehab | 8/9 | 1 | 0 · 1 (=1) | 1/1 | 0 |
-| c21_rehab_status_unknown | rehab | 10/11 | 2 | 0 · 1 · 1 (=2) | 0/0 | 1 |
+| c21_rehab_status_unknown | rehab | 11/11 | 2 | 0 · 1 · 1 (=2) | 0/0 | 1 |
 | c22_rehab_multislot | rehab | 10/11 | 0 | 2 (=2) | 1/1 | 1 |
 | c23_rehab_abandoned | rehab | 7/7 | 2 | 0 · 0 (=0) | 0/0 | 0 |
 | c24_rehab_request_nwb_override | rehab | 10/10 | 1 | 0 · 1 (=1) | 1/1 | 0 |
@@ -234,13 +234,13 @@
 
 **Patient (4):** almost, there's a small gap
 
-> Got it -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Thanks for sharing that -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees*
 
 **Patient (5):** I'm using a cane and I can walk about 15 minutes
 
-> Thanks for sharing that -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Okay -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields mobility_status, walking_duration_minutes*
 
@@ -291,22 +291,18 @@
 
 **Patient (3):** about 20 minutes
 
-> Got it -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
+> Thanks for sharing that -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes*
 
 **Patient (4):** foot over foot now
 
-> Thanks for sharing that -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
+> Okay -- stairs: foot over foot, matches the day-21 checkpoint (according to the discharge guidance): one step at a time with a handrail at first, foot over foot as you get stronger. Are you still keeping to your hip precautions -- not bending the hip past a right angle, not crossing your legs, avoiding low chairs? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked hip_precautions; new fields stairs*
 
 **Patient (5):** yes, still following them
 
-> Here's a friendly answer to the user's question:
-> 
-> You're making great progress on day 30 after your Total Hip Arthroplasty (THA)! You're doing a great job of following your hip precautions, which is helping your hip heal properly. Now that you're walking for 20 minutes at a stretch, your next goal is to work on reducing your walking aid, which your physiotherapist will advise on. In the meantime, don't forget to take care of your hip by icing it after activities and elevating your leg to reduce swelling.
-> 
 > Here's how things compare on post-op day 30, according to the discharge guidance:
 > - walking aid: crutches -- as the day-21 checkpoint describes (one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid)
 > - walking duration: 20 minutes -- meets the day-21 mark of more than 10 minutes
@@ -315,7 +311,7 @@
 > 
 > Next milestone: day 42 -- hip precautions: precautions commonly apply for about the first six weeks; wait for your surgeon to confirm they have ended; walking aid: reducing or stopping the walking aid when your physiotherapist advises. Say 'recovery check' at day 42 and I'll compare.
 
-*engine Recovery Progress Agent - Grounded Assessment; triage GREEN (engine GREEN); asked -; new fields hip_precautions*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked -; new fields hip_precautions*
 
 </details>
 
@@ -343,7 +339,7 @@
 
 **Patient (2):** no, nothing sharp
 
-> On post-op day 5 after Total Knee Arthroplasty (TKA), it's generally recommended to use a walking aid when navigating stairs, especially in the first week. This will help you maintain balance and reduce the risk of further injury. I recommend using a walking aid and icing the knee as directed by your surgeon to help manage pain and swelling, and also elevating your leg to reduce swelling.
+> On post-op day 5 after TKA, it's generally recommended to avoid using stairs until your healthcare team says it's okay. For now, focus on gentle exercises like leg swings and straight leg raises while sitting, and don't forget to ice your knee as directed and elevate your leg to help with healing and comfort. We'll discuss stair use and other mobility exercises in more detail when you see us next.
 > 
 > Your weight-bearing status on record is weight-bearing as tolerated, so nothing here should take you beyond it.
 > 
@@ -385,7 +381,7 @@
 
 **Patient (3):** no sharp pain and no swelling
 
-> On post-op day 20 after Total Hip Arthroplasty (THA), your exercises should focus on gentle movements to maintain range of motion and promote healing. Try to do some light leg swings, ankle rotations, and toe wiggles while sitting or standing with support, and don't forget to ice your hip for 15-20 minutes, 2-3 times a day, to help reduce pain and swelling.
+> On post-op day 20 after Total Hip Arthroplasty (THA), your goal is to continue gentle exercises to maintain range of motion and mobility. For now, focus on gentle movements like toe wiggles, ankle circles, and gentle knee bends while seated or with support. Remember to ice any sore areas after exercise and elevate your leg to reduce swelling.
 > 
 > I don't have your weight-bearing status, so don't put more weight through the leg than your team has told you until they confirm it.
 > 
@@ -814,7 +810,7 @@
 
 **Patient (2):** about 60 degrees
 
-> Okay -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Thanks for sharing that -- flexion of 60° on day 4; the first flexion checkpoint is day 7, which looks for 70°-90° (according to the discharge guidance) -- the target to work towards. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees*
 
@@ -826,7 +822,7 @@
 
 **Patient (4):** I use a walker
 
-> Okay -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 
@@ -872,19 +868,19 @@
 
 **Patient (1):** How's my progress looking?
 
-> Got it -- flexion of 95°, meets the day-14 mark of more than 80° (according to the discharge guidance). extension of 2°, within the day-14 range of 0°-10°. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Okay -- flexion of 95°, meets the day-14 mark of more than 80° (according to the discharge guidance). extension of 2°, within the day-14 range of 0°-10°. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees, rom_flexion_degrees*
 
 **Patient (2):** a cane
 
-> Thanks for sharing that -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Okay -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 
 **Patient (3):** about 20 minutes
 
-> Okay -- walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Got it -- walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes*
 
@@ -925,7 +921,7 @@
 
 **Patient (1):** I can bend my knee to 95 degrees and walk with a cane for about 20 minutes. How am I doing?
 
-> Okay -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. flexion of 95°, meets the day-14 mark of more than 80°. walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes. Do you know your current knee extension measurement in degrees (how close to fully straight)? (one more question after this)
+> Got it -- walking aid: a cane, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. flexion of 95°, meets the day-14 mark of more than 80°. walking duration of 20 minutes, meets the day-14 mark of more than 10 minutes. Do you know your current knee extension measurement in degrees (how close to fully straight)? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields mobility_status, rom_flexion_degrees, walking_duration_minutes*
 
@@ -937,6 +933,8 @@
 
 **Patient (3):** foot over foot
 
+> It sounds like you're making great progress with your knee recovery! You're meeting all the milestones for now, which is fantastic. For the next step, we'll be focusing on improving your knee flexion and extension, so keep working on bending and straightening your knee, and don't forget to ice and elevate your leg as needed to help with the healing process.
+> 
 > Here's how things compare on post-op day 15, according to the discharge guidance:
 > - flexion: 95° -- meets the day-14 mark of more than 80°
 > - extension: 3° -- within the day-14 range of 0°-10°
@@ -946,7 +944,7 @@
 > 
 > Next milestone: day 21 -- flexion: bending improving week by week, working towards more than 110 degrees by the end of week six; extension: straightening improving week by week, working towards a fully straight knee by the end of week six. Say 'recovery check' at day 21 and I'll compare.
 
-*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked -; new fields stairs*
+*engine Recovery Progress Agent - Grounded Assessment; triage GREEN (engine GREEN); asked -; new fields stairs*
 
 </details>
 
@@ -971,7 +969,7 @@
 
 **Patient (2):** about 90 degrees
 
-> Got it -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Thanks for sharing that -- flexion of 90°, within the day-7 range of 70°-90° (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees*
 
@@ -1005,32 +1003,30 @@
 
 **Patient (2):** 115 degrees
 
-> Okay -- flexion: 115°; the long-term guidance (according to the discharge guidance) gives no number, it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
+> Got it -- flexion: 115°; the long-term guidance (according to the discharge guidance) gives no number, it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises. Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked rom_extension_degrees; new fields rom_flexion_degrees*
 
 **Patient (3):** 0 degrees, it goes fully straight
 
-> Got it -- extension of 0°, meets the day-84 target of 0° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Okay -- extension of 0°, meets the day-84 target of 0° (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked mobility_status; new fields rom_extension_degrees*
 
 **Patient (4):** walking without any aid now
 
-> Thanks for sharing that -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Got it -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 
 **Patient (5):** about 60 minutes
 
-> Got it -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Okay -- walking duration: 60 minutes; the long-term guidance (according to the discharge guidance) gives no number, it expects regular walking as a preferred low-impact activity. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked stairs; new fields walking_duration_minutes*
 
 **Patient (6):** foot over foot
 
-> Based on your progress, it sounds like your knee recovery is going well! You're making good progress with your knee flexion and extension, and you're able to walk without any aid, which is a big step forward. Now, let's focus on the next steps - your goal is to get back to doing many of the activities you enjoyed before your surgery, and that's something to work towards.
-> 
 > Here's how things compare on post-op day 90, according to the discharge guidance:
 > - flexion: 115° -- no number in the long-term guidance; it expects some stiffness when bending the knee a long way is common; keep up the prescribed exercises
 > - extension: 0° -- meets the day-84 target of 0°
@@ -1040,7 +1036,7 @@
 > 
 > Next milestone: longer term -- daily activities: back to many previous activities, preferring low-impact ones. Say 'recovery check' any time and I'll compare with today.
 
-*engine Recovery Progress Agent - Grounded Assessment; triage GREEN (engine GREEN); asked -; new fields stairs*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked -; new fields stairs*
 
 </details>
 
@@ -1091,7 +1087,7 @@
 
 **Patient (5):** a walker
 
-> Thanks for sharing that -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
+> Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)
 
 *engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked walking_duration_minutes; new fields mobility_status*
 
@@ -1103,10 +1099,6 @@
 
 **Patient (7):** not yet
 
-> Here's a friendly answer to the user's question:
-> 
-> "Hi! On day 20 after your Total Knee Arthroplasty (TKA), your knee is making good progress. You're doing great with your walking aid - using a walker is right where you should be at this stage. For next steps, focus on bending your knee a bit more each day, aiming to get closer to 110 degrees by the end of week six. Don't forget to take care of your knee by icing it after activities and elevating your leg to reduce swelling. Keep up the good work!"
-> 
 > Here's how things compare on post-op day 20, according to the discharge guidance:
 > - extension: 5° -- within the day-14 range of 0°-10°
 > - walking aid: a walker/frame -- as the day-14 checkpoint describes (a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes)
@@ -1116,7 +1108,7 @@
 > 
 > Next milestone: day 21 -- flexion: bending improving week by week, working towards more than 110 degrees by the end of week six; extension: straightening improving week by week, working towards a fully straight knee by the end of week six. Say 'recovery check' at day 21 and I'll compare.
 
-*engine Recovery Progress Agent - Grounded Assessment; triage GREEN (engine GREEN); asked -; new fields stairs*
+*engine Recovery Deterministic Assessment Engine; triage GREEN (engine GREEN); asked -; new fields stairs*
 
 </details>
 
@@ -1144,7 +1136,7 @@
 
 **Patient (2):** no, nothing hurts
 
-> On post-op day 8 after Total Knee Arthroplasty (TKA), heel slides can be a helpful exercise to strengthen your knee. Since you're at the 8-day mark, your goal is to aim for gentle movements, and it's essential to remember that your knee is still recovering. Before attempting heel slides, make sure to ice your knee for 10-15 minutes, 2-3 times a day, and elevate your leg above the level of your heart to reduce swelling.
+> For heel slides on post-op day 8 after Total Knee Arthroplasty (TKA), focus on gentle, controlled movements. Since you're just starting to work on strengthening exercises, start with small, gentle slides, and gradually increase the range of motion as you become more comfortable. Remember to ice the area after each exercise and elevate your leg to reduce swelling and promote healing.
 > 
 > Your weight-bearing status on record is weight-bearing as tolerated, so nothing here should take you beyond it.
 > 
@@ -1165,7 +1157,7 @@
 | - | triage_equals_engine | PASS |  |
 | - | no_passage_id_in_text | PASS |  |
 | - | final_turn_closes_interview | PASS | no question pending |
-| - | final_has_trend_or_checkpoint | **FAIL** | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
+| - | final_has_trend_or_checkpoint | PASS | /on day \d+ after your (knee\|hip) replacement\|for day \d+ after your/ |
 | - | final_has_next_step | PASS | /Next session:/ |
 | - | persists_on_completion | PASS | 1 row(s) written, expected >= 1 |
 | - | weight_bearing_record_unchanged | PASS | None -> None |
@@ -1186,13 +1178,21 @@
 
 **Patient (3):** not yet
 
-> On post-op day 10 after Total Knee Arthroplasty (TKA), your goal is to focus on gentle exercises to help your knee recover. Since you're in the strengthening phase, we'll start with some gentle movements to promote flexibility and range of motion. Please try some gentle knee bends and straightening, and don't forget to ice your knee for 15-20 minutes, 2-3 times a day, to help reduce pain and swelling.
+> Here's the discharge guidance I have for your exercises on day 10 after your knee replacement:
+> • Walking practice that focuses on landing on the heel, a normal step pattern and equal weight on both legs.
+> • Stretching of the front thigh, hamstring and calf muscles, and strengthening that prioritises the quadriceps, hip and hamstring muscles.
+> • Straight leg raises in several directions once the knee can fully straighten.
+> • Repeated sit-to-stands from a chair.
+> • Small step-ups and step-downs, starting on a low step of about two to four inches.
+> • Balance work that progresses from standing on both legs to standing on one.
+> • Light ankle weights can usually be added to the basic exercises from about four to six weeks after surgery, increasing gradually as strength returns.
+> • Avoid long periods of sitting, and avoid any exercise that causes severe pain or a marked increase in swelling; your physiotherapist will adapt the programme to your progress.
 > 
 > I don't have your weight-bearing status, so don't put more weight through the leg than your team has told you until they confirm it.
 > 
 > Next session: walking practice landing on the heel, sit-to-stands from a chair and small step-ups on a low step, as your physiotherapist set. Say 'rehab check' tomorrow and I'll see how it went.
 
-*engine Rehabilitation Agent - Grounded Guidance; triage GREEN (engine GREEN); asked -; new fields exercises_done_today*
+*engine Rehabilitation Agent - Sourced Fallback; triage GREEN (engine GREEN); asked -; new fields exercises_done_today*
 
 </details>
 
@@ -1216,7 +1216,7 @@
 
 **Patient (1):** I did my exercises this morning and nothing hurts, no sharp pain. What exercises should I add next?
 
-> On post-op day 9, your exercises should focus on gentle range of motion and strengthening. Aim to maintain your current range of motion and continue to work on strengthening your knee muscles. Remember to follow your doctor's orders for icing and limb elevation as needed to support your recovery.
+> On post-op day 9 after Total Knee Arthroplasty (TKA), your exercises should focus on strengthening your knee muscles. Since you've completed exercises today and haven't experienced any sharp pain, you can consider adding exercises that target your quadriceps and hamstring muscles. Remember to follow your surgeon's guidelines and listen to your body, and don't hesitate to reach out to your physiotherapist if you have any questions or concerns.
 > 
 > Your weight-bearing status on record is weight-bearing as tolerated, so nothing here should take you beyond it.
 > 

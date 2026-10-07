@@ -145,12 +145,13 @@ def _handle(patient_id: str, message: str, *, surgery_type="Total Knee Arthropla
     )
 
 
-def _interview(patient_id: str, messages: List[str], *, stub_reply: str = "", stub_engine: str = "Clinical Synthesis Engine", **extra):
+def _interview(patient_id: str, messages: List[str], *, stub_reply: str = "", stub_engine: str = "Clinical Synthesis Engine",
+               stub_sources: Optional[list] = None, **extra):
     """Drive several turns through handle() directly with a stubbed LLM.
     (The orchestrator has no Rehabilitation continuation hook, so a bare
     'no' is not guaranteed to come back to this agent through it -- see
     REHAB_AGENT_CHANGES.md, shared changes needed.)"""
-    fn, calls = _stub_answer_question(reply=stub_reply, engine=stub_engine)
+    fn, calls = _stub_answer_question(reply=stub_reply, engine=stub_engine, sources=stub_sources)
     results = []
     history: List[Dict[str, str]] = []
     with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
@@ -884,6 +885,163 @@ def test_state_ttl_llm_guard_and_reexport() -> None:
     print()
 
 
+# ---------------------------------------------------------------------------
+# 21. Number guard and negation-aware status guard (live-run fixtures)
+# ---------------------------------------------------------------------------
+
+# Verbatim llama3.2 replies from eval/agents/LIVE_REPORT.md (direct run); each
+# was accepted and shipped before the number guard (c06/c20/c21) or wrongly
+# rejected by the status guard (c24).
+LIVE_C06 = (
+    "On post-op day 20 after Total Hip Arthroplasty (THA), your exercises should focus on gentle movements to "
+    "maintain range of motion and promote healing. Try to do some light leg swings, ankle rotations, and toe "
+    "wiggles while sitting or standing with support, and don't forget to ice your hip for 15-20 minutes, 2-3 "
+    "times a day, to help reduce pain and swelling."
+)
+LIVE_C20 = (
+    "On post-op day 8 after Total Knee Arthroplasty (TKA), heel slides can be a helpful exercise to strengthen "
+    "your knee. Since you're at the 8-day mark, your goal is to aim for gentle movements, and it's essential to "
+    "remember that your knee is still recovering. Before attempting heel slides, make sure to ice your knee for "
+    "10-15 minutes, 2-3 times a day, and elevate your leg above the level of your heart to reduce swelling."
+)
+LIVE_C21 = (
+    "On post-op day 10 after Total Knee Arthroplasty (TKA), your goal is to focus on gentle exercises to help "
+    "your knee recover. Since you're in the strengthening phase, we'll start with some gentle movements to "
+    "promote flexibility and range of motion. Please try some gentle knee bends and straightening, and don't "
+    "forget to ice your knee for 15-20 minutes, 2-3 times a day, to help reduce pain and swelling."
+)
+LIVE_C24 = (
+    "On post-op day 3 after TKA, it's generally recommended to focus on gentle, non-weight-bearing exercises to "
+    "help your knee recover. Since you're not allowed to bear weight on your knee yet, it's best to avoid squats "
+    "for now and instead focus on strengthening exercises that don't put too much stress on your knee joint. I "
+    "recommend checking with your surgeon or physiotherapist for personalized guidance on exercises and progression."
+)
+# The two passages ChatAgent retrieved in those runs (verbatim from the prompts).
+LIVE_DOCS_THA = [
+    {"topic": "Hip Precautions & Dislocation Prevention", "content": (
+        "Posterior approach THA precautions (first 6 weeks): Avoid hip flexion greater than 90 degrees (do not "
+        "bend forward past right angle), avoid crossing legs or ankles (adduction), and avoid internal rotation "
+        "(pointing toes inward). Use elevated toilet seat, avoid low chairs, and sleep with an abduction wedge or "
+        "pillow between knees.")},
+]
+LIVE_DOCS_TKA = [
+    {"topic": "Range of Motion & Extension Milestones", "content": (
+        "Target milestones for Total Knee Arthroplasty: By Post-Op Day 7, patients should aim for 70°-90° of "
+        "passive flexion and near-full extension (0°-5°). Full terminal extension is critical; patients should "
+        "avoid putting pillows directly under the knee joint, placing pillows under the ankle/calf instead to "
+        "promote gravity extension.")},
+]
+LIVE_DOC_NUTRITION = {"topic": "Orthopedic Recovery Nutrition", "content": (
+    "After TKA or THA, protein pacing of about 1.2 to 1.5 g/kg/day supports collagen synthesis, wound healing, "
+    "and muscle recovery; spread protein across meals using eggs, dairy, legumes, fish, or tofu. Vitamin C and "
+    "zinc support collagen formation; calcium and vitamin D support bone ingrowth for cementless prostheses, using "
+    "diet first and supplements only if the clinician advised them. Drink about 2 to 2.5 litres of fluid daily and "
+    "add fibre (prunes, whole grains, vegetables) to manage opioid-induced constipation. For nausea or poor "
+    "appetite, use small frequent protein-rich snacks rather than skipping meals. Nutrition guidance supports "
+    "recovery and does not replace the surgical team's diet orders or medical nutrition therapy.")}
+
+# What ChatAgent reports as `sources` for those two passages: their topics.
+TKA_TOPICS = [LIVE_DOCS_TKA[0]["topic"], LIVE_DOC_NUTRITION["topic"]]
+
+
+def _docs_text(docs) -> List[str]:
+    return [f"{d['topic']}: {d['content']}" for d in docs]
+
+
+def test_number_guard_and_status_negation() -> None:
+    _section("21 -- LLM number guard (digits, words, ranges) and the negation-aware weight-bearing guard [REAL-INTEGRATION]")
+
+    # Number extraction: digits, decimals, words, ranges as two end points.
+    _check(ra.numbers_in("ice for 15-20 minutes, 2-3 times a day") == ["15", "20", "2", "3"], "a range counts as its two end points")
+    _check(ra.numbers_in("about ten times, twenty-five reps, twice a day, 1.50 g") == ["10", "25", "2", "1.5"], "number words and decimals are canonicalised")
+    _check(ra.numbers_in("pick the one that suits you, one of them, take it one step at a time") == [], "'one' as a pronoun or idiom is not a number")
+    _check(ra.unsourced_numbers("hold for ten seconds", ["hold for 10 seconds"]) == [], "a number word matches the same value in digits")
+
+    # c06 / c20 / c21: the icing dose is in none of the sources -> rejected.
+    fixtures = (
+        ("c06", LIVE_C06, ["no sharp pain and no swelling", "20", "the evenings are too sore to face them",
+                           "exercise log: exercises logged as done on 2 and missed on 2 of the last 7 days"],
+         LIVE_DOCS_THA + [LIVE_DOC_NUTRITION], ["15", "3"]),
+        ("c20", LIVE_C20, ["no, nothing hurts", "8", "exercise log: exercises logged as done on 1 and missed on 0 of the last 7 days"],
+         LIVE_DOCS_TKA + [LIVE_DOC_NUTRITION], ["10", "15", "3"]),
+        ("c21", LIVE_C21, ["not yet", "10", "exercise log: exercises logged as done on 0 and missed on 1 of the last 7 days"],
+         LIVE_DOCS_TKA + [LIVE_DOC_NUTRITION], ["15", "20", "3"]),
+    )
+    for name, reply, agent_sources, docs, expected in fixtures:
+        missing = ra.unsourced_numbers(reply, agent_sources + _docs_text(docs))
+        _check(missing == expected, f"{name}: unsourced numbers {missing}, expected {expected}")
+    _check(ra.unsourced_numbers(LIVE_C24, ["Can I start doing squats?", "3"]) == [], "c24 names only the post-op day")
+
+    # End to end: the c21 reply never reaches the patient; the sourced fallback answers.
+    def _query(*_args, **_kwargs):
+        return LIVE_DOCS_TKA + [LIVE_DOC_NUTRITION]
+
+    _reset()
+    _seed_known("NUM-C21", done=False, wb=ra.UNKNOWN)   # status asked, unknown -- as in c21
+    with patch("rag.knowledge_base.ClinicalKnowledgeBase.query", side_effect=_query):
+        results, _ = _interview("NUM-C21", ["What exercises should I do today?"], day=10, stub_reply=LIVE_C21,
+                                stub_engine="Local LLM (llama3.2)", stub_sources=TKA_TOPICS)
+    reply = results[0]["reply"]
+    _check(results[0]["engine"] == RehabilitationAgent.ENGINE_FALLBACK and "15-20" not in reply, f"c21: an unsourced icing dose falls back: {reply[:90]!r}")
+    _check("Here's the discharge guidance I have for your exercises on day 10 after your knee replacement" in reply, "c21: the sourced fallback answers instead")
+
+    # A number the retrieved context states is accepted (the context is re-read only when needed).
+    sourced = "On day 10, aim for the flexion your team set; the guidance mentions 70 to 90 degrees by day 7."
+    calls: List[int] = []
+
+    def _counting_query(*_args, **_kwargs):
+        calls.append(1)
+        return LIVE_DOCS_TKA
+
+    _reset()
+    _seed_known("NUM-OK", done=False)
+    with patch("rag.knowledge_base.ClinicalKnowledgeBase.query", side_effect=_counting_query):
+        results, _ = _interview("NUM-OK", ["What exercises should I do today?"], day=10, stub_reply=sourced,
+                                stub_engine="Local LLM (llama3.2)", stub_sources=TKA_TOPICS)
+    _check(results[0]["engine"] == RehabilitationAgent.ENGINE_LLM and results[0]["reply"].startswith(sourced), "numbers from the retrieved context are accepted")
+    _check(len(calls) == 1, "the retrieved context is re-read once, for the numbers the agent's own sources lack")
+
+    # A number from the patient's own message needs no context lookup.
+    calls.clear()
+    own = "Doing them 3 times a day, as you describe, is a good routine to keep."
+    _reset()
+    _seed_known("NUM-OWN", done=True)
+    with patch("rag.knowledge_base.ClinicalKnowledgeBase.query", side_effect=_counting_query):
+        results, _ = _interview("NUM-OWN", ["I do my exercises 3 times a day, what else should I do?"], day=10,
+                                stub_reply=own, stub_engine="Local LLM (llama3.2)", stub_sources=TKA_TOPICS)
+    _check(results[0]["engine"] == RehabilitationAgent.ENGINE_LLM and not calls, "a number from the patient's message is sourced")
+
+    # A failed context lookup rejects an unverifiable number.
+    _reset()
+    _seed_known("NUM-ERR", done=False)
+    with patch("rag.knowledge_base.ClinicalKnowledgeBase.query", side_effect=RuntimeError("index offline")):
+        results, _ = _interview("NUM-ERR", ["What exercises should I do today?"], day=10, stub_reply=sourced,
+                                stub_engine="Local LLM (llama3.2)", stub_sources=TKA_TOPICS)
+    _check(results[0]["engine"] == RehabilitationAgent.ENGINE_FALLBACK, "an unverifiable number falls back")
+
+    # Status guard: c24 tells the patient to AVOID loading -> not a breach.
+    _check(not ra.reply_breaches_weight_bearing(LIVE_C24, "NWB"), "c24: 'not allowed to bear weight ... avoid squats' respects NWB")
+    for safe in ("Do not put weight through the leg yet.", "Avoid squats and lunges until your surgeon clears you.",
+                 "Never walk without your walker for now.", "Please don't stand on the operated leg alone.",
+                 "Focus on strengthening exercises first, rather than doing squats.",
+                 "Do quad sets instead of squats."):
+        _check(not ra.reply_breaches_weight_bearing(safe, "NWB"), f"negated loading is not a breach: {safe!r}")
+    for unsafe in ("You can start to put weight through the leg.", "There's no reason you can't squat now.",
+                   "You no longer need to avoid squats.", "Don't worry when you bear weight on it.",
+                   "Not too much at first, then squat a little deeper each day.", "You don't have to avoid squats.",
+                   "We can discuss squats further as your knee progresses."):
+        _check(ra.reply_breaches_weight_bearing(unsafe, "NWB"), f"loading advice is still a breach: {unsafe!r}")
+
+    _reset()
+    with patch("rag.knowledge_base.ClinicalKnowledgeBase.query", side_effect=_query):
+        results, _ = _interview("NWB-C24", ["Can I start doing squats?", "no"], day=3, stub_reply=LIVE_C24,
+                                stub_engine="Local LLM (llama3.2)", stub_sources=TKA_TOPICS,
+                                weight_bearing_status=WeightBearingStatus.NWB)
+    _check(results[-1]["engine"] == RehabilitationAgent.ENGINE_LLM and results[-1]["reply"].startswith(LIVE_C24),
+           f"c24: the NWB-respecting reply is used: {results[-1]['engine']}")
+    print()
+
+
 def main() -> int:
     _run(test_routing)
     _run(test_postop_day_reaches_agent)
@@ -905,6 +1063,7 @@ def main() -> int:
     _run(test_safety_concern_pause_and_tell_physio)
     _run(test_close_and_rehab_check_routing)
     _run(test_state_ttl_llm_guard_and_reexport)
+    _run(test_number_guard_and_status_negation)
 
     print("=" * 78)
     if _FAILURES:

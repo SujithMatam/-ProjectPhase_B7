@@ -31,8 +31,11 @@ Per turn (OBSERVE -> PLAN -> ASK / ANSWER):
      travel fenced in the domain instruction with the explicit rule "never
      suggest loading or activity beyond the stated weight-bearing status"
      and the Pain agent's abstention sentence. An LLM reply is used only
-     when the local model actually answered and the text does not breach
-     the weight-bearing status; otherwise a procedure-aware fallback built
+     when the local model actually answered, the text does not breach
+     the weight-bearing status (a negated "avoid squats" is not a breach),
+     and every number in it (digits, words, range end points) is stated by
+     the retrieved context, the patient's message, the record values passed
+     in or the post-op day; otherwise a procedure-aware fallback built
      ONLY from eval_corpus.json passages (EV-TKA-REHAB-01/03/04/05,
      EV-THA-REHAB-01/03/05) answers -- passage ids go into the result's
      `sources` metadata, never into patient text. Every answer ends with
@@ -702,9 +705,143 @@ _REASSURANCE_PHRASES: Tuple[str, ...] = (
 )
 
 
+# A loading phrase is negated ("not allowed to bear weight", "avoid squats")
+# only when a negator sits in the same clause at most three words before it,
+# with no subordinator between them ("don't worry when you squat" is not a
+# negation of "squat"), and nothing flips the negator back into permission
+# ("no need to avoid squats", "no reason you can't squat").
+_CLAUSE_BREAK_RE = re.compile(r"[.!?;:,\n]|\bbut\b|\bhowever\b")
+_WORD_RE = re.compile(r"[a-z]+(?:'[a-z]+)?")
+_NEGATORS = frozenset((
+    "not", "never", "no", "avoid", "avoiding", "without", "don't", "doesn't", "can't", "cannot",
+    "shouldn't", "mustn't", "won't", "isn't", "aren't", "refrain",
+))
+# "focus on X rather than doing squats" negates like "avoid".
+_ALTERNATIVE_RE = re.compile(r"\brather than\b|\binstead of\b")
+_NEGATION_WINDOW = 3
+_INTERVENING_BREAKS = frozenset((
+    "when", "once", "after", "if", "while", "as", "so", "then", "until", "before",
+    "worry", "forget", "hesitate", "afraid", "scared", "problem", "issue", "reason", "need", "longer", "wrong",
+))
+_PERMISSION_FLIPS: Tuple[str, ...] = (
+    "no need", "don't need", "do not need", "needn't", "no longer", "don't have to", "do not have to",
+    "doesn't have to", "no reason", "not a problem", "no problem", "nothing wrong", "why",
+)
+
+
+def _loading_phrase_negated(lower: str, start: int) -> bool:
+    prefix = lower[:start]
+    breaks = list(_CLAUSE_BREAK_RE.finditer(prefix))
+    clause = prefix[breaks[-1].end():] if breaks else prefix
+    words = _WORD_RE.findall(_ALTERNATIVE_RE.sub(" avoid ", clause))
+    window = words[-(_NEGATION_WINDOW + 1):]
+    negator_at = max((i for i, word in enumerate(window) if word in _NEGATORS), default=None)
+    if negator_at is None:
+        return False
+    if any(word in _INTERVENING_BREAKS for word in window[negator_at + 1:]):
+        return False
+    before = " ".join(words[: len(words) - len(window) + negator_at][-4:] + [window[negator_at]])
+    return not any(flip in before for flip in _PERMISSION_FLIPS)
+
+
 def reply_breaches_weight_bearing(reply: str, weight_bearing: Optional[str]) -> bool:
-    lower = (reply or "").lower()
-    return any(phrase in lower for phrase in _LOADING_BREACH_PHRASES.get(weight_bearing or "", ()))
+    """True when the reply suggests loading beyond the status: a loading
+    phrase for that status that is not negated in its own clause."""
+    lower = (reply or "").lower().replace("’", "'")
+    for phrase in _LOADING_BREACH_PHRASES.get(weight_bearing or "", ()):
+        for match in re.finditer(re.escape(phrase), lower):
+            if not _loading_phrase_negated(lower, match.start()):
+                return True
+    return False
+
+
+# ----------------------------------------------------------------------------
+# Number guard: the model must not introduce a number (repetitions, minutes,
+# icing doses, ranges such as "15-20") that its sources do not state. A range
+# counts as its two end points; number words count as their value.
+# ----------------------------------------------------------------------------
+
+_UNITS: Dict[str, int] = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+    "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+    "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
+}
+_TENS: Dict[str, int] = {
+    "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90,
+}
+_OTHER_NUMBER_WORDS: Dict[str, int] = {"hundred": 100, "dozen": 12, "twice": 2, "thrice": 3}
+_NUMBER_TOKEN_RE = re.compile(
+    r"\d+(?:\.\d+)?"
+    rf"|\b(?:{'|'.join(_TENS)})(?:[- ](?:{'|'.join(k for k in _UNITS if 0 < _UNITS[k] < 10)}))?\b"
+    rf"|\b(?:{'|'.join(list(_UNITS) + list(_OTHER_NUMBER_WORDS))})\b"
+)
+# "one" as a pronoun or idiom carries no quantity.
+_PRONOUN_ONE_BEFORE = frozenset(("this", "that", "the", "each", "every", "any", "no", "which", "another", "a", "other"))
+_IDIOM_ONE_AFTER_RE = re.compile(r"\s*(?:of\b|step at a time|day at a time)")
+
+
+def _canonical_number(token: str) -> str:
+    token = token.lower()
+    if token[0].isdigit():
+        value = float(token)
+        return str(int(value)) if value == int(value) else str(value)
+    parts = re.split(r"[- ]", token)
+    if parts[0] in _TENS:
+        return str(_TENS[parts[0]] + (_UNITS[parts[1]] if len(parts) > 1 else 0))
+    return str(_UNITS.get(token, _OTHER_NUMBER_WORDS.get(token)))
+
+
+def numbers_in(text: str) -> List[str]:
+    """Canonical values of every number in `text`, digits or words."""
+    lower = (text or "").lower()
+    found: List[str] = []
+    for match in _NUMBER_TOKEN_RE.finditer(lower):
+        token = match.group(0)
+        if token == "one":
+            before = _WORD_RE.findall(lower[: match.start()])[-1:]
+            if (before and before[0] in _PRONOUN_ONE_BEFORE) or _IDIOM_ONE_AFTER_RE.match(lower, match.end()):
+                continue
+        found.append(_canonical_number(token))
+    return found
+
+
+def unsourced_numbers(reply: str, sources: Sequence[str]) -> List[str]:
+    """Numbers in `reply` that none of `sources` states (in order, deduplicated)."""
+    allowed = {number for source in sources for number in numbers_in(source)}
+    missing: List[str] = []
+    for number in numbers_in(reply):
+        if number not in allowed and number not in missing:
+            missing.append(number)
+    return missing
+
+
+def _retrieved_context(retrieval_query: str, procedure: str, topics: Sequence[str]) -> List[str]:
+    """The passages ChatAgent retrieved for this query (same query, procedure
+    and limit; ChatAgent returns only their topics), kept to the topics it
+    reported. Empty on any failure, so an unverifiable number is rejected."""
+    try:
+        from rag.knowledge_base import ClinicalKnowledgeBase
+
+        docs = ClinicalKnowledgeBase.query(retrieval_query, procedure=procedure, limit=2) or []
+    except Exception as exc:
+        print(f"[REHAB] could not re-read the retrieved context for the number check: {exc}")
+        return []
+    wanted = set(topics or ())
+    return [f"{d.get('topic', '')}: {d.get('content', '')}" for d in docs if not wanted or d.get("topic") in wanted]
+
+
+def reply_unsourced_numbers(
+    reply: str, agent_sources: Sequence[str], *, retrieval_query: str, procedure: str, retrieved_topics: Sequence[str],
+) -> List[str]:
+    """The numbers in an LLM reply that neither the agent's own sources (the
+    patient's message, the record values, the post-op day) nor the retrieved
+    context state. The retrieved context is re-read only when needed."""
+    missing = unsourced_numbers(reply, agent_sources)
+    if missing:
+        missing = unsourced_numbers(
+            reply, list(agent_sources) + _retrieved_context(retrieval_query, procedure, retrieved_topics),
+        )
+    return missing
 
 
 def contains_reassurance(text: str) -> bool:
@@ -1043,8 +1180,20 @@ class RehabilitationAgent(BaseClinicalAgent):
             and not is_unhelpful_llm_reply(body)
             and not reply_breaches_weight_bearing(body, weight_bearing)
         )
+        if accepted:
+            # Every number must come from the patient's message, the record
+            # values passed in, the post-op day, or the retrieved context.
+            barrier = facts.get(EXERCISE_BARRIER)
+            agent_sources = [
+                user_message or "", str(day), *record_lines, str(barrier or ""),
+                _rehab_context_note(request_weight_bearing, current_rom, exercise_history) or "",
+            ]
+            accepted = not reply_unsourced_numbers(
+                body, agent_sources, retrieval_query=retrieval_query, procedure=procedure,
+                retrieved_topics=llm_result.get("sources") or [],
+            )
         if body and not accepted:
-            print("[REHAB] not using the LLM reply -- generic fallback engine, unhelpful, or beyond the weight-bearing status")
+            print("[REHAB] not using the LLM reply -- generic fallback engine, unhelpful, beyond the weight-bearing status, or an unsourced number")
 
         if accepted:
             engine = cls.ENGINE_LLM
