@@ -463,7 +463,7 @@ class PainSymptomsAgent(BaseClinicalAgent):
         restates the reported number as context; it never re-derives,
         overrides, or softens that triage decision.
         """
-        from agents import pain_integration, pain_logic, pain_state
+        from agents import pain_integration, pain_logic, pain_state, patient_memory
 
         history = chat_history or []
 
@@ -488,53 +488,60 @@ class PainSymptomsAgent(BaseClinicalAgent):
             )
 
         # ================================================================
-        # ACTIVE-ASSESSMENT HISTORY BOUNDARY -- determine whether this turn
-        # is a genuine CONTINUATION of the currently pending Pain question,
-        # or the start of a FRESH Pain assessment (a brand-new patient, a
-        # completed prior assessment, or an ABANDONED prior interview the
-        # patient never finished -- e.g. they switched to Daily Activity
-        # mid-interview and are now raising an unrelated new Pain
-        # complaint). Uses pain_logic.is_active_assessment_continuation(),
-        # which is deliberately STRICTER than the bridging
-        # previous_pending_field()/orchestrator _has_active_pain_followup()
-        # routing signal: it requires the conversation's LITERAL most
-        # recent assistant message (not one found by skipping backward
-        # past an intervening off-topic reply) to have asked the currently
-        # pending field. This is what correctly resets an ABANDONED
-        # interview once an off-topic detour has occurred, even though
-        # routing itself (a separate, narrower concern -- whether a short
-        # ambiguous reply stays with Pain) still allows resuming a pending
-        # question across a brief detour.
+        # ACTIVE-ASSESSMENT HISTORY BOUNDARY -- is this turn a CONTINUATION
+        # of the currently pending Pain question, or the start of a FRESH
+        # assessment (brand-new patient, completed prior assessment, or a
+        # genuinely new complaint)?
         #
-        # A FRESH assessment discards any leftover interview bookkeeping
-        # from an abandoned/completed prior assessment (pending_field,
-        # ask_counts, cached structured facts) and establishes a NEW
-        # active-history boundary at this turn -- see
-        # pain_state.PainSessionState.start_new_assessment(). Everything
-        # below (build_assessment, medication scan, previous_pending_field
-        # for acknowledgment wording) is then scoped to `scoped_history`,
-        # never the full, potentially cross-assessment `history`.
+        # pain_logic.is_active_assessment_continuation() is given the
+        # current message, so it tolerates an intervening off-topic detour
+        # the same way the orchestrator's _has_active_pain_followup()
+        # routing check does: "Can I climb stairs?" (answered by Daily
+        # Activity) followed by a bare "8" RESUMES the pending pain-score
+        # question instead of restarting the interview. A full new pain
+        # complaint after a detour ("My hip has started aching today.")
+        # still starts fresh and never inherits the abandoned interview's
+        # cached facts. Without any detour the behaviour is unchanged.
         # ================================================================
         state = pain_state.get_or_create_state(patient_id)
 
-        is_continuation = pain_logic.is_active_assessment_continuation(history, state.pending_field)
+        is_continuation = pain_logic.is_active_assessment_continuation(
+            history, state.pending_field, user_message,
+        )
         if not is_continuation:
             state.start_new_assessment(len(history))
+
+        # ================================================================
+        # MEMORY BEFORE ASKING -- loaded ONCE per interview (at its start)
+        # from the existing patient database via agents/patient_memory.py:
+        # today's metrics row, the last three completed assessments, the
+        # procedure and the weight-bearing status. Cached on the session so
+        # the final turn compares against the SAME previous assessment the
+        # opening line referred to. Best-effort: an unknown patient simply
+        # gets an empty memory and the interview runs exactly as before.
+        # ================================================================
+        memory = state.memory
+        if memory is None:
+            memory = patient_memory.load_patient_memory(patient_id)
+            state.set_memory(memory)
+
+        # The request's own procedure wins when it is a known code; the
+        # patient record only fills a missing/GEN value.
+        effective_procedure = str(procedure or "").strip().upper() or None
+        if effective_procedure in (None, "GEN") and memory.procedure in ("TKA", "THA"):
+            effective_procedure = memory.procedure
 
         active_history_start = state.active_history_start
         scoped_history = history[active_history_start:] if active_history_start is not None else history
 
         # ================================================================
-        # OBSERVE -- reconstruct everything currently known, purely from
+        # OBSERVE -- reconstruct everything currently known from
         # scoped_history + the current message + any structured fields,
-        # PLUS a supplemental fallback for the two structured fields
-        # (pain_score, swelling) that would otherwise silently vanish if
-        # the frontend doesn't resupply them on every turn -- see
-        # pain_state.py's structured-fact cache. Still no dependency on
-        # any previous DAY/session existing (only this active assessment's
-        # own earlier turns, and only as a baseline a later correction can
-        # always override -- see build_assessment()'s precedence
-        # contract).
+        # plus the structured-fact cache as a fallback baseline (see
+        # pain_logic.build_assessment_detailed for the precedence contract).
+        # A reply that answers several fields at once fills all of them;
+        # a reply that does not plausibly answer the pending question is
+        # never stored as that field's value.
         # ================================================================
         seed_facts = pain_logic.seed_from_structured_fields(
             pain_score=pain_score,
@@ -547,28 +554,35 @@ class PainSymptomsAgent(BaseClinicalAgent):
             pain_logic.SWELLING: seed_facts.get(pain_logic.SWELLING),
         })
 
-        assessment, needs_alt = pain_logic.build_assessment(
+        view = pain_logic.build_assessment_detailed(
             scoped_history, user_message,
             seed_facts=seed_facts,
             cached_facts=state.cached_structured_facts(),
+            procedure=effective_procedure,
         )
+        assessment = view.assessment
 
         # medication_mentioned: current message, plus USER-authored turns
         # belonging to THIS active assessment only -- never an assistant
-        # reply (a patient never "reports" medication use by the assistant
-        # mentioning it), and never a completed older assessment's turns.
+        # reply, never a completed older assessment's turns, and never a
+        # detour turn answered by another agent.
         medication_mentioned = pain_logic.mentions_medication(user_message) or any(
             pain_logic.mentions_medication(str(item.get("content", "")))
-            for item in scoped_history
-            if isinstance(item, dict) and str(item.get("role", "")).lower().strip() == "user"
+            for idx, item in enumerate(scoped_history)
+            if isinstance(item, dict)
+            and str(item.get("role", "")).lower().strip() == "user"
+            and idx not in view.detour_indices
         )
 
         # ================================================================
-        # DECIDE -- pure function; genuinely adaptive (branches on
-        # location/severity/context), not a fixed linear order.
+        # DECIDE -- pure function; adaptive (branches on location/severity/
+        # procedure), not a fixed linear order. The agent only COLLECTS;
+        # the triage level is decided upstream and never touched here.
         # ================================================================
         next_field = pain_logic.select_next_field(
-            assessment, medication_mentioned=medication_mentioned,
+            assessment,
+            medication_mentioned=medication_mentioned,
+            procedure=effective_procedure,
         )
 
         triage_level = "GREEN"
@@ -578,25 +592,55 @@ class PainSymptomsAgent(BaseClinicalAgent):
             is_escalated = bool(precomputed_triage.get("is_escalated", False))
 
         # ================================================================
-        # ASK -- exactly one tracked field per turn.
+        # ASK -- exactly one tracked field per turn: a one-line reflection
+        # of what is collected so far + the next question + a short
+        # progress indicator.
         # ================================================================
         if next_field is not None:
-            is_alt = next_field in needs_alt
+            is_alt = next_field in view.needs_alt
+            is_clarify = next_field in view.needs_clarify
+            confirm_declined = next_field in view.confirm_declined
             answered_field = pain_logic.previous_pending_field(scoped_history)
-            was_uncertain = answered_field is not None and answered_field in needs_alt
+            was_uncertain = answered_field is not None and answered_field in view.needs_alt
             variation_seed = state.ask_count_of(next_field)
 
-            if is_alt:
+            if is_alt or is_clarify:
                 state.note_asked(next_field)
 
+            remaining_after_this = pain_logic.estimate_remaining_questions(
+                assessment,
+                medication_mentioned=medication_mentioned,
+                procedure=effective_procedure,
+            ) - 1
+            indicator = pain_integration.progress_indicator(
+                max(remaining_after_this, 0),
+                branch_deciding=next_field in pain_logic.BRANCH_DECIDING_FIELDS,
+            )
+
             if answered_field is None:
+                # Opening turn of a fresh interview. If today's log already
+                # has a pain score and that is the first thing we'd ask,
+                # confirm it instead of asking from scratch; if a previous
+                # assessment exists, open by referring to it.
+                confirm_score = None
+                if next_field == pain_logic.PAIN_SCORE and not (is_alt or is_clarify):
+                    confirm_score = memory.today_pain_score
                 reply = pain_integration.opening_message(
                     next_field,
                     is_alt=is_alt,
                     trend=assessment.get(pain_logic.WORSENING_OR_IMPROVING),
+                    procedure=effective_procedure,
+                    memory_reference=pain_integration.memory_reference_line(memory.previous_assessment),
+                    confirm_score=confirm_score,
+                    indicator=indicator,
                 )
             else:
-                if not was_uncertain:
+                answered_resolved = (
+                    answered_field not in view.needs_alt
+                    and answered_field not in view.needs_clarify
+                    and answered_field not in view.confirm_declined
+                )
+                if answered_resolved:
                     state.resolve(answered_field)
                 reply = pain_integration.followup_message(
                     answered_field=answered_field,
@@ -605,6 +649,11 @@ class PainSymptomsAgent(BaseClinicalAgent):
                     is_alt=is_alt,
                     was_uncertain=was_uncertain,
                     variation_seed=variation_seed,
+                    assessment=assessment,
+                    procedure=effective_procedure,
+                    is_clarify=is_clarify,
+                    confirm_declined=confirm_declined,
+                    indicator=indicator,
                 )
 
             state.mark_pending(next_field)
@@ -619,47 +668,65 @@ class PainSymptomsAgent(BaseClinicalAgent):
 
         # ================================================================
         # CONCLUDE -- assessment complete. RAG + LLM first, deterministic
-        # fallback only if that reply looks generic/unhelpful (same pattern
-        # WoundCareAgent uses for its own final turn).
+        # fallback only if that reply looks generic/unhelpful/ungrounded/
+        # inconsistent. Either way the final turn ends with the same
+        # proactive close: summary, comparison with last time, the
+        # deterministic triage action protocol verbatim, ONE next step and
+        # a check-in offer. Persistence happens ONLY here -- an abandoned
+        # interview persists nothing.
         # ================================================================
         state.clear_pending()
 
         assessment_summary = pain_integration.summarize_assessment(assessment)
-        prior_assessments = pain_integration.load_recent_assessments(patient_id, limit=3)
+        prior_assessments = memory.recent_assessments or pain_integration.load_recent_assessments(
+            patient_id, limit=3,
+        )
         trend_note = pain_integration.build_trend_note(assessment, prior_assessments)
         has_unknown_fields = any(value == "unknown" for value in assessment.values())
 
+        record_context = None
+        if memory.weight_bearing_status:
+            record_context = f"Weight-bearing status on record: {memory.weight_bearing_status}"
+
+        # The raw current patient message travels ONLY inside the fenced
+        # untrusted-data block of the domain instruction (see
+        # pain_integration._wrap_untrusted_data) -- never as free-standing
+        # controlling text, and no longer as the RAG query.
         final_domain_instruction = pain_integration.build_final_turn_domain_instruction(
             base_domain_focus, assessment_summary, trend_note, has_unknown_fields,
+            latest_patient_message=user_message,
+            record_context=record_context,
         )
-        # retrieval_hint embeds the RAW current patient message (needed for
-        # useful RAG retrieval) -- it is folded INTO the same fenced
-        # untrusted-data block build_final_turn_message() already applies
-        # to assessment_summary/trend_note, never appended afterward as
-        # free-standing text (which would let raw, patient-controlled text
-        # be read as a controlling instruction rather than reported data --
-        # see pain_integration._build_untrusted_data_block).
-        retrieval_hint = pain_integration.build_retrieval_query(user_message, assessment)
-        final_message = pain_integration.build_final_turn_message(
-            assessment_summary, trend_note, retrieval_hint=retrieval_hint,
+
+        # RAG QUERY: built from the COLLECTED location and symptoms, not
+        # from the instruction block. ChatAgent uses `user_message` both as
+        # the retrieval query and as the "User's Question" prompt slot.
+        retrieval_query = pain_integration.build_retrieval_query(
+            assessment,
+            surgery_type=surgery_type,
+            procedure=effective_procedure,
+            postop_day=postop_day,
         )
 
         # chat_history=scoped_history (NOT the full, potentially cross-
-        # assessment `history`) -- otherwise a COMPLETED older Pain
-        # assessment's raw turns, already correctly excluded from
-        # build_assessment()/medication detection/pending-answer
-        # attribution above, could still reach the final LLM synthesis and
-        # influence it. scoped_history already ends at the last turn
-        # BEFORE this one (the current turn is represented by
-        # `final_message` itself), so it is not appended again here.
+        # assessment `history`) -- a COMPLETED older Pain assessment's raw
+        # turns must never reach the final LLM synthesis. scoped_history
+        # ends at the last turn BEFORE this one; the current message is
+        # carried, fenced, inside final_domain_instruction.
+        #
+        # TOKEN BUDGET: ChatAgent.answer_question() exposes no token-budget
+        # parameter (num_predict is fixed inside chat_agent.py), so none is
+        # passed here -- see agents/PAIN_AGENT_CHANGES.md "shared changes
+        # needed" for the one-line change that would allow 300 tokens on
+        # this final turn.
         llm_result = ChatAgent.answer_question(
             patient_id=patient_id,
             surgery_type=surgery_type,
             affected_limb=affected_limb,
             postop_day=postop_day,
-            user_message=final_message,
+            user_message=retrieval_query,
             chat_history=scoped_history,
-            procedure=procedure,
+            procedure=effective_procedure or procedure,
             domain_instruction=final_domain_instruction,
             precomputed_triage=precomputed_triage,
             surgery_date=surgery_date,
@@ -700,6 +767,9 @@ class PainSymptomsAgent(BaseClinicalAgent):
             and is_consistent_reply
         ):
             result = dict(llm_result)
+            result["reply"] = pain_integration.compose_final_reply(
+                llm_reply, assessment, precomputed_triage, trend_note,
+            )
         else:
             result = {
                 "reply": pain_integration.deterministic_summary(
@@ -713,15 +783,9 @@ class PainSymptomsAgent(BaseClinicalAgent):
 
         # AUTHORITATIVE FINAL TRIAGE: SafetyTriageEngine (already evaluated
         # upstream -- see lam/orchestrator.py Step 1/2) remains the sole
-        # classifier. Whatever ChatAgent.answer_question returned for
-        # triage_level/is_escalated (accepted LLM reply OR the deterministic
-        # fallback's own `llm_result.get(...)` defaults above) must never be
-        # allowed to conflict with precomputed_triage on the FINAL outgoing
-        # response -- this override applies unconditionally, after either
-        # branch above, so there is exactly one place the final answer's
-        # triage fields are decided. When precomputed_triage is None (an
-        # internal/direct caller that skipped full triage), this is a no-op
-        # and the existing fallback behaviour above is preserved unchanged.
+        # classifier. Whatever ChatAgent returned for triage_level/
+        # is_escalated must never conflict with precomputed_triage on the
+        # FINAL outgoing response. The LLM never sets or lowers the level.
         if precomputed_triage is not None:
             result["triage_level"] = precomputed_triage.get("triage_level", triage_level)
             result["is_escalated"] = bool(precomputed_triage.get("is_escalated", is_escalated))
@@ -731,6 +795,12 @@ class PainSymptomsAgent(BaseClinicalAgent):
             assessment,
             postop_day=postop_day,
             temperature_c=temperature_c,
+            precomputed_triage=precomputed_triage,
+        )
+        pain_integration.persist_today_metrics(
+            patient_id,
+            assessment,
+            postop_day=postop_day,
             precomputed_triage=precomputed_triage,
         )
 

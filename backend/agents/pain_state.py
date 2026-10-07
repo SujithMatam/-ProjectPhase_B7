@@ -138,12 +138,31 @@ class PainSessionState:
     _ask_counts: Dict[str, int] = field(default_factory=dict)
     _cached_structured_facts: Dict[str, Any] = field(default_factory=dict)
     _active_history_start: Optional[int] = None
+    # Patient memory snapshot (agents/patient_memory.PatientMemory) loaded
+    # ONCE at interview start and reused on every turn of that interview,
+    # so the DB is not re-read per turn and the final-turn comparison uses
+    # the SAME "previous assessment" the opening line referred to. Cleared
+    # together with the rest of the bookkeeping -- it is a per-interview
+    # cache, never a source of truth (the DB is).
+    _memory: Optional[Any] = field(default=None, repr=False, compare=False)
     _lock: threading.RLock = field(default_factory=threading.RLock, repr=False, compare=False)
 
     @property
     def pending_field(self) -> Optional[str]:
         with self._lock:
             return self._pending_field
+
+    @property
+    def memory(self) -> Optional[Any]:
+        """The PatientMemory snapshot cached for the active interview, or
+        None when none has been loaded (fresh state / after a reset)."""
+        with self._lock:
+            return self._memory
+
+    def set_memory(self, memory: Any) -> None:
+        with self._lock:
+            self._memory = memory
+            self.last_updated = _utcnow()
 
     @property
     def active_history_start(self) -> Optional[int]:
@@ -213,6 +232,7 @@ class PainSessionState:
             self._pending_field = None
             self._ask_counts = {}
             self._cached_structured_facts = {}
+            self._memory = None
             self._active_history_start = history_len
             self.last_updated = _utcnow()
 
@@ -270,6 +290,7 @@ class PainSessionState:
             self._pending_field = None
             self._ask_counts = {}
             self._cached_structured_facts = {}
+            self._memory = None
             self._active_history_start = None
             self.last_updated = _utcnow()
 
@@ -329,6 +350,7 @@ class PainSessionState:
             self._pending_field = None
             self._ask_counts = {}
             self._cached_structured_facts = {}
+            self._memory = None
             self._active_history_start = None
             self.last_updated = _utcnow()
 
