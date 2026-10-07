@@ -950,6 +950,24 @@ def test_deterministic_summary_uses_action_protocol() -> None:
         "swelling, warmth, redness" not in summary_no_protocol,
         "neutral fallback must not invent a symptom-watch list either",
     )
+
+    # Paragraph spacing: blocks are separated by EXACTLY one empty line,
+    # never a run of blank lines -- including the degenerate case of an
+    # empty facts list (which used to leave "told me:\n\n\n").
+    import re as _re
+    for label, text in (
+        ("GREEN", summary_green), ("YELLOW", summary_yellow), ("no protocol", summary_no_protocol),
+        ("empty facts", pain_integration.deterministic_summary({}, {"triage_level": "GREEN"}, None)),
+        ("with trend", pain_integration.deterministic_summary(
+            assessment, {"triage_level": "GREEN", "action_protocol": green_protocol},
+            "That's the same as last time.",
+        )),
+    ):
+        _check(
+            _re.search(r"\n[ \t]*\n[ \t]*\n", text) is None,
+            f"{label}: deterministic final reply must not contain repeated blank lines: {text!r}",
+        )
+        _check("\n\n" in text, f"{label}: blocks must still be separated by one empty line: {text!r}")
     print()
 
 

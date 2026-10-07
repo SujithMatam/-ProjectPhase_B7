@@ -203,7 +203,7 @@ used a small out-of-tree pytest plugin. It fails a test if that test added to
 The results were cross-checked by running each file's own `main()`. Both
 runners gave the same result.
 
-### Results: 66 passed, 1 failed (67 tests)
+### Results: 65 passed, 1 failed (66 tests)
 
 | File | Passed | Failed |
 |---|---|---|

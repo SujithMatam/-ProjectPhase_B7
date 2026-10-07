@@ -1198,6 +1198,17 @@ def _uncertainty_sentence(assessment: Dict[str, Any]) -> str:
     )
 
 
+_BLANK_RUN_RE = re.compile(r"\n[ \t]*\n(?:[ \t]*\n)+")
+
+
+def collapse_blank_lines(text: str) -> str:
+    """Normalise paragraph spacing in a final reply: every run of two or
+    more blank lines (including whitespace-only lines) becomes exactly ONE
+    empty line, so blocks are always separated the same way regardless of
+    which optional blocks (comparison, uncertainty, facts) were present."""
+    return _BLANK_RUN_RE.sub("\n\n", text).strip()
+
+
 def _closing_block(
     assessment: Dict[str, Any],
     precomputed_triage: Optional[Dict[str, Any]],
@@ -1216,7 +1227,7 @@ def _closing_block(
     if uncertainty:
         paragraphs.append(uncertainty)
     paragraphs.append(f"{next_step_line(triage_level, precomputed_triage)} {CHECK_IN_OFFER}")
-    return "\n\n".join(paragraphs)
+    return "\n\n".join(paragraph for paragraph in paragraphs if paragraph.strip())
 
 
 def compose_final_reply(
@@ -1230,7 +1241,9 @@ def compose_final_reply(
     collected = collected_summary_line(assessment)
     summary_line = f"Here's what you told me: {collected}." if collected else ""
     parts = [part for part in (summary_line, body.strip()) if part]
-    return "\n\n".join(parts + [_closing_block(assessment, precomputed_triage, trend_note)])
+    return collapse_blank_lines(
+        "\n\n".join(parts + [_closing_block(assessment, precomputed_triage, trend_note)])
+    )
 
 
 def deterministic_summary(
@@ -1242,7 +1255,7 @@ def deterministic_summary(
     every reported fact, then the same closing block as compose_final_reply
     (comparison, verbatim action protocol, one next step, check-in offer)."""
     facts_summary = summarize_assessment(assessment)
-    return (
+    return collapse_blank_lines(
         "Thanks for going through that with me. Based on what you've "
         f"told me:\n{facts_summary}\n\n"
         f"{_closing_block(assessment, precomputed_triage, trend_note)}\n\n"
