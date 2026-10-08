@@ -2,11 +2,11 @@
   "meta": {
     "label": "head_orchestrator",
     "backend_dir": "this checkout",
-    "commit": "fcfa3bb",
+    "commit": "b6c1730",
     "live": false,
     "via_orchestrator": true,
-    "started": "2026-10-08 04:32:33",
-    "seconds": 40.3
+    "started": "2026-10-08 14:52:31",
+    "seconds": 25.3
   },
   "runs": [
     {
@@ -46,7 +46,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -78,7 +78,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 24.33
+          "seconds": 13.62
         },
         {
           "index": 3,
@@ -110,7 +110,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         },
         {
           "index": 4,
@@ -148,7 +148,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -220,7 +220,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         },
         {
           "index": 7,
@@ -291,7 +291,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -499,7 +499,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -531,7 +531,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -566,7 +566,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
@@ -603,7 +603,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -642,7 +642,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.09
+          "seconds": 0.03
         }
       ],
       "rows_persisted": {
@@ -814,7 +814,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -848,7 +848,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -880,12 +880,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
           "patient": "almost, there's a small gap",
-          "reply": "Thanks for sharing that -- extension (nearly flat), within the day-7 range of 0\u00b0-5\u00b0 (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Got it -- extension (nearly flat), within the day-7 range of 0\u00b0-5\u00b0 (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -917,7 +917,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.09
+          "seconds": 0.02
         },
         {
           "index": 5,
@@ -958,7 +958,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         },
         {
           "index": 6,
@@ -1005,7 +1005,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.07
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1171,12 +1171,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
           "patient": "I'm still using one crutch",
-          "reply": "Thanks for sharing that -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)",
+          "reply": "Got it -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-THA-REHAB-04"
@@ -1210,7 +1210,7 @@
         {
           "index": 3,
           "patient": "about 20 minutes",
-          "reply": "Got it -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)",
+          "reply": "Thanks for sharing that -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-THA-REHAB-04"
@@ -1242,7 +1242,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
@@ -1281,7 +1281,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -1324,7 +1324,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -1470,7 +1470,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 10.27
+          "seconds": 10.2
         },
         {
           "index": 2,
@@ -1498,7 +1498,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.1
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1634,7 +1634,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -1666,7 +1666,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         },
         {
           "index": 3,
@@ -1703,7 +1703,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.07
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -1847,7 +1847,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.0
         },
         {
           "index": 2,
@@ -1883,7 +1883,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         }
       ],
       "rows_persisted": {
@@ -2021,7 +2021,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -2053,7 +2053,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 3,
@@ -2088,7 +2088,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
@@ -2125,7 +2125,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -2164,7 +2164,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         },
         {
           "index": 6,
@@ -2205,7 +2205,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -2375,7 +2375,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -2407,7 +2407,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -2439,7 +2439,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         },
         {
           "index": 4,
@@ -2474,7 +2474,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 5,
@@ -2511,7 +2511,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 6,
@@ -2550,7 +2550,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -2714,7 +2714,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -2746,7 +2746,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -2778,7 +2778,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 4,
@@ -2813,7 +2813,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -2850,7 +2850,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 6,
@@ -2889,7 +2889,7 @@
             "total": 2
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -3023,34 +3023,6 @@
         {
           "index": 1,
           "patient": "It's about a 5 out of 10, it came on gradually, and it's behind the knee.",
-          "reply": "",
-          "engine": "Clinical Synthesis Engine",
-          "sources": [],
-          "triage_level": "GREEN",
-          "engine_triage_level": "GREEN",
-          "routed_to": "IntakeContextAgent",
-          "expected_agent": "PainSymptomsAgent",
-          "misroute_kind": "fresh_classification",
-          "pending_before": null,
-          "is_agent_turn": true,
-          "asked_field": null,
-          "is_confirm": false,
-          "questions": 0,
-          "collected": {},
-          "collected_before": {},
-          "new_fields": [],
-          "rows_written": {
-            "symptom_assessments": 0,
-            "metrics_inserted": 0,
-            "metrics_updated": 0,
-            "total": 0
-          },
-          "error": null,
-          "seconds": 0.1
-        },
-        {
-          "index": 2,
-          "patient": "getting a bit better",
           "reply": "Let's see where you are on post-op day 9. About how many degrees can you currently bend your knee? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [],
@@ -3074,7 +3046,35 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.11
+          "seconds": 0.03
+        },
+        {
+          "index": 2,
+          "patient": "getting a bit better",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)",
+          "engine": "Recovery Deterministic Assessment Engine",
+          "sources": [],
+          "triage_level": "GREEN",
+          "engine_triage_level": "GREEN",
+          "routed_to": "RecoveryProgressAgent",
+          "expected_agent": "PainSymptomsAgent",
+          "misroute_kind": "fresh_classification",
+          "pending_before": null,
+          "is_agent_turn": true,
+          "asked_field": null,
+          "is_confirm": false,
+          "questions": 0,
+          "collected": {},
+          "collected_before": {},
+          "new_fields": [],
+          "rows_written": {
+            "symptom_assessments": 0,
+            "metrics_inserted": 0,
+            "metrics_updated": 0,
+            "total": 0
+          },
+          "error": null,
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -3162,7 +3162,7 @@
           "name": "routed_to_expected_agent",
           "turn": null,
           "passed": false,
-          "detail": "turn 1: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent)"
+          "detail": "turn 1: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent)"
         }
       ],
       "summary": {
@@ -3230,7 +3230,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -3265,7 +3265,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -3302,7 +3302,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -3419,7 +3419,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -3447,7 +3447,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.1
+          "seconds": 0.02
         },
         {
           "index": 3,
@@ -3475,17 +3475,17 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.09
+          "seconds": 0.02
         },
         {
           "index": 4,
           "patient": "around the kneecap",
-          "reply": "",
-          "engine": "Clinical Synthesis Engine",
+          "reply": "Just circling back to this -- About how many degrees can you currently bend your knee? (a few more questions)",
+          "engine": "Recovery Deterministic Assessment Engine",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
-          "routed_to": "IntakeContextAgent",
+          "routed_to": "RecoveryProgressAgent",
           "expected_agent": "PainSymptomsAgent",
           "misroute_kind": "fresh_classification",
           "pending_before": null,
@@ -3503,7 +3503,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.08
+          "seconds": 0.02
         },
         {
           "index": 5,
@@ -3531,7 +3531,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.0
         }
       ],
       "rows_persisted": {
@@ -3619,7 +3619,7 @@
           "name": "routed_to_expected_agent",
           "turn": null,
           "passed": false,
-          "detail": "turn 1: MedicationAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: IntakeContextAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent)"
+          "detail": "turn 1: MedicationAgent (fresh_classification, expected PainSymptomsAgent); turn 2: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 3: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 4: RecoveryProgressAgent (fresh_classification, expected PainSymptomsAgent); turn 5: MedicationAgent (fresh_classification, expected PainSymptomsAgent)"
         }
       ],
       "summary": {
@@ -3667,19 +3667,19 @@
         {
           "index": 1,
           "patient": "Am I on track with my knee?",
-          "reply": "",
-          "engine": "Clinical Synthesis Engine",
+          "reply": "Let's see where you are on post-op day 4. About how many degrees can you currently bend your knee? (a few more questions)",
+          "engine": "Recovery Deterministic Assessment Engine",
           "sources": [],
           "triage_level": "GREEN",
           "engine_triage_level": "GREEN",
-          "routed_to": "IntakeContextAgent",
+          "routed_to": "RecoveryProgressAgent",
           "expected_agent": "RecoveryProgressAgent",
-          "misroute_kind": "fresh_classification",
+          "misroute_kind": null,
           "pending_before": null,
           "is_agent_turn": true,
-          "asked_field": null,
+          "asked_field": "rom_flexion_degrees",
           "is_confirm": false,
-          "questions": 0,
+          "questions": 1,
           "collected": {},
           "collected_before": {},
           "new_fields": [],
@@ -3690,7 +3690,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.09
+          "seconds": 0.03
         },
         {
           "index": 2,
@@ -3705,7 +3705,7 @@
           "routed_to": "RecoveryProgressAgent",
           "expected_agent": "RecoveryProgressAgent",
           "misroute_kind": null,
-          "pending_before": null,
+          "pending_before": "rom_flexion_degrees",
           "is_agent_turn": true,
           "asked_field": "rom_extension_degrees",
           "is_confirm": false,
@@ -3724,12 +3724,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.1
+          "seconds": 0.01
         },
         {
           "index": 3,
           "patient": "about 10 degrees off straight",
-          "reply": "Got it -- extension of 10\u00b0 on day 4; the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0 (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Thanks for sharing that -- extension of 10\u00b0 on day 4; the first extension checkpoint is day 7, which looks for 0\u00b0-5\u00b0 (according to the discharge guidance) -- the target to work towards. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -3761,12 +3761,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
           "patient": "I use a walker",
-          "reply": "Thanks for sharing that -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Got it -- walking aid: a walker/frame on day 4; the first walking aid checkpoint is day 7, which describes walking with a frame, crutches or cane on a level surface (according to the discharge guidance) -- the target to work towards. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-01"
@@ -3800,12 +3800,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 5,
           "patient": "about 5 minutes",
-          "reply": "Got it -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Okay -- walking duration: 5 minutes on day 4; the first walking duration checkpoint is day 7, which describes walking little and often around the home (according to the discharge guidance) -- the target to work towards. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-01"
@@ -3841,7 +3841,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 6,
@@ -3885,7 +3885,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.07
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -3937,7 +3937,7 @@
           "name": "max_questions",
           "turn": null,
           "passed": true,
-          "detail": "4 asked, max 5"
+          "detail": "5 asked, max 5"
         },
         {
           "name": "triage_equals_engine",
@@ -3978,12 +3978,12 @@
         {
           "name": "routed_to_expected_agent",
           "turn": null,
-          "passed": false,
-          "detail": "turn 1: IntakeContextAgent (fresh_classification, expected RecoveryProgressAgent)"
+          "passed": true,
+          "detail": ""
         }
       ],
       "summary": {
-        "questions": 4,
+        "questions": 5,
         "fields_per_turn": [
           0,
           1,
@@ -3998,15 +3998,11 @@
         "record_fields_reused_sources": [],
         "record_fields_asked": [],
         "rows_persisted": 1,
-        "misrouted_turns": [
-          1
-        ],
+        "misrouted_turns": [],
         "misrouted_continuation": [],
-        "misrouted_fresh": [
-          1
-        ],
+        "misrouted_fresh": [],
         "red_preempted_turns": [],
-        "properties_passed": 13,
+        "properties_passed": 14,
         "properties_total": 14
       }
     },
@@ -4046,7 +4042,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -4080,7 +4076,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.09
+          "seconds": 0.02
         },
         {
           "index": 3,
@@ -4112,7 +4108,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
@@ -4144,7 +4140,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.09
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -4306,7 +4302,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -4347,7 +4343,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -4392,7 +4388,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.07
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -4545,12 +4541,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
           "patient": "about 90 degrees",
-          "reply": "Thanks for sharing that -- flexion of 90\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
+          "reply": "Okay -- flexion of 90\u00b0, within the day-7 range of 70\u00b0-90\u00b0 (according to the discharge guidance). Do you know your current knee extension measurement in degrees (how close to fully straight)? (a few more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "TKA-03"
@@ -4579,7 +4575,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -4687,7 +4683,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -4721,12 +4717,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.01
         },
         {
           "index": 3,
           "patient": "0 degrees, it goes fully straight",
-          "reply": "Okay -- extension of 0\u00b0, meets the day-84 target of 0\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Got it -- extension of 0\u00b0, meets the day-84 target of 0\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-05"
@@ -4758,12 +4754,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 4,
           "patient": "walking without any aid now",
-          "reply": "Got it -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Thanks for sharing that -- walking aid: walking without an aid, matches the day-84 checkpoint (according to the discharge guidance): walking further and more steadily, with less need for a walking aid. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-05"
@@ -4797,7 +4793,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 5,
@@ -4838,7 +4834,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.01
         },
         {
           "index": 6,
@@ -4883,7 +4879,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -5037,7 +5033,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.03
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -5065,7 +5061,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -5093,12 +5089,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.01
         },
         {
           "index": 4,
           "patient": "about 5 degrees",
-          "reply": "Okay -- extension of 5\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
+          "reply": "Thanks for sharing that -- extension of 5\u00b0, within the day-14 range of 0\u00b0-10\u00b0 (according to the discharge guidance). How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REHAB-02"
@@ -5127,12 +5123,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 5,
           "patient": "a walker",
-          "reply": "Got it -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
+          "reply": "Okay -- walking aid: a walker/frame, matches the day-14 checkpoint (according to the discharge guidance): a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes. Roughly how many minutes can you walk at a stretch at the moment? (one more question after this)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -5164,12 +5160,12 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.01
+          "seconds": 0.0
         },
         {
           "index": 6,
           "patient": "10 minutes",
-          "reply": "Okay -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
+          "reply": "Got it -- walking duration of 10 minutes, meets the day-14 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)",
           "engine": "Recovery Deterministic Assessment Engine",
           "sources": [
             "EV-TKA-REC-02"
@@ -5203,7 +5199,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         },
         {
           "index": 7,
@@ -5246,7 +5242,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.07
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -5409,7 +5405,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -5443,7 +5439,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.06
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -5573,7 +5569,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -5605,7 +5601,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.04
+          "seconds": 0.01
         },
         {
           "index": 3,
@@ -5642,7 +5638,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.12
+          "seconds": 0.03
         }
       ],
       "rows_persisted": {
@@ -5789,7 +5785,7 @@
             "total": 1
           },
           "error": null,
-          "seconds": 0.11
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {
@@ -5930,7 +5926,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.02
+          "seconds": 0.01
         },
         {
           "index": 2,
@@ -5958,7 +5954,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.05
+          "seconds": 0.01
         }
       ],
       "rows_persisted": {
@@ -6074,7 +6070,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.1
+          "seconds": 0.02
         },
         {
           "index": 2,
@@ -6106,7 +6102,7 @@
             "total": 0
           },
           "error": null,
-          "seconds": 0.1
+          "seconds": 0.02
         }
       ],
       "rows_persisted": {

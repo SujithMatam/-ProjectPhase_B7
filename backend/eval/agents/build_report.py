@@ -216,11 +216,15 @@ def main() -> int:
       "minutes\" now gets the clarifying question instead of being stored as *flexion of 20°*. \"I use a walker\" "
       "(c14) is no longer misrouted: c14's second message, \"about 60 degrees\", is now kept as the opening value, "
       "so the rest of the conversation lines up with the questions again.")
-    w("- **Fresh classification of opening turns**: \"It's about a 5 out of 10, it came on gradually, and it's "
-      "behind the knee.\" and \"Am I on track with my knee?\" go to IntakeContextAgent, \"My knee aches a little, I "
-      "took paracetamol an hour ago.\" to MedicationAgent, and \"Can I go up and down the stairs yet?\" to Daily "
-      "Activity; the conversation never reaches the agent, so its later answers are classified fresh too (c11, "
-      "c13). This is the intent classifier, outside this branch.")
+    w("- **Fresh classification of opening turns**: after the classifier fix measured in `eval/routing/REPORT.md`, "
+      "\"Am I on track with my knee?\" reaches RecoveryProgressAgent (c14 is clean through the orchestrator). Still "
+      "lost: \"It's about a 5 out of 10, it came on gradually, and it's behind the knee.\" now falls to the default "
+      "RecoveryProgressAgent instead of IntakeContextAgent (no pain word, and the semantic score for Pain is below "
+      "the 0.35 threshold); \"My knee aches a little, I took paracetamol an hour ago.\" goes to MedicationAgent "
+      "because Paracetamol is in the patient record (the orchestrator's recorded-medication rule runs before the "
+      "classifier); and \"Can I go up and down the stairs yet?\" goes to Daily Activity, which the routing "
+      "benchmark treats as an acceptable second owner. When the opening turn is lost the conversation never reaches "
+      "the agent, so its later answers are classified fresh too (c11, c13).")
     w("- **c01 turn 4 is RED by design**: the orchestrator's cumulative Pain triage combines 7/10, sudden onset "
       "and calf into a RED result, and the safety path answers. The `triage_equals_engine` property accepts this "
       "(the engine's own, more severe decision) and lists it in the detail.")
@@ -330,10 +334,14 @@ def main() -> int:
     w("4. **`agents/agent_router.py` -- forward `current_rom` to the Recovery agent** (Recovery 1). *Measured here:* "
       "c15 reuses 2/2 request values in direct calls, 0/2 through the orchestrator.")
     w("5. **Intent classifier** (Pain 5, Recovery 5, Rehab 5): keep \"pain\" / \"recovery\" / \"rehab\" so the "
-      "check-in offers route back; \"safe\" sends exercise questions to Medication first. *Measured here:* "
-      f"{total(aao, 'fresh')} fresh-classification misses on this branch, among them opening turns sent to "
-      "IntakeContextAgent (c11, c14) or MedicationAgent (c13) and \"Can I go up and down the stairs yet?\" sent to "
-      "Daily Activity (c05).")
+      "check-in offers route back; \"safe\" sends exercise questions to Medication first. *Partly done on this "
+      "branch* (`lam/intent_classifier.py`: \"safe\" / \"schedule\" / \"timing\" / \"warning\" dropped from the "
+      "medication list, \"I am ...\" no longer an introduction without an intake cue, whole-word matching in the "
+      "medication follow-up check, and no semantic INTAKE_CONTEXT without an intake cue; before/after per agent in "
+      f"`eval/routing/REPORT.md`). *Measured here:* {total(aao, 'fresh')} fresh-classification misses on this branch "
+      "(10 before the fix): c14's opening now reaches Recovery; c11's opening falls to the default agent, c13's "
+      "opening is claimed by the recorded medication name, and \"Can I go up and down the stairs yet?\" still goes "
+      "to Daily Activity (c05).")
     w("6. **`agents/chat_agent.py` -- token budget** (Pain 1, Recovery 3, Rehab 3): "
       "`answer_question(..., max_tokens=None)` passed through to `num_predict`.")
     w("7. **`agents/chat_agent.py` -- generic exercise fallback** (Rehab 2): the knee-only exercise text and "
