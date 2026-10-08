@@ -297,7 +297,7 @@ asking the same question indefinitely.)
 
 **Patient:** it's about 85 now
 
-> Got it -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
+> Thanks for sharing that -- flexion of 85°, within the day-7 range of 70°-90° (according to the discharge guidance), and improving: 70 -> 80 -> 85. Your log from yesterday says your extension was 5° -- still about that? (a few more questions)
 
 **Patient:** I don't know the number
 
@@ -305,14 +305,15 @@ asking the same question indefinitely.)
 
 **Patient:** almost, there's a small gap
 
-> Got it -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
+> Thanks for sharing that -- extension (nearly flat), within the day-7 range of 0°-5° (according to the discharge guidance), and improving: 8 -> 5. How are you currently getting around -- walking independently, or using a walker, cane, or crutches? (one or two more questions)
 
 **Patient:** I'm using a cane and I can walk about 15 minutes
 
-> Thanks for sharing that -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
+> Okay -- walking aid: a cane, matches the day-7 checkpoint (according to the discharge guidance): walking with a frame, crutches or cane on a level surface. walking duration: 15 minutes; the day-7 guidance gives no number, it expects walking little and often around the home. How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (last question)
 
 **Patient:** one step at a time holding the rail
 
+> All five things we checked are within the expected range or as described for your stage, and flexion and extension are improving over the week.
 > Here's how things compare on post-op day 10, according to the discharge guidance:
 > - flexion: 85° -- within the day-7 range of 70°-90°; over the week 70 -> 80 -> 85, improving
 > - extension: nearly flat -- within the day-7 range of 0°-5°; over the week 8 -> 5, improving
@@ -364,11 +365,11 @@ Patient on record with no metrics rows.
 
 **Patient:** I'm still using one crutch
 
-> Got it -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)
+> Thanks for sharing that -- walking aid: crutches, matches the day-21 checkpoint (according to the discharge guidance): one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid. Roughly how many minutes can you walk at a stretch at the moment? (one or two more questions)
 
 **Patient:** about 20 minutes
 
-> Thanks for sharing that -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
+> Got it -- walking duration of 20 minutes, meets the day-21 mark of more than 10 minutes (according to the discharge guidance). How are you managing stairs -- not yet, one step at a time holding the rail, or foot over foot? (one more question after this)
 
 **Patient:** foot over foot now
 
@@ -376,6 +377,7 @@ Patient on record with no metrics rows.
 
 **Patient:** yes, still following them
 
+> All four things we checked are within the expected range for your stage.
 > Here's how things compare on post-op day 30, according to the discharge guidance:
 > - walking aid: crutches -- as the day-21 checkpoint describes (one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid)
 > - walking duration: 20 minutes -- meets the day-21 mark of more than 10 minutes

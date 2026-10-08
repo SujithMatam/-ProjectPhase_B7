@@ -860,6 +860,132 @@ def format_next_milestone(
     return f"{head} " + "; ".join(parts) + "."
 
 
+# ONE summary line above the final block, built only from the verdicts and
+# trend directions the per-metric lines already use: counts and direction,
+# no judgement words, and no number that isn't already in the block (counts
+# are written as words; the only digits are checkpoint days from the lines).
+_COUNT_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+
+
+def _count_word(n: int) -> str:
+    return _COUNT_WORDS[n] if 0 <= n < len(_COUNT_WORDS) else str(n)
+
+
+def _join_labels(labels: Sequence[str]) -> str:
+    if len(labels) <= 1:
+        return "".join(labels)
+    return ", ".join(labels[:-1]) + " and " + labels[-1]
+
+
+def _summary_relation(checkpoint: "recovery_logic.CheckpointResult") -> str:
+    """The summary bucket of one comparison: "within", "as_described",
+    "below", "not_yet", or a neutral direction word."""
+    CV = recovery_logic.CheckpointVerdict
+    verdict = checkpoint.verdict
+    if verdict in (CV.MEETS_STATED_CHECKPOINT, CV.MATCHES_STATED_STATE):
+        return "within"
+    if verdict == CV.STATE_ONLY or (
+        checkpoint.entry is not None and checkpoint.entry.kind == "state" and verdict != CV.TARGET_NOT_YET_DUE
+    ):
+        # No number in the guidance: "as described", never below range.
+        return "as_described"
+    return {
+        CV.BELOW_STATED_CHECKPOINT: "below",
+        CV.NOT_YET_AT_STATED_STATE: "not_yet",
+        CV.EXCEEDS_STATED_RANGE: "beyond",
+        CV.BEYOND_STATED_STATE: "beyond",
+        CV.OUTSIDE_STATED_RANGE: "outside",
+        CV.OVERLAPS_STATED_RANGE: "overlaps",
+        CV.NEEDS_REVIEW: "review",
+        CV.TARGET_NOT_YET_DUE: "not_due",
+    }.get(verdict, "other")
+
+
+_SUMMARY_DIRECTION_TEXT: Dict[str, Tuple[str, str]] = {
+    # bucket: (singular, plural) -- "{labels} {text} the {word} guide"
+    "below": ("is below", "are below"),
+    "not_yet": ("is not yet at", "are not yet at"),
+    "beyond": ("is beyond", "are beyond"),
+    "outside": ("is outside", "are outside"),
+    "overlaps": ("may be within", "may be within"),
+}
+_SUMMARY_DIRECTION_ORDER: Tuple[str, ...] = ("below", "not_yet", "beyond", "outside", "overlaps", "review", "not_due")
+
+
+def format_summary_line(
+    comparisons: Sequence[Tuple["recovery_logic.CheckpointResult", Optional[str]]],
+) -> Optional[str]:
+    """
+    e.g. "All five things we checked are within the expected range for your
+    stage, and flexion and extension are improving over the week." or
+    "Three of four are within the expected range for your stage; walking
+    duration is below the day-21 guide, so that's the one to work on."
+    None when nothing was measured.
+    """
+    measured = [(c, t) for c, t in comparisons if c.entry is not None and c.verdict is not None]
+    if not measured:
+        return None
+    total = len(measured)
+    buckets: Dict[str, List["recovery_logic.CheckpointResult"]] = {}
+    for checkpoint, _ in measured:
+        buckets.setdefault(_summary_relation(checkpoint), []).append(checkpoint)
+    improving = [_metric_label(c.metric) for c, t in measured if getattr(t, "direction", None) == "improving"]
+
+    n_within = len(buckets.get("within", ()))
+    n_described = len(buckets.get("as_described", ()))
+    n_ok = n_within + n_described
+    if n_within and n_described:
+        ok_text = "within the expected range or as described for your stage"
+    elif n_within:
+        ok_text = "within the expected range for your stage"
+    else:
+        ok_text = "as the guidance describes for your stage"
+
+    clauses: List[str] = []
+    if total == 1 and n_ok:
+        clauses.append(f"{_metric_label(measured[0][0].metric).capitalize()}, the one thing we checked, is {ok_text}")
+    elif n_ok == total:
+        lead = "Both things" if total == 2 else f"All {_count_word(total)} things"
+        clauses.append(f"{lead} we checked are {ok_text}")
+    elif n_ok:
+        clauses.append(f"{_count_word(n_ok).capitalize()} of {_count_word(total)} are {ok_text}")
+
+    to_work_on = 0
+    for bucket in _SUMMARY_DIRECTION_ORDER:
+        group = buckets.get(bucket, [])
+        if not group:
+            continue
+        labels = [_metric_label(c.metric) for c in group]
+        if bucket == "review":
+            text = f"{_join_labels(labels)} {'needs' if len(labels) == 1 else 'need'} a check with your surgical team"
+        elif bucket == "not_due":
+            text = f"{_join_labels(labels)} {'is' if len(labels) == 1 else 'are'} not yet due for comparison"
+        else:
+            singular, plural = _SUMMARY_DIRECTION_TEXT[bucket]
+            # Group by checkpoint so each label sits next to its own guide.
+            by_word: Dict[str, List[str]] = {}
+            for checkpoint in group:
+                by_word.setdefault(_checkpoint_word(checkpoint), []).append(_metric_label(checkpoint.metric))
+            text = " and ".join(
+                f"{_join_labels(names)} {singular if len(names) == 1 else plural} the {word} guide"
+                for word, names in by_word.items()
+            )
+            if bucket in ("below", "not_yet"):
+                to_work_on += len(group)
+        clauses.append(text)
+
+    sentence = "; ".join(clauses)
+    if to_work_on:
+        sentence += ", so that's the one to work on" if to_work_on == 1 else ", so those are the ones to work on"
+    if improving:
+        verb = "is" if len(improving) == 1 else "are"
+        joiner = ", and " if len(clauses) == 1 and not to_work_on else "; "
+        subject = "it" if total == 1 else _join_labels(improving)
+        sentence += f"{joiner}{subject} {verb} improving over the week"
+    sentence = sentence[0].upper() + sentence[1:]
+    return f"{sentence}."
+
+
 def format_final_assessment(
     *,
     procedure: str,
@@ -870,11 +996,14 @@ def format_final_assessment(
     next_entries: Sequence["recovery_logic.MilestoneEntry"],
     metrics_of_interest: Iterable[str],
 ) -> str:
-    """header (cites the guidance once) -> one line per collected metric
+    """summary line (counts and direction only; omitted when nothing was
+    measured) -> header (cites the guidance once) -> one line per collected metric
     (never the acknowledgement sentence verbatim) -> metrics with no data
     -> next milestone (at most two metrics) -> check-in offer. No passage
     id anywhere: those are in the result's sources metadata."""
-    lines: List[str] = [f"Here's how things compare on post-op day {postop_day}, {CITATION}:"]
+    summary = format_summary_line(comparisons)
+    lines: List[str] = [summary] if summary else []
+    lines.append(f"Here's how things compare on post-op day {postop_day}, {CITATION}:")
     for checkpoint, trend in comparisons:
         lines.append(f"- {final_comparison_line(checkpoint, trend=trend)}")
     for metric in missing_metrics:

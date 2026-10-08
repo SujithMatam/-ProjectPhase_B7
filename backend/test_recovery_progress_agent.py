@@ -2295,8 +2295,100 @@ def test_llm_prompt_boilerplate_stripped() -> None:
     _reset_recovery_store()
     results, _ = _run_interview(_handle_tka, "ECHO-ONLY", _TKA_FULL_INTERVIEW, surgery_date=surgery_date, day=10, stub_reply=echo_only)
     final = results[-1]
-    _check(final["reply"].startswith("Here's how things compare on post-op day 10") and final["engine"] == RecoveryProgressAgent.ENGINE_NAME,
+    # UPDATED (summary line, test 34): the deterministic block now opens with its one-line summary.
+    _check(final["reply"].startswith("All five things we checked") and "\nHere's how things compare on post-op day 10" in final["reply"]
+           and final["engine"] == RecoveryProgressAgent.ENGINE_NAME,
            f"echo only -> the deterministic block alone: {final['reply'][:80]!r}")
+    print()
+
+
+# ----------------------------------------------------------------------------
+# 34. Summary line at the top of the close: counts and direction only, built
+#     from the checkpoint comparisons already made.
+# ----------------------------------------------------------------------------
+
+def test_final_block_summary_line() -> None:
+    _section("34 -- Close summary line: counts + direction, no judgement words, no new numbers [REAL-INTEGRATION]")
+
+    def _cp(procedure: str, metric: str, day: int, value):
+        _reset_recovery_store()
+        s = recovery_state.get_or_create_state(patient_id=f"SUM-{procedure}-{metric}-{day}-{value}", surgery_date_raw="2026-01-01T00:00:00.000", procedure=procedure)
+        s.apply_verified_day(day)
+        s.set_fact(metric, value, effective_postop_day=day)
+        return rl.evaluate_checkpoint(s, procedure=procedure, metric=metric)
+
+    def _improving(series: str):
+        return ri.TrendNote(f"improving: {series}", series=series, direction="improving")
+
+    def _block(procedure: str, day: int, comparisons) -> str:
+        next_checkpoint, next_entries = rl.next_milestone(procedure, day)
+        return ri.format_final_assessment(
+            procedure=procedure, postop_day=day, comparisons=comparisons, missing_metrics=[],
+            next_checkpoint=next_checkpoint, next_entries=next_entries, metrics_of_interest=[c.metric for c, _ in comparisons],
+        )
+
+    def _check_rules(block: str, label: str) -> str:
+        first, rest = block.split("\n", 1)
+        lower = first.lower()
+        for word in ("on track", "behind", "slow", "normal", "doing well", "ahead", "better", "worse"):
+            _check(word not in lower, f"{label}: judgement word {word!r} in the summary: {first!r}")
+        for number in _re.findall(r"\d+", first):
+            _check(number in rest, f"{label}: summary number {number} is not elsewhere in the block: {first!r}")
+        _check(rest.startswith("Here's how things compare on post-op day"), f"{label}: the header follows the summary: {rest[:80]!r}")
+        return first
+
+    # All in range (two with an improving trend).
+    tka = [
+        (_cp("TKA", rl.ROM_FLEXION_DEGREES, 10, 85), _improving("70 -> 80 -> 85")),
+        (_cp("TKA", rl.ROM_EXTENSION_DEGREES, 10, 5), _improving("8 -> 5")),
+        (_cp("TKA", rl.MOBILITY_STATUS, 10, "cane"), None),
+        (_cp("TKA", rl.STAIRS, 10, "one_at_a_time"), None),
+    ]
+    block = _block("TKA", 10, tka)
+    first = _check_rules(block, "all-in-range")
+    print(f"    all-in-range: {first!r}")
+    _check(first == "All four things we checked are within the expected range for your stage, and flexion and extension are improving over the week.", f"all-in-range summary: {first!r}")
+    for checkpoint, trend in tka:
+        _check(f"- {ri.final_comparison_line(checkpoint, trend=trend)}" in block, "per-metric lines unchanged")
+    _check("Next milestone: day 14 --" in block, "next-milestone sentence unchanged")
+
+    # One below range.
+    tha = [
+        (_cp("THA", rl.MOBILITY_STATUS, 30, "crutches"), None),
+        (_cp("THA", rl.WALKING_DURATION_MINUTES, 30, 5), None),
+        (_cp("THA", rl.STAIRS, 30, "foot_over_foot"), None),
+        (_cp("THA", rl.HIP_PRECAUTIONS, 30, "following"), None),
+    ]
+    _check(tha[1][0].verdict == rl.CheckpointVerdict.BELOW_STATED_CHECKPOINT, f"fixture: 5 minutes is below the day-21 mark: {tha[1][0].verdict}")
+    first = _check_rules(_block("THA", 30, tha), "one-below")
+    print(f"    one-below: {first!r}")
+    _check(first == "Three of four are within the expected range for your stage; walking duration is below the day-21 guide, so that's the one to work on.", f"one-below summary: {first!r}")
+
+    # State-only items only: "as described", never below range.
+    state_only = [
+        (_cp("TKA", rl.ROM_FLEXION_DEGREES, 25, 60), None),
+        (_cp("TKA", rl.ROM_EXTENSION_DEGREES, 25, 20), None),
+    ]
+    _check(all(c.verdict == rl.CheckpointVerdict.STATE_ONLY for c, _ in state_only), "fixture: TKA day-21 ROM entries carry no number")
+    first = _check_rules(_block("TKA", 25, state_only), "state-only")
+    print(f"    state-only: {first!r}")
+    _check(first == "Both things we checked are as the guidance describes for your stage.", f"state-only summary: {first!r}")
+    _check("below" not in first and "work on" not in first, "a state-only item is never called below range")
+    mixed = tka[:1] + [(_cp("TKA", rl.WALKING_DURATION_MINUTES, 10, 15), None)]
+    first = ri.format_summary_line(mixed)
+    _check(first == "Both things we checked are within the expected range or as described for your stage, and flexion is improving over the week.", f"within + state-only summary: {first!r}")
+
+    # Single item, phrased singly.
+    first = _check_rules(_block("TKA", 10, tka[:1]), "single-within")
+    print(f"    single-within: {first!r}")
+    _check(first == "Flexion, the one thing we checked, is within the expected range for your stage, and it is improving over the week.", f"single-item summary: {first!r}")
+    first = _check_rules(_block("THA", 30, tha[1:2]), "single-below")
+    print(f"    single-below: {first!r}")
+    _check(first == "Walking duration is below the day-21 guide, so that's the one to work on.", f"single below summary: {first!r}")
+
+    # Nothing measured: no summary line.
+    _check(ri.format_summary_line([]) is None, "no comparisons -> no summary")
+    _check(_block("TKA", 10, []).startswith("Here's how things compare on post-op day 10"), "no comparisons -> block starts with the header")
     print()
 
 
@@ -2334,6 +2426,7 @@ def main() -> int:
     _run(test_continuation_accepts_new_answer_shapes)
     _run(test_eval_report_regressions)
     _run(test_llm_prompt_boilerplate_stripped)
+    _run(test_final_block_summary_line)
 
     print("=" * 78)
     if _FAILURES:
