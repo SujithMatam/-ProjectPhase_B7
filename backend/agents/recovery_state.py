@@ -93,7 +93,7 @@ import re
 import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set, Tuple
 
 
 # ============================================================================
@@ -203,6 +203,10 @@ class RecoverySessionState:
     # comparison against effective_postop_day -- never authoritative on its
     # own.
     client_reported_postop_day: Optional[int] = None
+    # (client_day, server_day) of the last mismatch warning logged for this
+    # episode, so the warning is emitted once per disagreement rather than
+    # on every turn. Diagnostic only.
+    last_mismatch_logged: Optional[Tuple[int, int]] = None
 
     created_at: datetime = field(default_factory=lambda: _utcnow())
     last_updated: datetime = field(default_factory=lambda: _utcnow())
@@ -221,6 +225,24 @@ class RecoverySessionState:
     _field_status: Dict[str, str] = field(default_factory=dict)
     _ask_counts: Dict[str, int] = field(default_factory=dict)
     _pending_field: Optional[str] = None
+    # Which wording the pending question used: "primary" (the normal
+    # question), "alt" (the simpler rephrase after an uncertain answer) or
+    # "confirm" (a logged value offered back for confirmation). Extraction
+    # needs this to map a bare "yes"/"no" onto the right meaning.
+    _pending_variant: Optional[str] = None
+    # The logged value offered for confirmation when _pending_variant is
+    # "confirm" (e.g. yesterday's flexion from the metrics table). None
+    # otherwise. A "yes" stores this value; a number overrides it.
+    _pending_confirm_value: Any = None
+    # Fields whose confirmation offer the patient declined ("no") -- the
+    # plain question is asked next and the logged value is never offered
+    # again in this interview.
+    _confirm_declined: Set[str] = field(default_factory=set)
+    # Patient memory snapshot (agents/patient_memory.PatientMemory) loaded
+    # ONCE per interview and reused on every turn of it, exactly as
+    # pain_state.PainSessionState does -- a per-interview cache, never a
+    # source of truth (the DB is). Cleared with the transient reset.
+    _memory: Optional[Any] = field(default=None, repr=False, compare=False)
 
     # ------------------------------------------------------------------
     # Read-only views. Mutate only via the methods below -- direct
@@ -238,6 +260,48 @@ class RecoverySessionState:
     @property
     def pending_field(self) -> Optional[str]:
         return self._pending_field
+
+    @property
+    def pending_variant(self) -> Optional[str]:
+        return self._pending_variant if self._pending_field is not None else None
+
+    @property
+    def pending_confirm_value(self) -> Any:
+        if self._pending_field is None or self._pending_variant != "confirm":
+            return None
+        return self._pending_confirm_value
+
+    @property
+    def memory(self) -> Optional[Any]:
+        """The PatientMemory snapshot cached for the active interview, or
+        None when none has been loaded (fresh state / after a reset)."""
+        return self._memory
+
+    def set_memory(self, memory: Any) -> None:
+        self._memory = memory
+        self.last_updated = _utcnow()
+
+    def set_client_reported_postop_day(self, day: Optional[int]) -> None:
+        """Diagnostic-only record of the client-sent day (never used for a
+        comparison). A dedicated mutator so every write routes through a
+        method; the public field is kept for existing readers."""
+        self.client_reported_postop_day = day
+        self.last_updated = _utcnow()
+
+    def confirm_declined(self, field_name: str) -> bool:
+        return field_name in self._confirm_declined
+
+    def note_confirm_declined(self, field_name: str) -> None:
+        """The patient said the logged value is no longer right: stop
+        offering it and resolve the confirm question without an answer."""
+        self._confirm_declined.add(field_name)
+        if self._pending_field == field_name:
+            self._clear_pending_slot()
+        if self._field_status.get(field_name) == FieldStatus.PENDING:
+            # The confirm question is resolved (without a value): the field
+            # goes back to NEVER_ASKED so the plain question can be asked.
+            self._field_status[field_name] = FieldStatus.NEVER_ASKED
+        self.last_updated = _utcnow()
 
     # ------------------------------------------------------------------
     # CANONICAL FIELD-READ API -- see module docstring.
@@ -313,10 +377,15 @@ class RecoverySessionState:
         self._field_status.pop(field_name, None)
         self._ask_counts.pop(field_name, None)
         if self._pending_field == field_name:
-            self._pending_field = None
+            self._clear_pending_slot()
         self.last_updated = _utcnow()
 
-    def mark_pending(self, field_name: str) -> None:
+    def _clear_pending_slot(self) -> None:
+        self._pending_field = None
+        self._pending_variant = None
+        self._pending_confirm_value = None
+
+    def mark_pending(self, field_name: str, *, variant: str = "primary", confirm_value: Any = None) -> None:
         """
         The agent is now asking about `field_name`. Enforces "at most one
         field is PENDING at a time" atomically: if a DIFFERENT field was
@@ -324,11 +393,17 @@ class RecoverySessionState:
         call before the new field is marked -- two fields can never both
         show PENDING, and pending_field never disagrees with which field(s)
         carry the PENDING status.
+
+        `variant` records which wording was used ("primary" / "alt" /
+        "confirm"); `confirm_value` is the logged value offered back when
+        variant is "confirm" (see pending_confirm_value).
         """
         previous = self._pending_field
         if previous is not None and previous != field_name and self._field_status.get(previous) == FieldStatus.PENDING:
             self._field_status[previous] = FieldStatus.NEVER_ASKED
         self._pending_field = field_name
+        self._pending_variant = variant
+        self._pending_confirm_value = confirm_value if variant == "confirm" else None
         self._field_status[field_name] = FieldStatus.PENDING
         self.last_updated = _utcnow()
 
@@ -343,7 +418,7 @@ class RecoverySessionState:
         """
         if self._pending_field is not None and self._field_status.get(self._pending_field) == FieldStatus.PENDING:
             self._field_status[self._pending_field] = FieldStatus.NEVER_ASKED
-        self._pending_field = None
+        self._clear_pending_slot()
         self.last_updated = _utcnow()
 
     def mark_unknown(self, field_name: str) -> None:
@@ -358,7 +433,7 @@ class RecoverySessionState:
         self._ask_counts[field_name] = self._ask_counts.get(field_name, 0) + 1
         self._field_status[field_name] = FieldStatus.UNKNOWN
         if self._pending_field == field_name:
-            self._pending_field = None
+            self._clear_pending_slot()
         self.last_updated = _utcnow()
 
     def mark_unavailable(self, field_name: str) -> None:
@@ -374,7 +449,7 @@ class RecoverySessionState:
         """
         self._field_status[field_name] = FieldStatus.UNAVAILABLE
         if self._pending_field == field_name:
-            self._pending_field = None
+            self._clear_pending_slot()
         self.last_updated = _utcnow()
 
     # ------------------------------------------------------------------
@@ -443,8 +518,10 @@ class RecoverySessionState:
     # _reset_transient_interview_state()) -- one place owns this logic.
     # ------------------------------------------------------------------
     def _reset_transient_interview(self) -> None:
-        self._pending_field = None
+        self._clear_pending_slot()
         self._ask_counts = {}
+        self._confirm_declined = set()
+        self._memory = None
         for name, status in list(self._field_status.items()):
             if status in (FieldStatus.PENDING, FieldStatus.UNKNOWN, FieldStatus.UNAVAILABLE):
                 self._field_status[name] = FieldStatus.NEVER_ASKED

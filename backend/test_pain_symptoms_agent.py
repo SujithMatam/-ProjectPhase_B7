@@ -42,9 +42,26 @@ _FAILURES: List[str] = []
 
 
 def _check(condition: bool, message: str) -> None:
+    """A failed check is a REAL failure: it is recorded in _FAILURES (for the
+    main() summary) and raises AssertionError, so pytest marks the test as
+    failed instead of silently passing it. main() catches the AssertionError
+    per test so the script runner still runs every test and prints a summary."""
     if not condition:
         _FAILURES.append(message)
         print(f"    !! FAILED: {message}")
+        raise AssertionError(message)
+
+
+def _run(test_fn) -> None:
+    """main()-only wrapper: keeps the plain-script runner going past a failed
+    test (the failure is already recorded in _FAILURES by _check)."""
+    try:
+        test_fn()
+    except AssertionError as exc:
+        if str(exc) not in _FAILURES:
+            _FAILURES.append(str(exc))
+            print(f"    !! FAILED: {exc}")
+        print()
 
 
 def _stub_chat_agent(reply: str = "", sources: Optional[list] = None):
@@ -92,11 +109,89 @@ def _converse(patient_id: str, messages: List[str], stub_reply: str = "") -> Lis
     return results
 
 
-_ALL_QUESTION_TEXTS = list(pain_logic.QUESTIONS.values()) + list(pain_logic.ALT_QUESTIONS.values())
+_ALL_QUESTION_TEXTS = (
+    list(pain_logic.QUESTIONS.values())
+    + list(pain_logic.ALT_QUESTIONS.values())
+    + list(pain_logic.CLARIFY_QUESTIONS.values())
+    + list(pain_logic.QUESTIONS_THA.values())
+    + list(pain_logic.ALT_QUESTIONS_THA.values())
+    + list(pain_logic.CLARIFY_QUESTIONS_THA.values())
+)
 
 
 def _questions_present_in(reply: str) -> int:
     return sum(1 for question in _ALL_QUESTION_TEXTS if question in reply)
+
+
+def _handle_for(
+    patient_id: str,
+    message: str,
+    history: Optional[List[Dict[str, str]]] = None,
+    *,
+    surgery_type: str = "Total Knee Arthroplasty (TKA)",
+    procedure: str = "TKA",
+    postop_day: int = 5,
+    precomputed_triage: Optional[Dict[str, Any]] = None,
+    **kwargs,
+) -> Dict[str, Any]:
+    """Like _handle, but lets a test choose the procedure/surgery_type/
+    triage (THA cases, YELLOW action protocols, ...)."""
+    return PainSymptomsAgent.handle(
+        patient_id=patient_id,
+        surgery_type=surgery_type,
+        affected_limb="Right",
+        postop_day=postop_day,
+        user_message=message,
+        procedure=procedure,
+        chat_history=history or [],
+        precomputed_triage=precomputed_triage or {"triage_level": "GREEN", "is_escalated": False},
+        **kwargs,
+    )
+
+
+def _seed_patient(patient_id: str, *, surgery_type: str = "Total Knee Arthroplasty (TKA)",
+                  weight_bearing_status: str = "Weight Bearing as Tolerated (WBAT)") -> None:
+    """Create a real `patients`/`surgeries` row in the isolated test DB so
+    persistence (which is foreign-key enforced) actually succeeds."""
+    import sqlite3
+    from patient_database import create_patient
+
+    try:
+        create_patient({
+            "patient_id": patient_id,
+            "full_name": f"Test {patient_id}",
+            "surgery_type": surgery_type,
+            "affected_limb": "Right",
+            "surgery_date": "2026-10-01",
+            "postop_day": 5,
+            "weight_bearing_status": weight_bearing_status,
+        })
+    except sqlite3.IntegrityError:
+        pass  # already seeded by an earlier test in this run
+
+
+_GREEN_TRIAGE = {
+    "triage_level": "GREEN", "is_escalated": False,
+    "action_protocol": (
+        "Continue prescribed home rehabilitation exercises, cryotherapy, elevation, "
+        "and oral medication schedule. Log next check-in as scheduled."
+    ),
+}
+_YELLOW_TRIAGE = {
+    "triage_level": "YELLOW", "is_escalated": True,
+    "action_protocol": (
+        "Contact the orthopedic nursing hotline or schedule same-day follow-up. "
+        "Elevate limb, apply cold therapy (20 mins per session), and closely monitor wound."
+    ),
+}
+
+
+def _sentence_count(text: str) -> int:
+    """Sentences in a mid-interview reply, ignoring the trailing
+    "(... questions)" progress indicator."""
+    import re as _re
+    stripped = _re.sub(r"\s*\([^()]*\)\s*$", "", text.strip())
+    return len([s for s in _re.split(r"(?<=[.!?])\s+", stripped) if s.strip()])
 
 
 # ---------------------------------------------------------------------------
@@ -254,8 +349,14 @@ def test_uncertainty_then_unknown() -> None:
     print(f"    turn3={results[2]['reply']!r}")
     print(f"    turn4={results[3]['reply']!r}")
 
+    # BEHAVIOUR CHANGE (progress feedback): every mid-interview reply now
+    # ends with a short progress indicator such as "(one or two more
+    # questions)", so the ALT rephrase is CONTAINED in the reply rather
+    # than being the whole reply. The original question must still not be
+    # repeated verbatim.
     _check(
-        results[1]["reply"] == pain_logic.ALT_QUESTIONS[pain_logic.PAIN_SCORE],
+        pain_logic.ALT_QUESTIONS[pain_logic.PAIN_SCORE] in results[1]["reply"]
+        and pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] not in results[1]["reply"],
         "first uncertain answer should produce the ALT rephrase, not the original question repeated",
     )
     _check(
@@ -849,6 +950,24 @@ def test_deterministic_summary_uses_action_protocol() -> None:
         "swelling, warmth, redness" not in summary_no_protocol,
         "neutral fallback must not invent a symptom-watch list either",
     )
+
+    # Paragraph spacing: blocks are separated by EXACTLY one empty line,
+    # never a run of blank lines -- including the degenerate case of an
+    # empty facts list (which used to leave "told me:\n\n\n").
+    import re as _re
+    for label, text in (
+        ("GREEN", summary_green), ("YELLOW", summary_yellow), ("no protocol", summary_no_protocol),
+        ("empty facts", pain_integration.deterministic_summary({}, {"triage_level": "GREEN"}, None)),
+        ("with trend", pain_integration.deterministic_summary(
+            assessment, {"triage_level": "GREEN", "action_protocol": green_protocol},
+            "That's the same as last time.",
+        )),
+    ):
+        _check(
+            _re.search(r"\n[ \t]*\n[ \t]*\n", text) is None,
+            f"{label}: deterministic final reply must not contain repeated blank lines: {text!r}",
+        )
+        _check("\n\n" in text, f"{label}: blocks must still be separated by one empty line: {text!r}")
     print()
 
 
@@ -1463,29 +1582,41 @@ def test_final_turn_retrieval_hint_fenced_end_to_end() -> None:
         )
 
     _check(len(calls) == 1, "expected exactly one ChatAgent.answer_question call for a one-turn-complete message")
+    # BEHAVIOUR CHANGE (final-turn prompt): ChatAgent's `user_message` is
+    # now the RAG retrieval query built from the COLLECTED location and
+    # symptoms (pain_integration.build_retrieval_query), so the raw patient
+    # message -- and any injected text in it -- must NOT appear there at
+    # all. It still reaches ChatAgent, but only inside the fenced
+    # untrusted-data block of `domain_instruction`.
     sent_user_message = str(calls[0].get("user_message", "")) if calls else ""
-    print(f"    malicious text present in sent user_message: {malicious_text in sent_user_message}")
+    sent_instruction = str(calls[0].get("domain_instruction", "")) if calls else ""
+    print(f"    malicious text present in sent user_message (RAG query): {malicious_text in sent_user_message}")
+    print(f"    malicious text present in sent domain_instruction: {malicious_text in sent_instruction}")
     _check(
-        malicious_text in sent_user_message,
-        "malicious patient text should still reach ChatAgent (as fenced data, not silently dropped)",
+        malicious_text not in sent_user_message,
+        "the raw patient message must not be used as the RAG query / user_message any more",
+    )
+    _check(
+        malicious_text in sent_instruction,
+        "malicious patient text should still reach ChatAgent (as fenced data in domain_instruction, not silently dropped)",
     )
 
-    idx = sent_user_message.find(malicious_text)
+    idx = sent_instruction.find(malicious_text)
     found_any = False
     while idx != -1:
         found_any = True
-        preceding = sent_user_message[:idx]
+        preceding = sent_instruction[:idx]
         _check(
             "UNTRUSTED" in preceding and "BEGIN" in preceding,
             "an occurrence of the malicious patient text is not preceded by the UNTRUSTED/BEGIN framing",
         )
-        following_end = sent_user_message.find("END", idx)
+        following_end = sent_instruction.find("END", idx)
         _check(
             following_end != -1,
             "an occurrence of the malicious patient text is not followed by a closing END marker",
         )
-        idx = sent_user_message.find(malicious_text, idx + 1)
-    _check(found_any, "malicious text never found in the sent user_message -- test setup issue")
+        idx = sent_instruction.find(malicious_text, idx + 1)
+    _check(found_any, "malicious text never found in the sent domain_instruction -- test setup issue")
     print("    CONFIRMED: malicious patient text reaches ChatAgent only inside the fenced untrusted-data block.")
     print()
 
@@ -2100,46 +2231,854 @@ def test_location_extraction_prefers_more_specific_phrase() -> None:
     print()
 
 
+# ===========================================================================
+# PROACTIVE / MEMORY-AWARE PAIN AGENT REWORK (feature/agents-proactive) --
+# regression tests for each item in agents/PAIN_AGENT_CHANGES.md.
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# 40. Bug 1a: a non-numeric, non-category answer to the pain-score question
+# must trigger a clarifying re-ask -- never an acknowledgement containing
+# "None" -- and a number on the second attempt must then be stored.
+# ---------------------------------------------------------------------------
+
+def test_pain_score_nonnumeric_answer_triggers_clarify() -> None:
+    print("=" * 78)
+    print("40 -- Non-numeric pain-score answer -> clarifying re-ask, never 'None'")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    results = _converse("CLARIFY-SCORE-PT", [
+        "My knee hurts.",          # -> asks pain_score
+        "it really hurts a lot",   # -> no number, no category -> CLARIFY re-ask
+        "7",                       # -> stored, moves on
+    ])
+    for i, result in enumerate(results, start=1):
+        print(f"    turn{i}={result['reply']!r}")
+
+    _check("none" not in results[1]["reply"].lower(), "the re-ask must never contain 'None'")
+    _check(
+        pain_logic.CLARIFY_QUESTIONS[pain_logic.PAIN_SCORE] in results[1]["reply"],
+        "a non-numeric answer must get the CLARIFY re-ask for pain_score",
+    )
+    _check(
+        pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] not in results[1]["reply"],
+        "the original pain-score question must not simply be repeated verbatim",
+    )
+    _check(_questions_present_in(results[1]["reply"]) == 1, "the clarify turn must still ask exactly one question")
+
+    history = [
+        {"role": "user", "content": "My knee hurts."},
+        {"role": "assistant", "content": results[0]["reply"]},
+        {"role": "user", "content": "it really hurts a lot"},
+        {"role": "assistant", "content": results[1]["reply"]},
+    ]
+    view = pain_logic.build_assessment_detailed(history, "7")
+    _check(view.assessment.get(pain_logic.PAIN_SCORE) == 7, "the number given after the clarify must be stored")
+    _check(
+        "7/10" in results[2]["reply"] and pain_logic.QUESTIONS[pain_logic.ONSET] in results[2]["reply"],
+        "after the clarified score the agent must reflect 7/10 and move on to onset",
+    )
+
+    # Unit level: a non-numeric reply is NOT stored as the score.
+    view_bad = pain_logic.build_assessment_detailed(history[:2], "it really hurts a lot")
+    _check(pain_logic.PAIN_SCORE not in view_bad.assessment, "a non-numeric reply must never be stored as pain_score")
+    _check(pain_logic.PAIN_SCORE in view_bad.needs_clarify, "a non-numeric reply must flag pain_score for a clarifying re-ask")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 41. Bug 1b: a reply that does not plausibly answer the pending question
+# (off-topic question / no parser match / no yes-no) is NOT stored; the
+# field is clarified once, then recorded as "unknown".
+# ---------------------------------------------------------------------------
+
+def test_unfitting_answer_not_stored_clarify_once_then_unknown() -> None:
+    print("=" * 78)
+    print("41 -- Unfitting reply is never stored: clarify once, then 'unknown'")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    results = _converse("UNFIT-PT", [
+        "My knee pain is 6 out of 10.",   # -> asks onset
+        "Can I shower tomorrow?",          # -> clearly another topic -> CLARIFY onset
+        "the weather is nice",             # -> still no fit -> onset = unknown, asks location
+    ])
+    for i, result in enumerate(results, start=1):
+        print(f"    turn{i}={result['reply']!r}")
+
+    history = [
+        {"role": "user", "content": "My knee pain is 6 out of 10."},
+        {"role": "assistant", "content": results[0]["reply"]},
+    ]
+    view_1 = pain_logic.build_assessment_detailed(history, "Can I shower tomorrow?")
+    _check(pain_logic.ONSET not in view_1.assessment, "an off-topic reply must not be stored as the onset value")
+    _check(pain_logic.ONSET in view_1.needs_clarify, "an off-topic reply must flag onset for ONE clarifying re-ask")
+    _check(
+        pain_logic.CLARIFY_QUESTIONS[pain_logic.ONSET] in results[1]["reply"],
+        "the agent must ask the onset CLARIFY question once",
+    )
+
+    history += [
+        {"role": "user", "content": "Can I shower tomorrow?"},
+        {"role": "assistant", "content": results[1]["reply"]},
+    ]
+    view_2 = pain_logic.build_assessment_detailed(history, "the weather is nice")
+    _check(view_2.assessment.get(pain_logic.ONSET) == "unknown", "a second unfitting reply must record onset as 'unknown'")
+    _check(
+        pain_logic.QUESTIONS[pain_logic.LOCATION] in results[2]["reply"],
+        "after onset resolves to unknown the agent must move on to location",
+    )
+    _check(
+        pain_logic.QUESTIONS[pain_logic.ONSET] not in results[2]["reply"]
+        and pain_logic.CLARIFY_QUESTIONS[pain_logic.ONSET] not in results[2]["reply"],
+        "onset must not be asked a third time",
+    )
+
+    # Yes/no field: a reply with no yes/no and no field keyword is not stored
+    # either -- but a fact volunteered for ANOTHER field in the same reply is
+    # still captured (never discarded).
+    yes_no_history = [
+        {"role": "user", "content": "I suddenly have 8 out of 10 pain in my calf."},
+        {"role": "assistant", "content": pain_logic.QUESTIONS[pain_logic.SWELLING]},
+    ]
+    view_3 = pain_logic.build_assessment_detailed(yes_no_history, "it feels warm to touch")
+    _check(pain_logic.SWELLING not in view_3.assessment, "a reply without a yes/no or swelling wording must not be stored as swelling")
+    _check(pain_logic.SWELLING in view_3.needs_clarify, "swelling must be flagged for a clarifying re-ask")
+    _check(
+        view_3.assessment.get(pain_logic.WARMTH_OR_REDNESS) == "warm",
+        "the volunteered warmth fact in the same reply must still be captured",
+    )
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 42. Bug 1c: after an off-topic detour to another agent, a bare answer must
+# RESUME the pending question (same interview, same boundary, same cached
+# facts), not restart -- while a genuinely new complaint still restarts
+# (test 29 above keeps guarding that).
+# ---------------------------------------------------------------------------
+
+def test_detour_then_bare_answer_resumes_pending_question() -> None:
+    print("=" * 78)
+    print("42 -- Detour to another agent, then a bare answer resumes the pending question")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    patient_id = "DETOUR-RESUME-PT"
+    fn, _ = _stub_chat_agent()
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        r1 = LAMOrchestrator.process(
+            patient_id=patient_id, surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=5,
+            user_message="My knee pain suddenly got much worse today.",
+        )
+        _check(pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] in r1["reply"], "setup: turn 1 should ask pain_score")
+        history += [
+            {"role": "user", "content": "My knee pain suddenly got much worse today."},
+            {"role": "assistant", "content": r1["reply"]},
+        ]
+        boundary_before = pain_state.peek_state(patient_id).active_history_start
+
+        r_detour = LAMOrchestrator.process(
+            patient_id=patient_id, surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=5,
+            user_message="Can I climb stairs?", chat_history=list(history),
+        )
+        _check(r_detour["intent"] == "daily_activity", "setup: the detour must go to Daily Activity")
+        history += [
+            {"role": "user", "content": "Can I climb stairs?"},
+            {"role": "assistant", "content": r_detour["reply"]},
+        ]
+
+        r_resume = LAMOrchestrator.process(
+            patient_id=patient_id, surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=5,
+            user_message="8", chat_history=list(history),
+        )
+
+    print(f"    resume: intent={r_resume['intent']} reply={r_resume['reply']!r}")
+    _check(r_resume["intent"] == "pain_symptoms", "a bare answer after a detour must route back to Pain")
+    _check(
+        pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] not in r_resume["reply"],
+        "the pending pain-score question must NOT be asked again -- '8' answered it",
+    )
+    _check("8/10" in r_resume["reply"], "the resumed turn must reflect the 8/10 just given")
+    _check(
+        pain_logic.QUESTIONS[pain_logic.LOCATION] in r_resume["reply"],
+        "the interview must continue with the next missing field (location), not restart",
+    )
+    state_after = pain_state.peek_state(patient_id)
+    _check(
+        state_after is not None and state_after.active_history_start == boundary_before,
+        "the active-assessment boundary must be unchanged -- the interview resumed, it did not restart",
+    )
+
+    # Unit level: tolerant only when a message is supplied; strict without.
+    _check(
+        pain_logic.is_active_assessment_continuation(history, pain_logic.PAIN_SCORE, "8") is True,
+        "a bare answer after a detour must count as a continuation when the message is supplied",
+    )
+    _check(
+        pain_logic.is_active_assessment_continuation(history, pain_logic.PAIN_SCORE) is False,
+        "without the message the strict (orchestrator) semantics must be unchanged",
+    )
+    _check(
+        pain_logic.is_active_assessment_continuation(
+            history, pain_logic.PAIN_SCORE, "My hip has started aching today.",
+        ) is False,
+        "a fresh pain complaint after a detour must still start a fresh assessment",
+    )
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 43. Memory before asking: today's logged pain score is CONFIRMED instead
+# of asked; "yes" keeps it, a number overrides it, "no" falls back to the
+# normal question (and never produces a 'None' acknowledgement).
+# ---------------------------------------------------------------------------
+
+def test_memory_confirms_today_logged_pain_score() -> None:
+    print("=" * 78)
+    print("43 -- Today's logged pain score is confirmed instead of asked")
+    print("=" * 78)
+    from agents import patient_memory
+
+    patient_id = "MEM-CONFIRM-PT"
+    _seed_patient(patient_id)
+    _check(
+        patient_memory.write_today_metrics(patient_id, pain_score=6, swelling="Mild", postop_day=5),
+        "setup: writing today's metrics row for a seeded patient must succeed",
+    )
+    memory = patient_memory.load_patient_memory(patient_id)
+    _check(memory.today_pain_score == 6, f"setup: today's pain score should read back as 6, got {memory.today_pain_score!r}")
+
+    expected_confirm = pain_logic.confirm_pain_score_question(6)
+
+    # A. "yes" -> the logged 6 is used, no pain-score question asked.
+    pain_state._clear_all_state_for_tests()
+    results_yes = _converse(patient_id, ["My knee hurts.", "yes"])
+    print(f"    A1={results_yes[0]['reply']!r}")
+    print(f"    A2={results_yes[1]['reply']!r}")
+    _check(expected_confirm in results_yes[0]["reply"], "opening turn must confirm the logged score ('Your log says 6/10 ... still about that?')")
+    _check(pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] not in results_yes[0]["reply"], "the plain pain-score question must not be asked when today's log has a score")
+    _check("6/10" in results_yes[1]["reply"], "after 'yes' the reflection must carry the confirmed 6/10")
+    _check(pain_logic.QUESTIONS[pain_logic.ONSET] in results_yes[1]["reply"], "after 'yes' the interview must move on to onset")
+    history_yes = [
+        {"role": "user", "content": "My knee hurts."},
+        {"role": "assistant", "content": results_yes[0]["reply"]},
+    ]
+    view_yes = pain_logic.build_assessment_detailed(history_yes, "yes")
+    _check(view_yes.assessment.get(pain_logic.PAIN_SCORE) == 6, "'yes' to the confirmation must resolve pain_score to the logged 6")
+
+    # B. "no, it's more like an 8" -> 8 wins.
+    view_num = pain_logic.build_assessment_detailed(history_yes, "no, it's more like an 8")
+    _check(view_num.assessment.get(pain_logic.PAIN_SCORE) == 8, "a number given with the confirmation reply must override the logged value")
+
+    # B2. Turn order decides: a LATER explicit "7 out of 10" (volunteered
+    # while onset is pending) beats the EARLIER confirmed 6.
+    later_history = history_yes + [
+        {"role": "user", "content": "yes"},
+        {"role": "assistant", "content": results_yes[1]["reply"]},
+    ]
+    view_later = pain_logic.build_assessment_detailed(later_history, "7 out of 10, started suddenly")
+    _check(view_later.assessment.get(pain_logic.PAIN_SCORE) == 7, "a later explicit score must override the earlier confirmed one")
+    _check(view_later.assessment.get(pain_logic.ONSET) == "sudden", "the pending onset answer in the same reply is still attributed")
+
+    # C. plain "no" -> nothing stored, the normal question follows, no 'None'.
+    pain_state._clear_all_state_for_tests()
+    results_no = _converse(patient_id, ["My knee hurts.", "no"])
+    print(f"    C2={results_no[1]['reply']!r}")
+    _check("none" not in results_no[1]["reply"].lower(), "declining the confirmation must never produce a 'None' acknowledgement")
+    _check(pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] in results_no[1]["reply"], "after 'no' the normal pain-score question must be asked")
+    view_no = pain_logic.build_assessment_detailed(history_yes, "no")
+    _check(pain_logic.PAIN_SCORE not in view_no.assessment, "'no' must not store any pain_score value")
+    _check(pain_logic.PAIN_SCORE in view_no.confirm_declined, "'no' must be recorded as a declined confirmation")
+
+    # D. A patient with NO today row is asked the normal question.
+    pain_state._clear_all_state_for_tests()
+    plain = _handle("NO-TODAY-ROW-PT", "My knee hurts.")
+    _check(pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] in plain["reply"], "with no logged score the plain pain-score question is asked")
+    _check("still about that" not in plain["reply"], "no confirmation question without a logged score")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 44. Memory before asking: the opening line references the previous
+# assessment (score, location, trend), and the final turn compares score
+# AND location/trend with it.
+# ---------------------------------------------------------------------------
+
+def test_memory_opening_references_previous_assessment() -> None:
+    print("=" * 78)
+    print("44 -- Opening references the previous assessment; close compares with it")
+    print("=" * 78)
+    from agents import patient_memory
+
+    patient_id = "MEM-PREV-PT"
+    _seed_patient(patient_id)
+    _check(
+        patient_memory.write_symptom_assessment(patient_id, {
+            "postop_day": 4, "pain_score": 7, "onset": "sudden", "location": "behind the knee",
+            "worsening_or_improving": "worsening", "triage_level": "GREEN",
+        }),
+        "setup: writing a previous assessment must succeed for a seeded patient",
+    )
+
+    # Today's log ALSO has a score (6), so the opening both references the
+    # previous assessment (7/10) and confirms today's logged 6 -- and a "yes"
+    # must resolve to the LOGGED 6, never to the quoted previous 7.
+    _check(patient_memory.write_today_metrics(patient_id, pain_score=6, postop_day=5), "setup: today's metrics write must succeed")
+
+    pain_state._clear_all_state_for_tests()
+    results = _converse(patient_id, [
+        "My knee hurts.",
+        "5",
+        "gradually",
+        "behind the knee",
+        "about the same",
+    ])
+    opening = results[0]["reply"]
+    print(f"    opening={opening!r}")
+    _check(
+        opening.startswith("Last time you had 7/10 behind the knee and it was getting worse"),
+        "the opening line must reference the previous assessment's score, location and trend",
+    )
+    _check(pain_logic.confirm_pain_score_question(6) in opening, "the opening must confirm today's logged score as its first question")
+    confirm_history = [{"role": "user", "content": "My knee hurts."}, {"role": "assistant", "content": opening}]
+    _check(
+        pain_logic.build_assessment_detailed(confirm_history, "yes").assessment.get(pain_logic.PAIN_SCORE) == 6,
+        "'yes' must resolve to today's LOGGED 6/10, not the previous assessment's 7/10 quoted in the same message",
+    )
+
+    final = results[-1]
+    print(f"    final engine={final['engine']}")
+    print(f"    final reply={final['reply']!r}")
+    _check(final["engine"] == PainSymptomsAgent.ENGINE_FALLBACK, "setup: the interview should conclude on the 5th turn")
+    _check("lower than the pain score of 7/10 recorded last time" in final["reply"], "the close must compare the score with last time")
+    _check(
+        "Last time it was behind the knee and getting worse" in final["reply"]
+        and "now it's behind the knee and about the same" in final["reply"],
+        "the close must compare location AND trend with last time",
+    )
+
+    # The memory reference line itself, unit level.
+    _check(
+        pain_integration.memory_reference_line({"pain_severity_category": "moderate", "location": "in the calf"})
+        == "Last time you had moderate pain in the calf",
+        "a category-only previous score must be referenced as a category, never a fabricated number",
+    )
+    _check(pain_integration.memory_reference_line(None) is None, "no previous assessment -> no reference line")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 45. Procedure-aware wording and branching: THA offers groin/thigh/buttock/
+# calf; TKA keeps the knee wording; THA has its own collection branch. The
+# agent only collects -- triage stays deterministic and upstream.
+# ---------------------------------------------------------------------------
+
+def test_tha_location_wording_and_branch() -> None:
+    print("=" * 78)
+    print("45 -- THA location wording (groin/thigh/buttock/calf) and THA branch")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    fn, _ = _stub_chat_agent()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        tha = _handle_for(
+            "THA-PT", "My hip pain is 8 out of 10 and came on suddenly.",
+            surgery_type="Total Hip Arthroplasty (THA)", procedure="THA",
+        )
+        tka = _handle_for("TKA-PT", "My knee pain is 8 out of 10 and came on suddenly.")
+    print(f"    THA location question: {tha['reply']!r}")
+    print(f"    TKA location question: {tka['reply']!r}")
+    tha_question = pain_logic.QUESTIONS_THA[pain_logic.LOCATION]
+    _check(tha_question in tha["reply"], "a THA patient must get the hip-specific location question")
+    for word in ("groin", "thigh", "buttock", "calf"):
+        _check(word in tha_question, f"THA location question must offer '{word}'")
+    _check("knee" not in tha_question, "THA location question must not offer knee wording")
+    _check(pain_logic.QUESTIONS[pain_logic.LOCATION] in tka["reply"], "a TKA patient keeps the knee wording")
+    _check(_questions_present_in(tha["reply"]) == 1, "the THA turn must contain exactly one tracked question")
+
+    # Both wordings are recognised as the LOCATION question for attribution.
+    _check(pain_logic._field_from_question(tha_question) == pain_logic.LOCATION, "THA location wording must be identified as the location question")
+    history = [{"role": "user", "content": "My hip pain is 8 out of 10 and came on suddenly."}, {"role": "assistant", "content": tha["reply"]}]
+    view = pain_logic.build_assessment_detailed(history, "in the groin")
+    _check(view.assessment.get(pain_logic.LOCATION) == "in the groin", "'in the groin' must be attributed to location")
+
+    # THA branch in select_next_field (collection only).
+    groin = {pain_logic.PAIN_SCORE: 8, pain_logic.ONSET: "sudden", pain_logic.LOCATION: "in the groin"}
+    thigh = {pain_logic.PAIN_SCORE: 5, pain_logic.ONSET: "sudden", pain_logic.LOCATION: "my thigh"}
+    calf = {pain_logic.PAIN_SCORE: 5, pain_logic.ONSET: "sudden", pain_logic.LOCATION: "my calf"}
+    _check(pain_logic.select_next_field(groin, procedure="THA") == pain_logic.WORSENING_OR_IMPROVING, "THA severe groin pain asks the trend first")
+    _check(pain_logic.select_next_field(thigh, procedure="THA") == pain_logic.SWELLING, "THA thigh pain opens the thigh branch (swelling first)")
+    _check(pain_logic.select_next_field(thigh, procedure="TKA") == pain_logic.WORSENING_OR_IMPROVING, "TKA thigh pain keeps the standard joint branch")
+    _check(pain_logic.select_next_field(calf, procedure="THA") == pain_logic.SWELLING, "the calf branch is shared by every procedure")
+    _check(pain_logic.classify_location_branch("my thigh", "THA") == "thigh", "thigh classifies as its own branch for THA only")
+    _check(pain_logic.classify_location_branch("my thigh", "TKA") == "joint", "thigh stays in the joint branch for TKA")
+
+    severe_groin_done = dict(groin, **{pain_logic.WORSENING_OR_IMPROVING: "worsening", pain_logic.STIFFNESS: "no"})
+    _check(
+        pain_logic.select_next_field(severe_groin_done, procedure="THA") == pain_logic.NUMBNESS_OR_WEAKNESS,
+        "THA severe hip-joint pain also collects numbness/weakness",
+    )
+    _check(
+        pain_logic.select_next_field(severe_groin_done, procedure="TKA") is None,
+        "the extra THA question is not asked for TKA",
+    )
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 46. Multi-slot extraction: one reply answering several fields fills all of
+# them, and the agent asks only what is still missing.
+# ---------------------------------------------------------------------------
+
+def test_multi_slot_extraction_asks_only_missing() -> None:
+    print("=" * 78)
+    print("46 -- One reply answering several fields fills all of them")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    results = _converse("MULTI-SLOT-PT", [
+        "My knee hurts.",                                           # -> asks pain_score
+        "7 out of 10, started suddenly yesterday in the calf",      # -> score + onset + location
+    ])
+    print(f"    turn2={results[1]['reply']!r}")
+    history = [
+        {"role": "user", "content": "My knee hurts."},
+        {"role": "assistant", "content": results[0]["reply"]},
+    ]
+    view = pain_logic.build_assessment_detailed(history, "7 out of 10, started suddenly yesterday in the calf")
+    _check(view.assessment.get(pain_logic.PAIN_SCORE) == 7, "pain_score 7 must be extracted")
+    _check(view.assessment.get(pain_logic.ONSET) == "sudden", "onset 'sudden' must be extracted from the same reply")
+    _check("calf" in str(view.assessment.get(pain_logic.LOCATION, "")).lower(), "location 'calf' must be extracted from the same reply")
+
+    reply = results[1]["reply"]
+    _check(pain_logic.QUESTIONS[pain_logic.ONSET] not in reply, "onset must not be asked -- it was volunteered")
+    _check(pain_logic.QUESTIONS[pain_logic.LOCATION] not in reply, "location must not be asked -- it was volunteered")
+    _check(pain_logic.QUESTIONS[pain_logic.SWELLING] in reply, "only the next MISSING field (swelling, calf branch) is asked")
+    _check(_questions_present_in(reply) == 1, "still exactly one tracked question per turn")
+    for fragment in ("7/10", "sudden onset", "calf"):
+        _check(fragment in reply, f"the reflection line must mention {fragment!r}")
+
+    # Volunteered answers are never discarded even when the pending field
+    # itself went unanswered: swelling pending, reply gives warmth + fever.
+    history2 = history + [
+        {"role": "user", "content": "7 out of 10, started suddenly yesterday in the calf"},
+        {"role": "assistant", "content": results[1]["reply"]},
+    ]
+    view2 = pain_logic.build_assessment_detailed(history2, "it feels warm and I had chills last night")
+    _check(view2.assessment.get(pain_logic.WARMTH_OR_REDNESS) == "warm", "volunteered warmth must be kept")
+    _check(view2.assessment.get(pain_logic.FEVER_OR_TEMPERATURE) == "chills", "volunteered fever/chills must be kept")
+    _check(pain_logic.SWELLING not in view2.assessment, "the unanswered pending field must not be filled with the unrelated reply")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 47. Progress feedback: every mid-interview reply = one-line reflection +
+# exactly one question + a short indicator, under 3 sentences.
+# ---------------------------------------------------------------------------
+
+_INDICATORS = (
+    "(one or two more questions)", "(a few more questions)",
+    "(one more question after this)", "(last question)",
+)
+
+
+def test_progress_feedback_shape() -> None:
+    print("=" * 78)
+    print("47 -- Mid-interview replies: reflection + one question + indicator, < 3 sentences")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    results = _converse("PROGRESS-PT", [
+        "My knee hurts.",
+        "6",
+        "gradually",
+        "behind the knee",
+    ])
+    for i, result in enumerate(results, start=1):
+        reply = result["reply"]
+        print(f"    turn{i}: sentences={_sentence_count(reply)} reply={reply!r}")
+        if result["engine"] != PainSymptomsAgent.ENGINE_ASK:
+            continue
+        _check(_questions_present_in(reply) == 1, f"turn {i} must contain exactly one tracked question")
+        _check(any(reply.rstrip().endswith(ind) for ind in _INDICATORS), f"turn {i} must end with a short progress indicator")
+        _check(_sentence_count(reply) <= 2, f"turn {i} must be under 3 sentences (got {_sentence_count(reply)})")
+        if i > 1:
+            _check("so far:" in reply.lower(), f"turn {i} must reflect what has been collected so far")
+
+    _check("6/10" in results[1]["reply"], "the reflection after '6' must contain 6/10")
+    _check("6/10, gradual onset" in results[2]["reply"], "the reflection must accumulate (6/10, gradual onset)")
+    _check("(last question)" in results[3]["reply"], "the trend question for moderate knee pain is the last one")
+
+    # Indicator wording, unit level.
+    _check(pain_integration.progress_indicator(0) == "(last question)", "0 remaining -> last question")
+    _check(pain_integration.progress_indicator(0, branch_deciding=True) == "(one or two more questions)", "a branch-deciding field stays vague")
+    _check(pain_integration.progress_indicator(2) == "(one or two more questions)", "2 remaining -> one or two more")
+    _check(pain_integration.progress_indicator(3) == "(a few more questions)", "3+ remaining -> a few more")
+    _check(
+        pain_logic.estimate_remaining_questions({pain_logic.PAIN_SCORE: 8, pain_logic.ONSET: "sudden", pain_logic.LOCATION: "my calf"}) == 4,
+        "severe calf: swelling, warmth, numbness, fever = 4 remaining",
+    )
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 48. Proactive close: summary + comparison (score AND location/trend) +
+# action protocol verbatim + ONE next step + check-in offer; persistence to
+# symptom_assessments AND today's metrics.
+# ---------------------------------------------------------------------------
+
+def test_proactive_close_contents_and_persistence() -> None:
+    print("=" * 78)
+    print("48 -- Proactive close: summary, comparison, protocol verbatim, one next step, check-in")
+    print("=" * 78)
+    from agents import patient_memory
+    from patient_database import get_recent_symptom_assessments, get_patient
+
+    patient_id = "CLOSE-PT"
+    _seed_patient(patient_id)
+    patient_memory.write_symptom_assessment(patient_id, {
+        "postop_day": 4, "pain_score": 4, "location": "behind the knee",
+        "worsening_or_improving": "stable", "triage_level": "GREEN",
+    })
+    rows_before = len(get_recent_symptom_assessments(patient_id, limit=10))
+
+    pain_state._clear_all_state_for_tests()
+    fn, calls = _stub_chat_agent(reply="")
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        for message in ["My knee hurts.", "7", "suddenly", "in the calf", "yes it's swollen", "no", "no", "no fever"]:
+            result = _handle_for(patient_id, message, history, precomputed_triage=_YELLOW_TRIAGE)
+            history += [{"role": "user", "content": message}, {"role": "assistant", "content": result["reply"]}]
+    final = result
+    print(f"    engine={final['engine']}")
+    print(f"    reply={final['reply']!r}")
+    _check(final["engine"] == PainSymptomsAgent.ENGINE_FALLBACK, "setup: empty LLM stub -> deterministic close")
+    reply = final["reply"]
+
+    _check("pain score: 7/10" in reply and "in the calf" in reply, "the close must summarise the assessment")
+    _check("higher than the pain score of 4/10 recorded last time" in reply, "the close must compare the SCORE with the previous assessment")
+    _check(
+        "Last time it was behind the knee and about the same; now it's in the calf" in reply,
+        "the close must compare LOCATION/TREND with the previous assessment",
+    )
+    _check(_YELLOW_TRIAGE["action_protocol"] in reply, "the deterministic triage action protocol must appear verbatim")
+    _check(reply.count("Next step:") == 1, "exactly ONE concrete next step")
+    _check(pain_integration.CHECK_IN_OFFER in reply, "the close must end with the 'pain check' check-in offer")
+    _check("Next step: contact the orthopedic nursing hotline" in reply, "the YELLOW next step comes from the protocol's own first sentence")
+    _check(final["triage_level"] == "YELLOW", "the triage level is the upstream one, untouched")
+
+    stored = get_recent_symptom_assessments(patient_id, limit=10)
+    _check(len(stored) == rows_before + 1, "exactly one new symptom_assessments row must be written at the close")
+    _check(stored[-1].get("pain_score") == 7 and stored[-1].get("location") == "in the calf", "the persisted row must hold the collected facts")
+
+    today_rows = [row for row in get_patient(patient_id)["metrics_history"] if row.get("date") == patient_memory.today_iso()]
+    print(f"    today's metrics rows: {today_rows}")
+    _check(len(today_rows) == 1, "today's metrics row must be written once")
+    _check(today_rows and today_rows[0].get("pain_score") == 7, "today's metrics pain_score must be the collected score")
+    _check(today_rows and str(today_rows[0].get("swelling") or "").startswith("yes"), "today's metrics swelling must be the collected answer")
+
+    # LLM-accepted path: the body is kept and the same closing block is added.
+    composed = pain_integration.compose_final_reply(
+        "Your pain is 7/10 in the calf and started suddenly; please contact the nursing hotline today.",
+        {pain_logic.PAIN_SCORE: 7, pain_logic.ONSET: "sudden", pain_logic.LOCATION: "in the calf"},
+        _YELLOW_TRIAGE,
+        "That's higher than the pain score of 4/10 recorded last time.",
+    )
+    print(f"    composed (LLM path)={composed!r}")
+    _check(composed.startswith("Here's what you told me: 7/10, sudden onset, in the calf."), "the LLM path must open with the collected summary")
+    _check(_YELLOW_TRIAGE["action_protocol"] in composed, "the LLM path must carry the protocol verbatim")
+    _check(composed.count("Next step:") == 1 and composed.rstrip().endswith(pain_integration.CHECK_IN_OFFER), "the LLM path ends with one next step + the check-in offer")
+
+    # GREEN next step is a check-in step, never a clinical instruction.
+    green_step = pain_integration.next_step_line("GREEN", _GREEN_TRIAGE)
+    _check(green_step.startswith("Next step:") and "this evening" in green_step, "GREEN next step is a logging/check-in step")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 49. An ABANDONED interview persists nothing -- no symptom_assessments row
+# and no today's-metrics row.
+# ---------------------------------------------------------------------------
+
+def test_abandoned_interview_persists_nothing() -> None:
+    print("=" * 78)
+    print("49 -- Abandoned interview persists nothing")
+    print("=" * 78)
+    from agents import patient_memory
+    from patient_database import get_recent_symptom_assessments, get_patient
+
+    patient_id = "ABANDON-NOTHING-PT"
+    _seed_patient(patient_id)
+    pain_state._clear_all_state_for_tests()
+    fn, _ = _stub_chat_agent()
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        for message in ["My knee pain is 7 out of 10 and came on suddenly.", "in the calf", "yes it's swollen"]:
+            result = _handle(patient_id, message, history)
+            history += [{"role": "user", "content": message}, {"role": "assistant", "content": result["reply"]}]
+        _check(result["engine"] == PainSymptomsAgent.ENGINE_ASK, "setup: the interview must still be mid-way (not concluded)")
+        # Patient wanders off to another topic and never comes back.
+        LAMOrchestrator.process(
+            patient_id=patient_id, surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=5,
+            user_message="Can I climb stairs?", chat_history=list(history),
+        )
+
+    _check(get_recent_symptom_assessments(patient_id, limit=10) == [], "no symptom_assessments row may be written for an abandoned interview")
+    today_rows = [row for row in get_patient(patient_id)["metrics_history"] if row.get("date") == patient_memory.today_iso()]
+    _check(today_rows == [], "no today's-metrics row may be written for an abandoned interview")
+    print("    CONFIRMED: nothing persisted.")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 50. Final-turn prompt: the RAG query is built from the collected location
+# and symptoms (short, no instruction block); the domain instruction carries
+# the abstention sentence verbatim and the fenced latest message.
+# ---------------------------------------------------------------------------
+
+def test_final_turn_rag_query_from_collected_facts() -> None:
+    print("=" * 78)
+    print("50 -- Final-turn RAG query from collected facts; abstention instruction appended")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    calls: List[Dict[str, Any]] = []
+
+    def _capture(**kwargs) -> Dict[str, Any]:
+        calls.append(kwargs)
+        return {"reply": "", "triage_level": "GREEN", "is_escalated": False, "engine": "x", "sources": []}
+
+    last_message = "no fever at all"
+    history: List[Dict[str, str]] = []
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=_capture):
+        for message in ["I suddenly have 8 out of 10 pain in my calf, it's swollen and warm, no numbness.", last_message]:
+            result = _handle("RAGQ-PT", message, history)
+            history += [{"role": "user", "content": message}, {"role": "assistant", "content": result["reply"]}]
+    _check(len(calls) == 1, "setup: exactly one ChatAgent call on the final turn")
+    query = str(calls[0].get("user_message", ""))
+    instruction = str(calls[0].get("domain_instruction", ""))
+    print(f"    RAG query={query!r}")
+    _check(len(query) < 400, "the RAG query must be short, not the instruction block")
+    for word in ("calf", "swelling", "warmth", "sudden", "severe", "Total Knee Arthroplasty"):
+        _check(word in query, f"the RAG query must be built from the collected facts -- missing {word!r}")
+    for marker in ("UNTRUSTED", "FINAL PAIN", "Do not ask another question"):
+        _check(marker not in query, f"the RAG query must not contain instruction text ({marker!r})")
+    _check(last_message not in query, "the raw patient message is not the RAG query")
+
+    _check(pain_integration.ABSTENTION_INSTRUCTION in instruction, "the abstention sentence must be appended verbatim to the domain instruction")
+    _check(
+        pain_integration.ABSTENTION_INSTRUCTION == (
+            "Whenever the discharge notes do not cover the question, say you don't have that "
+            "information and ask the patient to check with their surgeon or physiotherapist."
+        ),
+        "the abstention sentence wording must be exactly as specified",
+    )
+    _check(instruction.startswith(PainSymptomsAgent.DOMAIN_FOCUS), "the domain instruction still starts with the unmodified DOMAIN_FOCUS")
+    _check("BEGIN PATIENT'S LATEST MESSAGE" in instruction and last_message in instruction, "the latest raw message travels fenced inside the domain instruction")
+
+    # The query is deterministic from the assessment alone.
+    direct = pain_integration.build_retrieval_query(
+        {pain_logic.PAIN_SCORE: 3, pain_logic.ONSET: "gradual", pain_logic.LOCATION: "behind the knee"},
+        surgery_type="Total Knee Arthroplasty (TKA)", procedure="TKA", postop_day=5,
+    )
+    print(f"    direct query={direct!r}")
+    _check("mild gradual-onset pain behind the knee after Total Knee Arthroplasty (TKA) on day 5" in direct, "query wording built from the collected facts")
+    _check("deep vein thrombosis" not in direct, "a knee location must not pull in the calf hint")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 51. CLARIFY questions are recognised as their field's SECOND ask (so a
+# second miss resolves to "unknown"), and no CLARIFY text equals an ALT
+# text (they are distinct wordings).
+# ---------------------------------------------------------------------------
+
+def test_clarify_questions_identify_field_and_second_ask() -> None:
+    print("=" * 78)
+    print("51 -- CLARIFY questions map to their field and count as a second ask")
+    print("=" * 78)
+    for field_name, text in pain_logic.CLARIFY_QUESTIONS.items():
+        _check(pain_logic._field_from_question(text) == field_name, f"CLARIFY for {field_name} must be identified as that field")
+        _check(pain_logic._is_alt_question(text), f"CLARIFY for {field_name} must count as a second ask")
+        _check(text != pain_logic.ALT_QUESTIONS[field_name], f"CLARIFY for {field_name} must differ from the ALT rephrase")
+        _check(text.startswith("Sorry, I didn't"), f"CLARIFY for {field_name} must explain the reply was not understood")
+    for field_name, text in pain_logic.CLARIFY_QUESTIONS_THA.items():
+        _check(pain_logic._field_from_question(text) == field_name and pain_logic._is_alt_question(text), "THA CLARIFY wording must be identified too")
+    _check(set(pain_logic.CLARIFY_QUESTIONS) == set(pain_logic.QUESTIONS), "every field has a CLARIFY wording")
+    _check(pain_logic._field_from_question(pain_logic.confirm_pain_score_question(6)) == pain_logic.PAIN_SCORE, "the confirmation question is the pain-score question")
+    _check(not pain_logic._is_alt_question(pain_logic.confirm_pain_score_question(6)), "the confirmation is a FIRST ask, not a second one")
+    print("    CONFIRMED.")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 52. agents/patient_memory.py: read/write round trip on the existing
+# tables, update-in-place for today's row, and best-effort behaviour for an
+# unknown patient (no raise, empty memory).
+# ---------------------------------------------------------------------------
+
+def test_patient_memory_roundtrip_and_best_effort() -> None:
+    print("=" * 78)
+    print("52 -- patient_memory: round trip, update-in-place, best-effort")
+    print("=" * 78)
+    from agents import patient_memory
+    from patient_database import get_patient
+
+    patient_id = "MEMORY-RT-PT"
+    _seed_patient(patient_id, surgery_type="Total Hip Arthroplasty (THA)", weight_bearing_status="Partial Weight Bearing (PWB)")
+
+    empty = patient_memory.load_patient_memory(patient_id)
+    _check(empty.record_found and empty.today_pain_score is None and empty.previous_assessment is None, "a seeded patient with no rows yet has an empty memory")
+    _check(empty.procedure == "THA", f"procedure must be resolved from the record, got {empty.procedure!r}")
+    _check(empty.weight_bearing_status == "Partial Weight Bearing (PWB)", "weight-bearing status must be read from the record")
+
+    _check(patient_memory.write_today_metrics(patient_id, pain_score=5, swelling="yes", triage="GREEN", postop_day=5), "first write must succeed")
+    _check(patient_memory.write_today_metrics(patient_id, pain_score=3, postop_day=5), "second write must succeed")
+    today_rows = [row for row in get_patient(patient_id)["metrics_history"] if row.get("date") == patient_memory.today_iso()]
+    print(f"    today's rows after two writes: {today_rows}")
+    _check(len(today_rows) == 1, "the second write must UPDATE today's row, not add another")
+    _check(today_rows and today_rows[0]["pain_score"] == 3 and today_rows[0]["swelling"] == "yes", "update keeps untouched columns and overwrites supplied ones")
+
+    loaded = patient_memory.load_patient_memory(patient_id)
+    _check(loaded.today_pain_score == 3 and loaded.today_swelling == "yes", "today's metrics must read back through load_patient_memory")
+
+    _check(patient_memory.write_symptom_assessment(patient_id, {"postop_day": 5, "pain_score": 3, "location": "in the groin"}), "assessment write must succeed")
+    loaded = patient_memory.load_patient_memory(patient_id)
+    _check(loaded.previous_assessment is not None and loaded.previous_assessment.get("location") == "in the groin", "the previous assessment must read back")
+
+    # Best-effort for an unknown patient: never raises, writes report False.
+    unknown = patient_memory.load_patient_memory("NOBODY-HERE-XYZ")
+    _check(not unknown.record_found and unknown.today_pain_score is None and unknown.recent_assessments == [], "unknown patient -> empty memory, no exception")
+    _check(patient_memory.write_today_metrics("NOBODY-HERE-XYZ", pain_score=4) is False, "metrics write for an unknown patient must fail softly (foreign key)")
+    _check(patient_memory.write_symptom_assessment("NOBODY-HERE-XYZ", {"pain_score": 4}) is False, "assessment write for an unknown patient must fail softly")
+    _check(patient_memory.write_today_metrics(patient_id) is False, "a write with nothing to write is a no-op")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 53. The check-in offer works: "pain check" routes to the Pain agent.
+# ---------------------------------------------------------------------------
+
+def test_pain_check_phrase_routes_to_pain() -> None:
+    print("=" * 78)
+    print("53 -- 'pain check' routes to the Pain agent")
+    print("=" * 78)
+    pain_state._clear_all_state_for_tests()
+    fn, _ = _stub_chat_agent()
+    with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+        result = LAMOrchestrator.process(
+            patient_id="PAINCHECK-PT", surgery_type="Total Knee Arthroplasty (TKA)",
+            affected_limb="Right", postop_day=5, user_message="pain check",
+        )
+    print(f"    intent={result['intent']} target={result['target_agent']}")
+    _check(result["intent"] == "pain_symptoms" and result["target_agent"] == "PainSymptomsAgent", "'pain check' must start a Pain interview")
+    _check(pain_logic.QUESTIONS[pain_logic.PAIN_SCORE] in result["reply"], "'pain check' must open with the pain-score question")
+    print()
+
+
+# ---------------------------------------------------------------------------
+# 54. Drug names trigger the medication-effect question (eval REPORT.md):
+# "I took paracetamol" is a medication mention like "painkillers". The
+# agent only ASKS whether it helped -- no dosing text anywhere.
+# ---------------------------------------------------------------------------
+
+import re as _re_dosing
+
+_DOSING_RE = _re_dosing.compile(
+    r"\b\d+\s*(?:mg|milligrams?|ml|g)\b|\bdos(?:e|es|age|ing)\b|\bevery\s+\d+\s+hours?\b|"
+    r"\b(?:once|twice|three times)\s+(?:a|per)\s+day\b|\bmaximum\b|\bmax\b",
+    _re_dosing.IGNORECASE,
+)
+
+
+def test_medication_names_trigger_effect_question() -> None:
+    print("=" * 78)
+    print("54 -- Drug names (paracetamol, Dolo, ibuprofen ...) trigger the medication-effect question; no dosing text")
+    print("=" * 78)
+    names = [
+        "I took paracetamol", "had a Dolo 650", "some acetaminophen", "an ibuprofen", "Brufen",
+        "diclofenac gel", "tramadol", "Ultracet", "my painkiller", "two painkillers", "a tablet", "the tablets",
+    ]
+    for text in names:
+        _check(pain_logic.mentions_medication(text), f"{text!r} is a medication mention")
+    for text in ("a pillow under my knee", "it hurts when I stand", "my knee aches"):
+        _check(not pain_logic.mentions_medication(text), f"{text!r} is not a medication mention")
+
+    pain_state._clear_all_state_for_tests()
+    results = _converse("MEDNAME-PT", [
+        "My knee aches a little, I took paracetamol an hour ago.", "3", "gradually", "around the kneecap", "yes it helped",
+    ])
+    for turn, result in enumerate(results, start=1):
+        print(f"    turn {turn}: {result['reply']!r}")
+    asked = [i for i, r in enumerate(results) if pain_logic.QUESTIONS[pain_logic.MEDICATION_EFFECT] in r["reply"]]
+    _check(len(asked) == 1, f"the medication-effect question is asked exactly once after 'paracetamol': turns {asked}")
+    final = results[-1]["reply"]
+    state = pain_state.peek_state("MEDNAME-PT")
+    _check(pain_logic.QUESTIONS[pain_logic.MEDICATION_EFFECT] not in final and (state is None or state.pending_field is None), f"the answer closes the interview: {final!r}")
+    for result in results:
+        _check(not _DOSING_RE.search(result["reply"]), f"no dosing text in any reply: {result['reply']!r}")
+    for question_set in (pain_logic.QUESTIONS, pain_logic.ALT_QUESTIONS, pain_logic.CLARIFY_QUESTIONS,
+                         pain_logic.QUESTIONS_THA, pain_logic.ALT_QUESTIONS_THA, pain_logic.CLARIFY_QUESTIONS_THA):
+        text = question_set.get(pain_logic.MEDICATION_EFFECT, "")
+        _check(not _DOSING_RE.search(text), f"the medication-effect wording has no dosing text: {text!r}")
+    print()
+
+
 def main() -> int:
-    test_fresh_independent_prompt_works()
-    test_multiple_facts_extracted_from_one_sentence()
-    test_short_reply_attribution()
-    test_known_values_never_reasked()
-    test_exactly_one_question_per_turn()
-    test_uncertainty_then_unknown()
-    test_adaptive_branching()
-    test_completion_stops_questions()
-    test_wound_message_overrides_pain()
-    test_red_overrides_pain()
-    test_medication_ownership_unchanged()
-    test_topic_switch_not_hijacked()
-    test_no_diagnosis_or_unsupported_reassurance()
-    test_no_robotic_wording()
-    test_structured_api_fields_still_work()
-    test_historical_persistence_and_trend()
-    test_cumulative_safety_reaches_red()
-    test_cumulative_safety_stale_state_not_hijacked()
-    test_no_duplicate_red_rules_outside_safety_engine()
-    test_swelling_ownership_routing()
-    test_deterministic_summary_uses_action_protocol()
-    test_untrusted_data_framing_in_final_turn()
-    test_pain_state_thread_safety()
-    test_ask_counts_reset_after_assessment_concludes()
-    test_pain_state_last_updated_locked_reads()
-    test_chat_request_patient_id_validation()
-    test_completed_assessment_not_contaminating_fresh_complaint()
-    test_orchestrator_cumulative_safety_scoped_to_active_boundary()
-    test_abandoned_pain_session_reset_after_topic_switch()
-    test_authoritative_final_triage_overrides_chat_agent()
-    test_final_turn_retrieval_hint_fenced_end_to_end()
-    test_medication_mentioned_scoped_to_active_user_turns()
-    test_pain_score_persistence_numeric_and_category()
-    test_foreign_key_enforcement_on_symptom_assessments()
-    test_final_turn_chat_history_scoped_to_active_assessment()
-    test_final_turn_rejects_ungrounded_unreported_symptom()
-    test_pain_trend_followup_not_stolen_by_wound()
-    test_final_reply_consistency_with_assessment_and_triage()
-    test_location_extraction_prefers_more_specific_phrase()
+    _run(test_fresh_independent_prompt_works)
+    _run(test_multiple_facts_extracted_from_one_sentence)
+    _run(test_short_reply_attribution)
+    _run(test_known_values_never_reasked)
+    _run(test_exactly_one_question_per_turn)
+    _run(test_uncertainty_then_unknown)
+    _run(test_adaptive_branching)
+    _run(test_completion_stops_questions)
+    _run(test_wound_message_overrides_pain)
+    _run(test_red_overrides_pain)
+    _run(test_medication_ownership_unchanged)
+    _run(test_topic_switch_not_hijacked)
+    _run(test_no_diagnosis_or_unsupported_reassurance)
+    _run(test_no_robotic_wording)
+    _run(test_structured_api_fields_still_work)
+    _run(test_historical_persistence_and_trend)
+    _run(test_cumulative_safety_reaches_red)
+    _run(test_cumulative_safety_stale_state_not_hijacked)
+    _run(test_no_duplicate_red_rules_outside_safety_engine)
+    _run(test_swelling_ownership_routing)
+    _run(test_deterministic_summary_uses_action_protocol)
+    _run(test_untrusted_data_framing_in_final_turn)
+    _run(test_pain_state_thread_safety)
+    _run(test_ask_counts_reset_after_assessment_concludes)
+    _run(test_pain_state_last_updated_locked_reads)
+    _run(test_chat_request_patient_id_validation)
+    _run(test_completed_assessment_not_contaminating_fresh_complaint)
+    _run(test_orchestrator_cumulative_safety_scoped_to_active_boundary)
+    _run(test_abandoned_pain_session_reset_after_topic_switch)
+    _run(test_authoritative_final_triage_overrides_chat_agent)
+    _run(test_final_turn_retrieval_hint_fenced_end_to_end)
+    _run(test_medication_mentioned_scoped_to_active_user_turns)
+    _run(test_pain_score_persistence_numeric_and_category)
+    _run(test_foreign_key_enforcement_on_symptom_assessments)
+    _run(test_final_turn_chat_history_scoped_to_active_assessment)
+    _run(test_final_turn_rejects_ungrounded_unreported_symptom)
+    _run(test_pain_trend_followup_not_stolen_by_wound)
+    _run(test_final_reply_consistency_with_assessment_and_triage)
+    _run(test_location_extraction_prefers_more_specific_phrase)
+    _run(test_pain_score_nonnumeric_answer_triggers_clarify)
+    _run(test_unfitting_answer_not_stored_clarify_once_then_unknown)
+    _run(test_detour_then_bare_answer_resumes_pending_question)
+    _run(test_memory_confirms_today_logged_pain_score)
+    _run(test_memory_opening_references_previous_assessment)
+    _run(test_tha_location_wording_and_branch)
+    _run(test_multi_slot_extraction_asks_only_missing)
+    _run(test_progress_feedback_shape)
+    _run(test_proactive_close_contents_and_persistence)
+    _run(test_abandoned_interview_persists_nothing)
+    _run(test_final_turn_rag_query_from_collected_facts)
+    _run(test_clarify_questions_identify_field_and_second_ask)
+    _run(test_patient_memory_roundtrip_and_best_effort)
+    _run(test_pain_check_phrase_routes_to_pain)
+    _run(test_medication_names_trigger_effect_question)
 
     print("=" * 78)
     if _FAILURES:

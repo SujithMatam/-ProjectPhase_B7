@@ -21,6 +21,7 @@ The classifier only returns routable intents.
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from typing import Optional
@@ -34,6 +35,13 @@ from lam.schemas import IntentLabel, LAMContext
 
 SEMANTIC_MIN_SCORE = 0.35
 SEMANTIC_MIN_MARGIN = 0.04
+
+# EXPERIMENT, not shipped (eval/routing/REPORT.md step 4). When True,
+# Sentence-BERT ranks the intents first and the keyword rules only act as a
+# tiebreaker (thin margin) or as the fallback (low confidence / model
+# offline). Off by default: the shipped order is keyword rules first, then
+# semantic. Set LAM_SEMANTIC_FIRST=1 in the environment to switch it on.
+SEMANTIC_FIRST = os.environ.get("LAM_SEMANTIC_FIRST", "").strip().lower() in {"1", "true", "yes", "on"}
 
 _MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -182,9 +190,31 @@ _GREETING_PATTERNS = [
 # the ENTIRE message.
 _INTRODUCTION_PATTERNS = [
     r"\bmy name is\s+[a-z][a-z\s'-]{1,40}",
-    r"\bi am\s+[a-z][a-z'-]{1,30}\b",
-    r"\bi'm\s+[a-z][a-z'-]{1,30}\b",
 ]
+
+# "I am X" / "I'm X" on its own is NOT an introduction any more: "I am
+# feeling okay today", "I'm walking with a walker now" and "I am anxious
+# about my visit" all start that way (eval/routing/REPORT.md). Such a message
+# is intake only when it also carries one of the cues in _has_intake_cue().
+
+# A greeting at the START of a longer message ("Hi, I am Rishi").
+_LEADING_GREETING_PATTERN = (
+    r"^\s*(?:hi|hello|hey|namaste|good morning|good afternoon|good evening)\b"
+)
+
+# A capitalised word right after "I am" / "I'm" in the ORIGINAL (un-lowercased)
+# message reads as a name: "I am Rishi", "I'm Anjali Nair". Common
+# sentence-initial capitalisations that are not names are excluded.
+_NAME_AFTER_PRONOUN_PATTERN = re.compile(
+    r"\bI(?:\s+am|'m)\s+([A-Z][a-z]+)\b"
+)
+_NOT_A_NAME = {
+    "ok", "okay", "fine", "good", "not", "feeling", "having", "done", "back",
+    "still", "very", "also", "able", "so", "now", "on", "in", "at", "a", "an",
+    "the", "just", "really", "worried", "scared", "anxious", "afraid", "tired",
+    "sure", "sorry", "here", "new", "from", "day", "getting", "going", "doing",
+    "taking", "walking", "trying", "unable", "already", "almost", "always",
+}
 
 
 # Explicit intake language.
@@ -218,6 +248,7 @@ _INTAKE_PATTERNS = [
     r"\bmy surgery was\b",
     r"\bmy operation was\b",
     r"\bi had .* surgery\b",
+    r"\bi had (?:a |an |my )?(?:\w+ ){0,3}(?:replacement|arthroplasty|operation)\b",
     r"\bi underwent\b",
 ]
 
@@ -255,14 +286,21 @@ _MEDICATION_KEYWORDS = {
     "prescription",
     "missed dose",
     "side effect",
-    "timing",
-    "schedule",
     "purpose",
-    "safety",
-    "safe",
-    "warning",
     "precaution",
 }
+# "safe", "safety", "schedule", "timing" and "warning" used to be in this
+# list. On their own they are not about medication ("Is it safe to climb
+# stairs?", "What is the schedule for my exercises?") and, because the
+# medication rule is checked first, they stole those turns from Daily
+# Activity, Rehabilitation and Recovery (eval/routing/REPORT.md). A message
+# that pairs them with a drug word still matches through the drug word.
+
+
+def _contains_word(text: str, marker: str) -> bool:
+    """Whole-word / whole-phrase match (no substring hits such as "no" in
+    "nothing", "ok" in "took" or "pill" in "pillow")."""
+    return re.search(r"\b" + re.escape(marker) + r"\b", text) is not None
 
 
 def _looks_like_medication_follow_up(
@@ -271,12 +309,13 @@ def _looks_like_medication_follow_up(
 ) -> bool:
     """Identify medication follow-ups whose current turn uses pronouns."""
     medication_context = (
-        "medication", "medicine", "dose", "dosage", "tablet", "pill",
-        "paracetamol", "enoxaparin", "aspirin", "antibiotic", "painkiller",
-        "blood thinner", "prescription",
+        "medication", "medications", "medicine", "medicines", "dose", "doses",
+        "dosage", "tablet", "tablets", "pill", "pills",
+        "paracetamol", "enoxaparin", "aspirin", "antibiotic", "antibiotics",
+        "painkiller", "painkillers", "blood thinner", "prescription",
     )
     follow_up = (
-        "take it", "taking it", "took it", "next dose", "dose", "dosage",
+        "take it", "taking it", "took it", "next dose", "dose", "doses", "dosage",
         "how often", "when should i take", "when do i take",
         "timing", "schedule", "what time",
         "hours late", "hour late", "pain level", "pain is",
@@ -288,8 +327,8 @@ def _looks_like_medication_follow_up(
         if isinstance(turn, dict)
     )
     return (
-        any(marker in text for marker in follow_up)
-        and any(marker in history_text for marker in medication_context)
+        any(_contains_word(text, marker) for marker in follow_up)
+        and any(_contains_word(history_text, marker) for marker in medication_context)
     )
 
 
@@ -589,23 +628,22 @@ def _is_simple_greeting(text: str) -> bool:
     return False
 
 
-def _is_introduction(text: str) -> bool:
+def _has_intake_cue(text: str, raw_text: Optional[str] = None) -> bool:
     """
-    Detect patient introductions and profile/surgery information.
-
-    Important:
-    The introduction does NOT have to be the whole message.
-
-    Examples:
-        "Hi, I am Rishi"
-        "I am Rishi and I had knee surgery 2 days ago"
-        "My name is John. My surgery was yesterday."
+    True when the message carries something that marks it as onboarding /
+    identity information rather than a clinical statement that merely
+    starts with "I am": a greeting, "my name is", one of the explicit
+    intake phrases, or a capitalised name right after "I am" / "I'm" in
+    the original message.
     """
 
     if not text:
         return False
 
     if _is_simple_greeting(text):
+        return True
+
+    if re.search(_LEADING_GREETING_PATTERN, text):
         return True
 
     for pattern in _INTRODUCTION_PATTERNS:
@@ -616,10 +654,37 @@ def _is_introduction(text: str) -> bool:
         if re.search(pattern, text):
             return True
 
+    if raw_text:
+        match = _NAME_AFTER_PRONOUN_PATTERN.search(str(raw_text).replace("’", "'"))
+        if match and match.group(1).lower() not in _NOT_A_NAME:
+            return True
+
     return False
 
 
-def _looks_like_intake_statement(text: str) -> bool:
+def _is_introduction(text: str, raw_text: Optional[str] = None) -> bool:
+    """
+    Detect patient introductions and profile/surgery information.
+
+    Important:
+    The introduction does NOT have to be the whole message.
+
+    Examples:
+        "Hi, I am Rishi"
+        "I am Rishi and I had knee surgery 2 days ago"
+        "My name is John. My surgery was yesterday."
+
+    "I am <something>" alone is not enough; the message needs an intake cue
+    (greeting, "my name is", an intake phrase, or a capitalised name).
+    """
+
+    if not text:
+        return False
+
+    return _has_intake_cue(text, raw_text)
+
+
+def _looks_like_intake_statement(text: str, raw_text: Optional[str] = None) -> bool:
     """
     Determine whether the message is primarily patient onboarding/context.
 
@@ -634,7 +699,7 @@ def _looks_like_intake_statement(text: str) -> bool:
     if _is_simple_greeting(text):
         return True
 
-    has_intro = _is_introduction(text)
+    has_intro = _is_introduction(text, raw_text)
 
     if not has_intro:
         return False
@@ -665,7 +730,7 @@ def _deterministic_intent(query: str) -> Optional[IntentLabel]:
     # Pure greeting / patient introduction / context
     # ------------------------------------------------------------
 
-    if _looks_like_intake_statement(text):
+    if _looks_like_intake_statement(text, query):
         return IntentLabel.INTAKE_CONTEXT
 
     # ------------------------------------------------------------
@@ -983,12 +1048,17 @@ class IntentClassifier:
                 decision_path="deterministic_context",
             )
 
+        if SEMANTIC_FIRST:
+            return cls._classify_semantic_first(query, text)
+
         # ============================================================
         # STEP 1
         # Deterministic classification
         # ============================================================
 
-        deterministic = _deterministic_intent(text)
+        # The raw query goes along so the intake check can see the original
+        # capitalisation ("I am Rishi" vs "I am fine").
+        deterministic = _deterministic_intent(query)
 
         if deterministic is not None:
 
@@ -1012,7 +1082,7 @@ class IntentClassifier:
 
         if scores is None:
 
-            fallback = cls._classify_by_keywords(text)
+            fallback = cls._classify_by_keywords(query)
 
             return ClassificationDetail(
                 intent=fallback,
@@ -1024,6 +1094,25 @@ class IntentClassifier:
                 matched_prototype=None,
                 decision_path="fallback_offline",
             )
+
+        # The intake prototypes ("I had a knee replacement yesterday.", "I
+        # need to tell you about my surgery.") sit close to ANY sentence that
+        # mentions the knee or the surgery, so "Am I on track with my knee?"
+        # and "Which exercises should I do today for my knee?" used to win as
+        # INTAKE_CONTEXT semantically (eval/routing/REPORT.md). Intake is an
+        # onboarding statement, which the deterministic step already
+        # recognises by its cues; without such a cue the semantic ranking
+        # does not get to pick intake, and the next-best intent competes
+        # against the usual thresholds instead.
+        if (
+            IntentLabel.INTAKE_CONTEXT in scores
+            and not _has_intake_cue(text, query)
+        ):
+            scores = {
+                intent: value
+                for intent, value in scores.items()
+                if intent != IntentLabel.INTAKE_CONTEXT
+            }
 
         ranked = sorted(
             scores.items(),
@@ -1054,7 +1143,7 @@ class IntentClassifier:
 
         if top1_score < SEMANTIC_MIN_SCORE:
 
-            fallback = cls._classify_by_keywords(text)
+            fallback = cls._classify_by_keywords(query)
 
             return ClassificationDetail(
                 intent=fallback,
@@ -1074,7 +1163,7 @@ class IntentClassifier:
 
         if margin < SEMANTIC_MIN_MARGIN:
 
-            fallback = cls._classify_by_keywords(text)
+            fallback = cls._classify_by_keywords(query)
 
             return ClassificationDetail(
                 intent=fallback,
@@ -1104,6 +1193,82 @@ class IntentClassifier:
         )
 
     # ========================================================================
+    # EXPERIMENT: SEMANTIC FIRST, KEYWORDS AS TIEBREAKER (SEMANTIC_FIRST)
+    # ========================================================================
+
+    @classmethod
+    def _classify_semantic_first(
+        cls,
+        query: str,
+        text: str,
+    ) -> ClassificationDetail:
+        """
+        Order used only when SEMANTIC_FIRST is True:
+
+          1. Sentence-BERT scores (with the same intake-cue gate as the
+             shipped path).
+          2. Confident and clear (score >= SEMANTIC_MIN_SCORE, margin >=
+             SEMANTIC_MIN_MARGIN) -> the semantic winner.
+          3. Confident but thin margin -> the keyword rules break the tie
+             between the top two; a keyword hit outside the top two wins
+             over both (it is the stronger evidence); no keyword at all ->
+             keep the semantic winner.
+          4. Low confidence or model offline -> the keyword rules, then the
+             default routable intent (exactly the shipped fallback).
+        """
+
+        def _detail(intent, path, ranked=None):
+            if ranked:
+                top1_intent, (top1_score, top1_prototype) = ranked[0]
+                top2_intent, top2_score = (ranked[1][0], ranked[1][1][0]) if len(ranked) > 1 else (None, 0.0)
+                return ClassificationDetail(
+                    intent=intent, top1_intent=top1_intent, top1_score=top1_score,
+                    top2_intent=top2_intent, top2_score=top2_score,
+                    margin=top1_score - top2_score, matched_prototype=top1_prototype,
+                    decision_path=path,
+                )
+            return ClassificationDetail(
+                intent=intent, top1_intent=None, top1_score=0.0, top2_intent=None,
+                top2_score=0.0, margin=0.0, matched_prototype=None, decision_path=path,
+            )
+
+        scores = _semantic_scores(text)
+
+        if scores is None:
+            return _detail(cls._classify_by_keywords(query), "fallback_offline")
+
+        if (
+            IntentLabel.INTAKE_CONTEXT in scores
+            and not _has_intake_cue(text, query)
+        ):
+            scores = {
+                intent: value for intent, value in scores.items()
+                if intent != IntentLabel.INTAKE_CONTEXT
+            }
+
+        ranked = sorted(scores.items(), key=lambda item: item[1][0], reverse=True)
+        top1_intent, top1_score = ranked[0][0], ranked[0][1][0]
+        top2_intent = ranked[1][0] if len(ranked) > 1 else None
+        top2_score = ranked[1][1][0] if len(ranked) > 1 else 0.0
+        margin = top1_score - top2_score
+
+        if top1_score >= SEMANTIC_MIN_SCORE and margin >= SEMANTIC_MIN_MARGIN:
+            return _detail(top1_intent, "semantic_first", ranked)
+
+        deterministic = _deterministic_intent(query)
+
+        if top1_score >= SEMANTIC_MIN_SCORE:
+            # Thin margin: let the keyword rules break the tie.
+            if deterministic in (top1_intent, top2_intent):
+                return _detail(deterministic, "semfirst_tiebreak_keywords", ranked)
+            if deterministic is not None:
+                return _detail(deterministic, "semfirst_tiebreak_deterministic", ranked)
+            return _detail(top1_intent, "semfirst_tiebreak_top1", ranked)
+
+        # Low confidence: keyword rules, then the default.
+        return _detail(cls._classify_by_keywords(query), "semfirst_low_confidence", ranked)
+
+    # ========================================================================
     # KEYWORD FALLBACK
     # ========================================================================
 
@@ -1119,7 +1284,7 @@ class IntentClassifier:
             return _DEFAULT_ROUTABLE_INTENT
 
         # Intake first only when it is actually an intake statement.
-        if _looks_like_intake_statement(text):
+        if _looks_like_intake_statement(text, query):
             return IntentLabel.INTAKE_CONTEXT
 
         # Clinical intents.

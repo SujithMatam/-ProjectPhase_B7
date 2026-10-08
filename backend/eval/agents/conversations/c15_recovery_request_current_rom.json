@@ -1,0 +1,63 @@
+{
+  "id": "c15_recovery_request_current_rom",
+  "agent": "recovery",
+  "title": "current_rom in the request: flexion and extension are fed back, never asked",
+  "tags": [
+    "memory",
+    "request-field"
+  ],
+  "record": {
+    "patient_id": "EVAL-C15",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 15,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 16,
+    "current_rom": "flexion 95, extension 2"
+  },
+  "record_fields": [
+    {
+      "field": "rom_flexion_degrees",
+      "source": "request current_rom",
+      "evidence": "95"
+    },
+    {
+      "field": "rom_extension_degrees",
+      "source": "request current_rom",
+      "evidence": "\\b2\\s*°|extension of 2"
+    }
+  ],
+  "expect": {
+    "max_questions": 3,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "How's my progress looking?"
+    },
+    {
+      "patient": "a cane",
+      "must_collect": [
+        "mobility_status"
+      ]
+    },
+    {
+      "patient": "about 20 minutes",
+      "must_collect": [
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "one step at a time",
+      "must_collect": [
+        "stairs"
+      ]
+    }
+  ]
+}

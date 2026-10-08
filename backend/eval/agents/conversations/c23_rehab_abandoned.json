@@ -1,0 +1,44 @@
+{
+  "id": "c23_rehab_abandoned",
+  "agent": "rehab",
+  "title": "Abandoned interview: the safety question is never answered; nothing persisted",
+  "tags": [
+    "abandoned"
+  ],
+  "record": {
+    "patient_id": "EVAL-C23",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 5,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 6
+  },
+  "record_fields": [
+    {
+      "field": "weight_bearing_status",
+      "source": "surgeries",
+      "evidence": null
+    }
+  ],
+  "expect": {
+    "max_questions": 2,
+    "completes": false,
+    "abandoned": true
+  },
+  "turns": [
+    {
+      "patient": "What exercises should I be doing?"
+    },
+    {
+      "patient": "hmm, let me think about that",
+      "must_not_collect": [
+        "exercise_safety"
+      ]
+    }
+  ]
+}

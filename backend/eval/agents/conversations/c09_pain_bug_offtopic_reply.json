@@ -1,0 +1,81 @@
+{
+  "id": "c09_pain_bug_offtopic_reply",
+  "agent": "pain",
+  "title": "Bug 1b: 'Can I shower tomorrow?' is never stored as the onset",
+  "tags": [
+    "bug-offtopic"
+  ],
+  "record": {
+    "patient_id": "EVAL-C09",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 3,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": [
+      {
+        "days_ago": 1,
+        "pain_score": 5,
+        "onset": "gradual",
+        "location": "behind the knee",
+        "worsening_or_improving": "stable",
+        "triage_level": "GREEN"
+      }
+    ]
+  },
+  "request": {
+    "postop_day": 4
+  },
+  "record_fields": [
+    {
+      "field": null,
+      "source": "previous assessment",
+      "evidence": "Last time you had 5/10"
+    }
+  ],
+  "expect": {
+    "max_questions": 5,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "My knee hurts quite a lot today."
+    },
+    {
+      "patient": "6",
+      "must_collect": [
+        "pain_score"
+      ]
+    },
+    {
+      "patient": "Can I shower tomorrow?",
+      "must_not_store": {
+        "onset": "shower"
+      },
+      "orchestrator_expected_agent": "*"
+    },
+    {
+      "patient": "it came on gradually",
+      "must_collect": [
+        "onset"
+      ],
+      "must_not_store": {
+        "onset": "shower"
+      }
+    },
+    {
+      "patient": "behind the knee",
+      "must_collect": [
+        "location"
+      ]
+    },
+    {
+      "patient": "getting worse",
+      "must_collect": [
+        "worsening_or_improving"
+      ]
+    }
+  ]
+}

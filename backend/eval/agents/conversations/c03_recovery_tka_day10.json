@@ -1,0 +1,85 @@
+{
+  "id": "c03_recovery_tka_day10",
+  "agent": "recovery",
+  "title": "TKA day 10: confirm logged ROM, flat-on-the-bed rephrase, walking and stairs",
+  "source": "RECOVERY_AGENT_CHANGES.md section 2, TKA post-op day 10",
+  "tags": [
+    "transcript",
+    "memory",
+    "multi-slot"
+  ],
+  "record": {
+    "patient_id": "EVAL-C03",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 9,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [
+      {
+        "days_ago": 3,
+        "rom_flexion": 70,
+        "rom_extension": 8
+      },
+      {
+        "days_ago": 1,
+        "rom_flexion": 80,
+        "rom_extension": 5
+      }
+    ],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 11
+  },
+  "record_fields": [
+    {
+      "field": "rom_flexion_degrees",
+      "source": "metrics yesterday",
+      "evidence": "bend to 80"
+    },
+    {
+      "field": "rom_extension_degrees",
+      "source": "metrics yesterday",
+      "evidence": "extension was 5"
+    }
+  ],
+  "expect": {
+    "max_questions": 5,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "How is my recovery going?"
+    },
+    {
+      "patient": "it's about 85 now",
+      "must_collect": [
+        "rom_flexion_degrees"
+      ]
+    },
+    {
+      "patient": "I don't know the number"
+    },
+    {
+      "patient": "almost, there's a small gap",
+      "must_collect": [
+        "rom_extension_degrees"
+      ]
+    },
+    {
+      "patient": "I'm using a cane and I can walk about 15 minutes",
+      "must_collect": [
+        "mobility_status",
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "one step at a time holding the rail",
+      "must_collect": [
+        "stairs"
+      ]
+    }
+  ]
+}

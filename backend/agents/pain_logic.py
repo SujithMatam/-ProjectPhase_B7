@@ -73,6 +73,42 @@ QUESTIONS: Dict[str, str] = {
     MEDICATION_EFFECT: "Did taking your pain medication help, or not really?",
 }
 
+# PROCEDURE-AWARE WORDING. QUESTIONS above is the TKA (knee) wording and the
+# default. A hip replacement (THA) patient is offered hip-relevant places
+# instead of knee ones. Only the fields whose wording actually depends on
+# the joint are overridden; every other field falls back to QUESTIONS.
+# The THA variants keep the SAME leading marker phrase ("where are you
+# feeling it most" / "lower down toward the calf") so question
+# identification (_PRIMARY_MARKERS/_ALT_MARKERS) works for both.
+QUESTIONS_THA: Dict[str, str] = {
+    LOCATION: (
+        "Where are you feeling it most -- in the groin, the thigh, the "
+        "buttock, the calf, or somewhere else?"
+    ),
+    STIFFNESS: "Does the hip feel stiff, especially when you try to move it?",
+}
+
+ALT_QUESTIONS_THA: Dict[str, str] = {
+    LOCATION: (
+        "That's okay -- just roughly, is it more in the groin, the thigh, "
+        "the buttock, or lower down toward the calf?"
+    ),
+}
+
+
+def question_text(field_name: str, *, procedure: Optional[str] = None, alt: bool = False) -> str:
+    """The patient-facing question for `field_name`, in the wording for
+    `procedure` ("TKA"/"THA"/"GEN"/None). Unknown or non-THA procedures use
+    the default (knee) wording, exactly as before."""
+    is_tha = str(procedure or "").strip().upper() == "THA"
+    if alt:
+        if is_tha and field_name in ALT_QUESTIONS_THA:
+            return ALT_QUESTIONS_THA[field_name]
+        return ALT_QUESTIONS[field_name]
+    if is_tha and field_name in QUESTIONS_THA:
+        return QUESTIONS_THA[field_name]
+    return QUESTIONS[field_name]
+
 # Simplified rephrase, used ONLY after a genuinely uncertain first answer
 # ("I don't know") -- never the identical question repeated verbatim.
 ALT_QUESTIONS: Dict[str, str] = {
@@ -93,6 +129,104 @@ ALT_QUESTIONS: Dict[str, str] = {
     MEDICATION_EFFECT: "That's okay -- after taking it, did the pain feel any different at all?",
 }
 
+# CLARIFYING re-ask, used ONCE after a reply that did not plausibly answer
+# the pending question at all (no number for the pain score, no onset/
+# location/trend wording, no yes/no for a yes/no question, or clearly a
+# different topic). Different lead-in from ALT_QUESTIONS ("I didn't catch
+# ..." rather than "No worries if you're not sure"), because the patient
+# was not uncertain -- the reply just did not fit the question. Each entry
+# deliberately CONTAINS its field's _ALT_MARKERS phrase, so it is
+# recognised as a SECOND ask of that field: a second reply that still does
+# not fit (or an uncertain one) resolves the field as "unknown", exactly
+# like the ALT path -- the agent never loops on the same question.
+CLARIFY_QUESTIONS: Dict[str, str] = {
+    PAIN_SCORE: (
+        "Sorry, I didn't catch a number there. Would you put it roughly in "
+        "the mild range (1-3), moderate range (4-6), or severe range (7-10)?"
+    ),
+    ONSET: (
+        "Sorry, I didn't quite catch that. Would you say the pain started all "
+        "at once, or built up gradually?"
+    ),
+    LOCATION: (
+        "Sorry, I didn't catch where it is. Just roughly, is it more in the "
+        "knee, behind it, or lower down toward the calf?"
+    ),
+    WORSENING_OR_IMPROVING: (
+        "Sorry, I didn't quite catch that. Compared to earlier, does it feel "
+        "any different at all, or about the same?"
+    ),
+    PAIN_CHARACTERISTICS: (
+        "Sorry, I didn't quite catch that. Would you call it more of a sharp "
+        "pain or a dull ache?"
+    ),
+    SWELLING: (
+        "Sorry, I didn't quite catch that -- a simple yes or no is fine. Does "
+        "the area look any more puffy than the other side?"
+    ),
+    WARMTH_OR_REDNESS: (
+        "Sorry, I didn't quite catch that -- a simple yes or no is fine. If "
+        "you gently touch the area, does it feel warmer than the skin around it?"
+    ),
+    STIFFNESS: (
+        "Sorry, I didn't quite catch that -- a simple yes or no is fine. Does "
+        "it feel harder to bend or move than usual?"
+    ),
+    NUMBNESS_OR_WEAKNESS: (
+        "Sorry, I didn't quite catch that -- a simple yes or no is fine. Does "
+        "the leg feel any different, like tingly or weaker than usual?"
+    ),
+    FEVER_OR_TEMPERATURE: (
+        "Sorry, I didn't quite catch that -- a simple yes or no is fine. Have "
+        "you felt chilly, sweaty, or generally unwell?"
+    ),
+    MEDICATION_EFFECT: (
+        "Sorry, I didn't quite catch that -- a simple yes or no is fine. After "
+        "taking it, did the pain feel any different at all?"
+    ),
+}
+
+CLARIFY_QUESTIONS_THA: Dict[str, str] = {
+    LOCATION: (
+        "Sorry, I didn't catch where it is. Just roughly, is it more in the "
+        "groin, the thigh, the buttock, or lower down toward the calf?"
+    ),
+}
+
+
+def clarify_question_text(field_name: str, *, procedure: Optional[str] = None) -> str:
+    if str(procedure or "").strip().upper() == "THA" and field_name in CLARIFY_QUESTIONS_THA:
+        return CLARIFY_QUESTIONS_THA[field_name]
+    return CLARIFY_QUESTIONS[field_name]
+
+
+# MEMORY CONFIRMATION of today's already-logged pain score -- asked INSTEAD
+# of the pain-score question when today's metrics row already has a score
+# (see agents/patient_memory.py). The logged value is embedded in the
+# question text ("{n}/10") so a bare "yes" reply can be resolved back to
+# that number purely from chat_history (see _confirm_value_from_question).
+_CONFIRM_MARKER = "still about that"
+# Anchored on "log says N/10" -- the same assistant message may ALSO quote a
+# previous assessment ("Last time you had 7/10 ..."), which must never be
+# mistaken for today's logged value.
+_CONFIRM_VALUE_RE = re.compile(r"log says\s+(10|[0-9])\s*/\s*10\b")
+
+
+def confirm_pain_score_question(logged_score: int) -> str:
+    return f"Your log says {int(logged_score)}/10 earlier today -- still about that?"
+
+
+def _confirm_value_from_question(text: str) -> Optional[int]:
+    normalised = _normalise(text)
+    if _CONFIRM_MARKER not in normalised:
+        return None
+    match = _CONFIRM_VALUE_RE.search(normalised)
+    if not match:
+        return None
+    value = int(match.group(1))
+    return value if 0 <= value <= 10 else None
+
+
 # Short, unique marker substrings used to recognise which field a PAST
 # assistant message asked about (primary phrasing), so a short reply like
 # "8" or "suddenly" can be attributed to the right field purely from
@@ -106,7 +240,7 @@ _PRIMARY_MARKERS: Dict[str, str] = {
     PAIN_CHARACTERISTICS: "sharp, dull, throbbing",
     SWELLING: "any swelling in that area",
     WARMTH_OR_REDNESS: "feel warmer than usual",
-    STIFFNESS: "does the joint feel stiff",
+    STIFFNESS: "feel stiff, especially when you try to move it",
     NUMBNESS_OR_WEAKNESS: "numbness or weakness in that leg",
     FEVER_OR_TEMPERATURE: "felt feverish at all",
     MEDICATION_EFFECT: "did taking your pain medication help",
@@ -156,10 +290,14 @@ def _is_uncertain_answer(text: str) -> bool:
 
 
 def _is_negative_answer(text: str) -> bool:
-    normalised = _normalise(text)
-    if normalised in ("no", "nope", "none", "not really", "nothing", "never"):
+    normalised = _normalise(text).strip(" .!")
+    if normalised in (
+        "no", "nope", "nah", "none", "not really", "nothing", "never", "not at all",
+    ):
         return True
-    return normalised.startswith(("no ", "nope ", "not really ", "none ", "nothing "))
+    if normalised in _NEGATIVE_ANSWERS:
+        return True
+    return normalised.startswith(("no ", "no,", "nope ", "nope,", "nah ", "not really ", "none ", "nothing "))
 
 
 def _word_present(normalised_text: str, word: str) -> bool:
@@ -218,12 +356,23 @@ def _field_from_question(text: str) -> Optional[str]:
     for field_name, marker in _PRIMARY_MARKERS.items():
         if marker in normalised:
             return field_name
+    if _CONFIRM_MARKER in normalised:
+        return PAIN_SCORE
     return None
 
 
 def _is_alt_question(text: str) -> bool:
+    """True for any SECOND-ask phrasing of a field: the simplified ALT
+    rephrase (after an uncertain answer) OR the CLARIFY re-ask (after a
+    reply that did not fit the question). Both share the field's
+    _ALT_MARKERS phrase by construction (see CLARIFY_QUESTIONS), so a reply
+    to either that is still uncertain/unfitting resolves to "unknown"."""
     normalised = _normalise(text)
     return any(marker in normalised for marker in _ALT_MARKERS.values())
+
+
+def _is_confirm_question(text: str) -> bool:
+    return _CONFIRM_MARKER in _normalise(text)
 
 
 def previous_pending_field(chat_history: Optional[List[Dict[str, str]]]) -> Optional[str]:
@@ -290,6 +439,7 @@ def _most_recent_assistant_message_field(
 def is_active_assessment_continuation(
     chat_history: Optional[List[Dict[str, str]]],
     pending_field: Optional[str],
+    user_message: Optional[str] = None,
 ) -> bool:
     """
     Whether THIS turn is a genuine continuation of `pending_field` (the
@@ -315,10 +465,29 @@ def is_active_assessment_continuation(
     was pending to continue -- covers both "brand-new patient" and "the
     previous assessment already concluded", since clear_pending() clears
     pending_field to None on conclusion).
+
+    DETOUR TOLERANCE (only when `user_message` is supplied): after an
+    off-topic detour ("Can I climb stairs?" answered by Daily Activity),
+    the literal most recent assistant message is not a Pain question, yet
+    the patient may now be answering the still-pending one ("8", "my
+    calf"). In that case this returns True when the BRIDGING check
+    (previous_pending_field, the same signal the orchestrator's
+    _has_active_pain_followup uses to route the turn to Pain in the first
+    place) still points at `pending_field` AND the message does not read
+    as a brand-new pain complaint (see looks_like_new_complaint) -- a fresh
+    complaint after a detour still starts a fresh assessment. Callers that
+    omit `user_message` (the orchestrator's cumulative-safety step today)
+    get the original strict behaviour unchanged.
     """
     if pending_field is None:
         return False
-    return _most_recent_assistant_message_field(chat_history) == pending_field
+    if _most_recent_assistant_message_field(chat_history) == pending_field:
+        return True
+    if user_message is None:
+        return False
+    if previous_pending_field(chat_history) != pending_field:
+        return False
+    return not looks_like_new_complaint(user_message)
 
 
 # ============================================================================
@@ -349,9 +518,14 @@ _LOCATION_TERMS = (
     "calf", "lower leg", "shin",
     "behind the knee", "behind my knee", "back of the knee",
     "thigh", "ankle", "hip", "incision", "surgical site",
+    "groin", "buttock", "glute",
 )
 
 _CALF_TERMS = ("calf", "lower leg", "shin")
+# THA-only sub-branch: thigh pain after a hip replacement gets the
+# swelling/warmth questions (the agent only COLLECTS these; what they mean
+# is SafetyTriageEngine's call, upstream).
+_THIGH_TERMS = ("thigh",)
 
 _WORSE_WORDS = ("worse", "worsening", "increasing", "more intense", "increased", "intensifying")
 _BETTER_WORDS = ("better", "improving", "improved", "decreasing", "easing", "settling")
@@ -383,6 +557,15 @@ _STIFFNESS_WORDS = ("stiff", "stiffness", "hard to bend", "hard to move", "tight
 _NUMBNESS_WORDS = ("numb", "numbness", "tingling", "tingly", "weak", "weakness")
 _FEVER_WORDS = ("fever", "feverish", "temperature", "chills", "sweaty", "hot and cold")
 _MEDICATION_WORDS = ("medication", "medicine", "tablet", "pill", "dose", "painkiller")
+# Common pain-relief names patients use instead of "medication". Only a
+# trigger for the medication-effect QUESTION (did it help?) -- the agent
+# never says anything about which drug, how much or how often.
+_MEDICATION_NAMES = (
+    "paracetamol", "acetaminophen", "dolo", "ibuprofen", "brufen", "diclofenac", "tramadol", "ultracet",
+)
+_MEDICATION_RE = re.compile(
+    r"\b(?:" + "|".join(_MEDICATION_WORDS + _MEDICATION_NAMES) + r"|pain ?killer|meds)(?:e?s)?\b"
+)
 _PAIN_CHARACTER_WORDS = ("sharp", "dull", "throbbing", "burning", "aching", "shooting", "stabbing")
 
 
@@ -450,11 +633,21 @@ _LOCATION_SPECIFIC_PHRASE_RE = re.compile(
 )
 
 _LOCATION_GENERIC_PHRASE_RE = re.compile(
-    r"\b((?:the|my)\s+(?:calf|lower leg|shin|knee|thigh|ankle|hip|incision|surgical site))\b",
+    r"\b((?:the|my)\s+(?:calf|lower leg|shin|knee|thigh|ankle|hip|incision|surgical site|groin|buttock|glute))\b",
     re.IGNORECASE,
 )
 
 _LOCATION_ANCHOR_WORDS = _LOCATION_TERMS + ("knee", "thigh", "ankle", "hip")
+
+# Words that make a reply a PLAUSIBLE answer to the LOCATION question even
+# when it is not specific enough for opportunistic extraction (a bare
+# "knee", "my leg", "the side"). Used only by answer_plausibly_fits().
+_LOCATION_ANSWER_WORDS = _LOCATION_ANCHOR_WORDS + (
+    "knee", "leg", "joint", "side", "front", "back", "top", "inside", "outside",
+    "behind", "around", "above", "below", "under", "kneecap", "foot", "toes",
+    "all over", "everywhere", "whole leg", "scar", "stitches", "staples",
+    "somewhere else", "elsewhere",
+)
 
 
 def _extract_location_phrase(text: str) -> str:
@@ -586,16 +779,22 @@ def _extract_pain_characteristics_direct(text: str) -> Optional[str]:
     return None
 
 
-def classify_location_branch(location_text: str) -> str:
+def classify_location_branch(location_text: str, procedure: Optional[str] = None) -> str:
     """
     Which follow-up branch a stored `location` value implies. "calf" is the
-    only currently-implemented specialised branch (DVT-adjacent associated
-    symptoms) -- everything else (knee, thigh, hip, "somewhere else", ...)
-    uses the standard joint-pain branch. Never returns a diagnosis label.
+    specialised branch for every procedure (associated-symptom questions);
+    "thigh" is a THA-only branch (swelling/warmth questions for thigh pain
+    after a hip replacement); everything else (knee, groin, buttock, hip,
+    "somewhere else", ...) uses the standard joint-pain branch. Never
+    returns a diagnosis label -- it only decides which QUESTIONS to ask.
     """
     normalised = _normalise(location_text)
     if any(term in normalised for term in _CALF_TERMS):
         return "calf"
+    if str(procedure or "").strip().upper() == "THA" and any(
+        term in normalised for term in _THIGH_TERMS
+    ):
+        return "thigh"
     return "joint"
 
 
@@ -665,8 +864,10 @@ def _direct_extraction_for_message(text: str) -> Dict[str, Any]:
 
 
 def mentions_medication(text: str) -> bool:
-    normalised = _normalise(text)
-    return any(word in normalised for word in _MEDICATION_WORDS)
+    """Generic words ("painkillers", "tablets") or a common drug name
+    ("paracetamol", "Dolo 650"), matched as whole words so "pillow" never
+    counts."""
+    return _MEDICATION_RE.search(_normalise(text)) is not None
 
 
 # ============================================================================
@@ -766,37 +967,250 @@ def _detect_correction(text: str) -> Optional[Tuple[str, Any]]:
 
 
 # ============================================================================
+# ANSWER PLAUSIBILITY -- does a reply plausibly answer the pending question?
+#
+# A reply that does NOT fit (no number for the pain score, no onset/location/
+# trend wording, no yes/no for a yes/no question, or clearly a different
+# topic) is never stored as the field's value. The field is re-asked ONCE
+# with CLARIFY_QUESTIONS; if the second reply still does not fit (or is
+# uncertain), the field is recorded as "unknown" and the interview moves on.
+# Anything the reply DID volunteer for OTHER fields is still captured by the
+# opportunistic direct-extraction pass -- a volunteered answer is never
+# discarded just because the pending question went unanswered.
+# ============================================================================
+
+_AFFIRMATIVE_ANSWERS: Tuple[str, ...] = (
+    "yes", "yeah", "yep", "yup", "ya", "sure", "correct", "right", "that's right",
+    "thats right", "definitely", "absolutely", "i think so", "a little", "a bit",
+    "a little bit", "slightly", "somewhat", "some", "kind of", "sort of", "mildly",
+    "quite a bit", "very", "a lot", "still", "same", "about the same", "about that",
+    "yes about that", "unchanged", "it is", "it does", "it did", "i have", "i did",
+    "it helped", "helped", "it worked", "worked", "yes it is", "yes it does",
+)
+
+_NEGATIVE_ANSWERS: Tuple[str, ...] = (
+    "no", "nope", "nah", "none", "not really", "nothing", "never", "not at all",
+    "no change", "not that i've noticed", "not that i noticed", "not that i have noticed",
+    "i don't think so", "i dont think so", "don't think so", "dont think so",
+    "not much", "it isn't", "it isnt", "it didn't", "it didnt", "it doesn't",
+    "it doesnt", "i haven't", "i havent", "didn't help", "didnt help",
+    "hasn't helped", "hasnt helped", "did not help", "not helping", "no it didn't",
+)
+
+_WORD_NUMBERS: Dict[str, int] = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+}
+
+_YES_NO_FIELDS: Tuple[str, ...] = (
+    SWELLING, WARMTH_OR_REDNESS, STIFFNESS, NUMBNESS_OR_WEAKNESS,
+    FEVER_OR_TEMPERATURE, MEDICATION_EFFECT,
+)
+
+# Extra words that make a reply a plausible answer to a given field even
+# when it carries no extractable value (the stored value is then the raw
+# reply, exactly as before -- these lists only gate WHETHER it is stored).
+_ONSET_ANSWER_WORDS: Tuple[str, ...] = _ONSET_TEMPORAL_WORDS + (
+    "ago", "since", "after", "when i", "started", "began", "overnight", "woke up",
+    "all at once", "out of nowhere", "bit by bit", "creeping", "crept",
+    "progressively", "steadily", "quick", "quickly", "fast", "slow", "sudden", "gradual",
+)
+_TREND_ANSWER_WORDS: Tuple[str, ...] = _WORSE_WORDS + _BETTER_WORDS + _SAME_WORDS + (
+    "different", "no change", "steady", "stable", "fluctuat", "comes and goes",
+    "up and down", "on and off", "varies", "depends",
+)
+_FIELD_ANSWER_KEYWORDS: Dict[str, Tuple[str, ...]] = {
+    SWELLING: _SWELLING_WORDS + ("puffier", "bigger", "larger", "tight skin", "normal size"),
+    WARMTH_OR_REDNESS: _WARMTH_WORDS + ("cool", "cold", "normal temperature", "pink", "colour", "color"),
+    STIFFNESS: _STIFFNESS_WORDS + ("loose", "moves fine", "bend", "move", "flexible", "locked"),
+    NUMBNESS_OR_WEAKNESS: _NUMBNESS_WORDS + ("pins and needles", "normal feeling", "strength", "strong", "gives way", "giving way"),
+    FEVER_OR_TEMPERATURE: _FEVER_WORDS + ("degrees", "thermometer", "unwell", "shivery", "normal temp", "afebrile"),
+    MEDICATION_EFFECT: (
+        "help", "helped", "helps", "work", "worked", "works", "relief", "relieve",
+        "eased", "ease", "took the edge", "edge off", "difference", "better", "worse",
+        "nothing", "no effect", "didn't", "did not", "not really", "a little", "bit",
+        "took", "taken", "haven't taken", "havent taken",
+    ),
+    PAIN_CHARACTERISTICS: _PAIN_CHARACTER_WORDS + (
+        "ache", "achy", "tender", "sore", "pressure", "cramp", "cramping", "pulling",
+        "tight", "electric", "pins", "like a", "feels like", "constant", "intermittent",
+    ),
+}
+
+# A reply that is itself a QUESTION on another topic ("Can I shower?",
+# "When can I drive?") is "clearly another topic" when it carries no
+# field evidence at all.
+_OFF_TOPIC_QUESTION_CUES: Tuple[str, ...] = (
+    "can i ", "could i ", "should i ", "when can", "how do i", "how should i",
+    "what about", "is it ok", "is it okay", "am i allowed", "do i need",
+    "what time", "when should", "how long", "may i ",
+)
+
+_TEMPERATURE_READING_RE = re.compile(
+    r"\b3[5-9](?:\.\d)?\b|\b4[0-2](?:\.\d)?\b|\b9[6-9](?:\.\d)?\b|\b10[0-5](?:\.\d)?\b"
+)
+
+
+def _is_affirmative_answer(text: str) -> bool:
+    normalised = _normalise(text).strip(" .!")
+    if not normalised:
+        return False
+    if normalised in _AFFIRMATIVE_ANSWERS:
+        return True
+    return bool(re.match(r"^(yes|yeah|yep|yup)\b", normalised))
+
+
+def _is_offtopic_question(normalised: str) -> bool:
+    if normalised.endswith("?"):
+        return True
+    return any(normalised.startswith(cue) for cue in _OFF_TOPIC_QUESTION_CUES)
+
+
+def _parse_pain_score_answer(text: str) -> Optional[Any]:
+    """An exact 0-10 number (digits or a number word) or a category word
+    from a reply to the pain-score question; None when there is neither."""
+    normalised = _normalise(text)
+    match = _PAIN_SCALE_RE.search(normalised) or _BARE_NUMBER_RE.search(normalised)
+    if match:
+        value = int(match.group(1))
+        if 0 <= value <= 10:
+            return value
+    for word, value in _WORD_NUMBERS.items():
+        if _word_present(normalised, word):
+            return value
+    category = _extract_pain_score_category(text)
+    if category is not None:
+        return category
+    return None
+
+
+def answer_plausibly_fits(field_name: str, text: str) -> bool:
+    """
+    True when `text` is a plausible answer to the question for `field_name`
+    -- a parser match, a yes/no for a yes/no question, a number where a
+    number is expected, or (for the open-ended "describe it" question)
+    anything that is not an off-topic question. An uncertain answer ("I
+    don't know") is handled by the caller before this is consulted.
+    """
+    normalised = _normalise(text).strip()
+    if not normalised:
+        return False
+
+    if field_name == PAIN_SCORE:
+        return _parse_pain_score_answer(text) is not None
+
+    if field_name == ONSET:
+        if _extract_onset_direct(text) is not None:
+            return True
+        return any(word in normalised for word in _ONSET_ANSWER_WORDS)
+
+    if field_name == LOCATION:
+        return any(word in normalised for word in _LOCATION_ANSWER_WORDS)
+
+    if field_name == WORSENING_OR_IMPROVING:
+        if _extract_worsening_direct(text) is not None:
+            return True
+        return any(word in normalised for word in _TREND_ANSWER_WORDS)
+
+    if field_name == PAIN_CHARACTERISTICS:
+        if any(word in normalised for word in _FIELD_ANSWER_KEYWORDS[PAIN_CHARACTERISTICS]):
+            return True
+        return not _is_offtopic_question(normalised)
+
+    if field_name in _YES_NO_FIELDS:
+        if _is_affirmative_answer(normalised) or _is_negative_answer(normalised):
+            return True
+        if any(word in normalised for word in _FIELD_ANSWER_KEYWORDS.get(field_name, ())):
+            return True
+        if field_name == FEVER_OR_TEMPERATURE and _TEMPERATURE_READING_RE.search(normalised):
+            return True
+        return False
+
+    return not _is_offtopic_question(normalised)
+
+
+def _concrete_value_if_any(field_name: str, text: str) -> Optional[Any]:
+    """A concrete, parser-backed value hidden inside an otherwise UNCERTAIN
+    reply ("not sure, maybe a 6" -> 6; "I think it's getting worse, not
+    sure" -> "worsening"). None when the reply carries nothing concrete, in
+    which case the caller treats it as genuinely uncertain."""
+    if field_name == PAIN_SCORE:
+        return _parse_pain_score_answer(text)
+    if field_name == ONSET:
+        return _extract_onset_direct(text)
+    if field_name == WORSENING_OR_IMPROVING:
+        return _extract_worsening_direct(text)
+    if field_name == LOCATION:
+        normalised = _normalise(text)
+        if any(term in normalised for term in _LOCATION_ANCHOR_WORDS):
+            return _extract_location_phrase(text)
+        return None
+    if field_name in _YES_NO_FIELDS:
+        normalised = _normalise(text)
+        # Only an UNAMBIGUOUS leading yes/no counts; "not sure if it's
+        # swollen" must stay uncertain.
+        if re.match(r"^(yes|yeah|yep|yup)\b", normalised):
+            return "yes"
+        if re.match(r"^(no|nope|nah)\b", normalised) and not _is_uncertain_answer(normalised[:12]):
+            return "no"
+        return None
+    return None
+
+
+# ============================================================================
+# NEW-COMPLAINT DETECTION -- used ONLY to decide, after an off-topic detour,
+# whether a message resumes the pending Pain question (a bare answer) or
+# opens a fresh Pain complaint (a full sentence describing pain somewhere).
+# ============================================================================
+
+_COMPLAINT_CUES: Tuple[str, ...] = (
+    "hurt", "hurts", "hurting", "ache", "aches", "aching", "sore", "soreness",
+    "painful", "pain in", "pain is", "pain has", "pain started", "pain got",
+    "started hurting", "has started", "flared", "flare", "throbbing in",
+    "stabbing in", "burning in", "my pain",
+)
+
+
+def looks_like_new_complaint(text: str) -> bool:
+    """A full sentence describing pain (location/pain word + complaint cue,
+    four or more words), as opposed to a bare answer like "8", "my calf",
+    "yes it's swollen" or "suddenly". Replies that OPEN with a yes/no are
+    never treated as a new complaint."""
+    normalised = _normalise(text).strip(" .!")
+    if not normalised:
+        return False
+    if _is_affirmative_answer(normalised) or _is_negative_answer(normalised):
+        return False
+    if len(normalised.split()) < 4:
+        return False
+    if not any(cue in normalised for cue in _COMPLAINT_CUES):
+        return False
+    return "pain" in normalised or any(word in normalised for word in _LOCATION_ANSWER_WORDS)
+
+
+# ============================================================================
 # PENDING-FIELD ATTRIBUTION (question/answer pairs) -- mirrors
 # wound_care_agent.py::_extract_answer_pairs. A short reply like "8" or
 # "suddenly" is attributed to whatever field the PRECEDING assistant
 # question was about, regardless of whether the reply's own wording would
-# have matched direct-extraction keywords.
+# have matched direct-extraction keywords -- PROVIDED it plausibly answers
+# that question at all (see answer_plausibly_fits).
 # ============================================================================
 
-def _attribute_pending_answer(field_name: str, text: str) -> Optional[str]:
+def _attribute_pending_answer(field_name: str, text: str) -> Optional[Any]:
     """Convert a raw reply into a stored value for `field_name`, once we
     already know (from the preceding assistant question) which field this
-    reply answers. Falls back to the raw trimmed text when no
-    field-specific parser applies -- the point of pending-field attribution
-    is that we don't need the reply to contain a recognisable keyword."""
+    reply answers AND that it plausibly fits. Falls back to the raw trimmed
+    text when no field-specific parser applies."""
     stripped = text.strip()
     if not stripped:
         return None
 
     if field_name == PAIN_SCORE:
-        match = _PAIN_SCALE_RE.search(_normalise(text)) or _BARE_NUMBER_RE.search(_normalise(text))
-        if match:
-            value = int(match.group(1))
-            if 0 <= value <= 10:
-                return str(value)
-        # No exact number given -- accept a rough category ("mild"/
-        # "moderate"/"severe") instead of looping on the same question.
-        # Never invented as a fabricated exact score (see severity_bucket
-        # and pain_integration._readable_value for how this is rendered).
-        category = _extract_pain_score_category(text)
-        if category is not None:
-            return category
-        return None
+        value = _parse_pain_score_answer(text)
+        if value is None:
+            return None
+        return str(value) if isinstance(value, int) else value
 
     if field_name == ONSET:
         direct = _extract_onset_direct(text)
@@ -809,34 +1223,117 @@ def _attribute_pending_answer(field_name: str, text: str) -> Optional[str]:
         direct = _extract_worsening_direct(text)
         return direct if direct is not None else stripped
 
+    if field_name in _YES_NO_FIELDS:
+        normalised = _normalise(text).strip(" .!")
+        if normalised in _AFFIRMATIVE_ANSWERS and normalised not in (
+            "still", "same", "about the same", "unchanged", "about that",
+        ):
+            return "yes"
+        if normalised in _NEGATIVE_ANSWERS:
+            return "no"
+        return stripped
+
     # Every remaining field: accept the raw answer verbatim (still subject
     # to the negative-answer/uncertainty handling one level up).
     return stripped
 
 
-def _extract_answer_pairs(
+def _detour_user_indices(history: List[Dict[str, str]]) -> Set[int]:
+    """
+    Indices of USER turns that belong to an off-topic DETOUR inside the
+    active Pain assessment: a user message whose very next assistant reply
+    is NOT a Pain question (another agent answered it -- e.g. "Can I climb
+    stairs?" -> Daily Activity). Such a turn is skipped by BOTH the
+    pending-answer attribution (it must not consume the pending Pain
+    question) and the opportunistic direct-extraction pass (a wound/activity
+    message must not seed Pain facts). The CURRENT message (last entry, no
+    assistant reply after it yet) is never a detour.
+    """
+    detours: Set[int] = set()
+    last_user_idx: Optional[int] = None
+    for idx, item in enumerate(history):
+        if not isinstance(item, dict):
+            continue
+        role = str(item.get("role", "")).lower().strip()
+        content = str(item.get("content", "")).strip()
+        if not content:
+            continue
+        if role == "user":
+            last_user_idx = idx
+            continue
+        if role in {"assistant", "bot"}:
+            if last_user_idx is not None and _field_from_question(content) is None:
+                detours.add(last_user_idx)
+            last_user_idx = None
+    return detours
+
+
+class AnswerPairs:
+    """Result of _extract_answer_pairs_detailed() -- see that function."""
+
+    __slots__ = (
+        "paired", "needs_alt", "needs_clarify", "confirm_declined",
+        "detour_indices", "confirm_reply_indices", "paired_by_index",
+    )
+
+    def __init__(self) -> None:
+        self.paired: Dict[str, Any] = {}
+        self.needs_alt: Set[str] = set()
+        self.needs_clarify: Set[str] = set()
+        self.confirm_declined: Set[str] = set()
+        self.detour_indices: Set[int] = set()
+        # The same attributions keyed by the USER-turn index they came from,
+        # so build_assessment_detailed() can merge attributed answers and
+        # opportunistic extraction in TURN ORDER (a later explicit "7 out of
+        # 10" must beat an earlier confirmed 6, whichever pass produced it).
+        self.paired_by_index: Dict[int, Dict[str, Any]] = {}
+        # User turns that answered the memory CONFIRMATION question with a
+        # plain yes/"about the same" -- "the same" there refers to the
+        # logged SCORE, so it must not be read as a trend answer.
+        self.confirm_reply_indices: Set[int] = set()
+
+    def _resolve(self, field_name: str, value: Any, idx: Optional[int] = None) -> None:
+        self.paired[field_name] = value
+        self.needs_alt.discard(field_name)
+        self.needs_clarify.discard(field_name)
+        self.confirm_declined.discard(field_name)
+        if idx is not None:
+            self.paired_by_index.setdefault(idx, {})[field_name] = value
+
+
+def _extract_answer_pairs_detailed(
     chat_history: Optional[List[Dict[str, str]]],
     current_message: str,
-) -> Tuple[Dict[str, Any], Set[str]]:
+) -> AnswerPairs:
     """
-    Returns (paired_facts, needs_alt) -- see wound_care_agent.py's identical
-    contract. needs_alt holds fields where the patient answered "I don't
-    know" to the FIRST-phrasing question; those are left OUT of
-    paired_facts so the caller re-asks with ALT_QUESTIONS instead of
-    accepting uncertainty as a real value. A SECOND uncertain answer (to the
-    alt phrasing) is recorded as the literal string "unknown".
+    Walk the conversation as question/answer pairs:
+
+      - an UNCERTAIN answer ("I don't know") to a FIRST-phrasing question
+        puts the field in `needs_alt` (ask the simplified ALT rephrase);
+        an uncertain answer to any SECOND ask records "unknown";
+      - an answer that does NOT plausibly fit the question (see
+        answer_plausibly_fits) is never stored: a first such answer puts
+        the field in `needs_clarify` (ask CLARIFY_QUESTIONS once); a second
+        records "unknown";
+      - a reply to the memory CONFIRMATION question ("Your log says 6/10
+        ... still about that?") resolves to the logged value on a yes, to
+        the stated number/category when the patient gives one, and
+        otherwise (no / anything else) to `confirm_declined` so the normal
+        pain-score question is asked next;
+      - user turns inside an off-topic detour are skipped entirely.
     """
     history = list(chat_history or [])
     if current_message.strip():
         history = history + [{"role": "user", "content": current_message.strip()}]
 
-    paired: Dict[str, Any] = {}
-    needs_alt: Set[str] = set()
+    result = AnswerPairs()
+    result.detour_indices = _detour_user_indices(history)
 
     pending_field: Optional[str] = None
-    pending_is_alt = False
+    pending_is_second = False
+    pending_confirm_value: Optional[int] = None
 
-    for item in history:
+    for idx, item in enumerate(history):
         if not isinstance(item, dict):
             continue
         role = str(item.get("role", "")).lower().strip()
@@ -848,37 +1345,75 @@ def _extract_answer_pairs(
             field_name = _field_from_question(content)
             if field_name:
                 pending_field = field_name
-                pending_is_alt = _is_alt_question(content)
+                pending_is_second = _is_alt_question(content)
+                pending_confirm_value = _confirm_value_from_question(content)
             continue
 
-        if role == "user" and pending_field:
-            if _is_uncertain_answer(content):
-                if pending_is_alt:
-                    paired[pending_field] = "unknown"
-                    needs_alt.discard(pending_field)
-                else:
-                    needs_alt.add(pending_field)
-            else:
-                correction = _detect_correction(content)
-                if correction is not None and correction[0] != pending_field:
-                    # This message is a cue-gated correction to a DIFFERENT,
-                    # already-established field (e.g. correcting pain_score
-                    # while onset is what's actually pending) -- do NOT
-                    # consume the pending question with it. The correction
-                    # itself is applied in build_assessment()'s corrections
-                    # pass; leaving pending_field unresolved here means the
-                    # SAME question is naturally re-asked, since the field
-                    # never appears in `paired`.
-                    pass
-                else:
-                    value = _attribute_pending_answer(pending_field, content)
-                    if value is not None:
-                        paired[pending_field] = value
-                        needs_alt.discard(pending_field)
-            pending_field = None
-            pending_is_alt = False
+        if role != "user":
+            continue
+        if idx in result.detour_indices:
+            # Detour turn (answered by another agent) -- leave the pending
+            # Pain question open so a later bare answer still resumes it.
+            continue
+        if not pending_field:
+            continue
 
-    return paired, needs_alt
+        if pending_confirm_value is not None:
+            concrete = _parse_pain_score_answer(content)
+            if concrete is not None and not _is_uncertain_answer(content):
+                result._resolve(pending_field, str(concrete) if isinstance(concrete, int) else concrete, idx)
+            elif _is_affirmative_answer(content):
+                result._resolve(pending_field, str(pending_confirm_value), idx)
+                result.confirm_reply_indices.add(idx)
+            else:
+                result.confirm_declined.add(pending_field)
+        elif _is_uncertain_answer(content):
+            concrete = _concrete_value_if_any(pending_field, content)
+            if concrete is not None:
+                result._resolve(pending_field, str(concrete) if isinstance(concrete, int) else concrete, idx)
+            elif pending_is_second:
+                result._resolve(pending_field, "unknown", idx)
+            else:
+                result.needs_alt.add(pending_field)
+        else:
+            correction = _detect_correction(content)
+            if correction is not None and correction[0] != pending_field:
+                # A cue-gated correction to a DIFFERENT, already-established
+                # field (e.g. correcting pain_score while onset is pending)
+                # -- do NOT consume the pending question with it. The
+                # correction itself is applied in build_assessment()'s
+                # corrections pass; the pending question is re-asked.
+                pass
+            elif not answer_plausibly_fits(pending_field, content):
+                if pending_is_second:
+                    result._resolve(pending_field, "unknown", idx)
+                else:
+                    result.needs_clarify.add(pending_field)
+            else:
+                value = _attribute_pending_answer(pending_field, content)
+                if value is not None:
+                    result._resolve(pending_field, value, idx)
+                elif pending_is_second:
+                    result._resolve(pending_field, "unknown", idx)
+                else:
+                    result.needs_clarify.add(pending_field)
+
+        pending_field = None
+        pending_is_second = False
+        pending_confirm_value = None
+
+    return result
+
+
+def _extract_answer_pairs(
+    chat_history: Optional[List[Dict[str, str]]],
+    current_message: str,
+) -> Tuple[Dict[str, Any], Set[str]]:
+    """Backward-compatible view: (paired_facts, needs_second_ask), where
+    needs_second_ask is the union of the uncertain (ALT) and unfitting
+    (CLARIFY) sets -- both mean "ask this field once more, differently"."""
+    detailed = _extract_answer_pairs_detailed(chat_history, current_message)
+    return detailed.paired, set(detailed.needs_alt) | set(detailed.needs_clarify)
 
 
 # ============================================================================
@@ -910,67 +1445,123 @@ def seed_from_structured_fields(
 # BUILD ASSESSMENT
 # ============================================================================
 
-def build_assessment(
+class AssessmentView:
+    """Everything build_assessment_detailed() knows about the active Pain
+    conversation. `needs_alt` / `needs_clarify` / `confirm_declined` are
+    disjoint from the keys of `assessment` (a resolved field is never also
+    pending a re-ask)."""
+
+    __slots__ = ("assessment", "needs_alt", "needs_clarify", "confirm_declined", "detour_indices")
+
+    def __init__(
+        self,
+        assessment: Dict[str, Any],
+        needs_alt: Set[str],
+        needs_clarify: Set[str],
+        confirm_declined: Set[str],
+        detour_indices: Optional[Set[int]] = None,
+    ) -> None:
+        self.assessment = assessment
+        self.needs_alt = needs_alt
+        self.needs_clarify = needs_clarify
+        self.confirm_declined = confirm_declined
+        # Indices (into chat_history + [current message]) of user turns that
+        # belong to an off-topic detour -- see _detour_user_indices().
+        self.detour_indices: Set[int] = set(detour_indices or ())
+
+    @property
+    def needs_second_ask(self) -> Set[str]:
+        return set(self.needs_alt) | set(self.needs_clarify)
+
+
+# The operated joint's bare name is too generic to count as pinpointing
+# WHERE the pain is (for a TKA patient "knee" is already excluded from
+# opportunistic extraction -- see _LOCATION_TERMS). "hip" stays in
+# _LOCATION_TERMS because for a KNEE patient hip pain IS a specific place;
+# for a HIP patient it is the operated joint, so an opportunistic bare
+# "hip" is dropped and the location question (groin / thigh / buttock /
+# calf / somewhere else) is asked. A bare "hip" given AS THE ANSWER to that
+# question is still accepted (pending-answer attribution is unaffected).
+_GENERIC_JOINT_LOCATIONS: Dict[str, Tuple[str, ...]] = {
+    "THA": ("hip", "my hip", "the hip", "in my hip", "in the hip", "hip itself"),
+    "TKA": ("knee", "my knee", "the knee", "in my knee", "in the knee", "knee itself"),
+}
+
+
+def _is_generic_joint_location(value: Any, procedure: Optional[str]) -> bool:
+    generic = _GENERIC_JOINT_LOCATIONS.get(str(procedure or "").strip().upper())
+    if not generic:
+        return False
+    return _normalise(str(value)) in generic
+
+
+def build_assessment_detailed(
     chat_history: Optional[List[Dict[str, str]]],
     current_message: str,
     *,
     seed_facts: Optional[Dict[str, Any]] = None,
     cached_facts: Optional[Dict[str, Any]] = None,
-) -> Tuple[Dict[str, Any], Set[str]]:
+    procedure: Optional[str] = None,
+) -> AssessmentView:
     """
     Reconstruct everything currently known for this Pain conversation:
         1. opportunistic direct extraction from every user message in the
-           conversation (catches facts volunteered without being asked)
+           conversation (catches facts volunteered without being asked --
+           this is also what makes a MULTI-SLOT reply like "7 out of 10,
+           started suddenly yesterday in the calf" fill three fields at
+           once), skipping user turns inside an off-topic detour
         2. pending-field (question/answer pair) attribution, which takes
-           priority over (1) for whichever field it resolves
+           priority over (1) for whichever field it resolves -- but only
+           when the reply plausibly answers the pending question
         3. cue-gated corrections (see _detect_correction), applied in
            chronological order so a LATER correction always overrides an
-           earlier value -- this is what lets "Actually wait, it's more
-           like a 7 than a 5." fix an already-resolved pain_score even
-           though a different field is the one actually pending
+           earlier value
         4. `cached_facts` -- a FALLBACK BASELINE only, filling ONLY the
            fields steps 1-3 left unresolved (see pain_state.py's
-           structured-fact cache). This is what lets an earlier turn's
-           structured pain_score/swelling_description survive onto a LATER
-           turn that doesn't resupply it, WITHOUT letting a stale cached
-           value override a genuine free-text correction from steps 1-3 --
-           a field already set by conversation/correction is never
-           overwritten by the cache.
+           structured-fact cache)
         5. `seed_facts` -- the CURRENT request's own structured API fields,
-           which always take top priority, unconditionally overriding
-           everything above -- explicit structured input supplied THIS
-           turn is trusted over inferred text parsing AND over the cache
-           (existing, unchanged API behaviour).
-
-    Returns (assessment, needs_alt).
+           which always take top priority
     """
     history = list(chat_history or [])
     if current_message.strip():
         history = history + [{"role": "user", "content": current_message.strip()}]
 
+    pairs = _extract_answer_pairs_detailed(chat_history, current_message)
+
     assessment: Dict[str, Any] = {}
-    for item in history:
+    for idx, item in enumerate(history):
         if not isinstance(item, dict):
             continue
         if str(item.get("role", "")).lower().strip() != "user":
+            continue
+        if idx in pairs.detour_indices:
             continue
         content = str(item.get("content", "")).strip()
         if not content:
             continue
         for field_name, value in _direct_extraction_for_message(content).items():
+            if field_name == WORSENING_OR_IMPROVING and idx in pairs.confirm_reply_indices:
+                continue
+            if field_name == LOCATION and _is_generic_joint_location(value, procedure):
+                continue
+            assessment[field_name] = value
+        # Pending-answer attribution for THIS turn wins over the same
+        # turn's opportunistic extraction -- but a LATER turn's explicit
+        # statement still overrides an earlier attributed answer (turn
+        # order, not pass order, decides).
+        for field_name, value in pairs.paired_by_index.get(idx, {}).items():
             assessment[field_name] = value
 
-    paired, needs_alt = _extract_answer_pairs(chat_history, current_message)
-    assessment.update(paired)
+    needs_alt = set(pairs.needs_alt)
+    needs_clarify = set(pairs.needs_clarify)
+    confirm_declined = set(pairs.confirm_declined)
 
-    for field_name in list(needs_alt):
-        if field_name in assessment:
-            needs_alt.discard(field_name)
-
-    for item in history:
+    for idx, item in enumerate(history):
         if not isinstance(item, dict):
             continue
         if str(item.get("role", "")).lower().strip() != "user":
+            continue
+        if idx in pairs.detour_indices:
             continue
         content = str(item.get("content", "")).strip()
         if not content:
@@ -979,23 +1570,23 @@ def build_assessment(
         if correction is not None:
             field_name, value = correction
             assessment[field_name] = value
-            needs_alt.discard(field_name)
 
     if cached_facts:
         for field_name, value in cached_facts.items():
-            # setdefault: fills ONLY a field still missing after direct
-            # extraction/pending-answer/corrections -- a value already
-            # established from the conversation itself is never overwritten
-            # by a cached (possibly stale) structured fact.
+            # Fills ONLY a field still missing after direct extraction/
+            # pending-answer/corrections -- a value already established
+            # from the conversation itself is never overwritten by a cached
+            # (possibly stale) structured fact.
             if field_name not in assessment:
                 assessment[field_name] = value
-                needs_alt.discard(field_name)
 
     if seed_facts:
         assessment.update(seed_facts)
-        for field_name in list(needs_alt):
+
+    for pending_set in (needs_alt, needs_clarify, confirm_declined):
+        for field_name in list(pending_set):
             if field_name in assessment:
-                needs_alt.discard(field_name)
+                pending_set.discard(field_name)
 
     if PAIN_SCORE in assessment and assessment[PAIN_SCORE] != "unknown":
         try:
@@ -1003,7 +1594,25 @@ def build_assessment(
         except (TypeError, ValueError):
             pass
 
-    return assessment, needs_alt
+    return AssessmentView(assessment, needs_alt, needs_clarify, confirm_declined, pairs.detour_indices)
+
+
+def build_assessment(
+    chat_history: Optional[List[Dict[str, str]]],
+    current_message: str,
+    *,
+    seed_facts: Optional[Dict[str, Any]] = None,
+    cached_facts: Optional[Dict[str, Any]] = None,
+) -> Tuple[Dict[str, Any], Set[str]]:
+    """Backward-compatible (assessment, needs_second_ask) view of
+    build_assessment_detailed() -- see that function for the precedence
+    contract. The second element is the union of fields awaiting the ALT
+    rephrase (uncertain answer) and fields awaiting the CLARIFY re-ask
+    (reply did not fit the question)."""
+    view = build_assessment_detailed(
+        chat_history, current_message, seed_facts=seed_facts, cached_facts=cached_facts,
+    )
+    return view.assessment, view.needs_second_ask
 
 
 # ============================================================================
@@ -1014,6 +1623,7 @@ def select_next_field(
     assessment: Dict[str, Any],
     *,
     medication_mentioned: bool = False,
+    procedure: Optional[str] = None,
 ) -> Optional[str]:
     """
     Decide the single most useful next field to ask about, given what is
@@ -1021,12 +1631,25 @@ def select_next_field(
     branches on location and severity, and stops as soon as the current
     branch has enough information rather than marching through every
     possible field.
+
+    `procedure` ("TKA"/"THA"/"GEN"/None) only changes WHICH questions are
+    collected after the three core fields; it never decides a triage level
+    (SafetyTriageEngine does that, upstream, deterministically):
+
+      - TKA / default: calf branch (swelling -> warmth -> numbness, + fever
+        when moderate/severe); joint branch (trend, + stiffness when severe).
+      - THA: calf branch as above; THIGH branch (swelling -> warmth, + trend
+        when moderate/severe); hip-joint branch (groin/buttock/hip/other:
+        trend when moderate/severe, + stiffness and numbness/weakness when
+        severe -- the agent collects these so the record is complete; what
+        they mean is upstream's call).
     """
     for field_name in REQUIRED_FIELDS:
         if field_name not in assessment:
             return field_name
 
-    branch = classify_location_branch(str(assessment.get(LOCATION, "")))
+    is_tha = str(procedure or "").strip().upper() == "THA"
+    branch = classify_location_branch(str(assessment.get(LOCATION, "")), procedure)
     severity = severity_bucket(assessment.get(PAIN_SCORE))
 
     if branch == "calf":
@@ -1035,6 +1658,13 @@ def select_next_field(
                 return field_name
         if severity in ("moderate", "severe") and FEVER_OR_TEMPERATURE not in assessment:
             return FEVER_OR_TEMPERATURE
+    elif branch == "thigh":
+        # THA-only thigh branch.
+        for field_name in (SWELLING, WARMTH_OR_REDNESS):
+            if field_name not in assessment:
+                return field_name
+        if severity in ("moderate", "severe") and WORSENING_OR_IMPROVING not in assessment:
+            return WORSENING_OR_IMPROVING
     else:
         # Standard joint-pain branch -- deliberately does NOT launch the
         # calf-specific swelling/warmth/numbness sequence for ordinary
@@ -1044,6 +1674,8 @@ def select_next_field(
                 return WORSENING_OR_IMPROVING
             if STIFFNESS not in assessment:
                 return STIFFNESS
+            if is_tha and NUMBNESS_OR_WEAKNESS not in assessment:
+                return NUMBNESS_OR_WEAKNESS
         elif severity == "moderate":
             if WORSENING_OR_IMPROVING not in assessment:
                 return WORSENING_OR_IMPROVING
@@ -1056,8 +1688,47 @@ def select_next_field(
     return None
 
 
-def is_complete(assessment: Dict[str, Any], *, medication_mentioned: bool = False) -> bool:
-    return select_next_field(assessment, medication_mentioned=medication_mentioned) is None
+def is_complete(
+    assessment: Dict[str, Any],
+    *,
+    medication_mentioned: bool = False,
+    procedure: Optional[str] = None,
+) -> bool:
+    return select_next_field(
+        assessment, medication_mentioned=medication_mentioned, procedure=procedure,
+    ) is None
+
+
+def estimate_remaining_questions(
+    assessment: Dict[str, Any],
+    *,
+    medication_mentioned: bool = False,
+    procedure: Optional[str] = None,
+) -> int:
+    """
+    How many more questions the interview needs from here, INCLUDING the
+    one about to be asked, assuming every answer stays on the current
+    branch. Computed by replaying select_next_field() with neutral
+    placeholders, so it is a LOWER BOUND: an answer that opens a new branch
+    (a calf location, a severe score) can add questions. Used only for the
+    patient-facing progress indicator, never for any decision.
+    """
+    simulated = dict(assessment)
+    count = 0
+    while count < 20:
+        field_name = select_next_field(
+            simulated, medication_mentioned=medication_mentioned, procedure=procedure,
+        )
+        if field_name is None:
+            break
+        count += 1
+        simulated[field_name] = "unknown"
+    return count
+
+
+# Fields whose ANSWER decides which branch the interview takes -- the
+# progress indicator stays deliberately vague while one of these is open.
+BRANCH_DECIDING_FIELDS: Tuple[str, ...] = (PAIN_SCORE, LOCATION)
 
 
 # ============================================================================

@@ -1,0 +1,45 @@
+{
+  "id": "c21_rehab_status_unknown",
+  "agent": "rehab",
+  "title": "No status on record: two questions, 'not yet' persisted, surgeries untouched",
+  "tags": [
+    "memory"
+  ],
+  "record": {
+    "patient_id": "EVAL-C21",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 9,
+    "weight_bearing_status": null,
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 10
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 2,
+    "completes": true,
+    "persist_min": 1,
+    "wb_record_unchanged": true
+  },
+  "turns": [
+    {
+      "patient": "What exercises should I do today?"
+    },
+    {
+      "patient": "no",
+      "must_collect": [
+        "exercise_safety"
+      ]
+    },
+    {
+      "patient": "not yet",
+      "must_collect": [
+        "exercises_done_today"
+      ]
+    }
+  ]
+}
