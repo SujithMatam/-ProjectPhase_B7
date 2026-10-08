@@ -21,6 +21,7 @@ The classifier only returns routable intents.
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from typing import Optional
@@ -34,6 +35,13 @@ from lam.schemas import IntentLabel, LAMContext
 
 SEMANTIC_MIN_SCORE = 0.35
 SEMANTIC_MIN_MARGIN = 0.04
+
+# EXPERIMENT, not shipped (eval/routing/REPORT.md step 4). When True,
+# Sentence-BERT ranks the intents first and the keyword rules only act as a
+# tiebreaker (thin margin) or as the fallback (low confidence / model
+# offline). Off by default: the shipped order is keyword rules first, then
+# semantic. Set LAM_SEMANTIC_FIRST=1 in the environment to switch it on.
+SEMANTIC_FIRST = os.environ.get("LAM_SEMANTIC_FIRST", "").strip().lower() in {"1", "true", "yes", "on"}
 
 _MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -1040,6 +1048,9 @@ class IntentClassifier:
                 decision_path="deterministic_context",
             )
 
+        if SEMANTIC_FIRST:
+            return cls._classify_semantic_first(query, text)
+
         # ============================================================
         # STEP 1
         # Deterministic classification
@@ -1180,6 +1191,82 @@ class IntentClassifier:
             matched_prototype=top1_prototype,
             decision_path="semantic",
         )
+
+    # ========================================================================
+    # EXPERIMENT: SEMANTIC FIRST, KEYWORDS AS TIEBREAKER (SEMANTIC_FIRST)
+    # ========================================================================
+
+    @classmethod
+    def _classify_semantic_first(
+        cls,
+        query: str,
+        text: str,
+    ) -> ClassificationDetail:
+        """
+        Order used only when SEMANTIC_FIRST is True:
+
+          1. Sentence-BERT scores (with the same intake-cue gate as the
+             shipped path).
+          2. Confident and clear (score >= SEMANTIC_MIN_SCORE, margin >=
+             SEMANTIC_MIN_MARGIN) -> the semantic winner.
+          3. Confident but thin margin -> the keyword rules break the tie
+             between the top two; a keyword hit outside the top two wins
+             over both (it is the stronger evidence); no keyword at all ->
+             keep the semantic winner.
+          4. Low confidence or model offline -> the keyword rules, then the
+             default routable intent (exactly the shipped fallback).
+        """
+
+        def _detail(intent, path, ranked=None):
+            if ranked:
+                top1_intent, (top1_score, top1_prototype) = ranked[0]
+                top2_intent, top2_score = (ranked[1][0], ranked[1][1][0]) if len(ranked) > 1 else (None, 0.0)
+                return ClassificationDetail(
+                    intent=intent, top1_intent=top1_intent, top1_score=top1_score,
+                    top2_intent=top2_intent, top2_score=top2_score,
+                    margin=top1_score - top2_score, matched_prototype=top1_prototype,
+                    decision_path=path,
+                )
+            return ClassificationDetail(
+                intent=intent, top1_intent=None, top1_score=0.0, top2_intent=None,
+                top2_score=0.0, margin=0.0, matched_prototype=None, decision_path=path,
+            )
+
+        scores = _semantic_scores(text)
+
+        if scores is None:
+            return _detail(cls._classify_by_keywords(query), "fallback_offline")
+
+        if (
+            IntentLabel.INTAKE_CONTEXT in scores
+            and not _has_intake_cue(text, query)
+        ):
+            scores = {
+                intent: value for intent, value in scores.items()
+                if intent != IntentLabel.INTAKE_CONTEXT
+            }
+
+        ranked = sorted(scores.items(), key=lambda item: item[1][0], reverse=True)
+        top1_intent, top1_score = ranked[0][0], ranked[0][1][0]
+        top2_intent = ranked[1][0] if len(ranked) > 1 else None
+        top2_score = ranked[1][1][0] if len(ranked) > 1 else 0.0
+        margin = top1_score - top2_score
+
+        if top1_score >= SEMANTIC_MIN_SCORE and margin >= SEMANTIC_MIN_MARGIN:
+            return _detail(top1_intent, "semantic_first", ranked)
+
+        deterministic = _deterministic_intent(query)
+
+        if top1_score >= SEMANTIC_MIN_SCORE:
+            # Thin margin: let the keyword rules break the tie.
+            if deterministic in (top1_intent, top2_intent):
+                return _detail(deterministic, "semfirst_tiebreak_keywords", ranked)
+            if deterministic is not None:
+                return _detail(deterministic, "semfirst_tiebreak_deterministic", ranked)
+            return _detail(top1_intent, "semfirst_tiebreak_top1", ranked)
+
+        # Low confidence: keyword rules, then the default.
+        return _detail(cls._classify_by_keywords(query), "semfirst_low_confidence", ranked)
 
     # ========================================================================
     # KEYWORD FALLBACK

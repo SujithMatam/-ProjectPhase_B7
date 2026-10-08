@@ -11,23 +11,24 @@ A prediction is correct when it is in the case's acceptable set. Two cases that 
 | Baseline (`baseline_b6c1730`) | **186/230 (81%)** | 141/176 (80%) | 186/224 (83%) | **195/230 (85%)** | 176/230 (77%) |
 | A: the three requested changes (`fix_a_requested`) | **195/230 (85%)** | 145/176 (82%) | 195/224 (87%) | **198/230 (86%)** | 185/230 (80%) |
 | B: A + semantic intake-cue gate (shipped) (`fix_b_intake_gate`) | **200/230 (87%)** | 149/176 (85%) | 200/224 (89%) | **202/230 (88%)** | 189/230 (82%) |
+| Experiment: semantic-first (flag on, not shipped) (`semantic_first`) | **198/230 (86%)** | 152/176 (86%) | 198/224 (88%) | **207/230 (90%)** | 182/230 (79%) |
 
 The shipped change (step B) moves the classifier from 186/230 (81%) to 200/230 (87%) and the orchestrator's routing from 195/230 (85%) to 202/230 (88%), with no agent below its baseline at either step (table below). On the conversation eval (`eval/agents/REPORT.md`, re-run after the fix) the orchestrator misroutes 10 of 97 turns instead of 11: c14's opening "Am I on track with my knee?" now reaches Recovery.
 
 ## Per agent, before / after
 
-| Agent | n | Baseline classifier | orchestrator | A classifier | orchestrator | B classifier | orchestrator |
-|---|---|---|---|---|---|---|---|
-| Pain & Symptoms | 36 | 27/36 (75%) | 27/36 (75%) | 27/36 (75%) (=) | 27/36 (75%) (=) | 29/36 (81%) (+2) | 28/36 (78%) (+1) |
-| Recovery Progress | 31 | 23/31 (74%) | 27/31 (87%) | 27/31 (87%) (+4) | 28/31 (90%) (+1) | 28/31 (90%) (+1) | 29/31 (94%) (+1) |
-| Rehabilitation | 28 | 23/28 (82%) | 24/28 (86%) | 24/28 (86%) (+1) | 24/28 (86%) (=) | 26/28 (93%) (+2) | 26/28 (93%) (+2) |
-| Wound Care | 26 | 25/26 (96%) | 25/26 (96%) | 25/26 (96%) (=) | 25/26 (96%) (=) | 25/26 (96%) (=) | 25/26 (96%) (=) |
-| Medication | 27 | 26/27 (96%) | 26/27 (96%) | 26/27 (96%) (=) | 26/27 (96%) (=) | 26/27 (96%) (=) | 26/27 (96%) (=) |
-| Daily Activity | 25 | 19/25 (76%) | 20/25 (80%) | 21/25 (84%) (+2) | 21/25 (84%) (+1) | 21/25 (84%) (=) | 21/25 (84%) (=) |
-| Nutrition | 24 | 20/24 (83%) | 20/24 (83%) | 20/24 (83%) (=) | 20/24 (83%) (=) | 20/24 (83%) (=) | 20/24 (83%) (=) |
-| Mental Wellbeing | 25 | 15/25 (60%) | 18/25 (72%) | 17/25 (68%) (+2) | 19/25 (76%) (+1) | 17/25 (68%) (=) | 19/25 (76%) (=) |
-| Intake / Context | 8 | 8/8 (100%) | 8/8 (100%) | 8/8 (100%) (=) | 8/8 (100%) (=) | 8/8 (100%) (=) | 8/8 (100%) (=) |
-| **All** | 230 | **186/230 (81%)** | **195/230 (85%)** | **195/230 (85%)** (+9) | **198/230 (86%)** (+3) | **200/230 (87%)** (+5) | **202/230 (88%)** (+4) |
+| Agent | n | Baseline classifier | orchestrator | A classifier | orchestrator | B classifier | orchestrator | Experiment classifier | orchestrator |
+|---|---|---|---|---|---|---|---|---|---|
+| Pain & Symptoms | 36 | 27/36 (75%) | 27/36 (75%) | 27/36 (75%) (=) | 27/36 (75%) (=) | 29/36 (81%) (+2) | 28/36 (78%) (+1) | 29/36 (81%) (=) | 29/36 (81%) (+1) |
+| Recovery Progress | 31 | 23/31 (74%) | 27/31 (87%) | 27/31 (87%) (+4) | 28/31 (90%) (+1) | 28/31 (90%) (+1) | 29/31 (94%) (+1) | 26/31 (84%) (-2) | 28/31 (90%) (-1) |
+| Rehabilitation | 28 | 23/28 (82%) | 24/28 (86%) | 24/28 (86%) (+1) | 24/28 (86%) (=) | 26/28 (93%) (+2) | 26/28 (93%) (+2) | 25/28 (89%) (-1) | 26/28 (93%) (=) |
+| Wound Care | 26 | 25/26 (96%) | 25/26 (96%) | 25/26 (96%) (=) | 25/26 (96%) (=) | 25/26 (96%) (=) | 25/26 (96%) (=) | 24/26 (92%) (-1) | 26/26 (100%) (+1) |
+| Medication | 27 | 26/27 (96%) | 26/27 (96%) | 26/27 (96%) (=) | 26/27 (96%) (=) | 26/27 (96%) (=) | 26/27 (96%) (=) | 26/27 (96%) (=) | 27/27 (100%) (+1) |
+| Daily Activity | 25 | 19/25 (76%) | 20/25 (80%) | 21/25 (84%) (+2) | 21/25 (84%) (+1) | 21/25 (84%) (=) | 21/25 (84%) (=) | 21/25 (84%) (=) | 21/25 (84%) (=) |
+| Nutrition | 24 | 20/24 (83%) | 20/24 (83%) | 20/24 (83%) (=) | 20/24 (83%) (=) | 20/24 (83%) (=) | 20/24 (83%) (=) | 20/24 (83%) (=) | 21/24 (88%) (+1) |
+| Mental Wellbeing | 25 | 15/25 (60%) | 18/25 (72%) | 17/25 (68%) (+2) | 19/25 (76%) (+1) | 17/25 (68%) (=) | 19/25 (76%) (=) | 19/25 (76%) (+2) | 21/25 (84%) (+2) |
+| Intake / Context | 8 | 8/8 (100%) | 8/8 (100%) | 8/8 (100%) (=) | 8/8 (100%) (=) | 8/8 (100%) (=) | 8/8 (100%) (=) | 8/8 (100%) (=) | 8/8 (100%) (=) |
+| **All** | 230 | **186/230 (81%)** | **195/230 (85%)** | **195/230 (85%)** (+9) | **198/230 (86%)** (+3) | **200/230 (87%)** (+5) | **202/230 (88%)** (+4) | **198/230 (86%)** (-2) | **207/230 (90%)** (+5) |
 
 The bracketed delta is against the previous column. Acceptance rule for a step: no agent's classifier accuracy may drop against the baseline.
 
@@ -35,6 +36,7 @@ The bracketed delta is against the previous column. Acceptance rule for a step: 
 |---|---|---|---|
 | A: the three requested changes | none | none | yes |
 | B: A + semantic intake-cue gate (shipped) | none | none | yes |
+| Experiment: semantic-first | Wound Care | none | not shipped (experiment) |
 
 ## Diagnosis of the baseline misses, by rule
 
@@ -136,7 +138,54 @@ Noticed while reading the orchestrator, not changed (outside the scope of this t
 
 ## Step 4 experiment: semantic-first, keywords as tiebreaker (not shipped)
 
-No `semantic_first` result file found.
+Behind `SEMANTIC_FIRST` in `lam/intent_classifier.py` (default off; `LAM_SEMANTIC_FIRST=1` switches it on; the benchmark's `--semantic-first` sets it for one run). Order with the flag on: Sentence-BERT scores (same intake-cue gate), the semantic winner when score >= 0.35 and margin >= 0.04, the keyword rules as tiebreaker when the margin is thin (a keyword hit inside the top two wins; a hit outside wins over both; no keyword keeps the semantic winner), and the keyword rules then the default when confidence is low or the model is offline. The recorded-medication and medication-context shortcuts still run first.
+
+| | Step B (shipped) | Semantic-first |
+|---|---|---|
+| Classifier | 200/230 (87%) | 198/230 (86%) (-2) |
+| Classifier, clear only | 149/176 (85%) | 152/176 (86%) (+3) |
+| Classifier, openings only | 200/224 (89%) | 198/224 (88%) (-2) |
+| Orchestrator (lenient) | 202/230 (88%) | 207/230 (90%) (+5) |
+| Orchestrator (strict) | 189/230 (82%) | 182/230 (79%) (-7) |
+
+| Agent | Step B classifier | Semantic-first classifier | Step B orchestrator | Semantic-first orchestrator |
+|---|---|---|---|---|
+| Pain & Symptoms | 29/36 (81%) | 29/36 (81%) (=) | 28/36 (78%) | 29/36 (81%) (+1) |
+| Recovery Progress | 28/31 (90%) | 26/31 (84%) (-2) | 29/31 (94%) | 28/31 (90%) (-1) |
+| Rehabilitation | 26/28 (93%) | 25/28 (89%) (-1) | 26/28 (93%) | 26/28 (93%) (=) |
+| Wound Care | 25/26 (96%) | 24/26 (92%) (-1) | 25/26 (96%) | 26/26 (100%) (+1) |
+| Medication | 26/27 (96%) | 26/27 (96%) (=) | 26/27 (96%) | 27/27 (100%) (+1) |
+| Daily Activity | 21/25 (84%) | 21/25 (84%) (=) | 21/25 (84%) | 21/25 (84%) (=) |
+| Nutrition | 20/24 (83%) | 20/24 (83%) (=) | 20/24 (83%) | 21/24 (88%) (+1) |
+| Mental Wellbeing | 17/25 (68%) | 19/25 (76%) (+2) | 19/25 (76%) | 21/25 (84%) (+2) |
+| Intake / Context | 8/8 (100%) | 8/8 (100%) (=) | 8/8 (100%) | 8/8 (100%) (=) |
+
+Cases the experiment gets right that step B misses (8):
+
+- R021 "There's some fluid coming from my surgical cut, is that normal?": recovery_progress -> wound_care (semfirst_tiebreak_top1)
+- R030 "I keep feeling down and unmotivated during this recovery.": recovery_progress -> mental_wellbeing (semantic_first)
+- R032 "I feel isolated and low because I can't do my usual routine.": recovery_progress -> mental_wellbeing (semfirst_tiebreak_top1)
+- R076 "Knee got swolen after walking little bit, should I worry?": mental_wellbeing -> pain_symptoms (semantic_first)
+- R099 "I want to know where I stand in my recovery timeline": daily_activity -> recovery_progress (semantic_first)
+- R152 "Can I take the pain killer on empty stomach?": pain_symptoms -> medication (semantic_first)
+- R198 "What fruits are good during recovery?": recovery_progress -> nutrition (semantic_first)
+- R207 "I feel scared to put weight on my leg even though physio said ok": rehabilitation -> mental_wellbeing (semantic_first)
+
+Cases the experiment loses (10):
+
+- R036 "Should I be worried about how slow this is going?" (expected recovery_progress): mental_wellbeing -> daily_activity (semantic_first, top1 daily_activity 0.47 via 'Is it safe for me to drive yet?')
+- R037 "My leg feels weird when I try to move it during exercises." (expected pain_symptoms): rehabilitation -> mental_wellbeing (semantic_first, top1 mental_wellbeing 0.68 via 'I feel anxious about moving my operated leg.')
+- R043 "Since I didn't take my medicine yesterday, my knee wound is worse" (expected medication): medication -> pain_symptoms (semantic_first, top1 pain_symptoms 0.60 via 'My joint seems more inflamed than yesterday and it is painful.')
+- R058 "Am I on track with my knee?" (expected recovery_progress): recovery_progress -> pain_symptoms (semfirst_tiebreak_top1, top1 pain_symptoms 0.48 via 'My joint seems more inflamed than yesterday and it is painful.')
+- R061 "fluid coming from my incision" (expected wound_care): wound_care -> pain_symptoms (semantic_first, top1 pain_symptoms 0.58 via 'There is tingling and throbbing pain near the incision.')
+- R062 "I'm walking with a walker now" (expected recovery_progress): rehabilitation -> daily_activity (semantic_first, top1 daily_activity 0.49 via 'When am I allowed to go up steps and get behind the wheel?')
+- R114 "Can I put full weight on my operated leg while doing exercises?" (expected rehabilitation): rehabilitation -> mental_wellbeing (semantic_first, top1 mental_wellbeing 0.55 via 'I feel scared to put weight on my leg.')
+- R131 "My incision is itching alot, is it normal?" (expected wound_care): wound_care -> pain_symptoms (semantic_first, top1 pain_symptoms 0.58 via 'There is tingling and throbbing pain near the incision.')
+- R192 "My appetite is very less since surgery, is it normal?" (expected nutrition): nutrition -> mental_wellbeing (semantic_first, top1 mental_wellbeing 0.57 via 'My mood has been low since the surgery.')
+- R217 "Sometimes I feel hopeless about getting back to normal" (expected mental_wellbeing): mental_wellbeing -> recovery_progress (semantic_first, top1 recovery_progress 0.56 via 'Am I recovering normally?')
+
+`test_phase2_intent.py` hard benchmark assertions that would fail with the flag on: 0. `test_multi_agent_orchestration.py` with `LAM_SEMANTIC_FIRST=1`: 1 of 5 fails (`test_missed_medication_then_wound_handoff`): R043 classifies as pain_symptoms, the orchestrator adds the classifier's intent to the keyword plan, and the plan becomes [medication, wound_care, pain_symptoms]. Net: the experiment trades 8 recovered cases for 10 lost ones, mostly symptom-shaped sentences pulled to the Mental Wellbeing and Pain prototypes ("put full weight on my operated leg", "my incision is itching"), and it loses on strict orchestrator routing. Not recommended as is; it would need the prototype lists reworked first.
+
 ## Test suites after the fix
 
 | Suite | Result |
