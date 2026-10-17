@@ -408,6 +408,59 @@ def _has_active_wound_followup(
     )
 
 
+_INTAKE_FOLLOWUP_MARKERS = (
+    "how are you feeling overall today",
+    "rate your pain or discomfort right now",
+    "how has your movement or walking been today",
+    "specific concerns, symptoms, or medication questions",
+    "daily recovery check-in",
+    "recovery check-in",
+    "numeric pain rating scale",
+    "is the pain mild",
+    "assistive device (like a walker or crutches)",
+    "compared to yesterday, would you say today feels",
+    "what is this intake",
+    "great question! this daily intake check-in",
+)
+
+
+def _has_active_intake_followup(
+    chat_history: Optional[List[Dict[str, str]]],
+) -> bool:
+    last_message = _normalise(
+        _last_assistant_message(chat_history)
+    )
+    if not last_message:
+        return False
+    if "daily recovery check-in complete" in last_message:
+        return False
+    return any(
+        marker in last_message
+        for marker in _INTAKE_FOLLOWUP_MARKERS
+    )
+
+
+def _is_explicit_clinical_switch(user_message: str) -> bool:
+    """True if the user is asking an explicit standalone question directed at another agent."""
+    text = (user_message or "").strip().lower()
+    is_question = "?" in text or any(text.startswith(prefix) for prefix in (
+        "can i", "should i", "what should", "how do i", "when can i", "is it safe", "could i"
+    ))
+    if not is_question:
+        return False
+    intake_info_markers = (
+        "what is intake", "why do you ask", "why do you need",
+        "wbat", "pwb", "nwb", "fwb", "nprs", "pain scale",
+        "surgery did i have", "my surgery", "when was my surgery",
+        "who is my doctor", "who was my surgeon",
+        "medications am i on", "what medicines", "what pills",
+        "who are you", "what is orthosync"
+    )
+    if any(m in text for m in intake_info_markers):
+        return False
+    return True
+
+
 # ============================================================================
 # SHORT ANSWER DETECTION
 #
@@ -608,6 +661,7 @@ class LAMOrchestrator:
         weight_bearing_status: Optional[WeightBearingStatus] = None,
         current_rom: Optional[str] = None,
         exercise_history: Optional[str] = None,
+        photo_analysis: Optional[Dict[str, Any]] = None,
     ) -> dict:
 
         history = chat_history or []
@@ -900,53 +954,73 @@ class LAMOrchestrator:
 
         else:
 
-            is_recovery_continuation = check_recovery_continuation(
-                patient_id=patient_id,
-                surgery_date_raw=surgery_date,
-                procedure=resolved_procedure,
-                user_message=user_message,
+            is_intake_continuation = (
+                _has_active_intake_followup(history)
+                and not _contains_wound_term(user_message)
+                and not _is_explicit_clinical_switch(user_message)
             )
 
-            if is_recovery_continuation:
+            if is_intake_continuation:
 
-                intent_label = IntentLabel.RECOVERY_PROGRESS
+                intent_label = IntentLabel.INTAKE_CONTEXT
                 applicable_intents = (intent_label,)
 
                 print(
                     "[LAM][CONTINUATION] "
                     f"query={user_message!r} "
-                    "matched a pending Recovery field -- routing directly to "
-                    "RecoveryProgressAgent without fresh intent classification."
+                    "matched an active Intake & Context follow-up -- routing directly to "
+                    "IntakeContextAgent without fresh intent classification."
                 )
 
             else:
 
-                classification = (
-                    IntentClassifier.classify_detailed(
-                        query=user_message,
-                        context=context,
+                is_recovery_continuation = check_recovery_continuation(
+                    patient_id=patient_id,
+                    surgery_date_raw=surgery_date,
+                    procedure=resolved_procedure,
+                    user_message=user_message,
+                )
+
+                if is_recovery_continuation:
+
+                    intent_label = IntentLabel.RECOVERY_PROGRESS
+                    applicable_intents = (intent_label,)
+
+                    print(
+                        "[LAM][CONTINUATION] "
+                        f"query={user_message!r} "
+                        "matched a pending Recovery field -- routing directly to "
+                        "RecoveryProgressAgent without fresh intent classification."
                     )
-                )
 
-                intent_label = classification.intent
-                applicable_intents = detected_intents
-                if intent_label not in applicable_intents:
-                    applicable_intents = (intent_label,) + applicable_intents
+                else:
 
-                # IMPORTANT DEBUG OUTPUT.
-                #
-                # This lets you immediately see whether the problem is:
-                # classifier -> router -> agent -> response.
-                print(
-                    "[LAM][INTENT] "
-                    f"query={user_message!r} "
-                    f"intent={intent_label.value} "
-                    f"path={classification.decision_path} "
-                    f"top1={getattr(classification.top1_intent, 'value', None)} "
-                    f"score={classification.top1_score:.3f} "
-                    f"top2={getattr(classification.top2_intent, 'value', None)} "
-                    f"margin={classification.margin:.3f}"
-                )
+                    classification = (
+                        IntentClassifier.classify_detailed(
+                            query=user_message,
+                            context=context,
+                        )
+                    )
+
+                    intent_label = classification.intent
+                    applicable_intents = detected_intents
+                    if intent_label not in applicable_intents:
+                        applicable_intents = (intent_label,) + applicable_intents
+
+                    # IMPORTANT DEBUG OUTPUT.
+                    #
+                    # This lets you immediately see whether the problem is:
+                    # classifier -> router -> agent -> response.
+                    print(
+                        "[LAM][INTENT] "
+                        f"query={user_message!r} "
+                        f"intent={intent_label.value} "
+                        f"path={classification.decision_path} "
+                        f"top1={getattr(classification.top1_intent, 'value', None)} "
+                        f"score={classification.top1_score:.3f} "
+                        f"top2={getattr(classification.top2_intent, 'value', None)} "
+                        f"margin={classification.margin:.3f}"
+                    )
 
 
         # ============================================================
@@ -998,6 +1072,7 @@ class LAMOrchestrator:
             weight_bearing_status=weight_bearing_status,
             current_rom=current_rom,
             exercise_history=exercise_history,
+            photo_analysis=photo_analysis,
         )
         if len(ordered_intents) > 1:
             coordinated = MultiAgentCoordinator.execute(

@@ -79,6 +79,27 @@ CREATE TABLE IF NOT EXISTS patient_credentials (
     username TEXT NOT NULL,
     password_hash TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS wound_assessments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id TEXT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
+    postop_day INTEGER,
+    date TEXT NOT NULL DEFAULT (date('now')),
+    timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    onset TEXT,
+    progression TEXT,
+    appearance TEXT,
+    warmth TEXT,
+    drainage TEXT,
+    drainage_type TEXT,
+    separation TEXT,
+    pain TEXT,
+    fever TEXT,
+    dressing_status TEXT,
+    redness_score REAL,
+    visual_flag TEXT,
+    triage_level TEXT,
+    summary TEXT
+);
 """
 
 
@@ -279,3 +300,78 @@ def save_source_report(patient_id: Optional[str], filename: str, extraction: Dic
             (patient_id, filename, extraction.get("extraction_method"),
              extraction.get("raw_text_preview"), json.dumps(extraction)),
         )
+
+
+def save_wound_assessment(
+    patient_id: str,
+    record: Dict[str, Any],
+    path: Optional[str] = None,
+) -> int:
+    """Save completed wound assessment to SQLite."""
+    initialize_database(path)
+    with connection_scope(path) as connection:
+        cursor = connection.execute(
+            """INSERT INTO wound_assessments
+               (patient_id, postop_day, onset, progression, appearance, warmth,
+                drainage, drainage_type, separation, pain, fever, dressing_status,
+                redness_score, visual_flag, triage_level, summary)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                patient_id,
+                record.get("postop_day"),
+                record.get("onset"),
+                record.get("progression"),
+                record.get("appearance"),
+                record.get("warmth"),
+                record.get("drainage"),
+                record.get("drainage_type"),
+                record.get("separation"),
+                record.get("pain"),
+                record.get("fever"),
+                record.get("dressing_status"),
+                record.get("redness_score"),
+                record.get("visual_flag"),
+                record.get("triage_level", "GREEN"),
+                record.get("summary"),
+            ),
+        )
+        return cursor.lastrowid
+
+
+def get_recent_wound_assessments(
+    patient_id: str,
+    limit: int = 3,
+    path: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Retrieve recent completed wound assessments for longitudinal comparison."""
+    initialize_database(path)
+    with connection_scope(path) as connection:
+        rows = connection.execute(
+            """SELECT * FROM wound_assessments
+               WHERE patient_id = ?
+               ORDER BY id DESC LIMIT ?""",
+            (patient_id, limit),
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+
+def record_triage_event(
+    patient_id: str,
+    level: str,
+    symptom: str,
+    action: str,
+    timestamp: Optional[str] = None,
+    path: Optional[str] = None,
+) -> None:
+    """Record a clinical triage alert event in SQLite."""
+    from datetime import datetime
+    initialize_database(path)
+    clean_id = (patient_id or "").strip().upper()
+    ts = timestamp or datetime.now().strftime("%Y-%m-%d %H:%M")
+    with connection_scope(path) as connection:
+        connection.execute(
+            """INSERT INTO triage_events (patient_id, timestamp, level, symptom, action)
+               VALUES (?, ?, ?, ?, ?)""",
+            (clean_id, ts, level, symptom, action),
+        )
+

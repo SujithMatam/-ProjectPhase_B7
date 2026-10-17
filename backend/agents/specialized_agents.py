@@ -28,6 +28,7 @@ from agents.chat_agent import ChatAgent
 from agents import recovery_integration
 from agents import recovery_logic
 from agents import recovery_state
+from agents import intake_logic
 from lam.schemas import TargetAgent, WeightBearingStatus
 from rag.knowledge_base import ClinicalKnowledgeBase
 
@@ -1262,14 +1263,19 @@ class MentalWellbeingAgent(BaseClinicalAgent):
 
 class IntakeContextAgent(BaseClinicalAgent):
     """
-    Intake & Context Agent.
+    Intake & Context Agent -- Interactive & Empathetic.
 
-    Consolidates the patient information already supplied to the LAM pipeline
-    and presents it as structured context for downstream clinical agents.
+    Milestone Sec 2.4:
+    Consolidates the patient's postoperative information, recent interactions,
+    and relevant clinical context before a task is processed by a specialized agent.
 
-    This agent does NOT perform emergency classification.
-    Emergency classification remains the responsibility of the deterministic
-    safety triage layer upstream.
+    Features:
+    - Warm, supportive bedside manner.
+    - Proactive sequential follow-up check-in (feeling -> comfort -> mobility -> concerns).
+    - Answering patient clarifying questions (NPRS scale, WBAT/PWB terms, procedure details).
+    - Exception handling for 'I don't know' responses, automatically checking hospital
+      records in SQLite (patients.sqlite3).
+    - Non-diagnostic and strictly preserves upstream safety triage.
     """
 
     TARGET_AGENT = TargetAgent.INTAKE_CONTEXT_AGENT
@@ -1288,3 +1294,30 @@ class IntakeContextAgent(BaseClinicalAgent):
         "triage layer upstream. "
         "Keep the output structured and patient-specific."
     )
+
+    @classmethod
+    def handle(
+        cls,
+        *,
+        patient_id: str,
+        surgery_type: str,
+        affected_limb: str,
+        postop_day: int,
+        user_message: str,
+        procedure: str,
+        chat_history: Optional[List[Dict[str, str]]] = None,
+        surgery_date: Optional[str] = None,
+        precomputed_triage: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """Interactive, friendly intake processing with follow-ups and exception handling."""
+        return intake_logic.generate_intake_turn(
+            patient_id=patient_id,
+            surgery_type=surgery_type,
+            affected_limb=affected_limb,
+            postop_day=postop_day,
+            user_message=user_message,
+            chat_history=chat_history,
+            surgery_date=surgery_date,
+            precomputed_triage=precomputed_triage,
+        )

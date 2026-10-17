@@ -100,6 +100,8 @@ class ChatRequest(BaseModel):
     weight_bearing_status: Optional[WeightBearingStatus] = Field(default=None, example="WBAT")
     current_rom: Optional[str] = Field(default=None, example="Flexion to about 80 degrees")
     exercise_history: Optional[str] = Field(default=None, example="Completed heel slides and quad sets today; missed yesterday's session")
+    # Optional multimodal wound photo analysis (WoundCareAgent fusion)
+    photo_analysis: Optional[Dict[str, Any]] = Field(default=None)
 
     @field_validator("patient_id")
     @classmethod
@@ -300,6 +302,7 @@ def chat(payload: ChatRequest):
             weight_bearing_status=payload.weight_bearing_status,
             current_rom=payload.current_rom,
             exercise_history=payload.exercise_history,
+            photo_analysis=payload.photo_analysis,
         )
         return result
     except Exception as e:
