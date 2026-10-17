@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:path/path.dart' as p;
 
 import '../models/patient_user.dart';
+import 'storage/local_storage.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._internal();
@@ -14,6 +15,7 @@ class DatabaseHelper {
 
   Database? _db;
   bool _useInMemoryFallback = false;
+  bool _fallbackLoaded = false;
 
   final Map<String, Map<String, dynamic>> _memAccounts = {};
   final Map<String, PatientUser> _memPatients = {};
@@ -22,7 +24,14 @@ class DatabaseHelper {
   final Map<String, List<Map<String, dynamic>>> _memChatMessages = {};
 
   Future<Database?> get database async {
-    if (_useInMemoryFallback) return null;
+    if (_useInMemoryFallback) {
+      if (!_fallbackLoaded) {
+        _fallbackLoaded = true;
+        _seedMemoryData();
+        await _loadFallbackData();
+      }
+      return null;
+    }
     if (_db != null) return _db!;
     try {
       _db = await _initDatabase();
@@ -32,7 +41,9 @@ class DatabaseHelper {
         'Database initialization failed ($e). Switching to safe fallback.',
       );
       _useInMemoryFallback = true;
+      _fallbackLoaded = true;
       _seedMemoryData();
+      await _loadFallbackData();
       return null;
     }
   }
@@ -211,6 +222,101 @@ class DatabaseHelper {
     );
   }
 
+  Future<void> _saveFallbackData() async {
+    if (!_useInMemoryFallback) return;
+    try {
+      final payload = {
+        'accounts': _memAccounts,
+        'patients': _memPatients.map((k, v) => MapEntry(k, v.toMap())),
+        'medical_history':
+            _memMedicalHistory.map((k, v) => MapEntry(k, v.toMap())),
+        'recovery_starts': _memRecoveryStarts.map(
+          (k, v) => MapEntry(k, v.toIso8601String()),
+        ),
+        'chat_messages': _memChatMessages,
+      };
+      await FallbackStorage.saveString(
+        'orthosync_fallback_data',
+        jsonEncode(payload),
+      );
+    } catch (e) {
+      debugPrint('Failed to persist fallback database: $e');
+    }
+  }
+
+  Future<void> _loadFallbackData() async {
+    try {
+      final str = await FallbackStorage.getString('orthosync_fallback_data');
+      if (str == null || str.trim().isEmpty) return;
+      final decoded = jsonDecode(str);
+      if (decoded is! Map<String, dynamic>) return;
+
+      if (decoded['accounts'] is Map) {
+        final accounts = Map<String, dynamic>.from(decoded['accounts'] as Map);
+        for (final entry in accounts.entries) {
+          if (entry.value is Map) {
+            _memAccounts[entry.key] = Map<String, dynamic>.from(
+              entry.value as Map,
+            );
+          }
+        }
+      }
+
+      if (decoded['patients'] is Map) {
+        final patients = Map<String, dynamic>.from(decoded['patients'] as Map);
+        for (final entry in patients.entries) {
+          if (entry.value is Map) {
+            _memPatients[entry.key] = PatientUser.fromMap(
+              Map<String, dynamic>.from(entry.value as Map),
+            );
+          }
+        }
+      }
+
+      if (decoded['medical_history'] is Map) {
+        final med = Map<String, dynamic>.from(
+          decoded['medical_history'] as Map,
+        );
+        for (final entry in med.entries) {
+          if (entry.value is Map) {
+            _memMedicalHistory[entry.key] = MedicalHistory.fromMap(
+              Map<String, dynamic>.from(entry.value as Map),
+            );
+          }
+        }
+      }
+
+      if (decoded['recovery_starts'] is Map) {
+        final starts = Map<String, dynamic>.from(
+          decoded['recovery_starts'] as Map,
+        );
+        for (final entry in starts.entries) {
+          final dt = DateTime.tryParse(entry.value.toString());
+          if (dt != null) {
+            _memRecoveryStarts[entry.key] = dt;
+          }
+        }
+      }
+
+      if (decoded['chat_messages'] is Map) {
+        final chats = Map<String, dynamic>.from(
+          decoded['chat_messages'] as Map,
+        );
+        for (final entry in chats.entries) {
+          if (entry.value is List) {
+            final list = (entry.value as List)
+                .whereType<Map>()
+                .map((m) => Map<String, dynamic>.from(m))
+                .toList();
+            _memChatMessages[entry.key] = list;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to load fallback database: $e');
+    }
+  }
+
   Future<void> _seedInitialData(Database db) async {
     await db.insert('accounts', {
       'email': 'b7@amrita.edu',
@@ -281,6 +387,7 @@ class DatabaseHelper {
       'password_hash': password,
       'created_at': DateTime.now().toIso8601String(),
     };
+    await _saveFallbackData();
     return _memAccounts.length;
   }
 
@@ -312,6 +419,7 @@ class DatabaseHelper {
     }
     if (_memAccounts.containsKey(cleanEmail)) {
       _memAccounts[cleanEmail]!['password_hash'] = newPassword;
+      await _saveFallbackData();
       return 1;
     }
     return 0;
@@ -327,6 +435,7 @@ class DatabaseHelper {
       );
     }
     _memPatients[user.patientId] = user;
+    await _saveFallbackData();
     return 1;
   }
 
@@ -381,6 +490,7 @@ class DatabaseHelper {
       );
     }
     _memMedicalHistory[history.patientId] = history;
+    await _saveFallbackData();
     return 1;
   }
 
@@ -432,6 +542,7 @@ class DatabaseHelper {
     }
 
     _memRecoveryStarts[patientId] = now;
+    await _saveFallbackData();
     return now;
   }
 
@@ -483,6 +594,7 @@ class DatabaseHelper {
     final list = _memChatMessages.putIfAbsent(patientId, () => []);
     row['id'] = list.length + 1;
     list.add(row);
+    await _saveFallbackData();
     return list.length;
   }
 
@@ -671,5 +783,6 @@ class DatabaseHelper {
     _memRecoveryStarts.clear();
     _memChatMessages.clear();
     _seedMemoryData();
+    await _saveFallbackData();
   }
 }

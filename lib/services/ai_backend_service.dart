@@ -56,6 +56,46 @@ class AiBackendService {
     return null;
   }
 
+  /// Register a new patient account against the Python backend.
+  Future<Map<String, dynamic>?> registerPatient({
+    required PatientUser user,
+    required String password,
+  }) async {
+    try {
+      final payload = {
+        'patient_id': user.patientId,
+        'email': user.email,
+        'full_name': user.fullName,
+        'password': password,
+        'phone_number': user.phoneNumber,
+        'surgery_type': user.surgeryType,
+        'affected_limb': user.affectedLimb,
+        'surgery_date': user.surgeryDate.toIso8601String(),
+        'postop_day': user.postopDayCount,
+      };
+      final response = await http
+          .post(
+            Uri.parse('$baseUrl/api/patient-register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(payload),
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+      }
+      debugPrint(
+        'Patient backend registration response: ${response.statusCode} ${response.body}',
+      );
+    } catch (e) {
+      debugPrint('Patient backend registration unavailable: $e');
+    }
+    return null;
+  }
+
   /// Send message to Chatbot Agent with patient context and previous turns.
   Future<Map<String, dynamic>> sendChatMessage({
     required PatientUser? patient,

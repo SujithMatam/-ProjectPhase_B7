@@ -47,11 +47,18 @@ class AuthService {
     );
     final backendPatient = backendResult?['patient'];
     if (backendPatient is Map<String, dynamic>) {
+      final emailFromBackend = backendPatient['email']?.toString();
+      final effectiveEmail = (emailFromBackend != null &&
+              emailFromBackend.trim().isNotEmpty)
+          ? emailFromBackend.trim()
+          : (cleanId.contains('@')
+              ? cleanId
+              : '${(backendPatient['patient_id'] ?? 'patient').toString().toLowerCase()}@orthosync.local');
+
       final patientUser = PatientUser(
         patientId: backendPatient['patient_id']?.toString() ?? '',
         fullName: backendPatient['full_name']?.toString() ?? identifier.trim(),
-        email:
-            '${(backendPatient['patient_id'] ?? 'patient').toString().toLowerCase()}@orthosync.local',
+        email: effectiveEmail,
         phoneNumber: backendPatient['phone_number']?.toString() ?? '',
         surgeryType:
             backendPatient['surgery_type']?.toString() ??
@@ -67,6 +74,8 @@ class AuthService {
         ),
       );
       await _dbHelper.insertPatient(patientUser);
+      await _dbHelper.insertAccount(effectiveEmail, password);
+      await _dbHelper.ensureRecoveryStart(patientUser.patientId);
       _currentUser = patientUser;
       return _currentUser;
     }
@@ -100,6 +109,15 @@ class AuthService {
 
     await _dbHelper.ensureRecoveryStart(user.patientId);
     _currentUser = user;
+
+    // Sync with backend if available
+    try {
+      await AiBackendService.instance.registerPatient(
+        user: user,
+        password: password,
+      );
+    } catch (_) {}
+
     return true;
   }
 

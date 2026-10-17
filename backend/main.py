@@ -201,6 +201,30 @@ def health_check():
     }
 
 
+class PatientRegisterRequest(BaseModel):
+    patient_id: str
+    email: str
+    full_name: str
+    password: str
+    phone_number: Optional[str] = ""
+    surgery_type: Optional[str] = "Total Knee Arthroplasty (TKA)"
+    affected_limb: Optional[str] = "Right"
+    surgery_date: Optional[str] = None
+    postop_day: Optional[int] = 1
+
+
+@app.post("/api/patient-register", status_code=201)
+def patient_register_endpoint(payload: PatientRegisterRequest):
+    try:
+        data = payload.dict()
+        patient = create_patient(data)
+        return {"status": "success", "patient": patient}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=409, detail="Patient already registered")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
 @app.post("/api/patient-login")
 def patient_login(payload: dict):
     patient = authenticate_patient(
