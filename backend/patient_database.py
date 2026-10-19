@@ -79,6 +79,20 @@ CREATE TABLE IF NOT EXISTS patient_credentials (
     username TEXT NOT NULL,
     password_hash TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS patient_scans (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id TEXT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
+    scan_type TEXT NOT NULL,         -- 'XRAY', 'MRI', 'CT', 'ULTRASOUND'
+    body_part TEXT NOT NULL,         -- 'Knee', 'Hip', 'Shoulder', 'Spine', 'Ankle'
+    laterality TEXT,                 -- 'Left', 'Right', 'Bilateral', 'Central'
+    scan_date TEXT,                  -- ISO date of scan
+    file_path TEXT,                  -- absolute or repo-relative path to image file
+    file_format TEXT,                -- 'JPEG', 'PNG', 'DICOM'
+    source_dataset TEXT,             -- e.g. 'Kaggle:orvile/digital-knee-xray-images'
+    findings TEXT,                   -- radiologist/AI findings text
+    kl_grade INTEGER,                -- Kellgren-Lawrence OA grade 0-4 (NULL if N/A)
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
@@ -238,6 +252,15 @@ def get_patient(patient_id: str, path: Optional[str] = None) -> Optional[Dict[st
             {k: item[k] for k in ("timestamp", "level", "symptom", "action")}
             for item in connection.execute("SELECT * FROM triage_events WHERE patient_id = ? ORDER BY id", (patient_id,))
         ]
+        result["scans"] = [
+            {k: item[k] for k in ("id", "scan_type", "body_part", "laterality",
+                                   "scan_date", "file_path", "file_format",
+                                   "source_dataset", "findings", "kl_grade")}
+            for item in connection.execute(
+                "SELECT * FROM patient_scans WHERE patient_id = ? ORDER BY scan_date DESC",
+                (patient_id,)
+            )
+        ]
         return result
 
 
@@ -279,3 +302,60 @@ def save_source_report(patient_id: Optional[str], filename: str, extraction: Dic
             (patient_id, filename, extraction.get("extraction_method"),
              extraction.get("raw_text_preview"), json.dumps(extraction)),
         )
+
+
+def add_patient_scan(
+    patient_id: str,
+    scan_type: str,
+    body_part: str,
+    file_path: str,
+    *,
+    laterality: Optional[str] = None,
+    scan_date: Optional[str] = None,
+    file_format: Optional[str] = None,
+    source_dataset: Optional[str] = None,
+    findings: Optional[str] = None,
+    kl_grade: Optional[int] = None,
+    path: Optional[str] = None,
+) -> int:
+    """Insert a scan record for a patient. Returns the new row id.
+
+    Args:
+        patient_id:     Patient ID (must already exist).
+        scan_type:      'XRAY', 'MRI', 'CT', or 'ULTRASOUND'.
+        body_part:      'Knee', 'Hip', 'Shoulder', 'Spine', 'Ankle', etc.
+        file_path:      Absolute or repo-relative path to the image file.
+        laterality:     'Left', 'Right', 'Bilateral', or 'Central'.
+        scan_date:      ISO-format date string of when the scan was taken.
+        file_format:    'JPEG', 'PNG', 'DICOM', etc.
+        source_dataset: Attribution string, e.g. 'Kaggle:orvile/digital-knee-xray-images'.
+        findings:       Free-text radiological / AI findings.
+        kl_grade:       Kellgren-Lawrence osteoarthritis grade (0-4), or None.
+        path:           Override DB file path.
+    """
+    initialize_database(path)
+    with connection_scope(path) as conn:
+        cursor = conn.execute(
+            """INSERT INTO patient_scans
+               (patient_id, scan_type, body_part, laterality, scan_date,
+                file_path, file_format, source_dataset, findings, kl_grade)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (patient_id, scan_type, body_part, laterality, scan_date,
+             file_path, file_format, source_dataset, findings, kl_grade),
+        )
+        return cursor.lastrowid  # type: ignore[return-value]
+
+
+def list_patient_scans(patient_id: str, path: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Return all scan records for a patient, newest first."""
+    initialize_database(path)
+    with connection_scope(path) as conn:
+        return [
+            {k: row[k] for k in ("id", "scan_type", "body_part", "laterality",
+                                  "scan_date", "file_path", "file_format",
+                                  "source_dataset", "findings", "kl_grade")}
+            for row in conn.execute(
+                "SELECT * FROM patient_scans WHERE patient_id = ? ORDER BY scan_date DESC",
+                (patient_id,),
+            )
+        ]
