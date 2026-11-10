@@ -72,6 +72,11 @@ _PROTOTYPE_SENTENCES = {
         "How long before I can move around like I used to?",
         "Am I recovering normally?",
         "Is my recovery going well?",
+        "When do most patients walk without a walking stick?",
+        "At what point do patients stop needing a walking aid?",
+        "What are the typical recovery milestones for knee surgery?",
+        "How long until I can walk unaided after my operation?",
+        "When do people generally stop using crutches after surgery?",
     ],
 
     IntentLabel.PAIN_SYMPTOMS: [
@@ -262,6 +267,34 @@ _MEDICATION_KEYWORDS = {
     "safe",
     "warning",
     "precaution",
+    # Drug names from dynamic pool
+    "codeine",
+    "tramadol",
+    "naproxen",
+    "diclofenac",
+    "oxycodone",
+    "celecoxib",
+    "gabapentin",
+    "enoxaparin",
+    "apixaban",
+    # Side-effect descriptors
+    "nauseous",
+    "nausea",
+    "dizzy",
+    "dizziness",
+    "constipated",
+    "constipation",
+    "drowsy",
+    "drowsiness",
+    "light-headed",
+    "light headed",
+    "lightheaded",
+    "queasy",
+    "bloated",
+    "bloating",
+    "fatigued",
+    "itchy",
+    "itching",
 }
 
 
@@ -343,6 +376,12 @@ _WOUND_KEYWORDS = {
     "yellow fluid",
     "wound care",
     "clean wound",
+    # Topical wound treatments — must come before medication antibiotic keyword
+    "ointment",
+    "topical",
+    "antiseptic",
+    "wound cream",
+    "surgical cut",
 }
 
 
@@ -407,6 +446,16 @@ _DAILY_ACTIVITY_KEYWORDS = {
     "housework",
     "transfer",
     "getting out of bed",
+    # Carrying / errands — common post-op daily activity queries
+    "carry",
+    "carrying",
+    "groceries",
+    "shopping",
+    "shopping bags",
+    "lift",
+    "lifting",
+    "light activity",
+    "errands",
 }
 
 
@@ -452,6 +501,18 @@ _MENTAL_KEYWORDS = {
     "sad",
     "hopeless",
     "lonely",
+    # Sleep-plus-mood phrasing handled by compound pre-check below,
+    # but these singles ensure fallback coverage.
+    "feeling down",
+    "feel down",
+    "low mood",
+    "trouble sleeping",
+    "can't sleep",
+    "cannot sleep",
+    "immobile",
+    "isolation",
+    "emotional blues",
+    "down about",
 }
 
 
@@ -461,6 +522,7 @@ _RECOVERY_KEYWORDS = {
     "progress",
     "how am i doing",
     "milestones",
+    "milestone",
     "timeline",
     "postop day",
     "post-op day",
@@ -470,6 +532,17 @@ _RECOVERY_KEYWORDS = {
     "getting better",
     "improve",
     "improvement",
+    # Milestone/aid-weaning phrasing — prevents SBERT intake confusion
+    "walking stick",
+    "without a walking",
+    "without crutches",
+    "without aids",
+    "without support",
+    "most patients",
+    "typical recovery",
+    "typical progress",
+    "on average",
+    "unaided",
 }
 
 
@@ -669,8 +742,83 @@ def _deterministic_intent(query: str) -> Optional[IntentLabel]:
         return IntentLabel.INTAKE_CONTEXT
 
     # ------------------------------------------------------------
+    # STEP 1b
+    # Compound pre-checks for known cross-intent ambiguities.
+    # These run BEFORE the general keyword loop to prevent a
+    # high-priority keyword (e.g. "antibiotic") in one intent
+    # from stealing a query that clearly belongs to another.
+    # ------------------------------------------------------------
+
+    # Wound-topical guard: "antibiotic ointment / topical / cream on
+    # surgical cut / wound / incision" → WOUND_CARE even though
+    # "antibiotic" is a MEDICATION keyword.
+    _WOUND_SITE_TERMS = (
+        "wound", "incision", "cut", "scar", "surgical",
+        "stitches", "staples", "suture",
+    )
+    if re.search(r"\bointment\b", text) or re.search(r"\btopical\b", text):
+        if any(re.search(r"\b" + re.escape(t) + r"\b", text) for t in _WOUND_SITE_TERMS):
+            return IntentLabel.WOUND_CARE
+
+    # Mental-wellbeing + sleep guard: "trouble sleeping" or "feeling down"
+    # combined with emotional language → MENTAL_WELLBEING before
+    # DAILY_ACTIVITY keyword "sleeping" fires.
+    _MOOD_SIGNALS = (
+        "feeling down", "feel down", "low mood", "sad", "hopeless",
+        "overwhelmed", "anxious", "anxiety", "depressed", "frustrated",
+        "worried", "stressed", "lonely", "emotional", "immobile",
+        "trouble sleeping", "can't sleep", "cannot sleep",
+    )
+    _SLEEP_SIGNALS = ("sleeping", "sleep", "rest",)
+    has_mood = any(re.search(r"\b" + re.escape(m) + r"\b", text) for m in _MOOD_SIGNALS)
+    has_sleep = any(re.search(r"\b" + re.escape(s) + r"\b", text) for s in _SLEEP_SIGNALS)
+    if has_mood and has_sleep:
+        return IntentLabel.MENTAL_WELLBEING
+
+    # Pain-during-exercise guard: a pain/symptom word appearing alongside
+    # exercise context means the user is reporting pain, not asking for
+    # exercise guidance.  PAIN_SYMPTOMS takes priority over REHABILITATION.
+    _PAIN_SIGNALS = (
+        "pain", "ache", "achy", "hurt", "hurts", "sore", "soreness",
+        "tender", "tenderness", "swelling", "swollen", "stiff", "stiffness",
+        "discomfort", "throbbing", "burning", "sharp", "numb", "numbness",
+    )
+    _EXERCISE_CONTEXT = (
+        "during exercises", "when i bend", "when bending", "after exercises",
+        "while exercising", "during physio", "when i do", "after rehab",
+    )
+    has_pain   = any(re.search(r"\b" + re.escape(p) + r"\b", text) for p in _PAIN_SIGNALS)
+    has_exctx  = any(re.search(re.escape(e), text) for e in _EXERCISE_CONTEXT)
+    if has_pain and has_exctx:
+        return IntentLabel.PAIN_SYMPTOMS
+
+    # Milestone-framing guard: questions that ask WHEN / HOW LONG until a
+    # patient can do a daily activity are recovery-progress milestone queries,
+    # not daily-activity queries.  Triggered by population-level framing.
+    _MILESTONE_FRAME = (
+        r"\bwhen do\b",
+        r"\bwhen does\b",
+        r"\bhow long (does|do|until|before)\b",
+        r"\bat what point\b",
+        r"\bis it realistic to\b",
+        r"\bmost patients\b",
+        r"\bthe average patient\b",
+        r"\bpeople at my stage\b",
+        r"\bpatients after\b",
+    )
+    _ACTIVITY_TARGETS = (
+        "return to driving", "drive", "climb stairs", "walk unaided",
+        "walk without", "stop using crutches", "put full weight",
+        "resume", "go back to",
+    )
+    has_frame    = any(re.search(pat, text) for pat in _MILESTONE_FRAME)
+    has_activity = any(re.search(r"\b" + re.escape(a), text) for a in _ACTIVITY_TARGETS)
+    if has_frame and has_activity:
+        return IntentLabel.RECOVERY_PROGRESS
+
+    # ------------------------------------------------------------
     # STEP 2
-    # Strong clinical intent
+    # Strong clinical intent (keyword loop)
     # ------------------------------------------------------------
 
     for intent, keywords in _DETERMINISTIC_RULES:

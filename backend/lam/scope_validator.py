@@ -1,4 +1,4 @@
-﻿"""
+"""
 LAM Scope Validator -- Algorithm 1 implementation (revised).
 
 Determines whether a patient query belongs to the orthopedic post-op care
@@ -86,7 +86,7 @@ SURGERY_TYPE_REGION_MAP: dict[str, str] = {
 _OFF_TOPIC_SIGNAL_LIST: list[str] = [
     "weather", "forecast", "temperature outside", "rain", "snow forecast",
     "stock price", "cryptocurrency", "bitcoin", "share market",
-    "football score", "cricket score", "match result", "world cup",
+    "football score", "cricket score", "match result", "world cup", "football game", "sports game",
     "movie", "netflix", "tv show", "celebrity",
     "recipe for", "cook a", "bake a",
     "write code", "python script", "programming", "debug my",

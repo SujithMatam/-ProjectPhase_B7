@@ -33,8 +33,8 @@ class SafetyTriageEngine:
     RED_FLAG_PATTERNS = {
         "Pulmonary Embolism": [
             "shortness of breath", "difficulty breathing", "chest pain",
-            "rapid breathing", "coughing blood", "sudden breathlessness",
-            "cant breathe", "can't breathe",
+            "rapid breathing", "coughing blood", "coughing up blood", "coughed up blood", "coughed blood",
+            "sudden breathlessness", "cant breathe", "can't breathe", "feeling faint",
         ],
         "Severe Joint Infection / Sepsis": [
             "high fever", "chills", "purulent drainage", "foul smelling pus",
@@ -59,6 +59,39 @@ class SafetyTriageEngine:
                 "tenderness", "pain", "painful", "ache", "aching", "hot",
                 "hard", "firm", "clot",
             ],
+        },
+        {
+            "category": "Neurovascular Impairment",
+            "anchor": ["foot", "feet", "toe", "toes", "leg"],
+            "symptom": [
+                "blue", "pale", "cold", "freezing", "dead", "numb", "numbness",
+                "loss of feeling", "cannot feel", "can't feel",
+                "cannot move", "can't move", "drop foot",
+            ],
+        },
+        {
+            "category": "Pulmonary Embolism (Hemoptysis)",
+            "anchor": ["cough", "coughed", "coughing", "spitting", "spat"],
+            "symptom": ["blood", "bloody"],
+        },
+        {
+            "category": "Suspected Prosthetic Dislocation",
+            "anchor": ["hip", "joint", "prosthesis", "implant", "knee"],
+            "symptom": [
+                "popping", "popped", "shortened", "shorter", "twisted inward", "twisted",
+                "cannot bear any weight", "dislocated", "inability to move", "cannot move",
+                "pop", "click"
+            ],
+        },
+        {
+            "category": "Acute Internal Hemorrhage (Anticoagulation)",
+            "anchor": ["stool", "stools", "vomit", "urine", "bruise", "bruises", "gums"],
+            "symptom": ["black", "tarry", "coffee grounds", "blood", "bleeding", "hematuria"],
+        },
+        {
+            "category": "Acute Compartment Syndrome",
+            "anchor": ["shin", "calf", "compartment"],
+            "symptom": ["rock hard", "tight as a drum", "unbearable", "out of proportion"],
         },
     ]
 
