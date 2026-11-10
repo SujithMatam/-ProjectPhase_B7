@@ -1,0 +1,1719 @@
+{
+  "filter_version": 2,
+  "splits": {
+    "test": {
+      "excluded": 31,
+      "excluded_records": [
+        {
+          "id": "QWEN_CHAT_0085",
+          "line": 1,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0086",
+          "line": 2,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0087",
+          "line": 3,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0088",
+          "line": 4,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0096",
+          "line": 12,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0097",
+          "line": 13,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0098",
+          "line": 14,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0190",
+          "line": 21,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0191",
+          "line": 22,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0192",
+          "line": 23,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0193",
+          "line": 24,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0285",
+          "line": 31,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0286",
+          "line": 32,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0287",
+          "line": 33,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0295",
+          "line": 41,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0296",
+          "line": 42,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0297",
+          "line": 43,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0298",
+          "line": 44,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0390",
+          "line": 51,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0391",
+          "line": 52,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0392",
+          "line": 53,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0485",
+          "line": 61,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0486",
+          "line": 62,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0487",
+          "line": 63,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0495",
+          "line": 71,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0496",
+          "line": 72,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0497",
+          "line": 73,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0589",
+          "line": 80,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0590",
+          "line": 81,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0591",
+          "line": 82,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0592",
+          "line": 83,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        }
+      ],
+      "exclusion_counts_by_reason": {
+        "assistant_emergency_escalation": 31,
+        "assistant_triage_decision": 9,
+        "expected_agent:EmergencyAgent": 31
+      },
+      "output": "qwen_sft_test_filtered.jsonl",
+      "output_sha256": "1ac77668f177d181dad637ca802d8a1927f9022aa7eaabac8cb7c28cc304c039",
+      "retained": 59,
+      "source": "qwen_sft_test.jsonl",
+      "source_sha256": "c1e07d024dcc687e08fe5b525c71203ea8c4d655303bc17b44456eb669372b20",
+      "total": 90
+    },
+    "train": {
+      "excluded": 142,
+      "excluded_records": [
+        {
+          "id": "QWEN_CHAT_0001",
+          "line": 1,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0002",
+          "line": 2,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0003",
+          "line": 3,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0004",
+          "line": 4,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0012",
+          "line": 12,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0013",
+          "line": 13,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0014",
+          "line": 14,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0022",
+          "line": 22,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0023",
+          "line": 23,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0024",
+          "line": 24,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0025",
+          "line": 25,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0033",
+          "line": 33,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0034",
+          "line": 34,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0035",
+          "line": 35,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0043",
+          "line": 43,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0044",
+          "line": 44,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0045",
+          "line": 45,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0046",
+          "line": 46,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0054",
+          "line": 54,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0055",
+          "line": 55,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0056",
+          "line": 56,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0064",
+          "line": 64,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0065",
+          "line": 65,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0066",
+          "line": 66,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0067",
+          "line": 67,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0106",
+          "line": 76,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0107",
+          "line": 77,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0108",
+          "line": 78,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0109",
+          "line": 79,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0117",
+          "line": 87,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0118",
+          "line": 88,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0119",
+          "line": 89,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0127",
+          "line": 97,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0128",
+          "line": 98,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0129",
+          "line": 99,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0130",
+          "line": 100,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0138",
+          "line": 108,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0139",
+          "line": 109,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0140",
+          "line": 110,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0148",
+          "line": 118,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0149",
+          "line": 119,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0150",
+          "line": 120,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0151",
+          "line": 121,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0159",
+          "line": 129,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0160",
+          "line": 130,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0161",
+          "line": 131,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0169",
+          "line": 139,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0201",
+          "line": 141,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0202",
+          "line": 142,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0203",
+          "line": 143,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0211",
+          "line": 151,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0212",
+          "line": 152,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0213",
+          "line": 153,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0214",
+          "line": 154,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0222",
+          "line": 162,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0223",
+          "line": 163,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0224",
+          "line": 164,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0232",
+          "line": 172,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0233",
+          "line": 173,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0234",
+          "line": 174,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0235",
+          "line": 175,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0243",
+          "line": 183,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0244",
+          "line": 184,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0245",
+          "line": 185,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0253",
+          "line": 193,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0254",
+          "line": 194,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0255",
+          "line": 195,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0256",
+          "line": 196,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0264",
+          "line": 204,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0265",
+          "line": 205,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0266",
+          "line": 206,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0306",
+          "line": 216,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0307",
+          "line": 217,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0308",
+          "line": 218,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0316",
+          "line": 226,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0317",
+          "line": 227,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0318",
+          "line": 228,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0319",
+          "line": 229,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0327",
+          "line": 237,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0328",
+          "line": 238,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0329",
+          "line": 239,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0337",
+          "line": 247,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0338",
+          "line": 248,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0339",
+          "line": 249,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0340",
+          "line": 250,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0348",
+          "line": 258,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0349",
+          "line": 259,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0350",
+          "line": 260,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0358",
+          "line": 268,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0359",
+          "line": 269,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0360",
+          "line": 270,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0361",
+          "line": 271,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0369",
+          "line": 279,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0400",
+          "line": 280,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0401",
+          "line": 281,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0402",
+          "line": 282,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0403",
+          "line": 283,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0411",
+          "line": 291,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0412",
+          "line": 292,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0413",
+          "line": 293,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0421",
+          "line": 301,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0422",
+          "line": 302,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0423",
+          "line": 303,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0424",
+          "line": 304,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0432",
+          "line": 312,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0433",
+          "line": 313,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0434",
+          "line": 314,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0442",
+          "line": 322,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0443",
+          "line": 323,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0444",
+          "line": 324,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0445",
+          "line": 325,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0453",
+          "line": 333,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0454",
+          "line": 334,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0455",
+          "line": 335,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0463",
+          "line": 343,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0464",
+          "line": 344,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0465",
+          "line": 345,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0466",
+          "line": 346,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0505",
+          "line": 355,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0506",
+          "line": 356,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0507",
+          "line": 357,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0508",
+          "line": 358,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0516",
+          "line": 366,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0517",
+          "line": 367,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0518",
+          "line": 368,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0526",
+          "line": 376,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0527",
+          "line": 377,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0528",
+          "line": 378,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0529",
+          "line": 379,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0537",
+          "line": 387,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0538",
+          "line": 388,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0539",
+          "line": 389,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0547",
+          "line": 397,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0548",
+          "line": 398,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0549",
+          "line": 399,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0550",
+          "line": 400,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0558",
+          "line": 408,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0559",
+          "line": 409,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0560",
+          "line": 410,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0568",
+          "line": 418,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0569",
+          "line": 419,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0600",
+          "line": 420,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        }
+      ],
+      "exclusion_counts_by_reason": {
+        "assistant_emergency_escalation": 142,
+        "assistant_triage_decision": 43,
+        "expected_agent:EmergencyAgent": 142
+      },
+      "output": "qwen_sft_train_filtered.jsonl",
+      "output_sha256": "fb4ef8020d2422656d1436fdfaec80f243f9f01be1a0117e4fc006dcce6536ee",
+      "retained": 278,
+      "source": "qwen_sft_train.jsonl",
+      "source_sha256": "04b3f696f95f677f164a99f6994eafcd575b4a870bf0447839ec6ebc6fa83f8c",
+      "total": 420
+    },
+    "val": {
+      "excluded": 28,
+      "excluded_records": [
+        {
+          "id": "QWEN_CHAT_0075",
+          "line": 6,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0076",
+          "line": 7,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0077",
+          "line": 8,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0170",
+          "line": 16,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0171",
+          "line": 17,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0172",
+          "line": 18,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0180",
+          "line": 26,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0181",
+          "line": 27,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0182",
+          "line": 28,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0274",
+          "line": 35,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0275",
+          "line": 36,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0276",
+          "line": 37,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0277",
+          "line": 38,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0370",
+          "line": 46,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0371",
+          "line": 47,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0379",
+          "line": 55,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0380",
+          "line": 56,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0381",
+          "line": 57,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0382",
+          "line": 58,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0474",
+          "line": 65,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0475",
+          "line": 66,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0476",
+          "line": 67,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0484",
+          "line": 75,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation",
+            "assistant_triage_decision"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0570",
+          "line": 76,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0571",
+          "line": 77,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0579",
+          "line": 85,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0580",
+          "line": 86,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        },
+        {
+          "id": "QWEN_CHAT_0581",
+          "line": 87,
+          "reasons": [
+            "expected_agent:EmergencyAgent",
+            "assistant_emergency_escalation"
+          ]
+        }
+      ],
+      "exclusion_counts_by_reason": {
+        "assistant_emergency_escalation": 28,
+        "assistant_triage_decision": 6,
+        "expected_agent:EmergencyAgent": 28
+      },
+      "output": "qwen_sft_val_filtered.jsonl",
+      "output_sha256": "a55e3d3014db64e3f7ea271b2a8f67d56dc1e9de4b943f10348e08ae7e6dbc67",
+      "retained": 62,
+      "source": "qwen_sft_val.jsonl",
+      "source_sha256": "d95a493f1f1306bf423750a1b580bacd5aeb5dfd9753fcb7c4fae5bf3d4cf60c",
+      "total": 90
+    }
+  }
+}

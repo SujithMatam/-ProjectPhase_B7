@@ -27,11 +27,8 @@ from trl import SFTTrainer
 # ============================================================================
 MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"  # or "Qwen/Qwen2.5-3B-Instruct" for lower VRAM
 DATA_DIR = Path(__file__).resolve().parent / "exports"
-# Use merged_sft_* files if available (external HF data + synthetic), else fall back to synthetic-only
-_merged_train = DATA_DIR / "merged_sft_train.jsonl"
-_merged_val   = DATA_DIR / "merged_sft_val.jsonl"
-TRAIN_FILE = str(_merged_train if _merged_train.exists() else DATA_DIR / "qwen_sft_train.jsonl")
-VAL_FILE   = str(_merged_val   if _merged_val.exists()   else DATA_DIR / "qwen_sft_val.jsonl")
+TRAIN_FILE = DATA_DIR / "qwen_sft_train_filtered.jsonl"
+VAL_FILE = DATA_DIR / "qwen_sft_val_filtered.jsonl"
 OUTPUT_DIR = Path(__file__).resolve().parent / "qwen_finetuned_checkpoint"
 
 
@@ -48,8 +45,19 @@ def format_chatml(example, tokenizer):
 
 
 def train():
+    missing_files = [path for path in (TRAIN_FILE, VAL_FILE) if not path.is_file()]
+    if missing_files:
+        missing = ", ".join(str(path) for path in missing_files)
+        raise FileNotFoundError(
+            f"Filtered SFT files are missing: {missing}. "
+            "Run `python backend/data/filter_qwen_sft_triage.py` first."
+        )
+
     print(f"[*] Loading dataset: {TRAIN_FILE}")
-    dataset = load_dataset("json", data_files={"train": TRAIN_FILE, "val": VAL_FILE})
+    dataset = load_dataset(
+        "json",
+        data_files={"train": str(TRAIN_FILE), "val": str(VAL_FILE)},
+    )
 
     # 4-bit Quantization Config for QLoRA
     bnb_config = BitsAndBytesConfig(
