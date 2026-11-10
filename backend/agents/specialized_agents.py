@@ -1246,9 +1246,147 @@ class NutritionAgent(BaseClinicalAgent):
     TARGET_AGENT = TargetAgent.NUTRITION_AGENT
     DOMAIN_FOCUS = (
         "Focus on postoperative diet, protein intake, hydration, and nutrition "
-        "supporting recovery."
+        "supporting recovery. Give general guidance only; never prescribe calorie, "
+        "protein, fluid, supplement, or restriction targets. Ask about dietary "
+        "needs and defer individual plans to the patient's clinician or dietitian."
     )
 
+    @classmethod
+    def handle(
+        cls,
+        *,
+        patient_id: str,
+        surgery_type: str,
+        affected_limb: str,
+        postop_day: int,
+        user_message: str,
+        procedure: str,
+        chat_history: Optional[List[Dict[str, str]]] = None,
+        surgery_date: Optional[str] = None,
+        precomputed_triage: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        from agents.emergency_agent import EmergencyEscalationAgent
+        from lam.schemas import ScopeStatus
+        from lam.scope_validator import ScopeValidator
+        from triage.safety_triage import SafetyTriageEngine
+
+        triage = precomputed_triage or SafetyTriageEngine.evaluate(
+            symptoms=user_message,
+            post_op_day=postop_day,
+        )
+        if triage.get("triage_level") == "RED":
+            return EmergencyEscalationAgent.handle(
+                patient_id=patient_id,
+                surgery_type=surgery_type,
+                affected_limb=affected_limb,
+                postop_day=postop_day,
+                user_message=user_message,
+                procedure=procedure,
+                chat_history=chat_history,
+                surgery_date=surgery_date,
+                precomputed_triage=triage,
+            )
+
+        scope, _ = ScopeValidator.validate(user_message, surgery_type)
+        if scope == ScopeStatus.OUT_OF_SCOPE:
+            return {
+                "reply": (
+                    "I can help with general nutrition questions related to your "
+                    "orthopedic recovery. For unrelated topics, please use a "
+                    "suitable resource; for other health concerns, contact a "
+                    "healthcare professional."
+                ),
+                "answer": (
+                    "I can help with general nutrition questions related to your "
+                    "orthopedic recovery. For unrelated topics, please use a "
+                    "suitable resource; for other health concerns, contact a "
+                    "healthcare professional."
+                ),
+                "triage_level": "GREEN",
+                "is_escalated": False,
+                "engine": "Nutrition Agent - Scope Deflection",
+                "sources": [],
+                "target_agent": TargetAgent.DEFLECTION_AGENT.value,
+                "action": "deflect",
+            }
+
+        text = user_message.lower()
+        history_text = " ".join(
+            str(turn.get("content", ""))
+            for turn in (chat_history or [])
+            if isinstance(turn, dict)
+        ).lower()
+        urgent_nutrition_signals = (
+            "can't keep fluids down",
+            "cannot keep fluids down",
+            "can't keep water down",
+            "cannot keep water down",
+            "vomiting repeatedly",
+            "persistent vomiting",
+            "very little urine",
+            "hardly urinating",
+            "not urinating",
+            "unable to swallow",
+        )
+        if any(signal in text for signal in urgent_nutrition_signals):
+            reply = (
+                "I am sorry you are dealing with this. Being unable to keep fluids "
+                "down, repeated vomiting, very little urine, or difficulty "
+                "swallowing needs prompt clinical advice. Please contact your "
+                "surgical team or healthcare professional today. If you feel "
+                "faint or confused, see blood, or feel in immediate danger, seek "
+                "emergency care now. Do not start a supplement or change a "
+                "prescribed diet or fluid plan based on this chat."
+            )
+            return {
+                "reply": reply,
+                "answer": reply,
+                "triage_level": "YELLOW",
+                "is_escalated": True,
+                "engine": "Nutrition Agent - Clinical Escalation",
+                "sources": [],
+                "target_agent": cls.TARGET_AGENT.value,
+                "action": "escalate",
+            }
+
+        has_special_diet_context = any(
+            term in text or term in history_text
+            for term in (
+                "kidney", "renal", "dialysis", "heart failure", "diabetes",
+                "allerg", "vegetarian", "vegan", "fluid restriction",
+                "dietitian", "dietician",
+            )
+        )
+        reply = (
+            "During recovery, aim for regular, balanced meals with a protein "
+            "food you tolerate (for example beans, lentils, eggs, dairy, fish, "
+            "tofu, or meat if it suits your diet), plus fruit or vegetables and "
+            "whole grains as tolerated. Drink regularly unless your clinician "
+            "has set a fluid limit. Follow any instructions from your surgical "
+            "team or dietitian, and check with them before starting supplements "
+            "or changing a prescribed diet. Individual protein, calorie, and "
+            "fluid needs vary, so I won't set a personal target here."
+        )
+        if has_special_diet_context:
+            reply += (
+                " I noticed you mentioned a medical or dietary consideration; "
+                "please keep its existing clinician-provided plan as the priority."
+            )
+        reply += (
+            "\n\nTo make this more relevant, what dietary restrictions or "
+            "allergies do you have, and are appetite, nausea, or a clinician-set "
+            "fluid limit affecting what you can eat or drink?"
+        )
+        return {
+            "reply": reply,
+            "answer": reply,
+            "triage_level": triage.get("triage_level", "GREEN"),
+            "is_escalated": triage.get("is_escalated", False),
+            "engine": "Nutrition Agent - Guided Recovery Support",
+            "sources": [],
+            "target_agent": cls.TARGET_AGENT.value,
+            "action": "inform",
+        }
 
 
 class MentalWellbeingAgent(BaseClinicalAgent):
@@ -1256,9 +1394,115 @@ class MentalWellbeingAgent(BaseClinicalAgent):
     DOMAIN_FOCUS = (
         "Focus on recovery-related anxiety, fear of movement, frustration, and "
         "motivation. Keep guidance supportive and non-diagnostic, staying within "
-        "postoperative-support scope."
+        "postoperative-support scope. Do not diagnose or minimize distress. "
+        "Self-harm and crisis disclosures must be escalated through deterministic "
+        "safety triage."
     )
 
+    @classmethod
+    def handle(
+        cls,
+        *,
+        patient_id: str,
+        surgery_type: str,
+        affected_limb: str,
+        postop_day: int,
+        user_message: str,
+        procedure: str,
+        chat_history: Optional[List[Dict[str, str]]] = None,
+        surgery_date: Optional[str] = None,
+        precomputed_triage: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        from agents.emergency_agent import EmergencyEscalationAgent
+        from lam.schemas import ScopeStatus
+        from lam.scope_validator import ScopeValidator
+        from triage.safety_triage import SafetyTriageEngine
+
+        triage = precomputed_triage or SafetyTriageEngine.evaluate(
+            symptoms=user_message,
+            post_op_day=postop_day,
+        )
+        if triage.get("triage_level") == "RED":
+            return EmergencyEscalationAgent.handle(
+                patient_id=patient_id,
+                surgery_type=surgery_type,
+                affected_limb=affected_limb,
+                postop_day=postop_day,
+                user_message=user_message,
+                procedure=procedure,
+                chat_history=chat_history,
+                surgery_date=surgery_date,
+                precomputed_triage=triage,
+            )
+
+        scope, _ = ScopeValidator.validate(user_message, surgery_type)
+        if scope == ScopeStatus.OUT_OF_SCOPE:
+            reply = (
+                "I can support feelings connected to your orthopedic recovery, "
+                "but I cannot help with unrelated topics. For other health "
+                "concerns, please contact a suitable healthcare professional."
+            )
+            return {
+                "reply": reply,
+                "answer": reply,
+                "triage_level": "GREEN",
+                "is_escalated": False,
+                "engine": "Mental Wellbeing Agent - Scope Deflection",
+                "sources": [],
+                "target_agent": TargetAgent.DEFLECTION_AGENT.value,
+                "action": "deflect",
+            }
+
+        text = user_message.lower()
+        persistent_distress = any(
+            phrase in text
+            for phrase in (
+                "hopeless", "can't function", "cannot function",
+                "can't cope", "cannot cope", "unable to function",
+            )
+        )
+        if persistent_distress:
+            reply = (
+                "I am sorry this feels so difficult. I cannot diagnose what is "
+                "causing it, but feeling hopeless or unable to manage day-to-day "
+                "deserves support. Please contact your healthcare professional "
+                "or surgical care team promptly, and consider telling someone "
+                "you trust so you do not have to handle this alone. If you feel "
+                "at risk of harming yourself or in immediate danger, contact "
+                "local emergency services or a crisis service now."
+            )
+            return {
+                "reply": reply,
+                "answer": reply,
+                "triage_level": "YELLOW",
+                "is_escalated": True,
+                "engine": "Mental Wellbeing Agent - Support Escalation",
+                "sources": [],
+                "target_agent": cls.TARGET_AGENT.value,
+                "action": "escalate",
+            }
+
+        reply = (
+            "It makes sense that recovery can bring worry, frustration, or fear, "
+            "and I am sorry you are facing that. I cannot diagnose you, but we "
+            "can take this one step at a time. Try a slow, comfortable breathing "
+            "pause, and keep movement within the plan already given by your "
+            "surgeon or physiotherapist; you do not need to push beyond it. "
+            "If these feelings persist or interfere with daily life, let your "
+            "care team or someone you trust know."
+            "\n\nWhat feels hardest right now: pain or movement, sleep, needing "
+            "help from others, or something else?"
+        )
+        return {
+            "reply": reply,
+            "answer": reply,
+            "triage_level": triage.get("triage_level", "GREEN"),
+            "is_escalated": triage.get("is_escalated", False),
+            "engine": "Mental Wellbeing Agent - Empathetic Support",
+            "sources": [],
+            "target_agent": cls.TARGET_AGENT.value,
+            "action": "advise",
+        }
 
 class IntakeContextAgent(BaseClinicalAgent):
     """

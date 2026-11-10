@@ -49,6 +49,7 @@ from typing import Optional, List, Dict
 
 from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
+from agents.emergency_agent import MENTAL_HEALTH_CRISIS_TEMPLATE
 from agents.recovery_integration import check_recovery_continuation
 from agents import pain_logic
 from agents import pain_state
@@ -993,14 +994,17 @@ class LAMOrchestrator:
             except Exception as exc:
                 print(f"[DOCTOR ALERT] notification scheduling failed: {exc}")
 
-            reply_text = (
-                "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
-                "Your reported symptoms require urgent medical "
-                f"evaluation: **{reason_text}**.\n\n"
-                f"{triage.get('action_protocol', '')}\n\n"
-                "Please contact your hospital emergency line or "
-                "visit the nearest emergency department right away."
-            )
+            if triage.get("category") == "mental_health_crisis":
+                reply_text = MENTAL_HEALTH_CRISIS_TEMPLATE
+            else:
+                reply_text = (
+                    "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
+                    "Your reported symptoms require urgent medical "
+                    f"evaluation: **{reason_text}**.\n\n"
+                    f"{triage.get('action_protocol', '')}\n\n"
+                    "Please contact your hospital emergency line or "
+                    "visit the nearest emergency department right away."
+                )
 
             return LAMResult(
                 reply=reply_text,

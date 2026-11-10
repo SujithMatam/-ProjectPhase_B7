@@ -6,10 +6,8 @@ Run directly:
 
 Plain-Python script (no pytest dependency), consistent with
 test_phase2_intent.py / test_phase3_rag.py. Mocks the shared
-ChatAgent.answer_question() response-generation layer so routing/dispatch
-can be verified without a generative model -- the mock records exactly which
-domain_instruction (i.e. which specialized agent) was actually invoked,
-proving dispatch is real rather than cosmetic.
+ChatAgent.answer_question() generation layer for agents that use it, while
+also verifying deterministic agents execute independently of that layer.
 """
 
 from __future__ import annotations
@@ -30,8 +28,8 @@ from agents.specialized_agents import (
     PainSymptomsAgent,
     RecoveryProgressAgent,
     RehabilitationAgent,
-    WoundCareAgent,
 )
+from agents.wound_care_agent import WoundCareAgent
 from triage.safety_triage import SafetyTriageEngine
 
 _FAILURES: list[str] = []
@@ -139,17 +137,20 @@ def run_all_agents_test() -> None:
             result["action"] == expected_action,
             f"{query!r} expected action {expected_action}, got {result['action']}",
         )
-        if expected_agent_cls is MedicationAgent:
+        if expected_agent_cls in {
+            RecoveryProgressAgent, PainSymptomsAgent, MedicationAgent,
+            WoundCareAgent, NutritionAgent, MentalWellbeingAgent,
+        }:
             _check(
                 len(calls) == 0,
-                f"{query!r} should be handled by the proactive engine before synthesis, got {len(calls)} call(s)",
+                f"{query!r} should use its deterministic domain handler, got {len(calls)} synthesis call(s)",
             )
         else:
             _check(
                 len(calls) == 1,
                 f"{query!r} expected exactly 1 response-generation call, got {len(calls)}",
             )
-        if expected_agent_cls is RecoveryProgressAgent:
+        if expected_agent_cls is RecoveryProgressAgent and captured_domain_instruction is not None:
             # RecoveryProgressAgent (Milestone Sec 2.5) genuinely enriches its
             # DOMAIN_FOCUS with retrieved-chunk milestone/day-window notes
             # (see agents/specialized_agents.py) -- it must still always
@@ -163,7 +164,10 @@ def run_all_agents_test() -> None:
                 f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through "
                 f"(as a prefix), got {captured_domain_instruction!r}",
             )
-        elif expected_agent_cls is not MedicationAgent:
+        elif expected_agent_cls not in {
+            RecoveryProgressAgent, PainSymptomsAgent, MedicationAgent,
+            WoundCareAgent, NutritionAgent, MentalWellbeingAgent,
+        }:
             _check(
                 captured_domain_instruction == expected_agent_cls.DOMAIN_FOCUS,
                 f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through, "

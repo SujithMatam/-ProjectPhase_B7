@@ -34,6 +34,16 @@ _ESCALATION_TEMPLATE = (
     "Your care team has been notified of this alert."
 )
 
+MENTAL_HEALTH_CRISIS_TEMPLATE = (
+    "I am sorry you are going through this. **Your safety matters, and you deserve "
+    "immediate support.**\n\n"
+    "If you may act on thoughts of harming yourself or are in immediate danger, "
+    "call your local emergency number or go to the nearest emergency department "
+    "now. If possible, stay with someone you trust and tell them directly what is "
+    "happening. Contact a local crisis service or healthcare professional right "
+    "away. Please do not wait for a reply in this chat."
+)
+
 
 class EmergencyEscalationAgent:
     """
@@ -66,7 +76,10 @@ class EmergencyEscalationAgent:
             f" ({', '.join(trigger_reasons)})" if trigger_reasons else ""
         )
 
-        reply_text = _ESCALATION_TEMPLATE.format(trigger_clause=trigger_clause)
+        if (precomputed_triage or {}).get("category") == "mental_health_crisis":
+            reply_text = MENTAL_HEALTH_CRISIS_TEMPLATE
+        else:
+            reply_text = _ESCALATION_TEMPLATE.format(trigger_clause=trigger_clause)
 
         cls._notify_care_team(
             patient_id=patient_id,
