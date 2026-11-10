@@ -16,3 +16,21 @@ venv\Scripts\activate
 pip install -r requirements.txt
 python main.py
 ```
+
+## Qwen SFT dataset
+
+Before fine-tuning, filter the exported SFT train/validation/test splits. This
+creates separate `*_filtered.jsonl` files and a deterministic
+`qwen_sft_filter_report.json` audit manifest; the source exports and triage
+intent datasets are not modified.
+
+Run these commands from the repository root:
+
+```bash
+python backend/data/filter_qwen_sft_triage.py
+python backend/data/test_filter_qwen_sft_triage.py
+python backend/data/train_qwen_lora.py
+```
+
+The Qwen trainer requires the filtered train and validation files and fails
+with a setup error if they have not been generated.
