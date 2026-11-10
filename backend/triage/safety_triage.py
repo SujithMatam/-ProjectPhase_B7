@@ -28,6 +28,14 @@ def _build_pattern(terms: List[str]) -> re.Pattern:
 
 
 class SafetyTriageEngine:
+    SELF_HARM_PATTERNS = [
+        "suicidal", "suicide", "self-harm", "self harm", "self-harming",
+        "hurt myself", "hurting myself", "harm myself", "harming myself",
+        "kill myself", "end my life",
+        "don't want to live", "do not want to live", "better off dead",
+        "wish I were dead",
+    ]
+
     # Exact-phrase RED patterns -- kept for genuinely idiomatic/sequential
     # phrases that aren't naturally said in a different word order.
     RED_FLAG_PATTERNS = {
@@ -95,6 +103,27 @@ class SafetyTriageEngine:
     _COMPOUND_MIN_CATEGORIES_TO_ESCALATE = 2
 
     @classmethod
+    def _self_harm_signal(cls, symptoms: str) -> bool:
+        for phrase in cls.SELF_HARM_PATTERNS:
+            match = re.search(r"\b" + re.escape(phrase) + r"\b", symptoms, re.IGNORECASE)
+            if not match:
+                continue
+            # Do not escalate a clear denial such as "I am not suicidal".
+            # "I don't want to live" is itself a crisis signal, not a denial.
+            if phrase in {"don't want to live", "do not want to live"}:
+                return True
+            preceding = symptoms[max(0, match.start() - 48):match.start()]
+            if re.search(
+                r"\b(?:not|never|no|don't|do not)\b"
+                r"(?:[ \t]+(?!but\b|however\b|although\b)[\w'-]+){0,3}[ \t]*$",
+                preceding,
+                re.IGNORECASE,
+            ):
+                continue
+            return True
+        return False
+
+    @classmethod
     def evaluate(cls, symptoms: str, temperature_c: float = None, post_op_day: int = 1) -> Dict[str, Any]:
         symptom_lower = symptoms.lower()
         red_flags_detected: List[str] = []
@@ -126,6 +155,24 @@ class SafetyTriageEngine:
                     f"{rule['category']} indicator: "
                     f"'{anchor_match.group()}' + '{symptom_match.group()}'"
                 )
+
+        mental_health_crisis = cls._self_harm_signal(symptom_lower)
+        if mental_health_crisis:
+            return {
+                "triage_level": "RED",
+                "urgency": "IMMEDIATE CRISIS SUPPORT REQUIRED",
+                "status_code": 3,
+                "reasons": ["Possible self-harm or suicide risk disclosed"],
+                "action_protocol": (
+                    "If you may act on thoughts of harming yourself or are in immediate "
+                    "danger, call your local emergency number or go to the nearest "
+                    "emergency department now. If possible, stay with someone you trust "
+                    "and contact a local crisis service or healthcare professional "
+                    "immediately. Do not wait for a reply in this chat."
+                ),
+                "is_escalated": True,
+                "category": "mental_health_crisis",
+            }
 
         # Evaluate Yellow Flags
         for category, triggers in cls.YELLOW_FLAG_PATTERNS.items():
@@ -199,4 +246,3 @@ class SafetyTriageEngine:
                 ),
                 "is_escalated": False,
             }
-

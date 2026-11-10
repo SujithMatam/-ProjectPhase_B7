@@ -452,6 +452,14 @@ _MENTAL_KEYWORDS = {
     "sad",
     "hopeless",
     "lonely",
+    "suicidal",
+    "suicide",
+    "self-harm",
+    "self harm",
+    "hurt myself",
+    "hurting myself",
+    "harm myself",
+    "harming myself",
 }
 
 

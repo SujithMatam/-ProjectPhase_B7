@@ -22,6 +22,7 @@ from lam.intent_classifier import (
     IntentClassifier,
     ROUTABLE_INTENTS,
     ClassificationDetail,
+    _deterministic_intent,
 )
 from lam.schemas import IntentLabel, LAMContext, ScopeStatus
 from lam.orchestrator import LAMOrchestrator
@@ -271,9 +272,14 @@ def run_fallback_and_safety_invariants() -> None:
         for query, _ in BENCHMARKS + [(q, None) for q in EMERGENCY_LIKE_QUERIES]:
             detail = IntentClassifier.classify_detailed(query, _ctx(query))
             _print_detail("forced-low-confidence", query, detail)
+            deterministic = _deterministic_intent(query)
+            expected_path = (
+                "deterministic" if deterministic is not None
+                else "fallback_low_confidence"
+            )
             _check(
-                detail.decision_path == "fallback_low_confidence",
-                f"expected fallback_low_confidence decision path for {query!r}, got {detail.decision_path}",
+                detail.decision_path == expected_path,
+                f"expected {expected_path} decision path for {query!r}, got {detail.decision_path}",
             )
             _check(
                 detail.intent != IntentLabel.EMERGENCY,
@@ -292,9 +298,14 @@ def run_fallback_and_safety_invariants() -> None:
         for query, _ in BENCHMARKS + [(q, None) for q in EMERGENCY_LIKE_QUERIES]:
             detail = IntentClassifier.classify_detailed(query, _ctx(query))
             _print_detail("forced-offline", query, detail)
+            deterministic = _deterministic_intent(query)
+            expected_path = (
+                "deterministic" if deterministic is not None
+                else "fallback_offline"
+            )
             _check(
-                detail.decision_path == "fallback_offline",
-                f"expected fallback_offline decision path for {query!r}, got {detail.decision_path}",
+                detail.decision_path == expected_path,
+                f"expected {expected_path} decision path for {query!r}, got {detail.decision_path}",
             )
             _check(
                 detail.intent != IntentLabel.EMERGENCY,
