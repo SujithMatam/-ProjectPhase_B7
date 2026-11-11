@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import logging
 import re
+import zlib
 from datetime import date, datetime
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -630,7 +631,9 @@ def format_assess_message(checkpoint: "recovery_logic.CheckpointResult", *, tren
     """
     if checkpoint.entry is None or checkpoint.verdict is None:
         return "I don't have a supported way to phrase this result yet."
-    seed = int((checkpoint.effective_postop_day or 0) + (abs(hash(str(checkpoint.patient_value))) % 7))
+    # zlib.crc32, not hash(): str hashes are salted per process, which made
+    # the chosen opener change from run to run for the same input.
+    seed = int((checkpoint.effective_postop_day or 0) + (zlib.crc32(str(checkpoint.patient_value).encode("utf-8")) % 7))
     ack = _pick(_ASSESS_ACK_DUE_POOL, seed) if with_ack else ""
     clause = comparison_clause(checkpoint, trend=trend, cite=with_ack)
     return f"{ack} {clause}.".strip()

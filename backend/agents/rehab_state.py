@@ -19,12 +19,16 @@ answers an exercise question:
                               hard (free text), or "none"
 
 Unlike Pain (which re-derives its clinical facts from chat_history every
-turn), these facts live in the session for the TTL: the orchestrator has
-no Rehabilitation continuation hook, so a bare "no" after a Rehabilitation
-question is not guaranteed to come back through chat_history anyway (see
-agents/REHAB_AGENT_CHANGES.md, "shared changes needed"). Everything here is
-best-effort and lost on restart; the durable record is patient_database.py
-(the agent writes today's exercise_completed there via patient_memory.py).
+turn), these facts live in the session for the TTL. The orchestrator's
+Rehabilitation continuation hook, check_rehab_continuation() in
+lam/orchestrator.py, reads this state through peek_state() only (it never
+creates or mutates it) and routes a short answer -- a bare "no", a
+weight-bearing status, a few words -- straight back to this agent while a
+pending_field is set. The agent then interprets that answer against the
+pending question kept here, not by re-reading chat_history. Everything here
+is best-effort and lost on restart; the durable record is
+patient_database.py (the agent writes today's exercise_completed there via
+patient_memory.py).
 
 Lock ordering is `_LOCK` (module) before `self._lock` (instance), exactly
 as in pain_state.py, so this can never deadlock against itself.
