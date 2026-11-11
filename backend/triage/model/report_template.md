@@ -37,13 +37,45 @@ the tables are filled in from `model/artifacts/results.json`. Data: `backend/tri
 - **CIs** are Wilson 95% intervals on RED recall. With 104 RED rows in test a recall of 0.95 has an
   interval of roughly +/- 0.04; with 58 RED challenge rows roughly +/- 0.06.
 
+Choices made on val (`model/artifacts/selection.json`). The unseen-scenario rows reuse the
+num_iterations chosen on the main split, as the tuning column shows.
+
 {{selection}}
 
 ## Headline (main split test and challenge set)
 
 {{headline}}
 
-FINDINGS_HEADLINE
+**Finding 1: the rule engines are not a usable baseline for free-text triage.** On the main test
+split B1 catches 20 of 104 RED messages (recall 0.192, CI 0.128-0.278) and sends 74 of them to
+GREEN; B0 catches 10. On the challenge set B1 catches 14 of 58. The rules match fixed phrases and
+read temperature only from a numeric argument, which a text-only message never supplies, so every
+"fever of 39"-type message falls through. B1 is better than B0 (self-harm patterns, co-occurrence
+rules) but the gap to any learned model is 60 or more points of RED recall.
+
+**Finding 2: the learned models reach 0.8-0.9 RED recall on test, and the thresholded rule buys about
+10 points of it.** M2 (SetFit) with argmax: 0.815 ± 0.008; with the val-chosen thresholds:
+0.927 ± 0.005, cutting RED->GREEN from 2.2 to 1.4 per 104. The price is precision and over-triage:
+RED precision falls from 0.83 to 0.71, macro F1 from 0.77 to 0.69, and about half the YELLOW
+messages are called RED (32 of 62). M1 behaves the same way, 0.779 -> 0.885. Neither model hits the
+0.95 RED-recall target on test that the thresholds were set to on val: M2's per-seed intervals
+include 0.95, M1's (0.809-0.933) do not.
+
+**Finding 3: M1 and M2 are close; the choice of M2 rests on a 0.005 val margin.** Val macro F1 was
+0.767 (M1) vs 0.772 (M2 mean of 5 seeds). On test M2 is ahead on RED recall (thresholded 0.927 vs
+0.885), but on the challenge set M1 has the higher macro F1 (argmax 0.783 vs 0.720) and identical
+RED->GREEN (0). Most differences between M1 and M2 are inside the confidence intervals. Seed-to-seed
+spread of M2 is small (sd <= 0.01 on RED recall).
+
+**Finding 4: H1 = max(B1, M2) adds nothing on the RED side and costs precision.** B1 catches **no**
+RED message that the shipped M2 (seed 4, thresholded) misses, on test, on the challenge set or on
+the unseen-scenario test. Every level H1 raises is a non-RED message: on test B1 adds 7 false REDs
+and raises 15 non-RED rows; on the challenge set it adds 12 false REDs and macro F1 drops from 0.63
+(M2 thresholded, mean of seeds) to 0.54. The two RED->GREEN misses left on main test are the same for M2 and H1:
+`HIGH_FEVER-048` "Is 38.5 the cut-off? Because that's what I've got right now." and `MOOD_SLEEP-013`
+"Some nights I think everyone would be better off without me. I've been looking at my tablets and
+thinking about it." The second is a self-harm disclosure that B1's self-harm list does not match
+("better off dead" is listed, "better off without me" is not).
 
 ## Main-split test: all metrics
 
@@ -61,13 +93,24 @@ Per category:
 
 {{challenge_categories_red}}
 
-FINDINGS_CHALLENGE
+**Finding 5: the models handle paraphrase, keyword-free and non-standard English; they are weakest
+on numbers and over-call benign messages.** On `keyword_free_red` the rules score 0/20 and every
+model 19-20/20. The weakest RED category for the models is `numeric_in_text` (RED recall 0.57-0.86):
+a sentence embedding does not compare 38.6 with 38.5. On `benign_scary_word` the models over-triage
+(accuracy 52-73%), and the thresholded rule makes it worse. Negation is handled better by M2 argmax
+(88%) than by anything else; H1 drops it to 30-45% because the rules fire on negated keywords.
 
 ### The 7 audit_regression rows
 
 {{audit_rows}}
 
-FINDINGS_AUDIT
+**Finding 6: the three RED audit rows are now caught by every model; two of the four non-RED rows are
+still wrong for every model.** "I cannot breathe properly", "I can’t breathe" (curly apostrophe) and
+"fever of 39" are RED for M1, M2 (5/5 seeds) and therefore H1, while B0 and B1 call all three GREEN.
+All models call "I don't have shortness of breath" RED (0/5 seeds right) and "My knee is a little red
+and swollen" RED (label YELLOW). "No chest pain, no chills" is right only for M2 argmax (5/5) and
+3/5 seeds of M2 thresholded; H1 turns it back to RED because B1 matches "chest pain" and "chills".
+"fluid coming from my incision" is right only for M1 argmax. H1 gets 3 of 7 right with either rule.
 
 {{challenge_confusion}}
 
@@ -82,7 +125,10 @@ Same on the unseen-scenario test:
 
 {{rules_no_template_unseen}}
 
-FINDINGS_TEMPLATE
+**Finding 7: the rules' low scores are not an artefact of the template rows.** Removing the 10
+source_template rows from main test changes B1 RED recall from 0.192 to 0.180 and B0 from 0.096 to
+0.090; on the unseen-scenario test (4 template rows) nothing changes. The rules do not score well on
+the sentences they were partly written from either.
 
 ## Unseen-scenario split
 
@@ -96,7 +142,17 @@ Per-scenario RED recall:
 
 {{unseen_per_scenario}}
 
-FINDINGS_UNSEEN
+**Finding 8: on unseen scenarios RED recall drops by about 10 points with thresholds and 25 points
+without, and missed fevers dominate.** M2 thresholded falls from 0.927 (main test) to 0.835 ± 0.011;
+M2 argmax from 0.815 to 0.562, mostly RED->YELLOW (37 of 105). The thresholded rule matters much more
+here than in-distribution. Per scenario, ALLERGIC_REACTION reaches 0.95 (38/40) with thresholds, but
+HIGH_FEVER only 0.75-0.76: the shipped seed (and H1) misses 12 of 50 RED fever messages, 5 of them
+to GREEN, and every one of the 12 states a temperature >= 38.5 °C (e.g. "39.6 is ths an emergency",
+"38.7, 38.8, 38.6 over the last three checks"). Train holds few such messages (DATASET_CARD.md), and
+neither the models nor the rules read the number. A deterministic temperature parser in front of
+the model would close most of this gap; it is not part of any contender here. Caveat:
+num_iterations was not re-tuned for this split, and the FALL_INJURY / WOUND_OPEN numbers come from
+the split's tuning set.
 
 {{unseen_confusion}}
 
@@ -106,13 +162,21 @@ FINDINGS_UNSEEN
 
 ![reliability diagram](model/reliability_best_model.png)
 
-FINDINGS_CALIBRATION
+**Finding 9: the shipped M2 is well calibrated on test at this prevalence.** Top-label ECE 0.031 and
+p(RED) ECE 0.038 for M2 seed 4 (M2 mean 0.039 / 0.046; M1 0.062 / 0.082). The reliability curve
+follows the diagonal except in sparsely populated bins (the 0.3-0.4 top-label bin holds 2 rows). The
+val-chosen t_red is low (0.15-0.24 across M2 seeds): to reach 95% RED recall the model has to flag
+messages it rates only about 20% likely to be RED. Calibration was measured at 38% RED prevalence;
+at a realistic base rate the same probabilities would be over-confident about RED.
 
 ## Latency and size
 
 {{latency}}
 
-FINDINGS_LATENCY
+**Finding 10: cost is not a deciding factor.** The rules take well under 1 ms per message. M1 and M2
+take about 8-10 ms per message on this CPU, almost all of it the MiniLM forward pass (22.7 M
+parameters, about 92 MB on disk). H1 costs the same as M2. The M1 head is 30 KB of JSON and is
+committed; the SetFit weights are about 92 MB per seed and are rebuilt by `train.py`.
 
 ## What this does not show
 

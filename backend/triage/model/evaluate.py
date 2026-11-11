@@ -101,7 +101,8 @@ def mets(c, k, y, mask=None):
 
 def cell(ml, key, fmt=f3):
     if len(ml) == 1:
-        return fmt(ml[0][key])
+        v = ml[0][key]
+        return str(v) if isinstance(v, int) else fmt(v)
     v = [m[key] for m in ml]
     if isinstance(v[0], int):
         return ms(v, "{:.1f}")
