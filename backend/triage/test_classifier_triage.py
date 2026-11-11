@@ -31,7 +31,7 @@ def run(text, probs, temperature_c=None):
 
 def test_classifier_green():
     r = run("when can I shower?", P(0.01, 0.02))
-    assert r["triage_level"] == "GREEN" and r["reasons"] == ["classifier"]
+    assert r["triage_level"] == "GREEN" and r["reason_codes"] == ["classifier"]
     assert r["doctor_alert"] is False and r["flags"] == [] and r["status_code"] == 1
 
 
@@ -51,28 +51,28 @@ def test_classifier_red_below_t_alert_is_red_without_email():
 def test_override_red_always_emails_even_with_low_p_red():
     r = run("39.6 is this an emergency", P(0.25, 0.5))
     assert r["triage_level"] == "RED" and r["doctor_alert"] is True
-    assert r["reasons"] == ["high_fever", "classifier"]
+    assert r["reason_codes"] == ["high_fever", "classifier"]
 
 
 def test_override_raises_classifier_green():
     r = run("when can I shower?", P(0.01, 0.02), temperature_c=38.9)
-    assert r["triage_level"] == "RED" and r["reasons"] == ["high_fever"]
+    assert r["triage_level"] == "RED" and r["reason_codes"] == ["high_fever"]
     assert r["doctor_alert"] is True
 
 
 def test_yellow_floor_from_temperature():
     r = run("temp 38.1", P(0.01, 0.02))
-    assert r["triage_level"] == "YELLOW" and r["reasons"] == ["moderate_fever"]
+    assert r["triage_level"] == "YELLOW" and r["reason_codes"] == ["moderate_fever"]
 
 
 def test_override_never_lowers_classifier():
     r = run("temp 38.1 and my calf is hard and hot", P(0.95, 0.03))
-    assert r["triage_level"] == "RED" and r["reasons"] == ["classifier"]
+    assert r["triage_level"] == "RED" and r["reason_codes"] == ["classifier"]
 
 
 def test_self_harm_gives_crisis_guidance():
     r = run("everyone would be better off without me", P(0.01, 0.05))
-    assert r["triage_level"] == "RED" and r["reasons"] == ["self_harm"]
+    assert r["triage_level"] == "RED" and r["reason_codes"] == ["self_harm"]
     assert r["category"] == "mental_health_crisis"
     assert r["action_protocol"] == ct.CRISIS_PROTOCOL
     assert r["doctor_alert"] is True
@@ -131,3 +131,19 @@ def test_doctor_alert_gate(monkeypatch):
     alerting = run("my calf is hot and hard", P(0.9, 0.05))
     assert n.notify_red_triage(patient_id="C", user_message="m", triage=alerting) is True
     assert sent == ["B", "C"]
+
+
+def test_reasons_are_patient_readable_and_codes_are_kept():
+    r = run("39.6 is this an emergency", P(0.25, 0.5))
+    assert r["reason_codes"] == ["high_fever", "classifier"]
+    assert r["reasons"] == ["a temperature of 38.5 °C or higher", "the symptoms you described"]
+    assert run("temp 38.1", P(0.01, 0.02))["reasons"] == [
+        "a temperature between 37.8 °C and 38.4 °C"]
+    sh = run("everyone would be better off without me", P(0.01, 0.05))
+    assert "harming yourself" in sh["reasons"][0]
+    for res in (r, sh, run("when can I shower?", P(0.01, 0.02))):
+        assert all("_" not in t for t in res["reasons"])           # no internal codes leak
+
+
+def test_reason_text_unknown_code_and_dedup():
+    assert ct.reason_text(["classifier", "something_new"]) == ["the symptoms you described"]

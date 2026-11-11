@@ -68,6 +68,26 @@ def load_challenge() -> list[dict]:
     return load_jsonl(DATA / "challenge.jsonl")
 
 
+def load_challenge_v2() -> list[dict]:
+    return load_jsonl(DATA / "challenge_v2.jsonl")
+
+
+V2_EXTRA = DATA / "train_v2_extra.jsonl"     # origin "generated_v2", TRAIN only (build_train_v2.py)
+
+
+def load_train(which: str, data: str = "v1") -> list[dict]:
+    """Training rows. v2 = the frozen split's train + the generated_v2 rows. For the
+    unseen-scenario split only the v2 rows flagged ``unseen_split_ok`` are added (no topic of an
+    unseen val/test scenario and no near-duplicate of an unseen val/test row)."""
+    rows = load_split(which, "train")
+    if data == "v1":
+        return rows
+    extra = load_jsonl(V2_EXTRA)
+    if which == "unseen":
+        extra = [r for r in extra if r["unseen_split_ok"]]
+    return rows + extra
+
+
 def labels_of(rows: list[dict]) -> np.ndarray:
     return np.array([L2I[r["label"]] for r in rows])
 

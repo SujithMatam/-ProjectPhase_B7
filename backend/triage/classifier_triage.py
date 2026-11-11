@@ -4,10 +4,14 @@
 
 * **Overrides** (``overrides.py``): temperature from the text or the request's ``temperature_c``
   (>= 38.5 °C RED, 37.8-38.4 °C YELLOW floor) and self-harm disclosures (RED, crisis guidance).
-* **Classifier**: the SetFit model M2 (``model/artifacts/setfit/m2_main_it3_seed4``) when its
-  weights are present, otherwise M1 (frozen MiniLM + the committed LR head). Thresholds t_red /
-  t_yel / t_alert come from ``model/artifacts/selection.json`` and were all chosen on val.
-  Which model was loaded is logged once and returned as ``model_used``.
+* **Classifier**: v2 (REPORT.md "v2: over-triage fix"): the SetFit model M2
+  (``model/artifacts/setfit/m2_main_v2_it3_seed0``) when its weights are present, otherwise M1
+  (frozen MiniLM + the committed LR head ``m1_main_v2.json``). Thresholds t_red / t_yel / t_alert
+  come from ``model/artifacts/selection_v2.json`` and were all chosen on val.
+  ``TRIAGE_MODEL_VERSION=v1`` pins the v1 model (``selection.json``). Which model was loaded is
+  logged once and returned as ``model_used``.
+* ``reasons`` is patient-readable text (``REASON_TEXT``); the internal codes are in
+  ``reason_codes``.
 * **No LLM** is involved anywhere in this path; the LLM never decides triage.
 * The final level is never lower than any component's level (max over components).
 
@@ -36,6 +40,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -70,11 +75,43 @@ GREEN_PROTOCOL = (
     "Continue prescribed home rehabilitation exercises, cryotherapy, elevation, "
     "and oral medication schedule. Log next check-in as scheduled."
 )
+# Patient-facing wording for each internal reason code. Callers (orchestrator, chat_agent,
+# symptom_agent, doctor_alert) print ``reasons`` verbatim, so ``reasons`` carries this text and
+# the machine codes live in ``reason_codes``.
+REASON_TEXT = {
+    "high_fever": "a temperature of 38.5 °C or higher",
+    "moderate_fever": "a temperature between 37.8 °C and 38.4 °C",
+    "self_harm": ("what you told us about thoughts of harming yourself; you deserve support "
+                  "right now and you do not have to manage this alone"),
+    "classifier": "the symptoms you described",
+}
+DEFAULT_REASON_TEXT = "the symptoms you described"
+
+
+def reason_text(codes: List[str]) -> List[str]:
+    """Patient-readable reasons for the given codes, in order, without duplicates."""
+    out: List[str] = []
+    for c in codes:
+        t = REASON_TEXT.get(c, DEFAULT_REASON_TEXT)
+        if t not in out:
+            out.append(t)
+    return out
+
+
 _URGENCY = {
     "RED": "EMERGENCY - IMMEDIATE CLINICAL ESCALATION REQUIRED",
     "YELLOW": "MODERATE RISK - SAME DAY / NEXT MORNING SURGEON CONTACT",
     "GREEN": "NORMAL RECOVERY PROTOCOL",
 }
+
+
+def selection_file() -> Path:
+    """Model version: ``TRIAGE_MODEL_VERSION=v1`` pins the v1 model (selection.json); otherwise
+    v2 (selection_v2.json) when present, else v1."""
+    v1, v2 = ART / "selection.json", ART / "selection_v2.json"
+    if os.environ.get("TRIAGE_MODEL_VERSION", "").strip().lower() == "v1":
+        return v1
+    return v2 if v2.exists() else v1
 
 
 class _Classifier:
@@ -83,6 +120,7 @@ class _Classifier:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._loaded = False
+        self.selection_file: Optional[str] = None
         self.proba = None
         self.model_used: Optional[str] = None
         self.t_red = self.t_yel = self.t_alert = None
@@ -108,10 +146,12 @@ class _Classifier:
     def _load_inner(self) -> None:
         import numpy as np
 
-        sel = json.loads((ART / "selection.json").read_text(encoding="utf-8"))["splits"]["main"]
+        sel_file = selection_file()
+        sel = json.loads(sel_file.read_text(encoding="utf-8"))["splits"]["main"]
         m2 = sel["M2"]
         seed, it = m2["best_seed"], m2["num_iterations"]
-        m2_path = ART / "setfit" / f"m2_main_it{it}_seed{seed}"
+        m2_path = ART / "setfit" / m2.get("weights_dir", f"m2_main_it{it}_seed{seed}")
+        self.selection_file = sel_file.name
         if m2_path.exists():
             from setfit import SetFitModel
             sf = SetFitModel.from_pretrained(str(m2_path))
@@ -124,7 +164,8 @@ class _Classifier:
             self.model_used = f"M2:{m2_path.name}"
         else:
             from sentence_transformers import SentenceTransformer
-            head = json.loads((ART / "m1_main.json").read_text(encoding="utf-8"))
+            head = json.loads((ART / sel["M1"].get("head_file", "m1_main.json"))
+                              .read_text(encoding="utf-8"))
             assert head["classes"] == list(LABELS)
             st = SentenceTransformer(head["embedding_model"], device="cpu")
             W, b = np.array(head["coef"]), np.array(head["intercept"])
@@ -172,7 +213,7 @@ def combine(text: str, probabilities: Optional[Dict[str, float]], t_red: Optiona
 
     components = [(o.level, o.reason) for o in overrides] + [(clf_level, "classifier")]
     level = max((c[0] for c in components), key=LEVEL_RANK.get)
-    reasons = [name for lvl, name in components if lvl == level]
+    reason_codes = [name for lvl, name in components if lvl == level]
 
     override_red = any(o.level == "RED" for o in overrides)
     flags: List[str] = []
@@ -192,7 +233,8 @@ def combine(text: str, probabilities: Optional[Dict[str, float]], t_red: Optiona
     result: Dict[str, Any] = {
         "triage_level": level,
         "status_code": _STATUS[level],
-        "reasons": reasons,
+        "reasons": reason_text(reason_codes),      # patient-readable (shown in replies)
+        "reason_codes": reason_codes,              # internal: high_fever | moderate_fever | ...
         "is_escalated": level != "GREEN",
         "triage_mode": "hybrid",
         "model_used": model_used,
@@ -247,4 +289,5 @@ def model_info() -> Dict[str, Any]:
     _CLASSIFIER.load()
     return {"model_used": _CLASSIFIER.model_used or "rules_fallback",
             "t_red": _CLASSIFIER.t_red, "t_yel": _CLASSIFIER.t_yel,
-            "t_alert": _CLASSIFIER.t_alert, "load_error": _CLASSIFIER.load_error}
+            "t_alert": _CLASSIFIER.t_alert, "load_error": _CLASSIFIER.load_error,
+            "selection_file": _CLASSIFIER.selection_file}

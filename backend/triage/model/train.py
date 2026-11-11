@@ -34,8 +34,8 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ART, CACHE, EMBED_MODEL, LABELS, MAX_SEQ_LENGTH, SETFIT_DIR, SETFIT_SEEDS,  # noqa: E402
-                    TRAIN_LOG, choose_thresholds, embed, labels_of, load_challenge, load_split,
-                    macro_f1, seed_everything)
+                    TRAIN_LOG, choose_thresholds, embed, labels_of, load_challenge,
+                    load_challenge_v2, load_split, load_train, macro_f1, seed_everything)
 
 PREDS = CACHE / "preds"
 C_GRID = [float(c) for c in np.logspace(-3, 3, 13)]
@@ -43,6 +43,12 @@ SETFIT_ITERS = (1, 3)
 SETFIT_ARGS = {"batch_size": 32, "num_epochs": 1, "body_learning_rate": 2e-5}
 SPLITS = ("main", "unseen")
 TUNE_SPLIT = "main"
+DATA = "v1"            # set by --data; "v2" adds data/train_v2_extra.jsonl to TRAIN only
+V2_ITERS = 3           # v2 reuses num_iterations 3 (chosen for v1 on main val, seed 0)
+
+
+def sfx() -> str:
+    return "" if DATA == "v1" else f"_{DATA}"
 
 
 def log(msg: str) -> None:
@@ -57,6 +63,8 @@ def eval_sets(split: str) -> dict[str, list[dict]]:
     sets = {"val": load_split(split, "val"), "test": load_split(split, "test")}
     if split == "main":
         sets["challenge"] = load_challenge()
+        if DATA != "v1":
+            sets["challenge_v2"] = load_challenge_v2()
     return sets
 
 
@@ -81,14 +89,14 @@ def load_preds(name: str) -> dict:
 
 
 def setfit_name(split: str, iters: int, seed: int) -> str:
-    return f"m2_{split}_it{iters}_seed{seed}"
+    return f"m2_{split}{sfx()}_it{iters}_seed{seed}"
 
 
 # ---------------------------------------------------------------- M1
 def train_m1(split: str) -> dict:
     from sklearn.linear_model import LogisticRegression
     seed_everything(0)
-    train = load_split(split, "train")
+    train = load_train(split, DATA)
     sets = eval_sets(split)
     xtr, ytr = embed([r["text"] for r in train]), labels_of(train)
     xv, yv = embed([r["text"] for r in sets["val"]]), labels_of(sets["val"])
@@ -102,13 +110,14 @@ def train_m1(split: str) -> dict:
     probs = {k: clf.predict_proba(embed([r["text"] for r in rows])) for k, rows in sets.items()}
     head = {"model": "M1", "embedding_model": EMBED_MODEL, "normalize_embeddings": True,
             "classes": list(LABELS), "C": c, "class_weight": "balanced", "split": split,
+            "data": DATA, "n_train": len(train),
             "coef": clf.coef_.tolist(), "intercept": clf.intercept_.tolist(),
             "val_macro_f1_argmax": f1,
             "c_grid": [{"C": g[1], "val_macro_f1": g[0]} for g in grid]}
     ART.mkdir(parents=True, exist_ok=True)
-    (ART / f"m1_{split}.json").write_text(json.dumps(head, indent=1) + "\n", encoding="utf-8")
-    save_preds(f"m1_{split}", sets, probs, {"C": c})
-    log(f"M1 {split}: C={c:g} val macro-F1 {f1:.3f}")
+    (ART / f"m1_{split}{sfx()}.json").write_text(json.dumps(head, indent=1) + "\n", encoding="utf-8")
+    save_preds(f"m1_{split}{sfx()}", sets, probs, {"C": c, "n_train": len(train)})
+    log(f"M1 {split}{sfx()}: C={c:g} val macro-F1 {f1:.3f}")
     return head
 
 
@@ -121,7 +130,7 @@ def train_setfit(split: str, seed: int, iters: int, save: bool = False) -> None:
     from datasets import Dataset
     from setfit import SetFitModel, Trainer, TrainingArguments
     seed_everything(seed)
-    train = load_split(split, "train")
+    train = load_train(split, DATA)
     sets = eval_sets(split)
     ds = Dataset.from_dict({"text": [r["text"] for r in train], "label": labels_of(train).tolist()})
     model = SetFitModel.from_pretrained(EMBED_MODEL)
@@ -139,6 +148,7 @@ def train_setfit(split: str, seed: int, iters: int, save: bool = False) -> None:
     probs = {k: np.asarray(model.predict_proba([r["text"] for r in rows], as_numpy=True))
              for k, rows in sets.items()}
     save_preds(name, sets, probs, {"seed": seed, "num_iterations": iters, "train_secs": secs,
+                                   "data": DATA, "n_train": len(train),
                                    "max_seq_length": MAX_SEQ_LENGTH, **SETFIT_ARGS})
     if save:
         model.save_pretrained(str(SETFIT_DIR / name))
@@ -183,8 +193,27 @@ def select() -> dict:
     return sel
 
 
+def run_all_v2() -> None:
+    """v2: M1 + SetFit (num_iterations 3; main seeds 0-4 saved, unseen seeds 0-2), one at a time.
+    Selection is done by select_v2.py (new operating-point rule)."""
+    def child(*a: str) -> None:
+        subprocess.run([sys.executable, str(Path(__file__).resolve()), "--data", DATA, *a],
+                       check=True)
+
+    log(f"=== train.py all --data {DATA} ===")
+    if not all(has_preds(f"m1_{sp}{sfx()}") for sp in SPLITS):
+        child("m1")
+    for split in ("main", "unseen"):
+        for sd in SETFIT_SEEDS[split]:
+            args = ["setfit", "--split", split, "--seed", str(sd), "--iters", str(V2_ITERS)]
+            child(*args, *(["--save"] if split == "main" else []))
+
+
 def run_all() -> None:
     """Every step in order, each SetFit run in its own child process, one at a time."""
+    if DATA != "v1":
+        return run_all_v2()
+
     def child(*a: str) -> None:
         subprocess.run([sys.executable, str(Path(__file__).resolve()), *a], check=True)
 
@@ -209,7 +238,12 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--iters", type=int, default=SETFIT_ITERS[-1])
     ap.add_argument("--save", action="store_true")
+    ap.add_argument("--data", choices=["v1", "v2"], default="v1")
     a = ap.parse_args()
+    global DATA
+    DATA = a.data
+    if a.cmd == "select" and DATA != "v1":
+        raise SystemExit("v2 selection: run select_v2.py")
     if a.cmd == "m1":
         for sp in SPLITS:
             train_m1(sp)

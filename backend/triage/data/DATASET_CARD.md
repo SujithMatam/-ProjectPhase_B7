@@ -3,7 +3,10 @@
 Single-message, 3-class triage (RED / YELLOW / GREEN) for patients after total knee (TKA) or
 total hip (THA) replacement. Built to replace `backend/data/exports/triage_intent_*.jsonl`, whose
 problems are measured in `AUDIT.md`. v1.1 = v1 with 12 labels adjudicated (`ADJUDICATION.md`); no
-row moved between splits. Models trained on it: `backend/triage/REPORT.md`.
+row moved between splits. **v2** (2026-11-12) adds a second held-out set (`challenge_v2.jsonl`, 90
+rows) and 380 training-only rows (`train_v2_extra.jsonl`, origin `generated_v2`); val, test,
+challenge and every existing label and row are unchanged (see "v2 additions" below). Models
+trained on it: `backend/triage/REPORT.md`.
 
 ## Files
 
@@ -12,6 +15,10 @@ row moved between splits. Models trained on it: `backend/triage/REPORT.md`.
 | `splits/train.jsonl`, `splits/val.jsonl`, `splits/test.jsonl` | **main split**: within-scenario cluster split; every scenario in all three splits |
 | `splits_unseen_scenario/*.jsonl` | **secondary split**: same rows, group-split by `scenario_id` (val/test scenarios never seen in train) |
 | `challenge.jsonl` | 150-row stress test, written after the splits; never train or tune on it |
+| `challenge_v2.jsonl` | **v2**: 90-row held-out set (negation, YELLOW/RED wound minimal pairs, routine multi-topic), written and committed (f340dc1) before any v2 training data; never train or tune on it |
+| `train_v2_extra.jsonl` | **v2**: 380 training-only rows (`origin: generated_v2`); `model/common.py load_train(split, "v2")` appends them to train |
+| `challenge_v2_source.tsv`, `build_challenge_v2.py`, `CHALLENGE_V2_REPORT.md` | v2 held-out set: source, builder (near-duplicate check), report |
+| `authored_v2/*.tsv`, `build_train_v2.py`, `TRAIN_V2_REPORT.md` | v2 training rows: source, builder (near-duplicate drops), report with every dropped row |
 | `LABELLING_GUIDELINE.md` | the label definitions and rules (v1.1) |
 | `ADJUDICATION.md`, `adjudication.tsv` | v1.1 label changes; applied by the builders after split assignment |
 | `RELABEL_CHANGES.md` | re-labelling of the 63 original sentences |
@@ -161,6 +168,41 @@ Challenge set (`challenge.jsonl`, 150 rows):
 
 The 7 `audit_regression` rows are exactly the cases named in the task, including the curly
 apostrophe in "I can’t breathe".
+
+## v2 additions (training-only data and challenge_v2)
+
+Why: the hybrid pipeline over-triaged (YELLOW->RED 34/62 and GREEN->RED 6 on test), called negated
+RED symptoms RED ("I don't have shortness of breath") and turned two routine multi-topic messages
+in `test_multi_agent_orchestration.py` RED (REPORT.md, Finding S4).
+
+Order, so the held-out set could not be shaped by the new training data:
+1. `challenge_v2.jsonl` (90 rows) was written by claude-opus-5-5 from the guideline v1.1, checked
+   (0 exact and 0 cosine > 0.92 matches with train/val/test/challenge; highest 0.903) and
+   committed alone (f340dc1). SHA-256 in `CHALLENGE_V2_REPORT.md`.
+2. Then three claude-opus-5-5 writers, one per category, were given only `LABELLING_GUIDELINE.md`
+   and `authored/README.md` (and told not to open any challenge, split, report or test file) and
+   wrote 382 rows (`authored_v2/`). Each row also lists the scenario topics it touches.
+3. `build_train_v2.py` dropped exact duplicates, rows with cosine > 0.92 to any row of main val,
+   main test, challenge or challenge_v2, rows with cosine > 0.92 to the two orchestration-test
+   messages, and rows labelled below their stated temperature. One row was also dropped on label
+   review as ambiguous. Result: 2 dropped, **380 kept**; highest cosine of a kept row to a
+   protected row 0.898, to an orchestration-test message 0.713.
+
+| set | rows | RED | YELLOW | GREEN | notes |
+|---|---:|---:|---:|---:|---|
+| challenge_v2 | 90 | 26 | 32 | 32 | negation 30 (6/8/16), wound_minimal_pair 36 (18/18/0, 18 pairs), routine_multi_topic 24 (2/6/16) |
+| train_v2_extra | 380 | 97 | 135 | 148 | negation 127, wound_minimal_pair 124, routine_multi_topic 129 |
+
+Main-split train for v2 = the 1,253 frozen train rows + 380 = 1,633 rows (RED 577, YELLOW 424,
+GREEN 632). For the unseen-scenario split only the 157 v2 rows flagged `unseen_split_ok` are added
+(no topic among that split's val/test scenarios and cosine <= 0.92 to every row of them), so its
+val/test scenarios stay unseen. The v2 rows are not tagged with a single `scenario_id`
+(`scenario_id: null`, `scenarios: [...]`).
+
+Limitations specific to v2: the same model family wrote the v2 training rows, challenge_v2 and the
+guideline, so a gain on challenge_v2 is partly a gain on the same author's phrasing, even with the
+near-duplicate filter and the separate writers. The labels were reviewed by the same model, not
+by a clinician, and not by a blind second annotator.
 
 ## Split and leakage checks
 
