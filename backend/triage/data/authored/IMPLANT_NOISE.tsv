@@ -1,0 +1,52 @@
+# IMPLANT_NOISE: clicking/clunking WITH pain, swelling, giving way or looseness. Lead label YELLOW.
+YELLOW	TKA	multi_symptom	My knee clicks with every step and for the last few days it's been aching and puffy around the kneecap.
+GREEN	TKA	hard_neg,negation	There's a little tick in the knee when I straighten it. Doesn't hurt, no swelling. Just curious.
+YELLOW	THA	-	Hip makes a clunk when I swing the leg forward and I get a sharp catch in the groin each time.
+RED	THA	hard_pos,indirect	Getting out of the car something went clunk deep in the hip, now the foot points outwards and I'm stuck on the seat.
+YELLOW	TKA	hard_pos,indirect	The new knee feels wobbly going downstairs, like it's going to fold, and there's a knocking feeling inside.
+GREEN	ANY	question	Is it normal for a new joint to make noises?
+YELLOW	TKA	indian_english	Knee is making tak tak sound while walking and paining also since one week. Kindly advise.
+YELLOW	TKA	typo	my knee crunches when i stand up n its gettin more sore each day
+GREEN	THA	hard_neg	Hip clicks sometimes when I roll over in bed, completely painless. Physio said it's fine.
+YELLOW	TKA	multi_symptom	Clunking under the kneecap when I climb stairs, and the knee has swelled up again after being fine for weeks.
+RED	TKA	multi_symptom	Knee buckled with a loud crack, I fell, and now it's bent at a strange angle and I can't straighten it.
+YELLOW	ANY	carer	My husband says his new joint creaks like an old door and he's started limping because of the pain.
+GREEN	TKA	hard_neg	I hear a soft clicking on the exercise bike but no pain at all, the knee feels strong.
+YELLOW	THA	hard_pos,indirect	Something in my hip feels like it slips and catches when I turn, and then it aches for an hour.
+YELLOW	TKA	indian_english	Sir, 8 months after operation knee is giving sound and sometimes it is giving way also. What to do now?
+GREEN	ANY	hard_neg,question	Can a clicking noise mean the implant is loose? Mine doesn't click, I just read about it online.
+YELLOW	TKA	-	Two years since my knee replacement and it's started grinding and aching after walks, which it never used to do.
+YELLOW	THA	-	Squeaking from the hip when I bend forward, and the outside of my thigh has started to ache.
+RED	THA	hard_pos,indirect	Bent down for my sock, felt the hip shift with a thunk, and now my knee is turned inwards and I can't lift the leg off the bed.
+GREEN	TKA	hard_neg	The knee clunks a little going from bent to straight first thing, but it's pain free and goes after a few steps.
+YELLOW	ANY	multi_symptom,temp_in_text	Clicking, swelling and a warm joint since the weekend. Temp 37.4.
+RED	TKA	temp_in_text,multi_symptom	Knee started clunking and swelling yesterday and now I have a fever of 38.9 with shivers.
+YELLOW	TKA	indian_english	Knee is making noise like crackers when I sit down on floor and swelling also coming. Please suggest.
+GREEN	TKA	indian_english,hard_neg,negation	Knee is giving small click sound but no pain, no swelling. Is it okay doctor?
+YELLOW	TKA	typo,hard_pos	knee keeps givin out on me n theres a clunky feeling, nearly went down in the kitchen
+YELLOW	THA	carer	Mum's new hip has been clicking and she says it feels loose when she stands on that leg.
+GREEN	THA	hard_neg	I was told to report a clunk with pain. Mine is just a faint click when I lift my leg, no pain, so I assume that's fine?
+YELLOW	TKA	-	When I kneel on the bed I feel a grinding and then a sharp pain at the front of the knee.
+RED	TKA	hard_pos,indirect	Knee clunked and gave way on the step, I'm on the floor and the kneecap looks like it's shoved off to the side.
+GREEN	ANY	question,typo	will the clickin in my joint go away ovr time?
+YELLOW	TKA	hard_pos,indirect	It feels like there's a marble rolling around in the knee when I walk, and it's sore afterwards.
+YELLOW	ANY	-	Clunk. Pain. Every step. Should I be worried?
+YELLOW	TKA	indian_english,carer	My mother's knee is going click-click and she cannot walk properly since 3 days, there is pain also. Kindly guide.
+GREEN	TKA	typo,negation	clicky knee but no pain no swelling, physio not worried, just wanted to log it
+YELLOW	THA	-	The hip clunks when I go from sitting to standing and there's a deep ache in the buttock afterwards that lasts all evening.
+YELLOW	TKA	multi_symptom	Knee feels loose side to side, clicks when I pivot, and the swelling won't settle like it used to.
+GREEN	THA	hard_neg	Hip clunked once last week as I got up, no pain, nothing since. Do I mention it at my review?
+YELLOW	TKA	indian_english	After operation knee is feeling like loose and some sound is coming. Is implant shifted? Bahut dar lag raha hai.
+RED	THA	multi_symptom	Crossed my legs on the sofa, felt the hip jump out of place, and now the leg is twisted and I can't move for the pain.
+YELLOW	ANY	typo,hard_pos	my joint is noisy and achy, worse every day, is the implant failing?
+GREEN	TKA	question	Why does my knee click when I do my straight leg raises?
+YELLOW	TKA	carer	My father's knee replacement clicks and he says it hurts so much he's stopped doing his exercises.
+YELLOW	THA	hard_pos	Feels like something's catching in my hip socket every few steps, I've had to go back on the crutches.
+GREEN	TKA	hard_neg	Grandson laughs that I'm a robot because my knee ticks, but it doesn't bother me at all.
+YELLOW	TKA	-	The grinding is getting louder and the knee has swollen up three days running now.
+GREEN	THA	indian_english,question	Hip is making click sound when doing exercises, no pain. Should I stop that exercise?
+YELLOW	TKA	multi_symptom	Clunk when I straighten, warm around the knee, and it gave way twice today.
+YELLOW	ANY	typo	the noise wouldnt bother me but now it hurts along w it
+GREEN	THA	question	Is it safe to keep walking if my hip pops quietly now and then without any pain?
+YELLOW	TKA	indian_english	Knee from 2 weeks making sound while getting up from chair and paining in front side.
+RED	THA	hard_pos,indirect	Heard a clunk turning in bed, and since then I can't take a single step on that leg, it just won't hold me.

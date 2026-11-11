@@ -1,0 +1,55 @@
+YELLOW	ANY	temp_in_text	temp 37.8 this evening
+YELLOW	ANY	temp_in_text	Thermometer says 100.4 F, feel a bit flushed
+YELLOW	ANY	hard_pos,indirect	Feel hot and sweaty on and off and my head's thick, haven't got a thermometer
+YELLOW	ANY	temp_in_text,indian_english	Having fever since 2 days, 38.2 in the morning and 37.9 in night. Kindly advise.
+YELLOW	TKA	temp_in_text	Day 3 after knee replacement, 38.1 at lunchtime
+YELLOW	ANY	temp_in_text,question	Is 38.4 something to worry about? Otherwise I feel fine.
+YELLOW	ANY	temp_in_text,typo	temp 100.9 F, feelin a bit off
+YELLOW	ANY	carer,temp_in_text	Mum's temperature has been 38.0 to 38.3 since yesterday, she's eating okay
+YELLOW	ANY	-	Running a temperature since lunch, no idea how high
+YELLOW	THA	temp_in_text	Hip done 6 days ago, low grade fever of 37.9
+YELLOW	ANY	temp_in_text	reading of 101.2F tonight
+YELLOW	ANY	indian_english	Feeling feverish from morning, body is warm. What to do?
+YELLOW	ANY	temp_in_text,hard_neg,negation	38.2, no chills, no shaking, wound looks clean
+YELLOW	ANY	temp_in_text	100 F on the dot
+YELLOW	ANY	temp_in_text,multi_symptom	37.8 and a little sore throat
+YELLOW	ANY	temp_in_text,indian_english,typo	temprature 100.6 since evning, pls suggest tablet
+YELLOW	ANY	hard_pos,indirect	I keep throwing the covers off then pulling them back, I think I've got a temperature
+YELLOW	THA	temp_in_text,carer	Writing for my grandad who doesn't use the phone much, he had his hip done ten days ago, his temp is 38.3 this evening and he's a bit more tired than usual but still eating
+YELLOW	TKA	temp_in_text,multi_symptom	knee bit warm and temp 38.0
+YELLOW	ANY	temp_in_text,indian_english	From yesterday mild fever 99.8 to 100.2 F coming and going
+YELLOW	ANY	temp_in_text,typo	37.9 agian today, 3rd day in a row
+YELLOW	THA	temp_in_text,question	My temp is 100.1, my hip feels the same as yesterday. Should I ring?
+YELLOW	ANY	hard_neg,negation	feverish and achy, but no shivers and no problems with the wound
+YELLOW	ANY	temp_in_text,typo	38.0 tmp n sweaty at nite
+YELLOW	ANY	temp_in_text	38.4°C under the arm
+YELLOW	TKA	temp_in_text,indian_english,carer	My mother is having slight fever 37.8 since evening after her knee operation, kindly tell what to give
+YELLOW	ANY	temp_in_text,indian_english	Fever of 38 is there since yesterday, what to do
+YELLOW	ANY	temp_in_text,multi_symptom	Night sweats and 37.8 when I woke
+YELLOW	ANY	temp_in_text,hard_neg	Was 38.7 last night but A&E checked me and sent me home, this morning it's 38.0
+YELLOW	ANY	temp_in_text,typo	between 37.8 n 38 all wk, never higher
+YELLOW	ANY	indian_english,question	Body is hot since 3 days, slight fever only, no thermometer. Is it infection?
+YELLOW	TKA	temp_in_text	Knee op 2 weeks ago, temp 101.0 F tonight, nothing else wrong
+YELLOW	ANY	temp_in_text	Smart thermometer flashing amber at 38.1
+YELLOW	ANY	multi_symptom	Feverish with a little redness around my stitches
+YELLOW	ANY	temp_in_text,question	100.5 normal at week 1?
+RED	ANY	temp_in_text	Temp came down from 38.6 to 38.2 with paracetamol
+RED	ANY	temp_in_text	thought it was a mild fever but the reading is 38.5
+RED	ANY	temp_in_text,indian_english	Slight fever only, 101.5 F, no other problem
+RED	ANY	hard_pos,multi_symptom	low-grade fever but now I'm shaking all over and can't stop
+RED	ANY	temp_in_text,carer,multi_symptom	Mum's mild temp of 38.2 but she's muddled and forgetting things today
+GREEN	ANY	temp_in_text,typo	37.5 tonite, nothin else
+GREEN	ANY	temp_in_text	Checked twice: 37.1 and 37.0
+GREEN	ANY	temp_in_text,question	37.7, should I keep checking?
+GREEN	ANY	temp_in_text,typo,question	99.9 F, is tht a fever?
+GREEN	ANY	question	What counts as a low grade temperature after surgery?
+GREEN	ANY	question,indian_english	Doctor sir, till what temperature I can take paracetamol at home only?
+GREEN	ANY	hard_neg,temp_in_text	had a slight temp of 37.9 two days back, doctor saw me, now it's 36.8
+GREEN	ANY	temp_in_text	Feel warm but the thermometer says 37.3
+GREEN	ANY	hard_neg,negation	no fever at all, just tired after physio
+GREEN	ANY	question	How often should I take my temperature in the first week?
+GREEN	ANY	temp_in_text,indian_english,question	Temperature is 99.1 F, body is little warm because of summer. Is it fine?
+GREEN	ANY	question	Can paracetamol hide a fever?
+GREEN	THA	temp_in_text,carer	Checked Dad's temp after his hip exercises, 37.4, he's chatty and fine
+GREEN	ANY	question	Which thermometer is most accurate, ear or under the tongue?
+GREEN	ANY	temp_in_text	36.9 this morning, wound dry

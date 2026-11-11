@@ -1,0 +1,1023 @@
+[
+  {
+    "id": "EV-TKA-PAIN-01",
+    "topic": "Knee pain in the first week after knee replacement",
+    "procedure": "TKA",
+    "days": "1-7",
+    "content": "Pain is expected after a total knee replacement and is a normal part of healing. In the first days the knee is usually sore, swollen and stiff, and it commonly hurts more when you bend it, walk, or do your exercises. Care teams usually combine more than one kind of pain relief so you can move comfortably; take whatever you have been prescribed exactly as directed, and ask the team before changing anything. Movement is part of pain control rather than something to avoid. A physical therapist normally starts knee exercises within hours of the operation, and although the exercises can feel uncomfortable at first, doing them regularly speeds recovery and actually lowers pain over the following days. It helps to plan exercise sessions for times when your pain relief is working well and to rest with the leg supported in between. If the knee aches or swells after activity, raise the leg and cool it with an ice pack wrapped in a towel. Pain when bending the knee in this first week is expected, but overall it should be slowly settling rather than steadily getting worse. Contact your surgical team promptly if pain keeps increasing both at rest and with movement, if it is not controlled by the pain relief you were given, or if it comes with fever, shaking chills, increasing redness or drainage at the wound, or new pain and swelling in the calf. Sudden shortness of breath or chest pain needs emergency help straight away, because it can mean a blood clot has reached the lungs.",
+    "keywords": [
+      "pain",
+      "bending",
+      "first week",
+      "exercise",
+      "normal"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "TKA",
+      "topic": "Knee pain in the first week after knee replacement",
+      "postop_window": "days 1-7",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/",
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/"
+      ],
+      "word_count": 260,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-PAIN-02",
+    "topic": "Easing knee pain and swelling after exercise: ice and elevation",
+    "procedure": "TKA",
+    "days": "1-21",
+    "content": "Pain and swelling that flare up after exercise or a walk are common in the first weeks after a knee replacement, and two simple measures help. The first is elevation: rest with the leg raised and supported, ideally with the foot above the level of the heart. NHS advice is to keep the leg up whenever you can, because this helps the swelling go down, and a firm chair with a footstool makes this easier at home. The second is cold. The American Academy of Orthopaedic Surgeons suggests cooling the knee with an ice pack or towel-wrapped ice for 20 minutes, then taking it off for 20 minutes, repeating that on-off cycle for about two hours after exercise or activity. Wrap the ice rather than putting it on bare skin, and follow any specific instructions your own team gives, particularly if you have been given a cooling device. Many hospitals also provide compression stockings to lower the risk of blood clots, and these may help with swelling; most people wear them day and night for at least six weeks, removing them only to wash, unless told otherwise. Standing for long periods early on can make the ankle and lower leg puff up, so alternate standing with rest. Swelling that goes down with rest, raising the leg and ice is typical, and mild to moderate swelling can come and go for months. Swelling that is severe, keeps increasing, or does not go down when the leg is raised, especially with calf pain, tenderness or redness above or below the knee, can be a sign of a blood clot and should be reported to your surgical team the same day.",
+    "keywords": [
+      "ice",
+      "icing",
+      "elevation",
+      "swelling",
+      "compression stockings"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "TKA",
+      "topic": "Easing knee pain and swelling after exercise: ice and elevation",
+      "postop_window": "days 1-21",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/"
+      ],
+      "word_count": 278,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-PAIN-03",
+    "topic": "Knee pain at night after knee replacement",
+    "procedure": "TKA",
+    "days": "8-21",
+    "content": "Many people find that the knee aches more in the evening and at night, and the American Academy of Orthopaedic Surgeons notes that it is common for the knee to hurt at night and with activity for several weeks after surgery. By the end of the day the knee can feel sore and swollen from walking and exercise, so a few habits can make nights easier. Spread your walks and exercise sessions through the day instead of doing everything at once. In the evening, rest with the leg raised and use ice for a while to settle swelling. When lying down, keep the knee straight: do not sleep with a pillow under the knee, because a knee that rests bent for long periods can lose its ability to fully straighten. NHS guidance says no particular sleeping position is required after a knee replacement, so choose whatever is comfortable while keeping the knee straight; propping the heel on a small rolled towel, as in your straightening exercise, is one way to support the leg. If night pain is regularly stopping you from sleeping, tell your surgical team or physiotherapist. They may suggest changing when you take your prescribed pain relief or adjusting your activity plan, but do not change your medicines on your own. Night pain should slowly become less of a problem over the weeks. Pain that is steadily getting worse instead of easing, pain at rest together with fever or redness around the wound, or new calf pain and swelling should be checked promptly rather than waiting for your next appointment.",
+    "keywords": [
+      "night",
+      "sleep",
+      "night pain",
+      "pillow",
+      "evening"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "TKA",
+      "topic": "Knee pain at night after knee replacement",
+      "postop_window": "weeks 2-3",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+        "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/"
+      ],
+      "word_count": 262,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-PAIN-04",
+    "topic": "Knee pain, stiffness and numbness in weeks 4-6",
+    "procedure": "TKA",
+    "days": "22-42",
+    "content": "Four to six weeks after a knee replacement, pain is usually less intense than in the first days, but aching after exercise, stiffness and some swelling are still common. Most people feel some stiffness, particularly when they bend the knee a long way, and it is often noticeable after sitting for a while. Keeping up the prescribed bending, straightening and strengthening exercises is the main way to reduce stiffness. Rehabilitation guidelines advise that if the range of motion stops improving and the end of the bend feels hard or painful, the physiotherapist should contact the surgeon, so mention this early rather than waiting. It is also common to have an area of numb or altered feeling in the skin around the scar; most people notice this, and it is not usually a sign that anything is wrong. Pain should be moving in the right direction: less intense, settling sooner after exercise, and easier to manage with rest, raising the leg and ice. Discomfort while exercising is expected, but exercise should not cause severe pain or a marked increase in swelling; if it does, ease back and talk to your physiotherapist about adjusting the programme. Pain medicines after joint replacement are intended for short-term use, so follow your team's plan for reducing them and ask before changing anything yourself. Contact your surgical team if pain starts increasing again after it had been settling, if the wound becomes red, hot or begins to drain, or if you develop a fever, shaking chills, or calf pain and swelling, because these can be signs of infection or a blood clot.",
+    "keywords": [
+      "stiffness",
+      "numbness",
+      "aching",
+      "weeks 4-6",
+      "range of motion"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "TKA",
+      "topic": "Knee pain, stiffness and numbness in weeks 4-6",
+      "postop_window": "weeks 4-6",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+        "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/"
+      ],
+      "word_count": 266,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-PAIN-05",
+    "topic": "Aching and swelling two to three months after knee replacement",
+    "procedure": "TKA",
+    "days": "43-84",
+    "content": "Two to three months after a knee replacement, the knee usually feels much better than it did in the first weeks, but it is still healing. The American Academy of Orthopaedic Surgeons notes that mild to moderate swelling can last for about three to six months after surgery, so it is common for the knee to look a little puffy after a busy day or a long walk. Some aching with activity is normal at this stage, and the knee can still feel stiff when you bend it a long way. Kneeling may be uncomfortable; it is not harmful to the new joint, but NHS guidance is to wait for your doctor's go-ahead before kneeling on the new knee. Continuing your exercises matters. The AAOS advises doing the exercises your physical therapist prescribed for at least two months after surgery, and many rehabilitation programmes continue strength, balance and walking work up to about twelve weeks. Raising the leg and applying ice after activity remain useful whenever the knee swells, and compression stockings may also help with swelling. Full recovery from a knee replacement takes several months or longer, so it is normal to still be improving at this point, and some days will feel better than others. Contact your surgical team if swelling becomes severe or new, if pain that had been easing starts to get worse at rest and with activity, or if you notice increasing redness or tenderness, drainage from the scar, a persistent fever or shaking chills. These can be signs of infection or a blood clot and should not wait until your next routine appointment.",
+    "keywords": [
+      "swelling",
+      "aching",
+      "kneeling",
+      "months",
+      "weeks 8-12"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "TKA",
+      "topic": "Aching and swelling two to three months after knee replacement",
+      "postop_window": "weeks 7-12",
+      "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/"
+      ],
+      "word_count": 269,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-PAIN-06",
+    "topic": "Warning signs after knee replacement: when pain or swelling needs urgent attention",
+    "procedure": "TKA",
+    "days": "1-84",
+    "content": "Most pain and swelling after a knee replacement is part of normal healing, but a few patterns need prompt medical attention. Possible infection: a fever above 100 degrees Fahrenheit (about 37.8 degrees Celsius) that does not go away, shaking chills, a wound that is becoming more red, tender or swollen, fluid leaking from the wound, or knee pain that keeps increasing both when you rest and when you move. Contact your surgeon's office the same day if you notice any of these, and call straight away if the wound looks red or starts to drain. Possible blood clot in the leg: pain in the calf or leg that is not related to the incision, tenderness or redness above or below the knee, and new or increasing swelling of the calf, ankle or foot, particularly swelling that does not settle when the leg is raised. Blood clots in the leg veins are among the more frequent complications after knee replacement, which is why you may be given compression stockings or boots, blood-thinning medicine, and exercises such as ankle pumps to keep blood moving; report possible clot symptoms promptly, because some people have few symptoms at first. A clot that travels to the lungs is an emergency. Sudden shortness of breath, sudden chest pain, or chest pain in one particular spot that comes on with coughing means you should call emergency services immediately rather than waiting for a call back from the clinic. Also contact your team if pain is not controlled by the pain relief you were prescribed, or if you are unsure whether a symptom is normal; it is always reasonable to ask.",
+    "keywords": [
+      "warning signs",
+      "infection",
+      "blood clot",
+      "DVT",
+      "fever",
+      "emergency"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "TKA",
+      "topic": "Warning signs after knee replacement: when pain or swelling needs urgent attention",
+      "postop_window": "days 1-84",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.orthoinfo.org/diseases--conditions/deep-vein-thrombosis/"
+      ],
+      "word_count": 274,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-PAIN-01",
+    "topic": "Hip pain in the first week after hip replacement",
+    "procedure": "THA",
+    "days": "1-7",
+    "content": "It is normal for the hip to be sore after a total hip replacement, and you will usually be given pain relief in the days after the operation. Doctors often combine several kinds of pain medicine, which improves relief while keeping the need for opioids as low as possible; take what you are prescribed as directed and speak to your team before changing anything. Getting moving early is part of recovery. Nurses and physiotherapists usually help you start walking as soon as possible after surgery, using crutches or a walking frame at first, and simple exercises in bed such as ankle pumps, buttock squeezes and gentle knee bends begin early. These exercises may feel uncomfortable at first, but AAOS guidance explains that they help recovery and actually reduce pain after the operation. It is common to feel sore after walking or exercising, and some discomfort with activity and at night can continue for several weeks. Resting with the leg raised slightly and applying ice can ease pain and swelling; follow your team's advice on cold therapy, and keep to your hip precautions when you position yourself. Overall, the first week's pain should gradually become easier to manage. Tell your team promptly if pain keeps getting worse both at rest and with movement, if it is not controlled by your prescribed pain relief, or if you have a persistent fever, shaking chills, redness or drainage at the wound, calf pain unrelated to the incision, or new swelling in the leg. Sudden shortness of breath or chest pain needs emergency care straight away, because it can mean a blood clot has travelled to the lungs.",
+    "keywords": [
+      "pain",
+      "first week",
+      "hip",
+      "exercise",
+      "normal"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "THA",
+      "topic": "Hip pain in the first week after hip replacement",
+      "postop_window": "days 1-7",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+        "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/"
+      ],
+      "word_count": 273,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-PAIN-02",
+    "topic": "Leg and foot swelling and discomfort after hip replacement",
+    "procedure": "THA",
+    "days": "8-21",
+    "content": "Swelling and discomfort in the operated leg are common after a hip replacement. The American Academy of Orthopaedic Surgeons warns that swelling is often moderate to severe during the first weeks, and the thigh, ankle and foot can all look puffy. NHS guidance notes that pain and swelling in the legs and feet usually improve over a few weeks, while the AAOS adds that milder swelling can continue for three to six months. To reduce swelling, raise the leg slightly when resting, apply ice for short periods, and wear compression stockings if they have been recommended. Try not to sit still for long periods: NHS guidance is to sit in a reclining position but get up and move regularly, because long spells without moving make swelling worse. Keep up the exercises your physiotherapist recommended and walk every day as far as is comfortable; walking and leg exercises also help blood flow in the veins. Swelling that settles with rest and raising the leg is expected. New or severe swelling, however, can be a warning sign of a blood clot. Tell your doctor straight away if swelling in the thigh, calf, ankle or foot is severe and does not go away when you sit with the leg propped up above the level of your heart, or if it comes with pain in the calf or leg that is not related to the incision, or with tenderness or redness of the calf. Sudden shortness of breath or chest pain, including chest pain in one spot that comes with coughing, is an emergency and needs immediate help.",
+    "keywords": [
+      "swelling",
+      "leg swelling",
+      "foot",
+      "ankle",
+      "compression stockings",
+      "ice"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "THA",
+      "topic": "Leg and foot swelling and discomfort after hip replacement",
+      "postop_window": "weeks 2-3",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.orthoinfo.org/en/treatment/total-hip-replacement/"
+      ],
+      "word_count": 264,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-PAIN-03",
+    "topic": "Night discomfort and sleeping positions after hip replacement",
+    "procedure": "THA",
+    "days": "8-21",
+    "content": "For several weeks after a hip replacement it is common to feel some discomfort at night and when you are active. Evenings can be harder because the hip may feel sore after the day's walking and exercises, and it takes time to find a comfortable position in bed while protecting the new joint. For a while your surgeon may want you to stay out of some sleeping positions or to keep a pillow between your knees in bed; these instructions vary with the surgical approach, so ask your own surgeon or physiotherapist which positions are safe for you and for how long. The precautions you were given for sitting and bending, such as not crossing your legs and not bending the hip beyond a right angle, also apply when getting into and out of bed, so use the technique you were taught. Things that may help at night include spreading walking and exercise through the day rather than doing it all at once, raising the leg slightly and applying ice in the evening to settle swelling, and getting up briefly to move if you have been still for a long time. If pain is regularly stopping you from sleeping, tell your team; they can review when you take your prescribed pain relief or adjust your activity plan, but do not change your medicines on your own. Night-time discomfort should ease gradually over the weeks. Pain that is steadily increasing, pain at rest together with fever or redness at the wound, sudden severe hip pain with difficulty moving the leg, or new calf pain and swelling should be checked promptly.",
+    "keywords": [
+      "night",
+      "sleep",
+      "sleeping position",
+      "pillow between legs",
+      "evening"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "THA",
+      "topic": "Night discomfort and sleeping positions after hip replacement",
+      "postop_window": "weeks 2-3",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 269,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-PAIN-04",
+    "topic": "Hip and thigh aching as activity increases (weeks 4-6)",
+    "procedure": "THA",
+    "days": "22-42",
+    "content": "Between about four and six weeks after a hip replacement, most people are doing more: walking further, doing standing exercises and, in many programmes, adding an exercise bike, with the pedal tension increased gradually from about four to six weeks. As the muscles around the hip, thigh and buttock work harder again, they can feel tired and achy after a session, and some discomfort after activity and at night may still be present. Aching that eases with rest is common while strength is rebuilt. Pace yourself: build up walking distance gradually, spread activity through the day, and avoid a big jump in activity on a day when you feel good. Resting with the leg slightly raised and applying ice can help if the hip or leg swells after exercise. Keep following any hip precautions you have been given. The AAOS notes they usually apply for about the first six weeks and that most patients can do most of the restricted movements after six to eight weeks without any effect on the implant, but your own surgeon will tell you when your precautions end. Speak to your physiotherapist if a particular exercise causes sharp pain rather than muscle ache, or if soreness is still getting worse the next day, as the programme may need adjusting. Contact your surgical team if pain that had been improving starts to increase both at rest and with activity, or if you notice a persistent fever, wound redness or drainage, new calf pain, or new or severe swelling of the leg.",
+    "keywords": [
+      "aching",
+      "muscle soreness",
+      "activity",
+      "weeks 4-6",
+      "pacing"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "THA",
+      "topic": "Hip and thigh aching as activity increases (weeks 4-6)",
+      "postop_window": "weeks 4-6",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/"
+      ],
+      "word_count": 255,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-PAIN-05",
+    "topic": "Lingering discomfort and swelling two to three months after hip replacement",
+    "procedure": "THA",
+    "days": "43-84",
+    "content": "By two to three months after a hip replacement, most people are walking with more confidence and doing most everyday activities, but some symptoms can linger. Mild to moderate swelling of the leg can continue for three to six months after surgery, and it tends to be more noticeable after a long, active day or after sitting still for a long time. It usually improves with rest, raising the leg slightly and applying ice. Some people notice that one leg feels slightly longer or shorter than the other; surgeons aim to make leg lengths even but sometimes lengthen or shorten the leg slightly to keep the hip stable, and some patients find a shoe lift more comfortable, so mention it if it bothers you. Aching after a long walk or exercise can still happen, but it should be becoming less frequent and less intense. Your follow-up appointment is often between six and twelve weeks after surgery, which is a good time to raise ongoing pain, swelling or questions about your progress. Full recovery from a hip replacement takes several months, so slow, continued improvement at this stage is normal. Long journeys matter too: pressure changes and long periods without moving can make the operated leg swell, so talk to your doctor before flying or taking a long trip. Contact your surgical team sooner if swelling is new or severe, if pain increases at rest as well as with activity, or if you have a fever, shaking chills, or redness or drainage from the wound.",
+    "keywords": [
+      "swelling",
+      "leg length",
+      "aching",
+      "months",
+      "travel"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "THA",
+      "topic": "Lingering discomfort and swelling two to three months after hip replacement",
+      "postop_window": "weeks 7-12",
+      "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 254,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-PAIN-06",
+    "topic": "Warning signs after hip replacement: blood clot, infection and dislocation",
+    "procedure": "THA",
+    "days": "1-84",
+    "content": "Most discomfort after a hip replacement is part of normal healing, but some symptoms need prompt attention. Possible blood clot in the leg: pain in the calf or leg that is unrelated to the incision, tenderness or redness of the calf, or new or increasing swelling of the thigh, calf, ankle or foot, particularly severe swelling that does not go down when the leg is raised. Report these straight away. Possible clot in the lungs, which is an emergency: sudden shortness of breath, sudden chest pain, or chest pain in one place that comes on with coughing; call emergency services immediately. Possible infection: a fever over 100 degrees Fahrenheit (about 37.8 degrees Celsius) that persists, shaking chills, a hip wound that is getting redder, more tender or more swollen, fluid leaking from the wound, or hip pain that keeps increasing both at rest and with activity. Contact your surgeon's office the same day. Possible dislocation: this happens when the ball of the new joint comes out of its socket. It is uncommon, and the risk is highest in the first few months while the tissues heal. Warning signs include sudden, severe pain in the hip or groin, muscle spasm, being unable to move the leg, and the leg suddenly looking turned inward or outward or appearing shorter. Do not try to move or straighten the leg yourself; call an ambulance or go to an emergency department. A dislocated hip replacement can usually be put back into place without further surgery. Following the precautions, exercises and walking-aid advice your team gave you lowers the risk of these problems.",
+    "keywords": [
+      "warning signs",
+      "dislocation",
+      "infection",
+      "blood clot",
+      "emergency"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "pain",
+      "procedure": "THA",
+      "topic": "Warning signs after hip replacement: blood clot, infection and dislocation",
+      "postop_window": "days 1-84",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://my.clevelandclinic.org/health/diseases/22222-hip-dislocation"
+      ],
+      "word_count": 268,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REHAB-01",
+    "topic": "Early exercises in the first week after knee replacement",
+    "procedure": "TKA",
+    "days": "1-7",
+    "content": "Exercise usually starts very soon after a knee replacement, often within hours, and a physical therapist will teach you a home programme before you leave hospital. The American Academy of Orthopaedic Surgeons describes a set of early exercises that most programmes include. Quadriceps sets: tighten the front thigh muscle and try to straighten the knee, holding for five to ten seconds. Straight leg raises: with the thigh tightened and the knee fully straight, lift the leg a few inches off the bed, hold briefly and lower it slowly. Ankle pumps: move the foot up and down rhythmically for a couple of minutes, several times an hour, to keep the blood moving. Knee straightening: place a small rolled towel just above the heel, tighten the thigh and try to press the back of the knee down towards the bed. Bed-supported knee bends: slide the heel towards the buttock to bend the knee, hold, and then straighten. Sitting knee bends: sit in a chair and bend the knee back as far as you can, using the other leg for support if needed. Repeat each exercise until the muscles feel tired, and follow the number of repetitions and sessions your own physiotherapist sets, because programmes differ. The Hospital for Special Surgery guideline gives the first-week aims as switching the thigh muscle back on, getting the knee as straight as possible, starting to regain bend, controlling swelling and walking safely with an aid. The exercises can feel uncomfortable at first, but they speed recovery and reduce pain. Avoid pushing into severe pain, and tell your physiotherapist if an exercise hurts a lot.",
+    "keywords": [
+      "exercises",
+      "quad sets",
+      "straight leg raise",
+      "ankle pumps",
+      "heel slides",
+      "first week"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "TKA",
+      "topic": "Early exercises in the first week after knee replacement",
+      "postop_window": "days 1-7",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+        "https://www.orthoinfo.org/en/treatment/total-knee-replacement/"
+      ],
+      "word_count": 268,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REHAB-02",
+    "topic": "Knee bend and straightening goals after knee replacement",
+    "procedure": "TKA",
+    "days": "1-42",
+    "content": "Regaining the knee's movement is a central goal of rehabilitation, and it has two parts: straightening (extension) and bending (flexion). Getting the knee fully straight is especially important for walking well, so do not rest with a pillow under the knee; instead, practise lying with the heel propped on a small rolled towel so the knee can straighten. Bending is increased gradually with heel slides, sitting knee bends and, later, cycling. As a general guide, the Hospital for Special Surgery rehabilitation guideline looks for about 80 degrees of active bending in sitting, with the knee straightening to within 10 degrees of fully straight, before patients move on from the first-week phase. By the end of the phase covering weeks two to six it aims for more than 110 degrees of bending with the knee fully straight. Bending beyond 120 degrees is a later goal, mainly for people returning to sport or demanding activities. The guideline stresses that progression is based on reaching these criteria and is adjusted for each patient, and your surgeon may set different targets, so treat these numbers as a guide rather than a deadline. Stretching into the end of the movement is expected to feel tight or uncomfortable. However, if your range of motion stops improving and the end of the bend feels hard or very painful, the guideline advises that the surgeon should be contacted, so mention it to your physiotherapist early. Swelling makes the knee harder to bend, so controlling it with ice, raising the leg and sensible pacing also helps you regain movement.",
+    "keywords": [
+      "range of motion",
+      "flexion",
+      "extension",
+      "degrees",
+      "bend",
+      "straighten"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "TKA",
+      "topic": "Knee bend and straightening goals after knee replacement",
+      "postop_window": "weeks 1-6",
+      "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+      "additional_source_urls": [
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+        "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/"
+      ],
+      "word_count": 260,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REHAB-03",
+    "topic": "Walking aids and stairs after knee replacement",
+    "procedure": "TKA",
+    "days": "1-21",
+    "content": "You will usually walk with help soon after a knee replacement, first with a walking frame or crutches. Stand upright, move the frame or crutches a short distance forward, step forward with the operated leg so the heel touches the floor first, and then bring the other leg through. As you get stronger, walks can become longer and you can gradually take more weight through the leg. The American Academy of Orthopaedic Surgeons suggests changing to a single crutch or cane once you are able to stand and walk for over ten minutes and no longer need to lean on the frame or crutches, which is often about two to three weeks after surgery. Hold the cane in the hand opposite the operated knee. NHS guidance describes going down to one crutch and then a walking stick as your confidence grows, and trying to walk without an aid after about six weeks if you feel ready. Rehabilitation guidelines also advise not walking without the aid until you can walk without limping. For stairs, remember 'up with the good, down with the bad': going up, lead with the non-operated leg; coming down, lead with the operated leg, taking one step at a time and using the handrail. Before going home, most people practise climbing up and down two or three stairs with their aid. Stepping foot over foot on stairs usually comes later, once walking is normal and the knee is strong. Your physiotherapist will tell you when to change aids and when you are ready to use stairs normally.",
+    "keywords": [
+      "walker",
+      "crutches",
+      "cane",
+      "walking aid",
+      "stairs",
+      "walking"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "TKA",
+      "topic": "Walking aids and stairs after knee replacement",
+      "postop_window": "days 1-21",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/"
+      ],
+      "word_count": 259,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REHAB-04",
+    "topic": "Building strength and function in weeks 2-6 after knee replacement",
+    "procedure": "TKA",
+    "days": "8-42",
+    "content": "From about the second week, rehabilitation after a knee replacement usually shifts from basic movement towards strength, balance and everyday function, alongside continued work on bending and straightening. For weeks two to six, the Hospital for Special Surgery guideline includes walking practice that focuses on landing on the heel, a normal step pattern and equal weight on both legs; stretching of the front thigh, hamstring and calf muscles; and strengthening that prioritises the quadriceps, hip and hamstring muscles. Typical exercises are straight leg raises in several directions once the knee can fully straighten, repeated sit-to-stands from a chair, small step-ups and step-downs starting on a low step of about two to four inches, and balance work that progresses from standing on both legs to standing on one. Everyday tasks are practised too, such as getting in and out of a bath or shower and a car. The American Academy of Orthopaedic Surgeons notes that light ankle weights can usually be added to the basic exercises from about four to six weeks after surgery, increasing gradually as strength returns. The guiding rules are to avoid long periods of sitting and to avoid exercise that causes severe pain or a marked increase in swelling. By the end of this stage the usual aims are controlled swelling and pain, good bend with a fully straight knee, no lag when lifting the straight leg, a normal walking pattern with or without an aid, climbing a standard step with control, and independence in daily activities. Your physiotherapist will adapt the programme to your progress.",
+    "keywords": [
+      "strengthening",
+      "balance",
+      "step ups",
+      "sit to stand",
+      "weeks 2-6",
+      "exercises"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "TKA",
+      "topic": "Building strength and function in weeks 2-6 after knee replacement",
+      "postop_window": "weeks 2-6",
+      "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/"
+      ],
+      "word_count": 259,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REHAB-05",
+    "topic": "Using a stationary exercise bike after knee replacement",
+    "procedure": "TKA",
+    "days": "8-84",
+    "content": "A stationary exercise bike is a common part of rehabilitation after a knee replacement because it helps rebuild muscle strength and knee movement without high impact, and your doctor may recommend riding one at physical therapy. The American Academy of Orthopaedic Surgeons advises raising the seat at first so that the sole of your foot only just reaches the pedal when the knee is nearly straight, and pedalling backwards to begin with, riding forwards only once a comfortable backward motion is possible. As you get stronger, at about four to six weeks, the tension can be increased slowly. Sessions typically start at 10 to 15 minutes twice a day and build up to 20 to 30 minutes three or four times a week, and the seat can be lowered slightly to encourage more bending during slow pedal turns. While riding, aim for as much bending and straightening as you comfortably can. The Hospital for Special Surgery guideline includes cycling in the weeks two to six phase, using a short-crank bike if the knee cannot yet bend to 90 degrees and a standard bike once bending is beyond about 110 degrees, and it continues cycling, treadmill and elliptical work in weeks seven to twelve. So, for many people, using a stationary bike at around six weeks is a normal part of recovery, provided the knee bends enough to pedal comfortably and the wound is healed. Check with your physiotherapist before starting or increasing resistance, stop if you get sharp pain, and expect some muscle tiredness afterwards. Road cycling outdoors is a later step to discuss with your surgeon.",
+    "keywords": [
+      "stationary bike",
+      "exercise bike",
+      "cycling",
+      "bicycle",
+      "exercycle"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "TKA",
+      "topic": "Using a stationary exercise bike after knee replacement",
+      "postop_window": "weeks 2-12",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf"
+      ],
+      "word_count": 267,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REHAB-06",
+    "topic": "Returning to exercise and sport after knee replacement",
+    "procedure": "TKA",
+    "days": "43-84",
+    "content": "Two to three months after a knee replacement, many people are ready to do more, and eventually most can return to many of the sports they enjoyed before surgery. The American Academy of Orthopaedic Surgeons stresses not doing too much, too soon, and continuing the exercises your physical therapist prescribed for at least two months after surgery. Walk as much as you like, but remember that walking does not replace your prescribed exercises. Swimming is an excellent low-impact activity once the wound has fully healed and your doctor agrees. In general, lower-impact activities such as golf, cycling and pickleball are easier on the knee and are generally a better choice than high-impact activities such as jogging, jumping and skiing. The Hospital for Special Surgery guideline advises avoiding high-impact activities such as running, jumping and plyometric exercise in weeks seven to twelve, while strength, balance and endurance are rebuilt with leg presses, step-ups and step-downs, squats against a wall or ball, and treadmill, elliptical or bicycle work. It notes that expert opinion varies widely on which sports are advisable after a knee replacement, so return to a particular sport should be agreed with your surgeon, and sport-specific training, if appropriate, usually comes later and only with the surgeon's clearance. Signs that you are progressing well include little increase in pain or swelling after activity, climbing stairs foot over foot, and managing tasks such as putting on socks and tying shoelaces yourself. If an activity leaves the knee painful or swollen for a long time afterwards, cut back and discuss it with your team.",
+    "keywords": [
+      "sport",
+      "sports",
+      "return to sport",
+      "low impact",
+      "high impact",
+      "swimming",
+      "golf"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "TKA",
+      "topic": "Returning to exercise and sport after knee replacement",
+      "postop_window": "weeks 7-12",
+      "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf"
+      ],
+      "word_count": 262,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REHAB-01",
+    "topic": "Early exercises in bed after hip replacement",
+    "procedure": "THA",
+    "days": "1-7",
+    "content": "Exercises after a hip replacement usually begin soon after surgery, and a physiotherapist will teach you a programme to continue at home; NHS guidance notes that doing them early on helps the long-term strength and movement of the hip. The American Academy of Orthopaedic Surgeons describes several early exercises done lying down, typically in three or four short sessions a day. Ankle pumps: slowly push the foot up and down; these can be repeated as often as every five or ten minutes to help circulation. Ankle rotations: turn the ankle in towards the other foot and then out away from it. Bed-supported knee bends: slide the heel towards the buttock, keeping the heel on the bed and not letting the knee roll inward, hold, and then straighten. Buttock squeezes: tighten the buttock muscles and hold for a count of five. Abduction: glide the leg outwards along the bed as far as you can manage, then return it to the middle. Quadriceps sets: tighten the thigh muscle and try to straighten the knee, holding for five to ten seconds. Straight leg raises: tighten the thigh and lift the straight leg a few inches off the bed. Most of these are repeated about ten times per session, but follow the numbers your own physiotherapist gives you. The exercises may feel uncomfortable at first, but they help recovery and reduce pain after the operation. Throughout, keep to any hip precautions you were given, such as not bending the hip past a right angle. Tell your physiotherapist if an exercise causes sharp or increasing pain, or if you cannot do it.",
+    "keywords": [
+      "exercises",
+      "ankle pumps",
+      "buttock contractions",
+      "abduction",
+      "quad sets",
+      "first week"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "THA",
+      "topic": "Early exercises in bed after hip replacement",
+      "postop_window": "days 1-7",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 267,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REHAB-02",
+    "topic": "Hip precautions during recovery",
+    "procedure": "THA",
+    "days": "1-56",
+    "content": "After a hip replacement you may be given extra precautions for how you sit, bend and sleep, typically for around six weeks, to help prevent the new joint from dislocating while the tissues heal. The exact precautions depend on the surgical approach your surgeon used, and not all surgeons recommend the same ones, so follow the instructions you were given and ask if you are unsure which apply to you. Common precautions include: do not bend at the waist or hip beyond 90 degrees, a right angle; do not bring the knee on the operated side up higher than the hip; do not cross your legs at the knees; do not lean forwards when seated or while lowering yourself into a chair; and do not reach down to your feet or ankles. Low chairs, low toilet seats and chairs without arms make standing up difficult, so a raised toilet seat and a firm, higher chair with arms help, as do aids such as a grabber, a long-handled sponge and a long shoehorn, so you can avoid bending too far. Your surgeon may also restrict some sleeping positions or suggest a pillow between the knees at night for a period. AAOS guidance adds that, whichever approach was used, most patients can do most of these movements again after six to eight weeks without affecting the implant, but wait until your surgeon confirms that your own precautions have ended. While the hip is recovering, NHS guidance is also to avoid exercises that involve jumping, sudden turns or a high risk of falling, and not to lift heavy objects until you are told it is safe.",
+    "keywords": [
+      "hip precautions",
+      "dislocation",
+      "bending",
+      "crossing legs",
+      "90 degrees",
+      "low chair"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "THA",
+      "topic": "Hip precautions during recovery",
+      "postop_window": "days 1-56",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 273,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REHAB-03",
+    "topic": "Standing exercises after hip replacement",
+    "procedure": "THA",
+    "days": "8-21",
+    "content": "Once you are up and walking, standing exercises are added to strengthen the muscles around the new hip. Do them while holding on to something firm and stable, such as a sturdy chair, a bar or a wall, so you are well supported. The American Academy of Orthopaedic Surgeons describes three standard standing exercises, usually repeated about ten times in three or four sessions a day. Standing knee raises: lift the operated leg towards your chest, but not higher than your waist, hold for two or three counts and lower it again. Standing hip abduction: with the hip, knee and foot pointing straight forward and your body upright, lift the leg out to the side with the knee straight, then slowly lower it so the foot is back on the floor. Standing hip extension: slowly lift the operated leg backwards while keeping your back straight, hold for two or three counts, and return. Keep every movement slow and controlled rather than swinging the leg. These exercises help your balance and walking and work alongside the bed exercises and daily walks. Continue to follow your hip precautions while exercising; in particular, keep the knee below waist height during knee raises so the hip does not bend too far. As strength improves, your physiotherapist may add resistance using elastic tubing, bringing the leg forward, out to the side and backwards against the band. Muscle tiredness afterwards is expected. Stop and tell your physiotherapist if an exercise causes sharp pain in the hip or groin, or if you feel unsteady doing it.",
+    "keywords": [
+      "standing exercises",
+      "knee raises",
+      "hip abduction",
+      "hip extension",
+      "strengthening"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "THA",
+      "topic": "Standing exercises after hip replacement",
+      "postop_window": "weeks 2-3",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+      "additional_source_urls": [],
+      "word_count": 259,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REHAB-04",
+    "topic": "Walking aids, moving off the walker, and stairs after hip replacement",
+    "procedure": "THA",
+    "days": "8-42",
+    "content": "Walking is central to recovery after a hip replacement, and you will need a walking frame or crutches at first. Move the frame or crutches forward a short distance, then step forward with the operated leg, knee straight, so the heel touches the floor first, and bring the other leg through. NHS guidance is to walk every day as far as is comfortable and to tell your physiotherapist about any problems. The American Academy of Orthopaedic Surgeons suggests changing to one crutch or a cane once you are able to stand and walk for over ten minutes and the leg is strong enough that you no longer rely on the frame or crutches to take its weight; hold the cane in the hand opposite the operated hip. There is no fixed date for giving up the walking aid, because it depends on strength, balance and how steadily you walk, and your physical therapist will help you decide which aids you need and when they can safely be stopped. For stairs, remember 'up with the good, down with the bad': lead with the non-operated leg going up and with the operated leg coming down, one step at a time at first. Always use a handrail, do not attempt steps higher than standard height, and consider asking someone to stay close by on the stairs until your strength has largely returned. As you become stronger you can begin climbing stairs foot over foot. Check with your physiotherapist before you stop using your aid, especially if you feel unsteady or still need it because of pain.",
+    "keywords": [
+      "walker",
+      "walking frame",
+      "crutches",
+      "cane",
+      "walking aid",
+      "stairs",
+      "walking"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "THA",
+      "topic": "Walking aids, moving off the walker, and stairs after hip replacement",
+      "postop_window": "weeks 2-6",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 263,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REHAB-05",
+    "topic": "Exercise bike and resistance exercises after hip replacement",
+    "procedure": "THA",
+    "days": "22-42",
+    "content": "As walking improves, many hip replacement programmes add an exercise bike and resistance exercises. Your doctor may recommend a stationary bicycle, usually at physical therapy, because it helps maintain muscle tone and flexibility. The American Academy of Orthopaedic Surgeons advises raising the seat until the sole of your foot only just reaches the pedal when the knee is nearly straight. Pedal backwards at first, and ride forwards only once a comfortable backward cycling motion is possible. At about four to six weeks the tension can be increased slowly. Sessions typically start at 10 to 15 minutes twice a day and build up to 20 to 30 minutes three or four times a week. Resistance can also be added with elastic tubing fixed to something stable: standing with feet slightly apart, bring the operated leg forward with the knee straight, then, in separate exercises, out to the side and straight back, letting the leg return slowly each time. Keep to your hip precautions throughout, including when getting on and off the bike, and ask your physiotherapist how to mount it safely. Increase one thing at a time, for example time first and then tension, and expect some muscle tiredness. Stop and speak to your physiotherapist if cycling or resistance work causes sharp pain in the hip or groin, or if soreness keeps getting worse from one day to the next. Your physiotherapist will tell you when these exercises suit your stage of recovery.",
+    "keywords": [
+      "exercise bike",
+      "stationary bike",
+      "cycling",
+      "resistance",
+      "elastic tubing",
+      "weeks 4-6"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "THA",
+      "topic": "Exercise bike and resistance exercises after hip replacement",
+      "postop_window": "weeks 4-6",
+      "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/"
+      ],
+      "word_count": 242,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REHAB-06",
+    "topic": "Returning to sport and recreation after hip replacement",
+    "procedure": "THA",
+    "days": "43-84",
+    "content": "By two to three months after a hip replacement, many people are ready to add more activity, and your doctor will tell you when you can begin particular sports; timing depends on your surgical approach, your precautions and how your recovery is going. Walking is encouraged. Swimming is a good low-impact activity once the wound has fully healed and your doctor agrees. The American Academy of Orthopaedic Surgeons advises that lower-impact choices such as golf, cycling, and doubles tennis or pickleball load the hip less, so they are generally favoured over higher-impact sports such as jogging, basketball, singles tennis, racquetball or skiing. While the hip is still recovering, NHS guidance is to avoid exercises that involve jumping, sudden turns or a high risk of falling, and not to lift heavy objects until you are told it is safe. This means that sports involving running, jumping, quick changes of direction or a risk of falls should be discussed with your surgeon before you return, even if you feel well. When you do restart an activity, build up gradually, keep doing your strengthening exercises, and notice how the hip feels the next day. Pain that lasts after activity or new swelling are signs to ease back and seek advice. Most people can return to an active lifestyle, but the right sports and the right time are an individual decision to make with your surgeon.",
+    "keywords": [
+      "sport",
+      "sports",
+      "return to sport",
+      "low impact",
+      "high impact",
+      "swimming",
+      "golf"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "rehab",
+      "procedure": "THA",
+      "topic": "Returning to sport and recreation after hip replacement",
+      "postop_window": "weeks 7-12",
+      "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 232,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REC-01",
+    "topic": "Leaving hospital and the first week at home after knee replacement",
+    "procedure": "TKA",
+    "days": "1-7",
+    "content": "Many people go home from hospital one to four days after a knee replacement, and some go home the same day. Before discharge you will usually need to get in and out of bed by yourself, have acceptable pain control, manage eating, drinking and going to the toilet, walk with a frame, crutches or cane on a level surface, manage two or three steps up and down, do your home exercises, and understand any precautions you have been given. You will often be given compression stockings to reduce the risk of blood clots, which most people wear for at least six weeks. Before you leave, a physiotherapist or occupational therapist will go through everyday tasks and your home exercises with you. In the first week at home, the main tasks are walking little and often, doing your exercises several times a day, keeping swelling down by raising the leg and using ice, and looking after the wound: keep it clean and dry, and do not soak it in a bath or pool until it has fully sealed and dried. You will probably need help with cooking, shopping, bathing and laundry for several weeks, so arrange this in advance if possible. Useful preparation includes a stable chair with a firm seat, arms and a footstool, a raised toilet seat, a shower chair, handrails on stairs, and clearing away loose rugs and cords. NHS guidance also advises against crossing your legs when sitting for the first six weeks. Contact your team if the wound becomes red or starts to drain, or if you develop a fever, chills, or calf pain and swelling.",
+    "keywords": [
+      "discharge",
+      "going home",
+      "hospital stay",
+      "first week",
+      "wound care"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "TKA",
+      "topic": "Leaving hospital and the first week at home after knee replacement",
+      "postop_window": "days 1-7",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.orthoinfo.org/en/treatment/total-knee-replacement/"
+      ],
+      "word_count": 270,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REC-02",
+    "topic": "What to expect two to three weeks after knee replacement",
+    "procedure": "TKA",
+    "days": "8-21",
+    "content": "Two to three weeks after a knee replacement is usually a time of steady but uneven progress. NHS guidance says stitches or clips are typically removed after about ten days, although some types of stitch are hidden under the skin and do not need removing. Walking is often becoming easier: the American Academy of Orthopaedic Surgeons notes that many people move from a frame or two crutches to a single crutch or cane at about two to three weeks, once they can walk and stand for more than ten minutes without leaning on the aid. Bending and straightening should be improving week by week with your exercises, and your physiotherapist will measure this and adjust the programme; the Hospital for Special Surgery guideline works towards more than 110 degrees of bending by the end of week six. Swelling, stiffness, and some pain with activity and at night are still common at this stage, and some days will feel worse than others. You may still need help with some household tasks. Keep wearing compression stockings if advised, raise the leg when resting, avoid standing still for long periods, and avoid twisting the knee, bending down and reaching up where you can. Hold off kneeling on the new knee until your doctor approves it, and avoid crossing your legs when sitting for the first six weeks. Keep the wound clean and dry and follow your team's advice about showering. Contact your team if the wound becomes red, hot or starts to drain, if you have a fever, or if calf pain or new swelling develops.",
+    "keywords": [
+      "weeks 2-3",
+      "progress",
+      "stitches",
+      "walking",
+      "milestones"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "TKA",
+      "topic": "What to expect two to three weeks after knee replacement",
+      "postop_window": "weeks 2-3",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/",
+        "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf"
+      ],
+      "word_count": 263,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REC-03",
+    "topic": "Recovery milestones around four to six weeks after knee replacement",
+    "procedure": "TKA",
+    "days": "22-42",
+    "content": "Around four to six weeks after a knee replacement, many people reach several practical milestones. The American Academy of Orthopaedic Surgeons says most people are back to most of their usual day-to-day activities between three and six weeks after surgery. Walking is usually stronger: NHS guidance suggests trying to walk without an aid after about six weeks if you feel ready, and rehabilitation guidelines aim for a normal walking pattern, with or without an aid, by the end of this period. Driving is a common question. The AAOS notes that most people resume driving about four to six weeks after surgery and that it is generally safe once you are no longer taking opioid pain medicine and your strength and reflexes are closer to normal; NHS guidance is to wait at least six weeks after a total knee replacement and to check with your doctor that you are fit to drive. Many hospitals arrange a follow-up appointment about six weeks after the operation. For movement, the Hospital for Special Surgery guideline aims for more than 110 degrees of bending with the knee fully straight by the end of weeks two to six, though individual progress varies. Light ankle weights are often added to the exercises from about four to six weeks. You may still have swelling, some stiffness and aching after activity, which is expected. NHS guidance is to avoid heavy household jobs, such as vacuuming or carrying shopping, for the first three months.",
+    "keywords": [
+      "weeks 4-6",
+      "driving",
+      "daily activities",
+      "milestones",
+      "follow-up"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "TKA",
+      "topic": "Recovery milestones around four to six weeks after knee replacement",
+      "postop_window": "weeks 4-6",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf"
+      ],
+      "word_count": 244,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REC-04",
+    "topic": "Two to three months after knee replacement: work and fuller activity",
+    "procedure": "TKA",
+    "days": "43-84",
+    "content": "Between about two and three months after a knee replacement, most people are doing much more of their normal routine. Returning to work depends on the demands of your job and how quickly you recover. NHS guidance says people usually go back after about six to twelve weeks, while the American Academy of Orthopaedic Surgeons notes it may take anywhere from several days to several weeks, and your doctor can advise on the right moment to go back to your usual duties. Rehabilitation in weeks seven to twelve typically focuses on strength, balance and endurance: walking on flat and uneven ground, step-ups and step-downs on higher steps, leg-press style strengthening, and cycling, treadmill or elliptical training, while avoiding high-impact activities such as running and jumping. A useful sign of progress is being able to manage everyday lower-body tasks such as putting on socks and tying shoelaces, and climbing stairs step over step with little pain. Mild to moderate swelling may still come and go, and it can last for about three to six months. NHS guidance is still to avoid heavy lifting at home, such as vacuuming or carrying shopping, until about three months. Recovery continues well beyond this point; full recovery from a knee replacement can take several months or longer, and the pace varies with age and general health, so do not be discouraged if the knee is not yet as strong or flexible as you hoped. Keep attending your follow-up appointments and raise any concerns about your progress with your team.",
+    "keywords": [
+      "return to work",
+      "weeks 8-12",
+      "work",
+      "activity",
+      "recovery"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "TKA",
+      "topic": "Two to three months after knee replacement: work and fuller activity",
+      "postop_window": "weeks 7-12",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf"
+      ],
+      "word_count": 254,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REC-05",
+    "topic": "Is my knee recovery on track? What steady progress looks like",
+    "procedure": "TKA",
+    "days": "22-84",
+    "content": "People recover from a knee replacement at different speeds, depending on factors such as age and general health, so comparing yourself with others is not always helpful. Rehabilitation programmes such as the Hospital for Special Surgery guideline are criteria-based, which means you move to the next stage when you reach certain goals rather than on a fixed date. Signs that recovery is on track include pain and swelling that ease gradually over the weeks, even if some days are worse than others; knee bending and straightening that keep improving; walking further and more steadily, with less need for your walking aid; and managing more daily activities on your own. Useful markers from the HSS guideline are about 80 degrees of bending by the end of the first week, more than 110 degrees with a fully straight knee by around six weeks, and more than 120 degrees for people aiming to return to demanding activities, but your own team's targets take priority. A knee that is still swollen and stiff at four to six weeks is common and does not by itself mean recovery is slow, because mild to moderate swelling can last three to six months. Talk to your physiotherapist or surgeon if your range of motion stops improving or the end of the bend feels hard and painful, if you cannot straighten the knee fully, if pain is increasing rather than decreasing, or if you cannot progress your walking. These are reasons to review your programme rather than reasons for alarm, and following your exercises consistently remains the most important thing you can do.",
+    "keywords": [
+      "recovery slow",
+      "on track",
+      "progress",
+      "normal recovery",
+      "milestones"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "TKA",
+      "topic": "Is my knee recovery on track? What steady progress looks like",
+      "postop_window": "weeks 4-12",
+      "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/"
+      ],
+      "word_count": 265,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-TKA-REC-06",
+    "topic": "The months ahead after knee replacement",
+    "procedure": "TKA",
+    "days": "43-365",
+    "content": "Recovery from a knee replacement continues for months after the early rehabilitation period, and NHS guidance says it can take several months or longer to recover fully. Mild to moderate swelling may persist for about three to six months, especially after activity. It is common to have a patch of numb skin near the scar and some stiffness, particularly when bending the knee a long way. Kneeling can feel uncomfortable, although it does not damage the implant; check with your doctor before you start kneeling on the new knee. The American Academy of Orthopaedic Surgeons advises continuing your prescribed exercises for at least two months after surgery and building activity up gradually rather than doing too much, too soon. In the longer term, most people can return to many of the activities they enjoyed before surgery; low-impact activities such as walking, swimming, golf and cycling are preferred over high-impact ones such as jogging, jumping and skiing. It is also important to protect the joint from infection. Bacteria that enter the bloodstream, for example during dental procedures or from urinary or skin infections, can settle around a joint replacement, so tell your dentist and other doctors that you have one; people with certain risk factors may be advised to take antibiotics before dental work. Keep attending your follow-up appointments. Contact your surgical team at any stage if the knee becomes increasingly painful, red, hot or swollen, or if you develop a fever, as these can be signs of a late infection or another problem that needs assessment.",
+    "keywords": [
+      "long term",
+      "months",
+      "kneeling",
+      "numbness",
+      "infection",
+      "recovery"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "TKA",
+      "topic": "The months ahead after knee replacement",
+      "postop_window": "week 7 onwards",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/treatment/total-knee-replacement/",
+        "https://www.orthoinfo.org/en/recovery/activities-after-knee-replacement/"
+      ],
+      "word_count": 256,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REC-01",
+    "topic": "Leaving hospital and the first week at home after hip replacement",
+    "procedure": "THA",
+    "days": "1-7",
+    "content": "After a hip replacement, many people go home within one to three days, and some have the operation as a day case and go home the same day. Staff will help you get up and walking early after the operation, using crutches or a walking frame at first. Before discharge you will usually need to get in and out of bed by yourself, have acceptable pain control, manage eating, drinking and using the toilet, walk with your aid on a level surface, manage two or three steps up and down, do your exercises, and understand the hip precautions you have been given. A physiotherapist or occupational therapist will go through daily tasks and your home exercises with you, and following the exercises early on helps the long-term strength and movement of the hip. At home in the first week, walk regularly as far as is comfortable, do your exercises several times a day, keep to your precautions, and rest with the leg slightly raised if it swells. Keep the wound clean and dry, do not get it wet until it has sealed, and follow your team's advice on dressings and showering. You may need help for several days to several weeks with cooking, shopping, bathing and laundry. Useful equipment includes a raised toilet seat, a firm, higher chair with arms, a shower chair, and aids such as a grabber, a long-handled sponge and a long shoehorn so that you do not bend too far. Contact your team if the wound becomes red or starts to drain, or if you develop a fever, chills, calf pain or new swelling in the leg.",
+    "keywords": [
+      "discharge",
+      "going home",
+      "hospital stay",
+      "first week",
+      "wound care"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "THA",
+      "topic": "Leaving hospital and the first week at home after hip replacement",
+      "postop_window": "days 1-7",
+      "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.orthoinfo.org/en/treatment/total-hip-replacement/"
+      ],
+      "word_count": 271,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REC-02",
+    "topic": "What you may be able to do two to three weeks after hip replacement",
+    "procedure": "THA",
+    "days": "8-21",
+    "content": "Two to three weeks after a hip replacement, most people are walking every day with a frame, crutches or a cane, getting a little further each week, and managing more of their own care, although many still need help with tasks such as cooking, shopping and laundry. Stitches or clips are usually removed at around ten days to two weeks after surgery. The American Academy of Orthopaedic Surgeons suggests moving from a frame or two crutches to a single crutch or cane once you can stand and walk for over ten minutes and the leg is strong enough that you no longer push weight through the aid; some people reach this within the first few weeks and others take longer. Your exercise programme will usually include bed exercises and standing exercises such as knee raises, hip abduction and hip extension several times a day. You should be able to get in and out of bed using the technique you were taught and manage stairs one step at a time with a handrail. At this stage you are still following your hip precautions, which usually last for about the first six weeks, such as not bending the hip beyond a right angle, not crossing your legs and avoiding low chairs. Some discomfort with activity and at night, and swelling in the leg and foot, are still common. It is too early to drive: NHS guidance is to wait at least six weeks. Most people resume light everyday activities within three to six weeks, so there is still steady progress to come.",
+    "keywords": [
+      "two weeks",
+      "weeks 2-3",
+      "milestones",
+      "what can I do",
+      "progress"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "THA",
+      "topic": "What you may be able to do two to three weeks after hip replacement",
+      "postop_window": "weeks 2-3",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 260,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REC-03",
+    "topic": "Recovery around four to six weeks after hip replacement",
+    "procedure": "THA",
+    "days": "22-42",
+    "content": "Around four to six weeks after a hip replacement, many people are noticeably more independent. The American Academy of Orthopaedic Surgeons says most people are managing most light everyday activities again between three and six weeks after surgery. Walking distance is usually increasing, and your physical therapist will advise when you can safely reduce or stop using your walking aid. Exercise programmes often add an exercise bike and resistance work around this time, with bike tension increased gradually from about four to six weeks. Hip precautions commonly apply for about the first six weeks, and most patients can do most of the restricted movements after six to eight weeks, but wait for your surgeon to confirm that yours have ended. For driving, NHS guidance is to wait at least six weeks and check with your doctor that you are fit to drive, and the AAOS notes it is generally safe once you are no longer taking opioid pain medicine and your reflexes have returned to normal. Returning to work usually takes about six weeks according to the NHS, although the AAOS notes it can range from several weeks to several months depending on the demands of your job and the speed of your recovery. NHS guidance also suggests avoiding sex for six to eight weeks after the operation. Some swelling, tiredness and aching after activity are still common at this stage. Your follow-up appointment is often around six to twelve weeks after surgery and is a good time to review your progress and plans.",
+    "keywords": [
+      "weeks 4-6",
+      "driving",
+      "return to work",
+      "precautions",
+      "milestones"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "THA",
+      "topic": "Recovery around four to six weeks after hip replacement",
+      "postop_window": "weeks 4-6",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/",
+        "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/"
+      ],
+      "word_count": 254,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REC-04",
+    "topic": "Two to three months after hip replacement, including lingering swelling",
+    "procedure": "THA",
+    "days": "43-84",
+    "content": "By two to three months after a hip replacement, most people are walking further, doing most everyday activities, and returning to work and hobbies. Most patients can do the movements restricted by their hip precautions after six to eight weeks, once their surgeon agrees. Your follow-up appointment, often between six and twelve weeks after surgery, is the time to check your progress and ask about further activities, including sport. Swelling can still be present. The American Academy of Orthopaedic Surgeons notes that mild to moderate swelling may last for three to six months after surgery, so some leg or ankle swelling at six to twelve weeks, particularly at the end of the day or after sitting still or travelling, is not unusual and does not by itself mean that your recovery is slow. Keep reducing it by raising the leg slightly, applying ice, wearing compression stockings if advised, and avoiding sitting still for long periods. Report new or severe swelling to your doctor, because it may be a warning sign of a blood clot, particularly if it does not go down when the leg is raised above the level of the heart or comes with calf pain, tenderness or redness. Continue your exercises and daily walking, building activity gradually. Talk to your doctor before long flights or car journeys, because pressure changes and long periods without moving can make the operated leg swell. Recovery from a hip replacement continues for several months, so it is normal to still be improving at this stage.",
+    "keywords": [
+      "weeks 8-12",
+      "swelling",
+      "six weeks",
+      "follow-up",
+      "recovery"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "THA",
+      "topic": "Two to three months after hip replacement, including lingering swelling",
+      "postop_window": "weeks 7-12",
+      "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 253,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REC-05",
+    "topic": "Is my hip recovery slow? What normal progress looks like",
+    "procedure": "THA",
+    "days": "22-84",
+    "content": "The speed of recovery after a hip replacement varies from person to person, depending on factors such as age and general health, so a slower pace than a friend or relative is not necessarily a problem. Signs that recovery is on track include pain and discomfort that gradually ease over the weeks, even with some bad days; walking further and more steadily, with less reliance on the walking aid; managing more daily tasks without help; and swelling that settles with rest and raising the leg. It is common to feel some discomfort at night and when active for several weeks, and mild to moderate swelling can last three to six months, so ongoing swelling at six weeks is not by itself a sign of slow recovery. Most people resume light daily activities within three to six weeks, but full recovery takes several months. Keep doing the exercises your physiotherapist recommended and walk daily as far as is comfortable, because following the exercises early on helps the long-term strength and movement of the hip. Talk to your physiotherapist or surgeon if you are not able to increase your walking, if you still depend on the aid for balance or because of pain, if pain is increasing rather than decreasing, or if swelling is getting worse over time. Seek urgent advice for new or severe swelling, calf pain, a persistent fever, redness or drainage from the wound, or sudden severe hip pain with difficulty moving the leg, because these can indicate a complication that needs assessment.",
+    "keywords": [
+      "recovery slow",
+      "on track",
+      "progress",
+      "normal recovery",
+      "swelling"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "THA",
+      "topic": "Is my hip recovery slow? What normal progress looks like",
+      "postop_window": "weeks 4-12",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 254,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  },
+  {
+    "id": "EV-THA-REC-06",
+    "topic": "The longer term after hip replacement",
+    "procedure": "THA",
+    "days": "43-365",
+    "content": "Recovery from a hip replacement takes several months, and a few things continue to matter in the months and years afterwards. Dislocation, where the ball of the new joint comes out of the socket, is uncommon; the risk is greatest in the first few months while the tissues heal, and most people can do most previously restricted movements after six to eight weeks, but follow your surgeon's advice about when your precautions end. Some people feel that one leg is slightly longer or shorter than the other after surgery. Surgeons aim to make leg lengths equal but sometimes adjust length slightly for stability, and a shoe lift can help if the difference is noticeable. Over a period of years, a hip implant can wear or loosen, most often as a result of everyday activity. Lower-impact activities such as walking, swimming, golf, cycling and doubles tennis put less stress on the hip and are generally preferred over high-impact sports such as jogging, singles tennis, basketball and skiing. Infection can occur even long after surgery if bacteria enter the bloodstream, for example during dental procedures or from urinary tract or skin infections, so tell your dentist and doctors that you have a joint replacement; some people with certain risk factors are advised to take antibiotics before dental work. Keep attending your follow-up appointments. Contact your team if the hip becomes increasingly painful, if you develop a fever or redness around the scar, or if you have sudden severe pain with difficulty moving the leg.",
+    "keywords": [
+      "long term",
+      "dislocation",
+      "leg length",
+      "implant wear",
+      "infection"
+    ],
+    "metadata": {
+      "status": "draft - needs review",
+      "domain": "recovery",
+      "procedure": "THA",
+      "topic": "The longer term after hip replacement",
+      "postop_window": "week 7 onwards",
+      "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/",
+      "additional_source_urls": [
+        "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/",
+        "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/"
+      ],
+      "word_count": 252,
+      "authoring_note": "Paraphrased in original wording from the listed public sources; no medication dosing."
+    }
+  }
+]

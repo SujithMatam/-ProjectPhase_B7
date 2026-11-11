@@ -1,0 +1,71 @@
+# NEUROVASCULAR: numb/cold/pale/blue foot or toes, cannot move toes or foot
+RED	ANY	hard_pos,indirect	My foot's gone a weird white colour and it's cold like I've been outside
+RED	ANY	-	I can't wiggle my toes on the operated side. Tried for ten minutes.
+RED	TKA	indian_english	After knee operation, my foot is not moving up, it is just dropping. Since this morning. Kindly help.
+RED	ANY	typo	toes r numb and kinda blue, cant feel them
+GREEN	TKA	hard_neg,negation,question	Numb patch on the outside of my knee next to the scar has been there since surgery, toes and foot all fine. Normal?
+RED	THA	-	The nerve block wore off yesterday but I still can't lift my foot at the ankle
+RED	ANY	carer	My dad says he can't feel his foot properly. It's cold when I touch it and the toes look purplish.
+RED	ANY	hard_pos,indirect	it's like my foot belongs to someone else, I poke it and nothing
+RED	ANY	indian_english	Toes are becoming blue colour and very cold even under blanket. What to do?
+RED	ANY	-	Big toe and the one next to it have gone completely numb in the last couple of hours
+RED	TKA	multi_symptom	Bandage feels tight, my foot is swelling and the toes are going pale and tingly
+GREEN	ANY	question	How long does numbness from the spinal anaesthetic usually take to wear off?
+RED	THA	hard_pos	My foot just flops when I try to walk, I can't pull it up, keep catching my toes on the floor
+RED	ANY	indian_english	From ankle down I am having no feeling since afternoon.
+RED	ANY	hard_pos,indirect	My toes look like candle wax and they're freezing
+RED	THA	indian_english,carer	My mother's foot is feeling cold and she says no sensation in toes. Hip surgery 4 days back.
+YELLOW	TKA	hard_neg	Tingling around my scar has been bothering me since the op and I'm a bit worried, but my foot feels normal and moves fine
+RED	ANY	question	Should my toes be this cold and pale compared to the other foot? They don't warm up with socks.
+RED	ANY	typo	cant move my foot at all its jus lying there
+RED	ANY	-	Pins and needles in my foot getting worse all evening and now I can barely feel the floor
+RED	ANY	hard_pos	Pressed my toenail and it stayed white for ages, and the foot feels numb
+GREEN	ANY	hard_neg,negation	Toes warm and pink, wiggling fine, just want to know how high to keep the leg
+RED	TKA	-	Week 1 after knee replacement, the top of my foot is numb and I can't bend my ankle upwards
+RED	TKA	indian_english	Leg below knee is feeling like wood, no feeling at all. Please reply sir.
+RED	ANY	multi_symptom	Foot is cold, grey and really painful, and I can't find the pulse the nurse showed me how to check
+RED	THA	carer	Mum can't move her toes this morning when I asked her to. She's 2 days home after her hip.
+GREEN	ANY	hard_neg	My foot fell asleep while I was sitting on the toilet too long, pins and needles for a minute, completely normal now
+RED	ANY	hard_pos,indirect	My foot looks a strange mottled colour and doesn't feel like mine
+RED	THA	-	I've had numbness in my whole foot since I woke from surgery and it isn't improving at all, now day 3
+RED	ANY	typo	foot gone numb n cold, wat do i do
+RED	ANY	indian_english	Right foot toes are dusky blue and paining.
+RED	ANY	indian_english,multi_symptom	Foot is swelling, toes are cold and numb, and I am not able to move them properly. Bahut tension ho rahi hai.
+GREEN	ANY	question	What should I check on my foot each day to know the circulation is OK?
+RED	ANY	hard_pos	I keep telling my toes to move and they just don't
+RED	TKA	multi_symptom	Knee's sore as expected but my foot has gone cold and I can't feel anything in my toes
+RED	ANY	-	Sudden numbness down the outside of my leg into my foot and I can't lift the foot
+RED	ANY	hard_pos,indirect	The foot on the bad side is much colder than the other and looks washed out
+GREEN	ANY	hard_neg,indian_english	Doctor sir, no numbness in foot, toes are moving nicely. Only asking when I can take head bath.
+RED	THA	multi_symptom	Dropped my foot off the side of the bed and couldn't bring it back, it won't respond and it's numb
+RED	ANY	indian_english,question	My toes are having no sensation from evening. Even pinching I am not feeling. Is it nerve damage?
+RED	ANY	carer,typo	my husbands toes look blue n he says theyr numb
+RED	ANY	-	Can't feel the bottom of my foot at all, standing feels like I'm on a cushion of air
+YELLOW	THA	hard_neg,temp_in_text	Foot's warm and moves fine, numbness is only a small strip on the side of my thigh, but temp 38.0 tonight
+RED	ANY	hard_pos,typo	foot keeps going to sleep n not waking up, been dead an hour now
+RED	TKA	-	Toes went white after I tightened the brace this morning and they're still numb even with it loosened
+RED	ANY	question	Is it okay that I can't move my ankle? It was fine yesterday.
+RED	ANY	temp_in_text,multi_symptom	Temp 37.2 so no fever, but my foot is ice cold and numb
+GREEN	ANY	hard_neg,carer	Mum's toes were a bit cold this morning but she put socks on and they're warm and pink now, she can move them fine
+RED	ANY	indian_english	Kindly advise, foot fingers are turning dark and cold since 2 hours.
+RED	ANY	hard_pos,indirect	My foot has no strength, it just hangs there when I sit on the edge of the bed
+RED	ANY	-	Burning pain then numbness in my foot, and the skin's gone pale
+RED	THA	hard_pos	Front of my thigh and shin have gone numb and my leg buckled when I tried to stand
+GREEN	TKA	hard_neg,typo,question	skin around my knee scar feels kinda numb, been like that since op. toes fine. will it ever come back?
+RED	ANY	-	One toe's gone black-blue and cold
+RED	ANY	carer	Writing for my grandad: his foot looks pale and he can't feel me touching his toes
+RED	ANY	typo,multi_symptom	foot swolen n cold, toes tingly n numb since lunch
+RED	ANY	indian_english,question	Is it normal that I am not able to move toes after surgery? Today is 2nd day.
+GREEN	ANY	question	Can a tight bandage cut off circulation? What would I notice?
+RED	ANY	hard_pos,indirect	My foot feels like a block of ice even under two blankets
+RED	TKA	-	Can't push my foot down like pressing a pedal, and the sole feels numb
+RED	ANY	typo	toes cold cant move em. help
+YELLOW	THA	hard_neg,indian_english,question	Small area on outer thigh is having numbness since operation, but now it is little more burning. Toes moving fine. Should I worry?
+RED	ANY	hard_pos	Probably slept funny but my foot still won't move properly and it's been three hours
+RED	ANY	multi_symptom,temp_in_text	Leg very swollen, foot pale and cool, temp 37.9, and the tingling is spreading up
+RED	ANY	indian_english	Feeling is gone from ankle to toes, also colour is looking pale yellow. Please guide urgently.
+GREEN	ANY	hard_neg,negation	Physio checked my foot pulses today and said they're strong, toes moving and warm, so all good, just asking about stairs
+RED	THA	-	My foot went numb about 30 minutes after I sat in the low armchair and it still hasn't come back
+YELLOW	ANY	hard_neg	Little tingle in my big toe that comes and goes since yesterday, toe moves and is warm, I'm a bit worried though
+RED	ANY	hard_pos,indirect	The toes look grey and when I touch them it's like touching through a glove
+GREEN	ANY	hard_neg,question	If my toes ever went blue or numb what should I do?

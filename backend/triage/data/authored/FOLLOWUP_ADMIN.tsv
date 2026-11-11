@@ -1,0 +1,48 @@
+# FOLLOWUP_ADMIN: appointments, staple removal date, reports, sick note, dressing supplies. Lead label GREEN.
+GREEN	ANY	question	When is my first check-up with the surgeon after I'm discharged?
+GREEN	ANY	hard_neg,negation	No bleeding or anything, just need a sick note for work.
+GREEN	TKA	question	Who takes the staples out, the practice nurse at my GP or the hospital?
+GREEN	ANY	indian_english,question	Kindly send the discharge summary on WhatsApp, insurance company is asking for it.
+GREEN	ANY	question	Can I get more dressings? I've used the last one in the pack.
+GREEN	THA	question	Do I need an X-ray before my six-week hip review?
+GREEN	ANY	typo,question	cant make the 2pm appt on thurs, can i move it to next wk
+GREEN	ANY	carer,question	I'm booking transport for my mother's follow-up. Does she need to bring her walker?
+YELLOW	TKA	hard_pos	Staples were meant to come out on day 14 but nobody has called. It's day 18, they're pulling and the skin round them is pink.
+GREEN	ANY	indian_english,question	Doctor sir, fitness certificate for office joining is needed. How to get it?
+GREEN	ANY	hard_neg,negation	Wound's healed nicely, no redness, no discharge. Do I still need the district nurse visits?
+GREEN	ANY	question	Where do I collect the operation report for my insurance claim?
+GREEN	ANY	question	Is the physio referral automatic or do I have to book it myself?
+RED	ANY	multi_symptom	Waiting for my wound check next week but the dressing has soaked right through with blood twice today.
+GREEN	ANY	question	Who do I contact out of hours if I'm worried about something?
+GREEN	ANY	typo,question	wheres the form for the blue badge, do u sign it or the GP
+GREEN	ANY	carer,indian_english,question	My father's follow-up date is not mentioned on the discharge paper. Please tell the date.
+GREEN	TKA	question	Do I need to bring my knee brace to the clinic?
+GREEN	ANY	hard_neg,question	Do I still go to the appointment if everything is fine, no pain or swelling?
+YELLOW	ANY	temp_in_text	Appointment isn't until the 20th but my temperature's been 38.1 two evenings in a row.
+GREEN	ANY	question	Can I have the follow-up by video call? I live two hours away.
+GREEN	ANY	indian_english,question	Implant card was not given at discharge. Is it required for airport security check?
+GREEN	THA	question	How long is a typical sick note after a hip replacement if I work in an office?
+GREEN	ANY	-	Got the letter for my 6-week review, just confirming the clinic room number.
+GREEN	ANY	hard_neg	Dressing came off in the shower but the wound is dry and closed. Can I get a spare from the pharmacy or do I need a prescription?
+GREEN	ANY	question	Do I need to fast before the blood test the nurse has booked?
+YELLOW	ANY	hard_pos,multi_symptom	Missed my staple removal because of the snow, and now one end of the cut has a small gap with clear stuff coming out.
+GREEN	ANY	question,typo	can my husband pick up the repeat prescrption for me or do i need to go
+GREEN	ANY	indian_english,question	Physiotherapist will come home or I need to go to hospital? What are the charges?
+GREEN	ANY	question	Is it normal not to hear anything from the hospital two weeks after going home?
+GREEN	THA	question	When will I be told whether I can stop the hip precautions? Is that at the follow-up?
+RED	ANY	carer,hard_pos	Mum's appointment is tomorrow but she's suddenly very short of breath and her lips look grey. Should we just wait?
+GREEN	ANY	question	Can I get a copy of my X-ray images on a disc or USB?
+GREEN	ANY	carer,question	Can I come into the appointment with my dad? He's hard of hearing.
+GREEN	TKA	hard_neg,negation	Got a letter saying my knee follow-up is at 12 weeks. Is that too long? Things are going well, no problems.
+GREEN	ANY	question	Will I get a letter for my employer about a phased return?
+YELLOW	ANY	-	Been waiting three days for the clinic to call back about my pain. It gets worse every day and the tablets barely help.
+GREEN	ANY	indian_english,question	Kindly tell when stitches to be removed and where. I am staying in another city now.
+GREEN	ANY	question	Do I need a referral letter to restart hydrotherapy at the leisure centre?
+GREEN	ANY	question	Is there a number for the dressing nurse to come to my house?
+GREEN	ANY	typo	the online portal wont show my op notes, is ther another way to get them
+YELLOW	THA	-	Waiting for my review, but the swelling in my hip and thigh has got worse each week, though it still goes down overnight.
+GREEN	ANY	-	Thanks for sorting the appointment. See you Tuesday.
+GREEN	ANY	indian_english,question	Doctor is not available on the given date, can I see other doctor in same department?
+RED	THA	-	My hip review is next month but I fell yesterday and since then I can't stand on that leg at all.
+GREEN	ANY	question	Do I hand back the walking frame at the follow-up or keep it?
+GREEN	ANY	indian_english,question	Bill and reports are required for mediclaim. From which counter I will get them?

@@ -1,0 +1,71 @@
+# DVT_CALF: calf/leg pain not from the incision, hot/hard/red calf, swelling that does not settle with elevation
+RED	TKA	hard_pos,indirect	Week 2 after my knee. The muscle below the knee at the back feels like a knot and hurts when I point my toes up
+RED	ANY	typo	calf rly sore n hot since this am, cant put heel down properly
+RED	THA	indian_english	Doctor sir, my left calf is paining from last night and it is becoming hard like stone. Kindly advise what to do.
+RED	ANY	carer	Writing for my mum, 9 days after her op. Her right calf is red and she flinches when I touch it.
+RED	ANY	hard_pos,indirect	one leg is fatter than the other now and it stays that way even with my feet up all evening
+RED	THA	-	Hip was done three weeks ago. Today my calf on the same side throbs when I walk to the bathroom.
+GREEN	ANY	hard_neg,negation,question	No calf pain or swelling, just want to know what signs of a clot I should watch for
+RED	TKA	multi_symptom	Swelling from ankle to knee not going down after a full night with pillows under it, and the calf is tender to squeeze.
+RED	ANY	-	calf hard and burning
+RED	ANY	indian_english,multi_symptom	Since 2 days my foot and ankle are swelling more and more, I kept leg up on pillows but no change. Also calf is little red.
+RED	ANY	hard_pos,indirect	There's a sore spot deep in the back of my leg, like a bruise but there's no bruise to see
+RED	ANY	question	Is it normal for my calf to feel hard and warm on day 6? It wasn't like this yesterday.
+GREEN	ANY	question	How do I check my own calf for a blood clot?
+RED	THA	-	my thigh on the operated side has puffed up a lot more since Sunday and doesn't come down when I lie flat with it raised
+RED	TKA	typo	calf is swolen and red, knee itself is ok, pls advise
+RED	TKA	carer,indian_english	My father had knee operation 12 days back. Today his calf is very tight and warm, he is not able to walk to washroom. What to do?
+RED	ANY	hard_pos,indirect	When I flex my foot up towards me it pulls painfully in the back of my leg, started this afternoon
+RED	ANY	multi_symptom	I stopped the injections a week early because I ran out and now my calf aches and looks a bit pink
+GREEN	TKA	hard_neg	My ankle puffs up by evening but by morning it's back to normal after sleeping with my leg up. Calf feels fine.
+RED	TKA	multi_symptom	Knee pain is improving but now there's a new ache lower down in the calf, plus the ankle is puffier than it's been all week
+RED	THA	hard_pos,indirect	My left sock leaves a deep line now and my right doesn't. Leg's been up all night. Calf feels heavy.
+RED	ANY	-	Woke at 3am with cramp in my calf that never really let go, still sore and tender to touch at breakfast
+RED	ANY	indian_english,question	Calf muscle is warm and paining when I press. Is it clot? Please reply fast.
+RED	ANY	-	red patch on the back of my calf, warm, about the size of my palm
+GREEN	ANY	hard_neg,negation,typo	calf is soft, not warm, not sore. jst asking if i still need the stockins at nite
+RED	THA	indian_english,typo	hip surgery done 10 days, now left leg below knee swelling, not reducing after keeping up. pls tel what to do
+RED	ANY	hard_pos,indirect	My leg feels heavy and full like it's going to burst, and the skin has a funny dusky tinge
+RED	TKA	-	Physio noticed my calf was warm and asked me to message you. It is a bit sore too.
+RED	ANY	carer	My husband's calf has gone hard and shiny and he says it aches all the time, not just walking. He's 3 weeks post op.
+RED	ANY	typo,indirect	back of leg hurts wen i walk, not the wound, lower down. been 2 days
+GREEN	ANY	hard_neg,indian_english	Last week calf was paining, they did scan and said no clot. Now pain is gone. How long to continue injections?
+RED	ANY	multi_symptom	Calf pain since yesterday and today I feel a bit short of breath going up the stairs
+RED	THA	-	the whole leg from groin to ankle is swollen and tight this morning, way worse than last week, and raising it hasn't helped
+RED	ANY	-	Tender hot calf, 4 weeks out. Long flight home 2 days ago.
+RED	TKA	indian_english	Back side of knee there is hard lump, paining while walking. Wound side is fine.
+RED	ANY	carer,indian_english	Madam, my mother's ankle and calf swelling is not going down even after keeping leg on pillow whole night. She is on blood thinner tablets only.
+GREEN	ANY	question	What's the point of the ankle pumps? Are they to stop clots?
+RED	ANY	temp_in_text,multi_symptom	Temp 37.4 so no fever, but my calf is sore and swollen and warmer than the other one
+RED	ANY	temp_in_text,multi_symptom	Calf is red and hot and I've got a temperature of 38.1
+RED	TKA	-	The ache in my calf is worse when I stand and it isn't easing with rest the way the knee soreness does
+RED	ANY	hard_pos,indirect	My foot looks like a balloon today and my leg feels tight all the way up. Had it propped up since lunch, no change.
+GREEN	TKA	hard_neg	Got cramp in my calf last night, stretched it out and it went in a minute. Fine today.
+RED	ANY	question	Should I be worried that my calf is tender and puffy two weeks after surgery? I'm keeping it raised and it isn't helping.
+RED	THA	-	Bit embarrassed to message, probably nothing, but my calf has been throbbing on and off all day and it's warm.
+RED	ANY	typo	calf hurtin bad 2day, warm 2 touch
+RED	ANY	indian_english	Leg is becoming heavy and paining in calf part. Swelling is there since morning. Should I come to hospital?
+RED	TKA	hard_pos,indirect	When I squeeze the back of my leg below the knee it really hurts, and the skin there looks a bit red
+GREEN	ANY	hard_neg,question	If my calf became hot and swollen, should I call you or go straight to A&E?
+RED	ANY	-	Day 4 home. Right calf feels tight like a band and it's sore when I walk, the wound itself looks fine.
+RED	ANY	carer	Mum's lower leg is bigger than this morning and she says it hurts behind the knee. Leg's been up on the sofa all afternoon.
+RED	ANY	indian_english,multi_symptom	Calf is paining, ankle also swollen, and feeling very tired and unwell today only
+RED	ANY	hard_pos	My leg just doesn't feel right. Calf is aching a lot and the veins look more obvious than usual.
+YELLOW	ANY	hard_neg,negation	swelling in my foot has been creeping up over the past 2 weeks, still goes down with my legs up, no calf pain
+RED	THA	-	Swelling in my thigh is getting bigger by the day and it's painful to touch, even after resting with it up.
+RED	ANY	indian_english	Bahut dard in calf since yesterday evening, skin is also red. Please advise urgently.
+RED	ANY	indian_english,question	After removing stockings yesterday, calf has become swollen and paining. Is it ok?
+RED	ANY	hard_pos,indirect	Feels like I pulled a muscle in my calf but I haven't done anything, and it's been getting worse since Tuesday
+YELLOW	TKA	hard_neg,negation	Calf fine, no pain there, but I missed last night's blood thinner injection
+RED	ANY	multi_symptom	Shin and calf look red and blotchy and feel hot, and my foot is more swollen than ever even with it elevated
+RED	TKA	-	Week 5, was doing great, but tonight my calf is sore and hot and it hurts to stand
+RED	ANY	typo,question	is it a clot if my calf is hard and painfull? its been like that since last nite
+GREEN	THA	hard_neg,typo	doppler on my leg came back clear yday, calf feels normal now. can i go back to normal walks
+RED	ANY	indian_english,question	Doctor, one doubt. Left calf is warm and slightly swollen compared to right. Is it serious?
+RED	ANY	hard_pos,indirect	Lower leg on the op side has gone a reddish colour and feels hotter than the good one
+RED	ANY	-	ankle swelling used to go down overnight but for the last 2 mornings it's still there and my calf aches
+GREEN	ANY	carer,question	My dad keeps asking if he can stop the clot injections after 2 weeks. What should I tell him?
+RED	ANY	hard_pos	Calf is sore when I press it. Not cramp, been constant for hours.
+YELLOW	ANY	hard_neg,negation,temp_in_text	Calf is totally fine, no swelling, but I'm running 37.9 this evening
+RED	ANY	multi_symptom	Leg's swollen, calf's tender, and I've noticed my heart beating faster than usual sitting down
+GREEN	ANY	hard_neg	Bruise on my thigh is going yellow and fading, calf is normal and the swelling goes down overnight

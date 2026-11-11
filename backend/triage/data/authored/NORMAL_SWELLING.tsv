@@ -1,0 +1,46 @@
+GREEN	ANY	hard_neg,negation	Calf is soft and not tender, only the ankle puffs up by evening. Should I wear the stockings to bed too?
+GREEN	TKA	question	Is it ok to put the ice pack straight on the skin or does it need a towel in between?
+GREEN	ANY	hard_neg	Physio checked my leg today and said the swelling is normal for week 2. It was down a lot when I woke up.
+GREEN	ANY	indian_english,question	Doctor sir, feet are swelling in evening time and going down by morning. Is this normal or any tablet needed?
+GREEN	TKA	typo	knee still kinda puffy but way better then last week, how long till it goes away totaly?
+GREEN	THA	carer,question	My mum had her hip done 10 days ago. Her ankle swells when she sits in the armchair all afternoon but is fine after a night in bed. Normal?
+GREEN	THA	question	How high should my leg be when I elevate it after hip surgery? Above heart level?
+GREEN	TKA	question	Can I use a bag of frozen peas instead of the cold therapy machine?
+YELLOW	TKA	hard_pos	The knee has been getting more swollen every week since I went back to my desk job. It settles when I lie down but it's bigger each week. Calf feels fine.
+GREEN	ANY	hard_neg,question	What does swelling from a clot look like compared to normal swelling, so I know the difference?
+RED	ANY	hard_pos,multi_symptom	Meant to ask about compression stockings but my calf has been hot and hard since yesterday and the swelling doesn't go down even with my leg up all night
+GREEN	ANY	indian_english	Kindly advise how many hours to keep leg raised on pillows. Swelling is less in morning.
+GREEN	TKA	-	Knee swelling comes back every afternoon after my walk, but it's gone by bedtime.
+GREEN	ANY	hard_neg,negation,question	no redness, no heat in the calf, foot just looks a bit puffy at night. ok to fly in 6 weeks?
+GREEN	THA	hard_neg	Thigh was quite swollen around the hip in the first days. It's much softer now at day 9 and goes down when I lie flat. When does it fully settle?
+GREEN	ANY	temp_in_text,hard_neg	Checking in: temperature 98.6F, swelling down from last week, calf soft. Is massaging the ankle helpful?
+GREEN	ANY	indian_english,question	Can I do ice and then hot water fomentation also for swelling? My mother-in-law is saying hot is better.
+GREEN	TKA	typo,question	hw long do i keep wearing teh white stockings? ankles r fine in mornings
+GREEN	ANY	question	Is it normal for swelling to hang around for three months after a joint replacement?
+GREEN	ANY	hard_neg,negation	Bit of bruising on the shin fading to yellow, swelling's going down, no pain in the calf. Just keeping you posted.
+GREEN	TKA	carer,indian_english	My father is 72, had knee operation. His foot is little swollen by evening and normal by morning. Should we continue the leg raising? Please guide.
+GREEN	ANY	-	Swollen ankle again tonight. Feet up on the sofa and it's already shrinking.
+GREEN	ANY	question	Should elevation be done lying flat or is a recliner chair good enough?
+GREEN	ANY	hard_neg,question	If the swelling ever didn't go down after a night with the leg up, would that be a reason to call?
+GREEN	TKA	question	ice before or after the bending exercises?
+GREEN	ANY	indian_english,typo	leg sweling is there since operation but reducing daily, can i go to temple on sunday
+GREEN	ANY	question	Does drinking more water help with leg swelling or make it worse?
+RED	ANY	hard_pos	swelling in my foot and ankle was going down fine but since this morning the whole calf is tight and sore and raising it isn't helping at all
+YELLOW	ANY	hard_pos	Each week the puffiness reaches a bit higher up my shin, though it still goes down with my feet up. Not painful. Should I mention it to the clinic?
+GREEN	ANY	-	Morning: ankle bone visible again. Evening: gone. Is that the pattern everyone gets?
+GREEN	TKA	question	Can I sleep with the knee propped on a pillow to keep the swelling down, or will it stop it straightening?
+GREEN	ANY	indian_english,question	Swelling is coming in evening only, morning it is fine. Is it ok to sit with legs down for 1 hour for my work from home?
+GREEN	THA	carer,question	Husband had his hip replaced and his foot looks a bit puffy in the evening. Do we raise just the foot or the whole leg?
+GREEN	ANY	hard_neg,negation	The nurse looked at my leg on Monday and said no sign of a clot, just normal post-op swelling. How long before I can stop elevating?
+GREEN	ANY	question	What's the best kind of ice pack? The gel ones go warm so fast.
+GREEN	TKA	-	Knee still a bit bigger than the other one at 10 weeks. Ok?
+YELLOW	ANY	temp_in_text,multi_symptom	Swelling is the usual and goes down overnight, but I'm feeling hot and the thermometer says 37.9. Is that normal at this stage?
+GREEN	ANY	indian_english,question	Is it compulsory to keep ice or can I stop after 2 weeks? Swelling is very less now.
+RED	TKA	hard_pos,typo	knee swelling ok but my calf is red n hot and really hurts when i walk, started last nite. should i still do the ice?
+GREEN	ANY	hard_neg,negation	Not worried as such, no chest pain, breathing fine, just ankles a bit fat by teatime. Could it be the tablets?
+GREEN	ANY	question	How soon after surgery does the swelling usually peak?
+GREEN	ANY	indian_english,question	Can I keep my leg on a stool while eating at dining table or should it be higher?
+GREEN	THA	question	After my hip op my knee is swollen too even though they didn't touch it. Why? It goes down by morning.
+GREEN	ANY	typo	swellings gone down heaps since i started puttin my legs up for 15 mins after lunch, keep doing it?
+YELLOW	ANY	carer,hard_pos	Dad's ankle swelling is a little worse each week since he came home a month ago. Still flattens out overnight with his legs up and his calf isn't sore. Worth a call?
+GREEN	ANY	-	ankle puffy again, normal?

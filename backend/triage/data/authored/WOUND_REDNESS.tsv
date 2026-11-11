@@ -1,0 +1,58 @@
+YELLOW	TKA	-	There's a pink rim along both sides of my knee incision, maybe half a centimetre wide.
+YELLOW	THA	hard_pos,indirect	The skin next to my hip scar feels hotter than the rest of my thigh when I lay my hand on it.
+GREEN	ANY	question	How red is too red for a healing incision?
+GREEN	ANY	hard_neg	Scar has faded from bright pink to a pale line over the last month, really pleased with it.
+YELLOW	ANY	indian_english	Doctor sir, little bit redness is coming near the stitches from 2 days. Kindly check and advise.
+YELLOW	TKA	typo	theres a red patch at the top of my knee scar, bit puffy, not spreading
+RED	ANY	temp_in_text,multi_symptom	The red area round my wound has doubled since this morning and I've got a temperature of 38.9.
+RED	TKA	hard_pos,indirect	I drew round the red bit with a pen like the nurse said and by tonight it's gone way past the line.
+YELLOW	ANY	carer	My dad's incision looks a bit angrier than yesterday, slightly red at the lower end. He says it doesn't hurt more.
+GREEN	ANY	hard_neg,negation	Checked the wound tonight, no redness, no heat, no swelling. All good.
+YELLOW	THA	multi_symptom	Hip scar is a bit swollen and warm along the middle third, and tender if I press it.
+YELLOW	ANY	temp_in_text,multi_symptom	Little redness by the stitches and I'm running 37.8.
+GREEN	ANY	temp_in_text,hard_neg	Scar is the same soft pink it's been all along, temperature 36.9, just doing my weekly check-in.
+YELLOW	TKA	indian_english,question	Knee operation site is looking slightly red and feeling garam when I touch. Is it infection?
+YELLOW	ANY	-	A small red blotch has come up next to one of the staples.
+GREEN	ANY	hard_neg	The redness I mentioned at my last visit has completely gone, the GP looked and said it's healing nicely.
+YELLOW	ANY	hard_pos,indirect	Week 3 and the line of my cut has gone from pale to sort of rosy, and it feels a bit puffy.
+RED	ANY	multi_symptom	Red streaks are running up my thigh from the wound and I keep shaking with chills.
+YELLOW	ANY	typo,multi_symptom	sum redness round the wound, warm 2 touch, wht shud i do
+GREEN	ANY	question	Is it normal for a scar to stay pink for a few months?
+YELLOW	THA	-	The bottom of my hip incision has a red half-moon shape around it that wasn't there on Sunday.
+YELLOW	TKA	-	My knee is redder on the outside of the scar than it was. I'm 77 and my daughter told me to report it.
+YELLOW	ANY	carer,indian_english	Myself writing for my mother-in-law. Her wound is showing some redness and slight swelling since yesterday evening. Please guide.
+RED	ANY	multi_symptom	It's red and hot and now there's thick yellow stuff coming from the middle of the scar.
+GREEN	TKA	hard_neg	The bruising round my knee is purple and yellow but the incision itself isn't red at all.
+YELLOW	ANY	multi_symptom,negation	The skin each side of the stitches is pinkish and a bit itchy, no discharge.
+YELLOW	TKA	question	Should I worry that my knee scar has a warm, slightly red patch below the kneecap?
+YELLOW	ANY	-	Red around my wound now.
+GREEN	ANY	question	The surgeon called my wound "calm" at the check. How long before I can rub bio-oil into it?
+YELLOW	THA	hard_pos,indirect	Since I started sleeping on that side my hip wound looks flushed and feels like there's a heat pad on it.
+YELLOW	ANY	temp_in_text	Some redness along the wound edge. Temp was 37.5 this morning.
+RED	ANY	temp_in_text,multi_symptom	Wound gone red and swollen, 102F tonight and I feel awful
+YELLOW	ANY	indian_english,negation	Near the wound one red spot is there, like small pimple. No pus. What to do?
+GREEN	ANY	question	What does a normal healing wound look like at two weeks?
+YELLOW	TKA	-	My knee scar goes redder after physio and stays that way for hours now.
+YELLOW	ANY	hard_pos	The tape marks have healed but the incision itself is slowly getting pinker instead of paler.
+GREEN	ANY	hard_neg	There was a red mark from the dressing adhesive but it faded within a day of taking the tape off.
+YELLOW	ANY	carer,typo	my wifes scar looks red n a bit swolen tonite, she's ok in herself
+RED	TKA	hard_pos,indirect	Since lunch the redness has crept from my knee halfway down my shin and the whole area is burning.
+YELLOW	THA	question	Hip incision is warm and a bit pink at the top end, is that just healing or should I get it looked at?
+YELLOW	ANY	-	I've got a ring of redness around the spot where the drain came out.
+GREEN	ANY	hard_neg,question	My scar is still a bit pink, but it's 4 months on, flat and painless. Is pink normal for this long?
+YELLOW	ANY	indian_english,multi_symptom	Stitches area is red and swelling is also there, little bit paining also. Should I come to hospital?
+YELLOW	ANY	hard_pos,indirect	When the dressing comes off the skin underneath looks blotchy and blushed, and it's tender.
+YELLOW	TKA	typo	knee incison looks redish at the botom, slightly warm
+YELLOW	ANY	-	Week 1. Thin red line either side of the staples, sore when my trousers rub.
+GREEN	THA	hard_neg,question	My hip scar goes a bit purple when I'm cold and back to normal once I warm up, is that harmless?
+RED	ANY	multi_symptom	The red patch keeps spreading and now the wound has opened a little at the bottom.
+YELLOW	ANY	multi_symptom	Bit of warmth and redness around the scar and I've felt feverish this afternoon.
+YELLOW	ANY	carer	Grandad's wound is pink and a little raised along one edge. He's eating and walking fine.
+GREEN	ANY	indian_english,question	What are the signs of wound infection, doctor? I want to know so I can watch properly.
+YELLOW	THA	indian_english	Operation done on right hip 12 days ago. Today I see redness around incision and it is warm. Kindly advise.
+YELLOW	ANY	-	The area round my scar has gone shiny and red, like a mild sunburn.
+GREEN	ANY	hard_neg	Doctor at my check said the slight pinkness was normal healing and it's been fading every day since.
+YELLOW	ANY	typo,question	is it bad if the cut is warm? its a lil pink too
+YELLOW	ANY	indian_english,temp_in_text	Redness near stitches and body temperature 99.8 F. Should I take antibiotic on my own?
+RED	ANY	indian_english,multi_symptom	Wound redness is spreading fast since morning and having shivering with fever. Please tell urgently.
+YELLOW	TKA	indian_english	Knee wound has become little red and swollen after I sat on the floor for puja. Please advise.
