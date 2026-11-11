@@ -1,0 +1,4 @@
+# SetFit weights (~90 MB each) and caches are not committed; rebuild with train.py
+artifacts/setfit/
+artifacts/cache/
+__pycache__/
