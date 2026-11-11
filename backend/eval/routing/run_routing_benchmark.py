@@ -33,6 +33,9 @@ Options:
   --label NAME        results go to eval/routing/results/NAME.json and .md,
                       and the markdown is copied to
                       eval/reports/<date>_routing-NAME.md
+  --cases MODULE      case module in eval/routing to score (default: cases;
+                      heldout_v2 is the held-out set written before the
+                      medication-symptom / recovery-prototype changes)
   --semantic-first    set intent_classifier.SEMANTIC_FIRST = True for the run
                       (the step-4 experiment flag; ignored with a warning when
                       the attribute does not exist)
@@ -188,7 +191,8 @@ def run(args) -> int:
     sys.path.insert(0, str(HERE))
     os.chdir(str(BACKEND))
 
-    from cases import CASES  # noqa: E402
+    import importlib  # noqa: E402
+    CASES = importlib.import_module(args.cases).CASES
     import lam.intent_classifier as ic  # noqa: E402
     from lam.schemas import LAMContext  # noqa: E402
 
@@ -209,7 +213,7 @@ def run(args) -> int:
         cases = [c for c in cases if needle in c["id"].lower() or needle in c["source"].lower()
                  or needle in c["text"].lower()]
 
-    print(f"[routing] commit={git_commit()} cases={len(cases)} semantic_first={semantic_first} "
+    print(f"[routing] commit={git_commit()} case_set={args.cases} cases={len(cases)} semantic_first={semantic_first} "
           f"orchestrator={not args.no_orchestrator}")
     print(f"[routing] PATIENT_DATABASE_PATH={db_path}; SMTP*/DOCTOR_ALERT* cleared")
 
@@ -308,7 +312,7 @@ def run(args) -> int:
         orchestrator_seconds = round(time.time() - t0, 1)
 
     meta = {
-        "label": args.label, "commit": git_commit(), "date": date.today().isoformat(),
+        "label": args.label, "case_set": args.cases, "commit": git_commit(), "date": date.today().isoformat(),
         "semantic_first": semantic_first, "orchestrator": not args.no_orchestrator,
         "cases": len(rows), "classifier_seconds": classifier_seconds,
         "orchestrator_seconds": orchestrator_seconds,
@@ -426,12 +430,12 @@ def markdown(meta: Dict[str, Any], summary: Dict[str, Any], rows: List[Dict[str,
     L: List[str] = []
     L.append(f"# Routing benchmark -- `{meta['label']}`")
     L.append("")
-    L.append(f"- commit `{meta['commit']}`, {meta['date']}; {meta['cases']} cases; "
+    L.append(f"- commit `{meta['commit']}`, {meta['date']}; case set `{meta.get('case_set', 'cases')}`, {meta['cases']} cases; "
              f"semantic_first={meta['semantic_first']}; thresholds {meta['thresholds']}")
     L.append(f"- classifier run {meta['classifier_seconds']}s"
              + (f", orchestrator run {meta['orchestrator_seconds']}s" if with_orch else ""))
     L.append("- a prediction is correct when it is in the case's acceptable set; *clear only* excludes debatable cases; "
-             "*openings* excludes the six answers-to-a-pending-question, which carry no routable signal on their own")
+             "*openings* excludes answers to a pending question (cases.py has six; heldout_v2 none), which carry no routable signal on their own")
     if with_orch:
         L.append("- orchestrator *lenient*: at least one dispatched agent is acceptable (the eval/agents definition); "
                  "*strict*: every dispatched agent is acceptable")
@@ -537,6 +541,7 @@ def markdown(meta: Dict[str, Any], summary: Dict[str, Any], rows: List[Dict[str,
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--label", required=True)
+    parser.add_argument("--cases", default="cases")
     parser.add_argument("--semantic-first", action="store_true")
     parser.add_argument("--no-orchestrator", action="store_true")
     parser.add_argument("--only", default=None)
