@@ -329,6 +329,69 @@ _MEDICATION_KEYWORDS = {
 # Activity, Rehabilitation and Recovery (eval/routing/REPORT.md). A message
 # that pairs them with a drug word still matches through the drug word.
 
+# The side-effect descriptors above stay in _MEDICATION_KEYWORDS (they also
+# count as a clinical symptom in _has_clinical_symptom_signal), but on their
+# own they are not about medication: "My incision is itching", "I feel
+# bloated after meals", "I get dizzy when I stand up after physio". Because
+# the medication rule is checked first, they took those turns from Wound
+# Care, Nutrition, Pain and Daily Activity. They now count for MEDICATION
+# only when the message also carries a medication cue (_has_medication_cue);
+# otherwise the message continues to the next keyword rules and the
+# semantic step.
+_MEDICATION_SYMPTOM_KEYWORDS = frozenset({
+    "nauseous",
+    "nausea",
+    "dizzy",
+    "dizziness",
+    "constipated",
+    "constipation",
+    "drowsy",
+    "drowsiness",
+    "light-headed",
+    "light headed",
+    "lightheaded",
+    "queasy",
+    "bloated",
+    "bloating",
+    "fatigued",
+    "itchy",
+    "itching",
+})
+
+# A medication cue: every non-symptom medication keyword (drug names,
+# tablet, pill, medicine, dose, painkiller, side effect, ...) except the
+# generic "purpose" / "precaution", plus plural and colloquial forms and
+# "since I started"-style onset phrases.
+_MEDICATION_CUE_KEYWORDS = frozenset(
+    (_MEDICATION_KEYWORDS - _MEDICATION_SYMPTOM_KEYWORDS - {"purpose", "precaution"})
+    | {
+        "meds",
+        "doses",
+        "painkillers",
+        "pain killer",
+        "pain killers",
+        "antibiotics",
+        "capsule",
+        "capsules",
+        "injection",
+        "injections",
+        "side effects",
+        "since i started",
+        "since starting",
+        "since i began",
+        "after taking",
+        "started taking",
+    }
+)
+
+
+def _has_medication_cue(text: str) -> bool:
+    """True when the (normalised) message names a medication or its intake."""
+    return any(
+        re.search(r"\b" + re.escape(cue) + r"\b", text)
+        for cue in _MEDICATION_CUE_KEYWORDS
+    )
+
 
 def _contains_word(text: str, marker: str) -> bool:
     """Whole-word / whole-phrase match (no substring hits such as "no" in
@@ -623,6 +686,24 @@ _DETERMINISTIC_RULES = [
 ]
 
 
+def _rule_keyword_matches(intent: IntentLabel, keywords, text: str) -> list[str]:
+    """
+    Keywords of one deterministic rule that match `text` (whole word).
+
+    For MEDICATION, a side-effect descriptor (_MEDICATION_SYMPTOM_KEYWORDS)
+    only counts when the message also has a medication cue, so "my incision
+    is itching" no longer matches the medication rule while "itching since
+    the new tablets" still does.
+    """
+    matched = [
+        keyword for keyword in keywords
+        if re.search(r"\b" + re.escape(keyword) + r"\b", text)
+    ]
+    if intent == IntentLabel.MEDICATION and matched and not _has_medication_cue(text):
+        matched = [k for k in matched if k not in _MEDICATION_SYMPTOM_KEYWORDS]
+    return matched
+
+
 # ============================================================================
 # MODEL STATE
 # ============================================================================
@@ -896,10 +977,8 @@ def _deterministic_intent(query: str) -> Optional[IntentLabel]:
 
     for intent, keywords in _DETERMINISTIC_RULES:
 
-        for keyword in keywords:
-
-            if re.search(r"\b" + re.escape(keyword) + r"\b", text):
-                return intent
+        if _rule_keyword_matches(intent, keywords, text):
+            return intent
 
     return None
 
@@ -1104,10 +1183,7 @@ class IntentClassifier:
         for intent, keywords in _DETERMINISTIC_RULES:
             if intent in detected:
                 continue
-            matches = [
-                keyword for keyword in keywords
-                if re.search(r"\b" + re.escape(keyword) + r"\b", text)
-            ]
+            matches = _rule_keyword_matches(intent, keywords, text)
             # "pain tablet/medicine/pill" identifies the medication, not a
             # second pain-assessment request.  Retain pain when the turn also
             # contains an independent symptom (for example "pain is worse").
@@ -1446,9 +1522,7 @@ class IntentClassifier:
         # Clinical intents.
         for intent, keywords in _DETERMINISTIC_RULES:
 
-            for keyword in keywords:
-
-                if re.search(r"\b" + re.escape(keyword) + r"\b", text):
-                    return intent
+            if _rule_keyword_matches(intent, keywords, text):
+                return intent
 
         return _DEFAULT_ROUTABLE_INTENT

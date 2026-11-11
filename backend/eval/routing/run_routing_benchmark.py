@@ -114,8 +114,12 @@ def git_commit() -> str:
 def keyword_hits(ic, text: str) -> List[Dict[str, Any]]:
     """Keywords that match `text`, in rule order, as the classifier sees them."""
     hits = []
+    gate = getattr(ic, "_rule_keyword_matches", None)  # medication symptom words need a medication cue
     for position, (intent, keywords) in enumerate(ic._DETERMINISTIC_RULES):
-        matched = sorted(k for k in keywords if re.search(r"\b" + re.escape(k) + r"\b", text))
+        if gate is not None:
+            matched = sorted(gate(intent, keywords, text))
+        else:
+            matched = sorted(k for k in keywords if re.search(r"\b" + re.escape(k) + r"\b", text))
         if matched:
             hits.append({"intent": intent.value, "keywords": matched, "rule_position": position})
     return hits
