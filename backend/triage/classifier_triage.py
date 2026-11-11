@@ -177,12 +177,15 @@ class _Classifier:
             self.model_used = f"M2:{m2_path.name}"
         else:
             head_file = sel["M1"].get("head_file", "m1_main.json")
+            if sel_file.name == "selection_v2.json":       # the shipped folder is in git
+                fix = ("Restore it with `git checkout -- "
+                       f"backend/triage/model/artifacts/setfit/{m2_path.name}`")
+            else:                                          # v1 weights were never committed
+                fix = "v1 weights are not in git; rebuild them with triage/model/train.py"
             self.load_warning = (
                 f"[TRIAGE][HYBRID] WARNING: M2 model folder {m2_path} {m2_problem}. "
                 f"Using the M1 fallback (frozen all-MiniLM-L6-v2 + {head_file}), which is less "
-                "accurate than the shipped model. Restore the folder with `git checkout -- "
-                f"backend/triage/model/artifacts/setfit/{m2_path.name}` (or `git lfs pull` if "
-                "LFS is in use), or set TRIAGE_MODE=rules to use the keyword engine.")
+                f"accurate. {fix}, or set TRIAGE_MODE=rules to use the keyword engine.")
             print(self.load_warning, file=sys.stderr, flush=True)
             from sentence_transformers import SentenceTransformer
             head = json.loads((ART / head_file).read_text(encoding="utf-8"))
