@@ -401,6 +401,12 @@ def main() -> int:
     w("| `eval/agents/run_conversations.py --via-orchestrator` | 271/306 properties (270 before), 10 misrouted turns (11 before), 1 RED pre-empted; direct calls 282/282 unchanged |")
     w("")
 
+    # ---------------------------------------------------------------- post-merge notes
+    w('## Update 2026-11-12: R013 accepts pain or emergency')
+    w('')
+    w('R013 "I\'ve got a burning sensation and some numbness in my foot." now accepts `pain_symptoms` **or** `emergency`. Main\'s Neurovascular RED co-occurrence rule (anchor foot/leg/toe + numb/numbness/..., `triage/safety_triage.py`, merged into PR #9 on 2026-11-12) makes the orchestrator pre-empt this message as RED. That is a cautious escalation by the safety engine, not a routing error. There is no clinical sign-off either way, so both outcomes are counted as correct. `run_routing_benchmark.py` now counts an `emergency` / `out_of_scope` pre-emption as correct when the case lists it as acceptable (before this change, R013 was the only such case). Re-run `post_merge_r013`: classifier 198/230 (unchanged: the classifier still says pain), orchestrator lenient 201 -> 202/230, strict 186 -> 187/230; R013 is the only row that changed against `post_merge_main`.')
+    w("")
+
     # ---------------------------------------------------------------- how to run
     w("## How to run")
     w("")

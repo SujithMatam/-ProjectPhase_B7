@@ -308,18 +308,32 @@ Engine `Rehabilitation Agent - Safety Hold`; no LLM call; triage YELLOW,
 
 ## 3. Shared changes needed (outside this branch's scope)
 
-1. **`lam/orchestrator.py` — a Rehabilitation continuation hook.** The
-   orchestrator has continuation checks for Pain, Wound and Recovery only.
-   After the Rehabilitation agent asks its safety question, a bare *"no"*
-   is re-classified from scratch (observed: `recovery_progress` via the
-   low-confidence fallback) and *"no, nothing hurts"* goes to Pain, so the
-   answer never reaches this agent through `/api/chat`. A peek-only check
-   on `rehab_state.peek_state(patient_id).pending_field` (plus a yes/no or
-   weight-bearing-shaped reply), placed where `check_recovery_continuation`
-   runs, would route it. Until then the two-question flow works for direct
-   callers and tests only; the single-turn behaviour (status from the
-   record, sourced fallbacks, the close) works through the orchestrator
-   already.
+1. **`lam/orchestrator.py` — Rehabilitation continuation hook: DONE
+   (`b6c1730`).** `check_rehab_continuation(patient_id=..., user_message=...)`
+   now exists in `lam/orchestrator.py`, modelled on
+   `check_recovery_continuation`:
+   - It reads `rehab_state.peek_state(patient_id)` only. It never creates
+     or mutates state, and returns False once the session is stale.
+   - It matches only when a real `pending_field` is set (the safety,
+     done-today, weight-bearing or barrier question) and the message
+     plausibly answers it. That means one of:
+     - a yes/no (*"no"*, *"not yet"*, *"no, nothing hurts"*, *"I don't
+       know"*);
+     - a weight-bearing-shaped answer (*"partial weight bearing"*, *"as
+       tolerated"*, *"NWB"*);
+     - a message of at most 8 words.
+   - A question, or an explicit switch to another domain (*"I need my
+     tablets"*), is never a match. Those go to fresh classification.
+   - It runs after the Wound, Pain and Recovery continuation checks and
+     before the fresh `IntentClassifier`, so it never overrides RED
+     safety, OUT_OF_SCOPE or a genuine topic switch.
+   - On a match, the turn goes straight to `REHABILITATION`.
+
+   As a result, a bare *"no"* after the safety question now reaches this
+   agent through `/api/chat` instead of being re-classified (before the
+   hook it went to `recovery_progress` via the low-confidence fallback,
+   and *"no, nothing hurts"* went to Pain). The two-question flow now works
+   through the orchestrator, not only for direct callers and tests.
 2. **`agents/chat_agent.py` — the generic exercise fallback.** `
    _generate_smart_reply()` still carries the knee-only exercise text
    (*"heel slides aiming for 70°–90° flexion ... walking 5–10 minutes with

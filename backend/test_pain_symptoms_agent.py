@@ -803,64 +803,106 @@ def test_cumulative_safety_stale_state_not_hijacked() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 19d. Test D: no new RED medical rule exists outside SafetyTriageEngine --
-# pain_logic/pain_integration/specialized_agents must never independently
-# decide a triage level or approximate a red-flag rule.
+# 19d. Test D: no copied RED rule exists outside SafetyTriageEngine --
+# pain_logic/pain_integration/specialized_agents must never carry their own
+# copy of the engine's RED keyword lists, regexes or co-occurrence rules.
+# Importing SafetyTriageEngine and calling .evaluate() is ALLOWED: that is
+# using the single source of truth, not duplicating it.
 # ---------------------------------------------------------------------------
+
+# Names under which SafetyTriageEngine keeps its rule tables; a module-level
+# or class-level assignment to one of these outside the engine is a copy.
+_RED_TABLE_NAME_MARKERS = (
+    "RED_FLAG", "RED_COOCCURRENCE", "YELLOW_FLAG", "COMPOUND_ESCALATION", "SELF_HARM_PATTERNS",
+)
+# One RED phrase in passing (e.g. "chills" in a symptom-word list) is not a
+# rule; two or more of the engine's exact RED phrases in one literal list,
+# set, tuple or regex alternation is a copied keyword rule.
+_RED_PHRASE_COPY_THRESHOLD = 2
+
+
+def _red_phrases() -> set:
+    phrases = {p.lower() for terms in SafetyTriageEngine.RED_FLAG_PATTERNS.values() for p in terms}
+    phrases |= {p.lower() for p in getattr(SafetyTriageEngine, "SELF_HARM_PATTERNS", [])}
+    return phrases
+
+
+def _duplicate_red_rule_findings(source: str, module_name: str) -> List[str]:
+    """
+    AST walk (comments and docstrings are invisible to it) that returns one
+    message per copied RED rule found in `source`:
+
+      - an assignment to a name the engine uses for its rule tables
+        (RED_FLAG_PATTERNS, RED_COOCCURRENCE_RULES, SELF_HARM_PATTERNS, ...);
+      - a list / tuple / set literal holding >= 2 of the engine's exact RED
+        phrases ("chest pain", "shortness of breath", "suicidal", ...);
+      - a string constant that is a regex alternation ("|") containing >= 2
+        of those phrases;
+      - a dict literal with both "anchor" and "symptom" keys (the engine's
+        co-occurrence rule shape).
+
+    Importing SafetyTriageEngine and calling SafetyTriageEngine.evaluate()
+    are deliberately NOT findings.
+    """
+    import ast
+
+    phrases = _red_phrases()
+    findings: List[str] = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, (ast.Assign, ast.AnnAssign)):
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+            for target in targets:
+                name = target.id if isinstance(target, ast.Name) else getattr(target, "attr", "")
+                if any(marker in name for marker in _RED_TABLE_NAME_MARKERS):
+                    findings.append(f"{module_name}:{node.lineno} defines its own red-flag rule table ({name})")
+        elif isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+            hits = sorted({
+                elt.value.strip().lower()
+                for elt in node.elts
+                if isinstance(elt, ast.Constant) and isinstance(elt.value, str)
+                and elt.value.strip().lower() in phrases
+            })
+            if len(hits) >= _RED_PHRASE_COPY_THRESHOLD:
+                findings.append(f"{module_name}:{node.lineno} copies SafetyTriageEngine RED phrases {hits}")
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str) and "|" in node.value:
+            lowered = node.value.lower().replace("\\", "")
+            hits = sorted(p for p in phrases if p in lowered)
+            if len(hits) >= _RED_PHRASE_COPY_THRESHOLD:
+                findings.append(f"{module_name}:{node.lineno} has a regex alternation copying RED phrases {hits}")
+        elif isinstance(node, ast.Dict):
+            keys = {k.value for k in node.keys if isinstance(k, ast.Constant)}
+            if {"anchor", "symptom"} <= keys:
+                findings.append(f"{module_name}:{node.lineno} defines its own anchor/symptom co-occurrence rule")
+    return findings
+
 
 def test_no_duplicate_red_rules_outside_safety_engine() -> None:
     print("=" * 78)
-    print("19d -- No new RED rule exists outside SafetyTriageEngine")
+    print("19d -- No copied RED rule exists outside SafetyTriageEngine")
     print("=" * 78)
-    import ast
     import inspect
     from agents import specialized_agents
 
-    # The real invariant: pain_logic/pain_integration/specialized_agents must
-    # never themselves DECIDE a triage level -- i.e. never actually IMPORT or
-    # CALL SafetyTriageEngine, and never define their own red-flag/DVT/PE
-    # rule table. They are allowed, and expected, to mention
-    # "SafetyTriageEngine" or "DVT" by name in comments/docstrings (this
-    # module's own docstrings do, explaining what must NOT happen) and to
-    # READ an already-computed triage_level purely to phrase a reply -- a
-    # plain substring search over the whole source text cannot tell prose
-    # apart from real code and would flag those as false positives. This
-    # walks the actual AST instead, so only real import/call/assignment
-    # nodes are checked -- comments and docstring text are invisible to it.
-
-    def _find_forbidden(source: str, module_name: str) -> None:
-        tree = ast.parse(source)
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom) and any(
-                alias.name == "SafetyTriageEngine" for alias in node.names
-            ):
-                _check(False, f"{module_name} must never import SafetyTriageEngine directly")
-            if isinstance(node, ast.Call):
-                func = node.func
-                if (
-                    isinstance(func, ast.Attribute)
-                    and func.attr == "evaluate"
-                    and isinstance(func.value, ast.Name)
-                    and func.value.id == "SafetyTriageEngine"
-                ):
-                    _check(False, f"{module_name} must never call SafetyTriageEngine.evaluate() itself")
-            if isinstance(node, ast.Assign):
-                for target in node.targets:
-                    if isinstance(target, ast.Name) and any(
-                        marker in target.id
-                        for marker in ("RED_FLAG", "RED_COOCCURRENCE", "YELLOW_FLAG", "COMPOUND_ESCALATION")
-                    ):
-                        _check(False, f"{module_name} must not define its own red-flag rule table ({target.id})")
-
-    _find_forbidden(inspect.getsource(pain_logic), "pain_logic")
-    _find_forbidden(inspect.getsource(pain_integration), "pain_integration")
-    _find_forbidden(inspect.getsource(specialized_agents), "specialized_agents")
+    # The invariant: RED rules live ONLY in SafetyTriageEngine. Other modules
+    # may import the engine and call .evaluate() (Nutrition / Mental
+    # Wellbeing do, when no precomputed triage is passed in), may mention
+    # "SafetyTriageEngine" or "DVT" in prose, and may READ an
+    # already-computed triage_level to phrase a reply. What they must not do
+    # is carry their own copy of the engine's keyword lists, regexes or
+    # co-occurrence rules, which would drift from the engine.
+    for module, name in (
+        (pain_logic, "pain_logic"),
+        (pain_integration, "pain_integration"),
+        (specialized_agents, "specialized_agents"),
+    ):
+        for finding in _duplicate_red_rule_findings(inspect.getsource(module), name):
+            _check(False, finding)
 
     _check(
         hasattr(pain_logic, "build_cumulative_triage_text"),
         "pain_logic must expose build_cumulative_triage_text (pure text synthesis, no classification)",
     )
-    print("    CONFIRMED (AST-verified): pain_logic/pain_integration/specialized_agents contain no independent RED/triage decision logic.")
+    print("    CONFIRMED (AST-verified): pain_logic/pain_integration/specialized_agents carry no copied RED rule.")
     print()
 
 

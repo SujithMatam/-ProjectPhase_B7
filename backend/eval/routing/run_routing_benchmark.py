@@ -284,6 +284,10 @@ def run(args) -> int:
                     dispatched = [i for i in routed if i not in ("emergency", "out_of_scope")]
                     correct_lenient = any(i in acceptable for i in dispatched)
                     correct_strict = bool(dispatched) and all(i in acceptable for i in dispatched)
+                    # A pre-emption counts only when the case lists it as
+                    # acceptable (e.g. R013: pain OR a cautious RED escalation).
+                    if len(routed) == 1 and routed[0] in ("emergency", "out_of_scope") and routed[0] in acceptable:
+                        correct_lenient = correct_strict = True
                 pre_empted = None
                 if routed == ["emergency"]:
                     pre_empted = "red_triage"

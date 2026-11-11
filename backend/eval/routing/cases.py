@@ -93,7 +93,13 @@ C("How long does it typically take to fully recover from this kind of operation?
 C("Am I healing at the pace the surgeon expected?", RP, source=S)
 C("What can I expect in terms of getting back to my usual life?", RP, source=S)
 C("The area around my joint feels really tender and inflamed.", PS, source=S)
-C("I've got a burning sensation and some numbness in my foot.", PS, source=S)
+# Pain OR emergency. Since main's Neurovascular RED co-occurrence rule
+# (anchor foot/leg/toe + numb/numbness/..., triage/safety_triage.py, merged
+# 2026-11-12) the orchestrator pre-empts this message as RED. That is a
+# cautious escalation by the safety engine, not a routing error. There is
+# no clinical sign-off either way, so both outcomes count as correct.
+C("I've got a burning sensation and some numbness in my foot.", PS, [PS, "emergency"], source=S,
+  note="emergency = cautious RED escalation by main's neurovascular rule; no clinical sign-off either way")
 C("Why does my leg feel so stiff and achy this morning?", PS, source=S)
 C("What kind of stretching routine should I follow for physio?", RH, source=S)
 C("Can you tell me how to improve my range of motion?", RH, source=S)
