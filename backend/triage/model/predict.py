@@ -7,8 +7,8 @@ p(RED)+p(YELLOW) >= t_yel, else GREEN); `level_argmax` is the plain argmax.
   M1: frozen all-MiniLM-L6-v2 + the committed LR head (artifacts/m1_main.json).
   M2: SetFit weights in artifacts/setfit/ (not committed; run train.py to rebuild them).
 
-This module does not combine with the rules (H1) and is not wired into safety_triage.py or the
-orchestrator.
+This module does not combine with the rules (H1). The production path is
+triage/classifier_triage.py (TRIAGE_MODE=hybrid), which loads the same model and thresholds.
 
   backend/.venv/Scripts/python backend/triage/model/predict.py "my calf is hot and hard"
 """

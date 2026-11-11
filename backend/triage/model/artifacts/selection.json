@@ -8,7 +8,11 @@
     "t_red": 0.23298969864845276,
     "t_yel": 0.5758473873138428,
     "val_red_recall": 0.9514563106796117,
-    "val_yellow_found": 0.9104477611940298
+    "val_yellow_found": 0.9104477611940298,
+    "t_alert": 0.5791624784469604,
+    "t_alert_val_precision": 0.9036144578313253,
+    "t_alert_val_red_recall": 0.7281553398058253,
+    "t_alert_val_n_flagged": 83
    },
    "M2": {
     "num_iterations": 3,
@@ -51,7 +55,11 @@
       "t_red": 0.21700508892536163,
       "t_yel": 0.2371876835823059,
       "val_red_recall": 0.9514563106796117,
-      "val_yellow_found": 0.9104477611940298
+      "val_yellow_found": 0.9104477611940298,
+      "t_alert": 0.6369696855545044,
+      "t_alert_val_precision": 0.9032258064516129,
+      "t_alert_val_red_recall": 0.8155339805825242,
+      "t_alert_val_n_flagged": 93
      }
     },
     "best_seed": 4,
@@ -67,7 +75,11 @@
     "t_red": 0.18481050431728363,
     "t_yel": 0.484531968832016,
     "val_red_recall": 0.9537037037037037,
-    "val_yellow_found": 0.9032258064516129
+    "val_yellow_found": 0.9032258064516129,
+    "t_alert": 0.6678381562232971,
+    "t_alert_val_precision": 0.9137931034482759,
+    "t_alert_val_red_recall": 0.49074074074074076,
+    "t_alert_val_n_flagged": 58
    },
    "M2": {
     "num_iterations": 3,
@@ -82,7 +94,11 @@
       "t_red": 0.0973334088921547,
       "t_yel": 0.1720932424068451,
       "val_red_recall": 0.9537037037037037,
-      "val_yellow_found": 0.9032258064516129
+      "val_yellow_found": 0.9032258064516129,
+      "t_alert": 0.6043161749839783,
+      "t_alert_val_precision": 0.9052631578947369,
+      "t_alert_val_red_recall": 0.7962962962962963,
+      "t_alert_val_n_flagged": 95
      },
      "1": {
       "val_macro_f1": 0.7181769354619737,
@@ -105,5 +121,6 @@
    "best_model": "M2",
    "best_model_rule": "higher val macro-F1 (argmax; M2 = mean over seeds)"
   }
- }
+ },
+ "t_alert_rule": "lowest threshold on val p(RED) with val RED precision >= 0.9 (model/choose_alert_threshold.py); doctor email fires for an override RED or p(RED) >= t_alert"
 }
