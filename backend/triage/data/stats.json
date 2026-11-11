@@ -4,29 +4,29 @@
     "train": {
       "rows": 1253,
       "RED": 480,
-      "YELLOW": 297,
-      "GREEN": 476,
+      "YELLOW": 289,
+      "GREEN": 484,
       "scenarios": 31
     },
     "val": {
       "rows": 276,
       "RED": 103,
-      "YELLOW": 68,
-      "GREEN": 105,
+      "YELLOW": 67,
+      "GREEN": 106,
       "scenarios": 31
     },
     "test": {
       "rows": 266,
       "RED": 104,
-      "YELLOW": 64,
-      "GREEN": 98,
+      "YELLOW": 62,
+      "GREEN": 100,
       "scenarios": 31
     },
     "all": {
       "rows": 1795,
       "RED": 687,
-      "YELLOW": 429,
-      "GREEN": 679,
+      "YELLOW": 418,
+      "GREEN": 690,
       "scenarios": 31
     }
   },
@@ -55,8 +55,8 @@
       "rows": 73,
       "train": {
         "RED": 40,
-        "YELLOW": 3,
-        "GREEN": 7
+        "YELLOW": 2,
+        "GREEN": 8
       },
       "val": {
         "RED": 9,
@@ -207,8 +207,8 @@
       "rows": 73,
       "train": {
         "RED": 40,
-        "YELLOW": 3,
-        "GREEN": 7
+        "YELLOW": 2,
+        "GREEN": 8
       },
       "val": {
         "RED": 9,
@@ -340,18 +340,18 @@
       "rows": 52,
       "train": {
         "RED": 4,
-        "YELLOW": 23,
-        "GREEN": 9
+        "YELLOW": 18,
+        "GREEN": 14
       },
       "val": {
         "RED": 1,
-        "YELLOW": 5,
-        "GREEN": 2
+        "YELLOW": 4,
+        "GREEN": 3
       },
       "test": {
         "RED": 1,
-        "YELLOW": 5,
-        "GREEN": 2
+        "YELLOW": 4,
+        "GREEN": 3
       }
     },
     "MISSED_DOSE": {
@@ -397,8 +397,8 @@
       "rows": 53,
       "train": {
         "RED": 3,
-        "YELLOW": 25,
-        "GREEN": 8
+        "YELLOW": 24,
+        "GREEN": 9
       },
       "val": {
         "RED": 1,
@@ -407,8 +407,8 @@
       },
       "test": {
         "RED": 1,
-        "YELLOW": 5,
-        "GREEN": 2
+        "YELLOW": 4,
+        "GREEN": 3
       }
     },
     "WOUND_REDNESS": {

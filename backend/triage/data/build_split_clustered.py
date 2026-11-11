@@ -30,7 +30,8 @@ from pathlib import Path
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 
-from build_dataset import EMBED_MODEL, LABELS, NEAR_DUP, SPLITS, TARGET, embed, norm_text
+from build_dataset import (EMBED_MODEL, LABELS, NEAR_DUP, SPLITS, TARGET, apply_adjudication,
+                           embed, norm_text)
 
 HERE = Path(__file__).resolve().parent
 SRC = HERE / "splits_unseen_scenario"
@@ -221,7 +222,10 @@ def main() -> None:
     rows = load()
     emb = embed([r["text"] for r in rows])
     cid, unit, joined, sims = cluster(rows, emb)
-    split, cost = assign(rows, unit)
+    # assignment uses the pre-adjudication labels so adjudication never moves a row
+    pre = [dict(r) for r in rows]
+    n_adj = apply_adjudication(pre, reverse=True)
+    split, cost = assign(pre, unit)
     for r, s in zip(rows, split):
         r["split"] = s
 
@@ -258,7 +262,10 @@ def main() -> None:
     w(f"- Whole clusters assigned to train/val/test by seeded local search (seed {SEED}, "
       f"{RESTARTS} restarts) against a 70/15/15 share of each label inside each scenario, with a "
       f"weak balance term on tags and origin; each scenario must be in all three splits and each "
-      f"RED-led scenario must have >= {MIN_RED_EVAL} RED rows in val and in test. Final cost {cost:.2f}.\n")
+      f"RED-led scenario must have >= {MIN_RED_EVAL} RED rows in val and in test. Final cost {cost:.2f}.")
+    w(f"- The search runs on the pre-adjudication labels; the {n_adj} labels changed in "
+      f"`adjudication.tsv` (`ADJUDICATION.md`) are applied afterwards, so no row moved. All "
+      f"counts below use the adjudicated labels.\n")
 
     csize = Counter(cid)
     sizes = Counter(csize.values())

@@ -44,6 +44,40 @@ TAGS = {"hard_pos", "hard_neg", "negation", "temp_in_text", "indian_english", "t
         "indirect", "multi_symptom", "question", "carer"}
 
 
+ADJUDICATION = HERE / "adjudication.tsv"
+
+
+def load_adjudication() -> dict[str, tuple[str, str]]:
+    """id -> (old label, new label) from adjudication.tsv (see ADJUDICATION.md)."""
+    out = {}
+    if not ADJUDICATION.exists():
+        return out
+    for line in ADJUDICATION.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        rid, old, new = line.split("\t")[:3]
+        assert old in LABELS and new in LABELS and old != new and rid not in out, line
+        out[rid] = (old, new)
+    return out
+
+
+def apply_adjudication(rows: list[dict], reverse: bool = False) -> int:
+    """Set adjudicated labels in place (reverse=True restores the pre-adjudication labels).
+
+    Split assignment is always computed on pre-adjudication labels, so applying this never
+    moves a row between splits."""
+    adj = load_adjudication()
+    n = 0
+    for r in rows:
+        if r["id"] in adj:
+            old, new = adj[r["id"]]
+            frm, to = (new, old) if reverse else (old, new)
+            assert r["label"] == frm, (r["id"], r["label"], frm)
+            r["label"] = to
+            n += 1
+    return n
+
+
 def norm_text(t: str) -> str:
     t = t.lower().replace("’", "'")
     t = re.sub(r"[^a-z0-9.' ]+", " ", t)
@@ -254,6 +288,10 @@ def main() -> None:
         kept.append(r)
     rows = kept
 
+    # split on the pre-adjudication labels (keeps the v1 assignment frozen), then adjudicate
+    assign = group_split(rows)
+    n_adj = apply_adjudication(rows)
+
     # temperature consistency
     temp_rows, under, over = 0, [], []
     for r in rows:
@@ -278,10 +316,10 @@ def main() -> None:
       f"threshold: {len(under)}")
     for r, cs in under:
         w(f"  - `{r['id']}` {r['label']} temps {cs}: \"{r['text']}\"")
+    w(f"- labels changed by `adjudication.tsv` after split assignment (see `ADJUDICATION.md`): {n_adj}")
     w("")
 
-    # split
-    assign = group_split(rows)
+    # split (assignment computed above, on pre-adjudication labels)
     for r in rows:
         r["split"] = assign[r["scenario_id"]]
 

@@ -1,8 +1,9 @@
-# Dataset card: post-op triage messages (v1)
+# Dataset card: post-op triage messages (v1.1)
 
 Single-message, 3-class triage (RED / YELLOW / GREEN) for patients after total knee (TKA) or
 total hip (THA) replacement. Built to replace `backend/data/exports/triage_intent_*.jsonl`, whose
-problems are measured in `AUDIT.md`. No model has been trained on it yet.
+problems are measured in `AUDIT.md`. v1.1 = v1 with 12 labels adjudicated (`ADJUDICATION.md`); no
+row moved between splits. Models trained on it: `backend/triage/REPORT.md`.
 
 ## Files
 
@@ -11,7 +12,8 @@ problems are measured in `AUDIT.md`. No model has been trained on it yet.
 | `splits/train.jsonl`, `splits/val.jsonl`, `splits/test.jsonl` | **main split**: within-scenario cluster split; every scenario in all three splits |
 | `splits_unseen_scenario/*.jsonl` | **secondary split**: same rows, group-split by `scenario_id` (val/test scenarios never seen in train) |
 | `challenge.jsonl` | 150-row stress test, written after the splits; never train or tune on it |
-| `LABELLING_GUIDELINE.md` | the label definitions and rules |
+| `LABELLING_GUIDELINE.md` | the label definitions and rules (v1.1) |
+| `ADJUDICATION.md`, `adjudication.tsv` | v1.1 label changes; applied by the builders after split assignment |
 | `RELABEL_CHANGES.md` | re-labelling of the 63 original sentences |
 | `AUDIT.md`, `SPLIT_REPORT.md`, `CHALLENGE_REPORT.md`, `stats.json` | generated reports (`SPLIT_REPORT.md`/`stats.json` describe the main split) |
 | `SPLIT_REPORT_unseen_scenario.md`, `stats_unseen_scenario.json` | reports for the secondary split |
@@ -37,6 +39,8 @@ HF_HUB_OFFLINE=1 ../../.venv/Scripts/python build_challenge.py
 python annotation/build_annotation_sample.py   # blind sample for the second annotator
 python annotation/compute_agreement.py         # after annotation/second_labels.tsv exists
 ```
+`adjudication.tsv` is applied inside `build_dataset.py`, `build_split_clustered.py` and
+`build_challenge.py`; split assignment always uses the pre-adjudication labels.
 
 ## Sources
 
@@ -73,17 +77,17 @@ known topics. Details in `SPLIT_REPORT.md`.
 
 | split | rows | RED | YELLOW | GREEN | RED % | scenarios | source_template | generated |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| train | 1,253 | 480 | 297 | 476 | 38.3 | 31 | 44 | 1,209 |
-| val | 276 | 103 | 68 | 105 | 37.3 | 31 | 9 | 267 |
-| test | 266 | 104 | 64 | 98 | 39.1 | 31 | 10 | 256 |
-| **all** | **1,795** | **687** | **429** | **679** | **38.3** | **31** | **63** | **1,732** |
+| train | 1,253 | 480 | 289 | 484 | 38.3 | 31 | 44 | 1,209 |
+| val | 276 | 103 | 67 | 106 | 37.3 | 31 | 9 | 267 |
+| test | 266 | 104 | 62 | 100 | 39.1 | 31 | 10 | 256 |
+| **all** | **1,795** | **687** | **418** | **690** | **38.3** | **31** | **63** | **1,732** |
 
 Surgery: TKA 875, THA 920. Words per message: 3-38, median 15.
 
 | scenario_id | lead | rows | train R/Y/G | val R/Y/G | test R/Y/G |
 |---|---|---:|---|---|---|
 | ALLERGIC_REACTION | RED | 51 | 28/4/3 | 6/1/1 | 6/1/1 |
-| BLEEDING_ANTICOAG | RED | 73 | 40/3/7 | 9/1/1 | 9/1/2 |
+| BLEEDING_ANTICOAG | RED | 73 | 40/2/8 | 9/1/1 | 9/1/2 |
 | COMPARTMENT | RED | 73 | 40/3/8 | 8/1/2 | 9/1/1 |
 | DISLOCATION | RED | 73 | 40/2/10 | 9/0/2 | 8/0/2 |
 | DVT_CALF | RED | 73 | 41/2/8 | 9/0/2 | 9/1/1 |
@@ -91,17 +95,17 @@ Surgery: TKA 875, THA 920. Words per message: 3-38, median 15.
 | HIGH_FEVER | RED | 70 | 35/6/8 | 7/1/2 | 8/2/1 |
 | NEUROVASCULAR | RED | 73 | 40/3/8 | 9/0/2 | 9/1/1 |
 | PE_CHEST | RED | 74 | 42/2/8 | 9/0/2 | 9/1/1 |
-| SEPSIS_WOUND | RED | 73 | 40/3/7 | 9/1/2 | 9/1/1 |
+| SEPSIS_WOUND | RED | 73 | 40/2/8 | 9/1/2 | 9/1/1 |
 | WOUND_OPEN | RED | 60 | 34/4/4 | 7/1/1 | 7/1/1 |
 | CLEAR_DRAINAGE | YELLOW | 62 | 4/30/10 | 1/6/2 | 1/6/2 |
 | CONSTIPATION | YELLOW | 55 | 4/22/12 | 1/5/3 | 1/5/2 |
 | IMPLANT_NOISE | YELLOW | 54 | 5/21/12 | 1/5/2 | 1/4/3 |
 | LOW_FEVER | YELLOW | 58 | 3/26/11 | 1/6/3 | 1/5/2 |
 | MED_SIDE_EFFECT | YELLOW | 52 | 6/20/10 | 2/4/2 | 1/5/2 |
-| MINOR_BLEEDING | YELLOW | 52 | 4/23/9 | 1/5/2 | 1/5/2 |
+| MINOR_BLEEDING | YELLOW | 52 | 4/18/14 | 1/4/3 | 1/4/3 |
 | MISSED_DOSE | YELLOW | 52 | 5/22/10 | 1/5/2 | 1/4/2 |
 | UNCONTROLLED_PAIN | YELLOW | 57 | 6/26/8 | 1/5/2 | 1/6/2 |
-| WOUND_IRRITATION | YELLOW | 53 | 3/25/8 | 1/6/2 | 1/5/2 |
+| WOUND_IRRITATION | YELLOW | 53 | 3/24/9 | 1/6/2 | 1/4/3 |
 | WOUND_REDNESS | YELLOW | 58 | 6/25/10 | 1/6/2 | 1/5/2 |
 | DAILY_ACTIVITY | GREEN | 48 | 2/2/31 | 0/0/6 | 0/0/7 |
 | FOLLOWUP_ADMIN | GREEN | 48 | 2/3/28 | 0/1/6 | 1/1/6 |
@@ -137,7 +141,7 @@ is mostly ALLERGIC_REACTION and HIGH_FEVER. It is the v1 split unchanged. Detail
 
 | split | rows | RED | YELLOW | GREEN | RED % | scenarios |
 |---|---:|---:|---:|---:|---:|---:|
-| train | 1,240 | 474 | 305 | 461 | 38.2 | 21 |
+| train | 1,240 | 474 | 294 | 472 | 38.2 | 21 |
 | val | 280 | 108 | 62 | 110 | 38.6 | 5 (CLEAR_DRAINAGE, FALL_INJURY, MED_TIMING, NORMAL_SWELLING, WOUND_OPEN) |
 | test | 275 | 105 | 62 | 108 | 38.2 | 5 (ALLERGIC_REACTION, FOLLOWUP_ADMIN, HIGH_FEVER, MOOD_SLEEP, UNCONTROLLED_PAIN) |
 
@@ -151,9 +155,9 @@ Challenge set (`challenge.jsonl`, 150 rows):
 | typo_or_slang | 21 | 8 | 7 | 6 |
 | numeric_in_text | 21 | 7 | 7 | 7 |
 | multi_symptom | 20 | 9 | 8 | 3 |
-| benign_scary_word | 20 | 0 | 2 | 18 |
+| benign_scary_word | 20 | 0 | 3 | 17 |
 | audit_regression | 7 | 3 | 2 | 2 |
-| **all** | **150** | **58** | **37** | **55** |
+| **all** | **150** | **58** | **38** | **54** |
 
 The 7 `audit_regression` rows are exactly the cases named in the task, including the curly
 apostrophe in "I can’t breathe".
@@ -198,10 +202,11 @@ label, all 31 scenarios) plus all 150 challenge rows.
 | challenge rows | 150 | 98.7% | 0.980 (0.948-1.000) |
 
 There are 6 disagreements: 5 YELLOW->GREEN and 1 GREEN->YELLOW (ours -> second); none involves RED.
-They are listed with the deciding guideline rule in `ANNOTATION_DISAGREEMENTS.md`. **No label has been
-changed pending adjudication.** One of them (`CH-131`, beetroot and pinkish urine, ours GREEN) looks
-inconsistent with rule 7 as written. Treat these numbers as an upper bound: the messages were written
-to fit the guideline and both annotators are Claude models.
+They are listed with the deciding guideline rule in `ANNOTATION_DISAGREEMENTS.md`. The numbers above
+are against the **pre-adjudication** labels and are kept as measured. Adjudication (`ADJUDICATION.md`)
+changed 5 of the 6 to the second annotator's label (`CH-102` stayed YELLOW), added three guideline
+rules, and applied those rules to 7 further rows found by searching every row. Treat the agreement as
+an upper bound: the messages were written to fit the guideline and both annotators are Claude models.
 
 ## What is synthetic
 

@@ -3,8 +3,8 @@
     "train": {
       "rows": 1240,
       "RED": 474,
-      "YELLOW": 305,
-      "GREEN": 461,
+      "YELLOW": 294,
+      "GREEN": 472,
       "scenarios": 21
     },
     "val": {
@@ -24,8 +24,8 @@
     "all": {
       "rows": 1795,
       "RED": 687,
-      "YELLOW": 429,
-      "GREEN": 679,
+      "YELLOW": 418,
+      "GREEN": 690,
       "scenarios": 31
     }
   },
@@ -34,8 +34,8 @@
       "split": "train",
       "rows": 73,
       "RED": 58,
-      "YELLOW": 5,
-      "GREEN": 10,
+      "YELLOW": 4,
+      "GREEN": 11,
       "source_template": 3,
       "generated": 70
     },
@@ -124,8 +124,8 @@
       "split": "train",
       "rows": 52,
       "RED": 6,
-      "YELLOW": 33,
-      "GREEN": 13,
+      "YELLOW": 26,
+      "GREEN": 20,
       "source_template": 0,
       "generated": 52
     },
@@ -178,8 +178,8 @@
       "split": "train",
       "rows": 73,
       "RED": 58,
-      "YELLOW": 5,
-      "GREEN": 10,
+      "YELLOW": 4,
+      "GREEN": 11,
       "source_template": 3,
       "generated": 70
     },
@@ -205,8 +205,8 @@
       "split": "train",
       "rows": 53,
       "RED": 5,
-      "YELLOW": 36,
-      "GREEN": 12,
+      "YELLOW": 34,
+      "GREEN": 14,
       "source_template": 2,
       "generated": 51
     },
@@ -314,14 +314,14 @@
     "question": {
       "rows": 464,
       "RED": 37,
-      "YELLOW": 33,
-      "GREEN": 394
+      "YELLOW": 29,
+      "GREEN": 398
     },
     "indian_english": {
       "rows": 303,
       "RED": 118,
-      "YELLOW": 89,
-      "GREEN": 96
+      "YELLOW": 87,
+      "GREEN": 98
     },
     "hard_pos": {
       "rows": 256,
@@ -332,26 +332,26 @@
     "hard_neg": {
       "rows": 242,
       "RED": 0,
-      "YELLOW": 43,
-      "GREEN": 199
+      "YELLOW": 42,
+      "GREEN": 200
     },
     "multi_symptom": {
       "rows": 206,
       "RED": 162,
-      "YELLOW": 44,
-      "GREEN": 0
+      "YELLOW": 42,
+      "GREEN": 2
     },
     "typo": {
       "rows": 190,
       "RED": 77,
-      "YELLOW": 56,
-      "GREEN": 57
+      "YELLOW": 52,
+      "GREEN": 61
     },
     "temp_in_text": {
       "rows": 159,
       "RED": 78,
-      "YELLOW": 57,
-      "GREEN": 24
+      "YELLOW": 56,
+      "GREEN": 25
     },
     "carer": {
       "rows": 158,
