@@ -103,6 +103,13 @@ _PROTOTYPE_SENTENCES = {
         "Can you guide me through strengthening exercises?",
         "How should I do my rehab stretches?",
         "Am I ready to progress my physical therapy exercises?",
+        # Range-of-motion deficits. Without these, "How to straighten my knee
+        # fully" lost its Rehab margin to the Recovery prototype "What are
+        # the typical recovery milestones for knee surgery?" (0.403 vs 0.438)
+        # and fell to the low-margin default. No "knee" here on purpose:
+        # "knee" alone would pull "Am I on track with my knee?" to Rehab.
+        "Which exercises help the leg straighten out fully?",
+        "How can I get more bend and straightening in the operated joint?",
     ],
 
     IntentLabel.MEDICATION: [
@@ -130,6 +137,12 @@ _PROTOTYPE_SENTENCES = {
         "Can I take a bath or shower now?",
         "How do I safely transfer from bed to a chair?",
         "When am I allowed to go up steps and get behind the wheel?",
+        # Going out and travelling. Without these, "Is it ok to go for a
+        # short walk outside daily?" and "When can I travel by bus...?" were
+        # closest to the Recovery milestone prototype "When do most patients
+        # walk without a walking stick?" and fell to the low-margin default.
+        "Can I step out of the house for a short stroll?",
+        "When can I travel by car or public transport?",
     ],
 
     IntentLabel.NUTRITION: [
