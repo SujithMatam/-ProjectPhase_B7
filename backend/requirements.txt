@@ -2,5 +2,16 @@ fastapi>=0.110.0
 uvicorn[standard]>=0.28.0
 pydantic>=2.6.0
 requests>=2.31.0
-sentence-transformers>=2.7.0
 chromadb>=0.5.0
+
+# Hybrid triage (the default TRIAGE_MODE): versions the shipped SetFit model
+# triage/model/artifacts/setfit/m2_main_v2_it3_seed0 was trained and tested with
+# (see its README.md "Framework Versions"). The CPU build of torch is enough; to avoid
+# the large CUDA wheel on Linux install it first with
+#   pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0
+sentence-transformers==6.0.1
+setfit==1.2.0
+transformers==5.17.0
+# model_head.pkl is a pickled scikit-learn LogisticRegression; load it with the same version.
+scikit-learn==1.9.1

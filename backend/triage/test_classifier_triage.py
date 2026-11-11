@@ -84,8 +84,8 @@ def test_rules_fallback_when_no_probabilities():
 
 
 @pytest.mark.parametrize("value, expected", [
-    (None, "rules"), ("", "rules"), ("rules", "rules"), ("HYBRID", "hybrid"),
-    (" hybrid ", "hybrid"), ("something", "rules"),
+    (None, "hybrid"), ("", "hybrid"), ("  ", "hybrid"), ("rules", "rules"), (" RULES ", "rules"),
+    ("HYBRID", "hybrid"), (" hybrid ", "hybrid"), ("something", "hybrid"),
 ])
 def test_triage_mode(monkeypatch, value, expected):
     if value is None:
@@ -96,14 +96,18 @@ def test_triage_mode(monkeypatch, value, expected):
 
 
 def test_rules_mode_is_unchanged(monkeypatch):
-    monkeypatch.delenv("TRIAGE_MODE", raising=False)
+    monkeypatch.setenv("TRIAGE_MODE", "rules")
     for text in ("my calf is warm and swollen", "No chest pain, no chills", "fever of 39"):
         assert SafetyTriageEngine.evaluate(text) == SafetyTriageEngine.evaluate_rules(text)
     assert "triage_mode" not in SafetyTriageEngine.evaluate("chest pain")
 
 
-def test_hybrid_mode_dispatches(monkeypatch):
-    monkeypatch.setenv("TRIAGE_MODE", "hybrid")
+@pytest.mark.parametrize("value", ["hybrid", None])
+def test_hybrid_mode_dispatches(monkeypatch, value):
+    if value is None:                                   # unset -> hybrid is the default
+        monkeypatch.delenv("TRIAGE_MODE", raising=False)
+    else:
+        monkeypatch.setenv("TRIAGE_MODE", value)
     seen = {}
 
     def fake(symptoms, temperature_c=None, post_op_day=1):
@@ -112,6 +116,43 @@ def test_hybrid_mode_dispatches(monkeypatch):
     monkeypatch.setattr(ct, "evaluate", fake)
     SafetyTriageEngine.evaluate("hello", temperature_c=38.6)
     assert seen == {"symptoms": "hello", "temperature_c": 38.6}
+
+
+class _FakeST:
+    """Stands in for SentenceTransformer so the M1 fallback test needs no download."""
+
+    def __init__(self, *a, **k):
+        pass
+
+    def encode(self, texts, **k):
+        import numpy as np
+        return np.zeros((len(texts), 384))
+
+
+@pytest.mark.parametrize("broken", [False, True])
+def test_missing_or_broken_m2_warns_and_uses_m1(monkeypatch, tmp_path, capsys, broken):
+    """M2 folder missing (or present but unloadable) -> one stderr warning naming the folder,
+    then the M1 fallback. Never silent."""
+    import json
+    import shutil
+    import sentence_transformers
+    monkeypatch.delenv("TRIAGE_MODEL_VERSION", raising=False)
+    for name in ("selection_v2.json", "m1_main_v2.json"):
+        shutil.copy(ct.ART / name, tmp_path / name)
+    m2_dir = json.loads((tmp_path / "selection_v2.json").read_text(encoding="utf-8"))[
+        "splits"]["main"]["M2"]["weights_dir"]
+    if broken:
+        (tmp_path / "setfit" / m2_dir).mkdir(parents=True)
+        (tmp_path / "setfit" / m2_dir / "config.json").write_text("not json", encoding="utf-8")
+    monkeypatch.setattr(ct, "ART", tmp_path)
+    monkeypatch.setattr(sentence_transformers, "SentenceTransformer", _FakeST)
+    clf = ct._Classifier()
+    assert clf.load() is True
+    err = capsys.readouterr().err
+    assert err.count("WARNING") == 1
+    assert m2_dir in err and "M1 fallback" in err
+    assert ("failed to load" in err) is broken and ("is missing" in err) is not broken
+    assert clf.model_used == "M1:m1_main_v2.json" and clf.load_warning in err
 
 
 def test_doctor_alert_gate(monkeypatch):

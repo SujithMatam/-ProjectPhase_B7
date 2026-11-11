@@ -16,7 +16,7 @@ from agents.chat_agent import ChatAgent
 from agents.report_agent import ReportGenerationAgent
 from lam.orchestrator import LAMOrchestrator
 from lam.schemas import WeightBearingStatus
-from triage.safety_triage import SafetyTriageEngine
+from triage.safety_triage import SafetyTriageEngine, triage_mode
 from medication_reminders import reminder_service
 from patient_database import (
     authenticate_patient,
@@ -53,6 +53,15 @@ app.include_router(admin_report_router)
 def start_medication_reminders() -> None:
     initialize_database()
     reminder_service.start()
+
+
+@app.on_event("startup")
+def load_triage_classifier() -> None:
+    # Hybrid triage (the default) loads its model here rather than on the first patient message,
+    # so a missing or broken model folder is reported once, at startup.
+    if triage_mode() == "hybrid":
+        from triage.classifier_triage import model_info
+        model_info()
 
 
 @app.on_event("shutdown")

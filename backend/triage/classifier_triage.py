@@ -23,7 +23,8 @@ is a non-RED message: on test they add 7 false REDs, on the challenge set 12, an
 from 0.63 to 0.54. They fire on negated keywords ("No chest pain, no chills" -> RED) and on single
 words ("red", "pus", "chills"). The two RED gaps the rules were meant to cover - numbers and
 self-harm - are handled here by ``overrides.py``, which reads the temperature value and is
-negation-aware, instead of by keyword lists. Rules mode (the default) is unchanged.
+negation-aware, instead of by keyword lists. Hybrid is the default mode; TRIAGE_MODE=rules runs
+the keyword engine alone, unchanged.
 
 Doctor-alert gate
 -----------------
@@ -32,15 +33,18 @@ precision >= 0.90; ``model/choose_alert_threshold.py``). A classifier RED with
 t_red <= p(RED) < t_alert still gets the RED patient advice, but ``doctor_alert`` is False and
 ``flags`` contains ``"alert_suppressed_low_confidence"``; ``doctor_alert.py`` honours that flag.
 
-If the classifier cannot be loaded or fails at run time, this module falls back to the rules
-engine for the classifier component (logged, ``model_used = "rules_fallback"``) so that triage
-never silently degrades to overrides only.
+Fallbacks are never silent. If the M2 folder is missing or fails to load, one WARNING naming the
+folder is printed to stderr and M1 is used (``model_used = "M1:<head file>"``); main.py loads the
+classifier at startup so this shows when the server starts. If no classifier loads at all, or it
+fails at run time, the rules engine fills the classifier component (printed as an ERROR,
+``model_used = "rules_fallback"``) so triage never degrades to overrides only.
 """
 from __future__ import annotations
 
 import json
 import logging
 import os
+import sys
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -125,6 +129,7 @@ class _Classifier:
         self.model_used: Optional[str] = None
         self.t_red = self.t_yel = self.t_alert = None
         self.load_error: Optional[str] = None
+        self.load_warning: Optional[str] = None
 
     def load(self) -> bool:
         if self._loaded:
@@ -136,10 +141,9 @@ class _Classifier:
                 self._load_inner()
             except Exception as exc:  # noqa: BLE001 - logged and reported via model_used
                 self.load_error = f"{type(exc).__name__}: {exc}"
-                LOGGER.error("[TRIAGE][HYBRID] classifier unavailable (%s); "
-                             "falling back to the rules engine for the classifier component",
-                             self.load_error)
-                print(f"[TRIAGE][HYBRID] classifier unavailable: {self.load_error}")
+                print(f"[TRIAGE][HYBRID] ERROR: no classifier could be loaded "
+                      f"({self.load_error}); using the rules engine for the classifier "
+                      "component (overrides still apply).", file=sys.stderr, flush=True)
             self._loaded = True
             return self.proba is not None
 
@@ -152,10 +156,19 @@ class _Classifier:
         seed, it = m2["best_seed"], m2["num_iterations"]
         m2_path = ART / "setfit" / m2.get("weights_dir", f"m2_main_it{it}_seed{seed}")
         self.selection_file = sel_file.name
-        if m2_path.exists():
-            from setfit import SetFitModel
-            sf = SetFitModel.from_pretrained(str(m2_path))
-            assert list(sf.model_head.classes_) == [0, 1, 2]
+        m2_problem: Optional[str] = None
+        if not m2_path.is_dir():
+            m2_problem = "is missing"
+        else:
+            try:
+                from setfit import SetFitModel
+                sf = SetFitModel.from_pretrained(str(m2_path))
+                if list(sf.model_head.classes_) != [0, 1, 2]:
+                    raise ValueError(f"unexpected head classes {list(sf.model_head.classes_)}")
+            except Exception as exc:  # noqa: BLE001 - reported below, then M1 is used
+                m2_problem = f"failed to load ({type(exc).__name__}: {exc})"
+
+        if m2_problem is None:
             t = m2["seeds"][str(seed)]
 
             def proba(text: str):
@@ -163,9 +176,16 @@ class _Classifier:
                                                    show_progress_bar=False))[0]
             self.model_used = f"M2:{m2_path.name}"
         else:
+            head_file = sel["M1"].get("head_file", "m1_main.json")
+            self.load_warning = (
+                f"[TRIAGE][HYBRID] WARNING: M2 model folder {m2_path} {m2_problem}. "
+                f"Using the M1 fallback (frozen all-MiniLM-L6-v2 + {head_file}), which is less "
+                "accurate than the shipped model. Restore the folder with `git checkout -- "
+                f"backend/triage/model/artifacts/setfit/{m2_path.name}` (or `git lfs pull` if "
+                "LFS is in use), or set TRIAGE_MODE=rules to use the keyword engine.")
+            print(self.load_warning, file=sys.stderr, flush=True)
             from sentence_transformers import SentenceTransformer
-            head = json.loads((ART / sel["M1"].get("head_file", "m1_main.json"))
-                              .read_text(encoding="utf-8"))
+            head = json.loads((ART / head_file).read_text(encoding="utf-8"))
             assert head["classes"] == list(LABELS)
             st = SentenceTransformer(head["embedding_model"], device="cpu")
             W, b = np.array(head["coef"]), np.array(head["intercept"])
@@ -175,8 +195,7 @@ class _Classifier:
                 z = st.encode([text], normalize_embeddings=True, show_progress_bar=False) @ W.T + b
                 z = np.exp(z - z.max(1, keepdims=True))
                 return (z / z.sum(1, keepdims=True))[0]
-            self.model_used = "M1:m1_main.json"
-            LOGGER.warning("[TRIAGE][HYBRID] M2 weights not found at %s; using M1", m2_path)
+            self.model_used = f"M1:{head_file}"
         self.t_red, self.t_yel, self.t_alert = t["t_red"], t["t_yel"], t["t_alert"]
         self.proba = proba
         LOGGER.info("[TRIAGE][HYBRID] classifier loaded: %s (t_red=%.3f t_yel=%.3f t_alert=%.3f)",
@@ -290,4 +309,5 @@ def model_info() -> Dict[str, Any]:
     return {"model_used": _CLASSIFIER.model_used or "rules_fallback",
             "t_red": _CLASSIFIER.t_red, "t_yel": _CLASSIFIER.t_yel,
             "t_alert": _CLASSIFIER.t_alert, "load_error": _CLASSIFIER.load_error,
+            "load_warning": _CLASSIFIER.load_warning,
             "selection_file": _CLASSIFIER.selection_file}
