@@ -352,10 +352,17 @@ Engine `Rehabilitation Agent - Safety Hold`; no LLM call; triage YELLOW,
    the proper home.
 5. **Intent classifier:** the check-in offer depends on "rehab check" being
    classified as `rehabilitation` (verified by test 19 via the "rehab"
-   keyword); keep "rehab" in that set if the classifier is retuned. Note
-   that "What hip exercises are safe for me?" is classified `medication`
-   first ("safe"), so the coordinator runs Medication before Rehabilitation
-   for it.
+   keyword); keep "rehab" in that set if the classifier is retuned.
+   "What hip exercises are safe for me?" used to be classified
+   `medication` first, because of "safe". That is no longer true:
+   `6b67373` removed "safe" (with "safety", "schedule", "timing" and
+   "warning") from the medication keywords. The message is now
+   `rehabilitation` (deterministic, keyword "exercises"), and
+   `detect_applicable_intents` returns only `rehabilitation`, so no
+   Medication turn runs first. The side-effect words that main added to
+   the medication keywords (itching, dizzy, nausea, ...) now count for
+   medication only together with a medication cue (tablet, pill, dose,
+   a drug name, ...), so they don't take exercise turns either.
 6. **`surgeries.weight_bearing_status` is free text.** Seeded values such
    as *"Weight Bearing as Tolerated (WBAT)"* are normalised by
    `patient_memory.normalize_weight_bearing_status()`; a controlled column
