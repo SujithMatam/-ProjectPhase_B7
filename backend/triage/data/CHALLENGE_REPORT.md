@@ -26,13 +26,13 @@ Closest split row for the 10 most similar challenge rows:
 
 | cosine | challenge | closest split row |
 |---:|---|---|
-| 0.910 | Tablet I forgot to take yesterday night, the blood thinning one. Should I take two today? (YELLOW) | Yesterday I missed the blood thinning tablet by mistake. Today should I take two? Kindly advise. (YELLOW, train) |
+| 0.910 | Tablet I forgot to take yesterday night, the blood thinning one. Should I take two today? (YELLOW) | Yesterday I missed the blood thinning tablet by mistake. Today should I take two? Kindly advise. (YELLOW, val) |
 | 0.891 | Temp 38.5 this evening (RED) | temp 37.8 this evening (YELLOW, train) |
-| 0.887 | Temperature 38.4, feel okay otherwise (YELLOW) | temp 38.4, no chills, feeling ok (YELLOW, test) |
-| 0.876 | Itchy rash on my arms and my stomach is upset since the antibiotics, face is fine (YELLOW) | got a itchy rash on my arms since the antibiotics started, lips n face r fine, breathing ok (YELLOW, train) |
-| 0.875 | temp 38.9 and my knee is swollen and hot (RED) | Knee is swollen and hot, plus temperature of 101.8 also (RED, test) |
-| 0.869 | Bit of a temperature, 37.9, and my calf is aching and tight (RED) | temp 39.3 and my calf hurts (RED, test) |
+| 0.887 | Temperature 38.4, feel okay otherwise (YELLOW) | temp 38.4, no chills, feeling ok (YELLOW, train) |
+| 0.876 | Itchy rash on my arms and my stomach is upset since the antibiotics, face is fine (YELLOW) | got a itchy rash on my arms since the antibiotics started, lips n face r fine, breathing ok (YELLOW, test) |
+| 0.875 | temp 38.9 and my knee is swollen and hot (RED) | Knee is swollen and hot, plus temperature of 101.8 also (RED, train) |
+| 0.869 | Bit of a temperature, 37.9, and my calf is aching and tight (RED) | temp 39.3 and my calf hurts (RED, train) |
 | 0.863 | No fever at all, but my calf has gone hard and hot since this morning (RED) | Temp 37.4 so no fever, but my calf is sore and swollen and warmer than the other one (RED, train) |
-| 0.863 | Kindly tell me when the stitches will be cut, I am from outstation (GREEN) | Kindly tell when stitches to be removed and where. I am staying in another city now. (GREEN, test) |
+| 0.863 | Kindly tell me when the stitches will be cut, I am from outstation (GREEN) | Kindly tell when stitches to be removed and where. I am staying in another city now. (GREEN, train) |
 | 0.857 | Stitches area is little red and paining slightly more than yesterday (YELLOW) | Doctor sir, little bit redness is coming near the stitches from 2 days. Kindly check and advise. (YELLOW, train) |
 | 0.855 | foot gone numb n cold cnt move toes (RED) | foot gone numb n cold, wat do i do (RED, train) |

@@ -1,0 +1,399 @@
+{
+  "splits": {
+    "train": {
+      "rows": 1240,
+      "RED": 474,
+      "YELLOW": 305,
+      "GREEN": 461,
+      "scenarios": 21
+    },
+    "val": {
+      "rows": 280,
+      "RED": 108,
+      "YELLOW": 62,
+      "GREEN": 110,
+      "scenarios": 5
+    },
+    "test": {
+      "rows": 275,
+      "RED": 105,
+      "YELLOW": 62,
+      "GREEN": 108,
+      "scenarios": 5
+    },
+    "all": {
+      "rows": 1795,
+      "RED": 687,
+      "YELLOW": 429,
+      "GREEN": 679,
+      "scenarios": 31
+    }
+  },
+  "scenarios": {
+    "BLEEDING_ANTICOAG": {
+      "split": "train",
+      "rows": 73,
+      "RED": 58,
+      "YELLOW": 5,
+      "GREEN": 10,
+      "source_template": 3,
+      "generated": 70
+    },
+    "COMPARTMENT": {
+      "split": "train",
+      "rows": 73,
+      "RED": 57,
+      "YELLOW": 5,
+      "GREEN": 11,
+      "source_template": 3,
+      "generated": 70
+    },
+    "CONSTIPATION": {
+      "split": "train",
+      "rows": 55,
+      "RED": 6,
+      "YELLOW": 32,
+      "GREEN": 17,
+      "source_template": 2,
+      "generated": 53
+    },
+    "DAILY_ACTIVITY": {
+      "split": "train",
+      "rows": 48,
+      "RED": 2,
+      "YELLOW": 2,
+      "GREEN": 44,
+      "source_template": 3,
+      "generated": 45
+    },
+    "DISLOCATION": {
+      "split": "train",
+      "rows": 73,
+      "RED": 57,
+      "YELLOW": 2,
+      "GREEN": 14,
+      "source_template": 3,
+      "generated": 70
+    },
+    "DVT_CALF": {
+      "split": "train",
+      "rows": 73,
+      "RED": 59,
+      "YELLOW": 3,
+      "GREEN": 11,
+      "source_template": 3,
+      "generated": 70
+    },
+    "HIP_PRECAUTIONS": {
+      "split": "train",
+      "rows": 49,
+      "RED": 3,
+      "YELLOW": 2,
+      "GREEN": 44,
+      "source_template": 3,
+      "generated": 46
+    },
+    "IMPLANT_NOISE": {
+      "split": "train",
+      "rows": 54,
+      "RED": 7,
+      "YELLOW": 30,
+      "GREEN": 17,
+      "source_template": 3,
+      "generated": 51
+    },
+    "LOW_FEVER": {
+      "split": "train",
+      "rows": 58,
+      "RED": 5,
+      "YELLOW": 37,
+      "GREEN": 16,
+      "source_template": 3,
+      "generated": 55
+    },
+    "MED_SIDE_EFFECT": {
+      "split": "train",
+      "rows": 52,
+      "RED": 9,
+      "YELLOW": 29,
+      "GREEN": 14,
+      "source_template": 1,
+      "generated": 51
+    },
+    "MINOR_BLEEDING": {
+      "split": "train",
+      "rows": 52,
+      "RED": 6,
+      "YELLOW": 33,
+      "GREEN": 13,
+      "source_template": 0,
+      "generated": 52
+    },
+    "MISSED_DOSE": {
+      "split": "train",
+      "rows": 52,
+      "RED": 7,
+      "YELLOW": 31,
+      "GREEN": 14,
+      "source_template": 1,
+      "generated": 51
+    },
+    "NEUROVASCULAR": {
+      "split": "train",
+      "rows": 73,
+      "RED": 58,
+      "YELLOW": 4,
+      "GREEN": 11,
+      "source_template": 3,
+      "generated": 70
+    },
+    "NUTRITION": {
+      "split": "train",
+      "rows": 50,
+      "RED": 2,
+      "YELLOW": 3,
+      "GREEN": 45,
+      "source_template": 3,
+      "generated": 47
+    },
+    "PE_CHEST": {
+      "split": "train",
+      "rows": 74,
+      "RED": 60,
+      "YELLOW": 3,
+      "GREEN": 11,
+      "source_template": 3,
+      "generated": 71
+    },
+    "REHAB_EXERCISE": {
+      "split": "train",
+      "rows": 48,
+      "RED": 2,
+      "YELLOW": 3,
+      "GREEN": 43,
+      "source_template": 2,
+      "generated": 46
+    },
+    "SEPSIS_WOUND": {
+      "split": "train",
+      "rows": 73,
+      "RED": 58,
+      "YELLOW": 5,
+      "GREEN": 10,
+      "source_template": 3,
+      "generated": 70
+    },
+    "STIFFNESS": {
+      "split": "train",
+      "rows": 49,
+      "RED": 2,
+      "YELLOW": 2,
+      "GREEN": 45,
+      "source_template": 3,
+      "generated": 46
+    },
+    "WALKING_AIDS": {
+      "split": "train",
+      "rows": 50,
+      "RED": 3,
+      "YELLOW": 2,
+      "GREEN": 45,
+      "source_template": 4,
+      "generated": 46
+    },
+    "WOUND_IRRITATION": {
+      "split": "train",
+      "rows": 53,
+      "RED": 5,
+      "YELLOW": 36,
+      "GREEN": 12,
+      "source_template": 2,
+      "generated": 51
+    },
+    "WOUND_REDNESS": {
+      "split": "train",
+      "rows": 58,
+      "RED": 8,
+      "YELLOW": 36,
+      "GREEN": 14,
+      "source_template": 0,
+      "generated": 58
+    },
+    "CLEAR_DRAINAGE": {
+      "split": "val",
+      "rows": 62,
+      "RED": 6,
+      "YELLOW": 42,
+      "GREEN": 14,
+      "source_template": 3,
+      "generated": 59
+    },
+    "FALL_INJURY": {
+      "split": "val",
+      "rows": 60,
+      "RED": 48,
+      "YELLOW": 5,
+      "GREEN": 7,
+      "source_template": 0,
+      "generated": 60
+    },
+    "MED_TIMING": {
+      "split": "val",
+      "rows": 49,
+      "RED": 3,
+      "YELLOW": 5,
+      "GREEN": 41,
+      "source_template": 2,
+      "generated": 47
+    },
+    "NORMAL_SWELLING": {
+      "split": "val",
+      "rows": 49,
+      "RED": 3,
+      "YELLOW": 4,
+      "GREEN": 42,
+      "source_template": 3,
+      "generated": 46
+    },
+    "WOUND_OPEN": {
+      "split": "val",
+      "rows": 60,
+      "RED": 48,
+      "YELLOW": 6,
+      "GREEN": 6,
+      "source_template": 0,
+      "generated": 60
+    },
+    "ALLERGIC_REACTION": {
+      "split": "test",
+      "rows": 51,
+      "RED": 40,
+      "YELLOW": 6,
+      "GREEN": 5,
+      "source_template": 0,
+      "generated": 51
+    },
+    "FOLLOWUP_ADMIN": {
+      "split": "test",
+      "rows": 48,
+      "RED": 3,
+      "YELLOW": 5,
+      "GREEN": 40,
+      "source_template": 1,
+      "generated": 47
+    },
+    "HIGH_FEVER": {
+      "split": "test",
+      "rows": 70,
+      "RED": 50,
+      "YELLOW": 9,
+      "GREEN": 11,
+      "source_template": 0,
+      "generated": 70
+    },
+    "MOOD_SLEEP": {
+      "split": "test",
+      "rows": 49,
+      "RED": 4,
+      "YELLOW": 5,
+      "GREEN": 40,
+      "source_template": 3,
+      "generated": 46
+    },
+    "UNCONTROLLED_PAIN": {
+      "split": "test",
+      "rows": 57,
+      "RED": 8,
+      "YELLOW": 37,
+      "GREEN": 12,
+      "source_template": 0,
+      "generated": 57
+    }
+  },
+  "tags": {
+    "question": {
+      "rows": 464,
+      "RED": 37,
+      "YELLOW": 33,
+      "GREEN": 394
+    },
+    "indian_english": {
+      "rows": 303,
+      "RED": 118,
+      "YELLOW": 89,
+      "GREEN": 96
+    },
+    "hard_pos": {
+      "rows": 256,
+      "RED": 183,
+      "YELLOW": 73,
+      "GREEN": 0
+    },
+    "hard_neg": {
+      "rows": 242,
+      "RED": 0,
+      "YELLOW": 43,
+      "GREEN": 199
+    },
+    "multi_symptom": {
+      "rows": 206,
+      "RED": 162,
+      "YELLOW": 44,
+      "GREEN": 0
+    },
+    "typo": {
+      "rows": 190,
+      "RED": 77,
+      "YELLOW": 56,
+      "GREEN": 57
+    },
+    "temp_in_text": {
+      "rows": 159,
+      "RED": 78,
+      "YELLOW": 57,
+      "GREEN": 24
+    },
+    "carer": {
+      "rows": 158,
+      "RED": 77,
+      "YELLOW": 40,
+      "GREEN": 41
+    },
+    "indirect": {
+      "rows": 144,
+      "RED": 109,
+      "YELLOW": 35,
+      "GREEN": 0
+    },
+    "negation": {
+      "rows": 98,
+      "RED": 2,
+      "YELLOW": 36,
+      "GREEN": 60
+    }
+  },
+  "origin": {
+    "source_template": {
+      "train": 51,
+      "val": 8,
+      "test": 4
+    },
+    "generated": {
+      "train": 1189,
+      "val": 272,
+      "test": 271
+    }
+  },
+  "surgery": {
+    "THA": 920,
+    "TKA": 875
+  },
+  "near_duplicates": {
+    "threshold": 0.92,
+    "cross_pairs_before": 0,
+    "dropped": 0,
+    "cross_pairs_after": 0,
+    "max_cross_cosine": 0.9168
+  },
+  "exact_duplicates_dropped": 0
+}
