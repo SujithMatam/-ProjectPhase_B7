@@ -28,13 +28,21 @@ def _build_pattern(terms: List[str]) -> re.Pattern:
 
 
 class SafetyTriageEngine:
+    SELF_HARM_PATTERNS = [
+        "suicidal", "suicide", "self-harm", "self harm", "self-harming",
+        "hurt myself", "hurting myself", "harm myself", "harming myself",
+        "kill myself", "end my life",
+        "don't want to live", "do not want to live", "better off dead",
+        "wish I were dead",
+    ]
+
     # Exact-phrase RED patterns -- kept for genuinely idiomatic/sequential
     # phrases that aren't naturally said in a different word order.
     RED_FLAG_PATTERNS = {
         "Pulmonary Embolism": [
             "shortness of breath", "difficulty breathing", "chest pain",
-            "rapid breathing", "coughing blood", "sudden breathlessness",
-            "cant breathe", "can't breathe",
+            "rapid breathing", "coughing blood", "coughing up blood", "coughed up blood", "coughed blood",
+            "sudden breathlessness", "cant breathe", "can't breathe", "feeling faint",
         ],
         "Severe Joint Infection / Sepsis": [
             "high fever", "chills", "purulent drainage", "foul smelling pus",
@@ -59,6 +67,39 @@ class SafetyTriageEngine:
                 "tenderness", "pain", "painful", "ache", "aching", "hot",
                 "hard", "firm", "clot",
             ],
+        },
+        {
+            "category": "Neurovascular Impairment",
+            "anchor": ["foot", "feet", "toe", "toes", "leg"],
+            "symptom": [
+                "blue", "pale", "cold", "freezing", "dead", "numb", "numbness",
+                "loss of feeling", "cannot feel", "can't feel",
+                "cannot move", "can't move", "drop foot",
+            ],
+        },
+        {
+            "category": "Pulmonary Embolism (Hemoptysis)",
+            "anchor": ["cough", "coughed", "coughing", "spitting", "spat"],
+            "symptom": ["blood", "bloody"],
+        },
+        {
+            "category": "Suspected Prosthetic Dislocation",
+            "anchor": ["hip", "joint", "prosthesis", "implant", "knee"],
+            "symptom": [
+                "popping", "popped", "shortened", "shorter", "twisted inward", "twisted",
+                "cannot bear any weight", "dislocated", "inability to move", "cannot move",
+                "pop", "click"
+            ],
+        },
+        {
+            "category": "Acute Internal Hemorrhage (Anticoagulation)",
+            "anchor": ["stool", "stools", "vomit", "urine", "bruise", "bruises", "gums"],
+            "symptom": ["black", "tarry", "coffee grounds", "blood", "bleeding", "hematuria"],
+        },
+        {
+            "category": "Acute Compartment Syndrome",
+            "anchor": ["shin", "calf", "compartment"],
+            "symptom": ["rock hard", "tight as a drum", "unbearable", "out of proportion"],
         },
     ]
 
@@ -95,6 +136,27 @@ class SafetyTriageEngine:
     _COMPOUND_MIN_CATEGORIES_TO_ESCALATE = 2
 
     @classmethod
+    def _self_harm_signal(cls, symptoms: str) -> bool:
+        for phrase in cls.SELF_HARM_PATTERNS:
+            match = re.search(r"\b" + re.escape(phrase) + r"\b", symptoms, re.IGNORECASE)
+            if not match:
+                continue
+            # Do not escalate a clear denial such as "I am not suicidal".
+            # "I don't want to live" is itself a crisis signal, not a denial.
+            if phrase in {"don't want to live", "do not want to live"}:
+                return True
+            preceding = symptoms[max(0, match.start() - 48):match.start()]
+            if re.search(
+                r"\b(?:not|never|no|don't|do not)\b"
+                r"(?:[ \t]+(?!but\b|however\b|although\b)[\w'-]+){0,3}[ \t]*$",
+                preceding,
+                re.IGNORECASE,
+            ):
+                continue
+            return True
+        return False
+
+    @classmethod
     def evaluate(cls, symptoms: str, temperature_c: float = None, post_op_day: int = 1) -> Dict[str, Any]:
         symptom_lower = symptoms.lower()
         red_flags_detected: List[str] = []
@@ -126,6 +188,24 @@ class SafetyTriageEngine:
                     f"{rule['category']} indicator: "
                     f"'{anchor_match.group()}' + '{symptom_match.group()}'"
                 )
+
+        mental_health_crisis = cls._self_harm_signal(symptom_lower)
+        if mental_health_crisis:
+            return {
+                "triage_level": "RED",
+                "urgency": "IMMEDIATE CRISIS SUPPORT REQUIRED",
+                "status_code": 3,
+                "reasons": ["Possible self-harm or suicide risk disclosed"],
+                "action_protocol": (
+                    "If you may act on thoughts of harming yourself or are in immediate "
+                    "danger, call your local emergency number or go to the nearest "
+                    "emergency department now. If possible, stay with someone you trust "
+                    "and contact a local crisis service or healthcare professional "
+                    "immediately. Do not wait for a reply in this chat."
+                ),
+                "is_escalated": True,
+                "category": "mental_health_crisis",
+            }
 
         # Evaluate Yellow Flags
         for category, triggers in cls.YELLOW_FLAG_PATTERNS.items():
@@ -199,4 +279,3 @@ class SafetyTriageEngine:
                 ),
                 "is_escalated": False,
             }
-
