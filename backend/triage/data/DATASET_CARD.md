@@ -25,6 +25,7 @@ trained on it: `backend/triage/REPORT.md`.
 | `AUDIT.md`, `SPLIT_REPORT.md`, `CHALLENGE_REPORT.md`, `stats.json` | generated reports (`SPLIT_REPORT.md`/`stats.json` describe the main split) |
 | `SPLIT_REPORT_unseen_scenario.md`, `stats_unseen_scenario.json` | reports for the secondary split |
 | `ANNOTATION_AGREEMENT.md`, `ANNOTATION_DISAGREEMENTS.md`, `annotation/` | blind second annotation: agreement numbers, every disagreement, sample and scripts |
+| `ANNOTATION_AGREEMENT_V2.md`, `annotation/v2/`, `annotation/build_annotation_sample_v2.py` | blind second annotation of challenge_v2 (`compute_agreement.py --v2`) |
 | `authored/*.tsv`, `challenge_source.tsv`, `source_relabelled.jsonl` | inputs to the builders |
 | `audit_source.py`, `relabel_source.py`, `build_dataset.py`, `build_split_clustered.py`, `build_challenge.py` | scripts, run in that order |
 | `source/`, `PROVENANCE.md` | original files copied unchanged, and where they came from |
@@ -201,8 +202,11 @@ val/test scenarios stay unseen. The v2 rows are not tagged with a single `scenar
 
 Limitations specific to v2: the same model family wrote the v2 training rows, challenge_v2 and the
 guideline, so a gain on challenge_v2 is partly a gain on the same author's phrasing, even with the
-near-duplicate filter and the separate writers. The labels were reviewed by the same model, not
-by a clinician, and not by a blind second annotator.
+near-duplicate filter and the separate writers. The v2 training labels were reviewed by the same model, not by a
+clinician or a blind second annotator. challenge_v2 was blind-annotated by a fresh claude-sonnet
+subagent (guideline + shuffled texts only): 90/90 agreement, kappa 1.000 overall and in every
+category (`ANNOTATION_AGREEMENT_V2.md`; no label changed). That shows the guideline is reproducible
+on these prototypical messages, not that the labels are clinically right.
 
 ## Split and leakage checks
 
