@@ -4,8 +4,12 @@ Near-duplicate guard for routing sentences.
     .venv/Scripts/python.exe eval/routing/check_near_duplicates.py heldout
         every heldout_v2 sentence vs every case in cases.py
 
+    .venv/Scripts/python.exe eval/routing/check_near_duplicates.py heldout --set heldout_v3
+        every heldout_v3 sentence vs every case in cases.py AND heldout_v2.py
+
     .venv/Scripts/python.exe eval/routing/check_near_duplicates.py prototypes "sentence one" "sentence two" ...
-        candidate prototype sentences vs every case in cases.py AND heldout_v2.py
+        candidate prototype sentences vs every case in cases.py, heldout_v2.py
+        AND heldout_v3.py
 
 Cosine similarity with all-MiniLM-L6-v2 (normalised embeddings), the same
 model the intent classifier uses.  Exit code 1 when any pair is above the
@@ -42,23 +46,28 @@ def main(argv=None) -> int:
     parser.add_argument("mode", choices=("heldout", "prototypes"))
     parser.add_argument("sentences", nargs="*")
     parser.add_argument("--threshold", type=float, default=0.85)
+    parser.add_argument("--set", default="heldout_v2", choices=("heldout_v2", "heldout_v3"),
+                        help="heldout mode only: which held-out set to check (default heldout_v2)")
     args = parser.parse_args(argv)
 
     from sentence_transformers import SentenceTransformer
     from cases import CASES
     import heldout_v2
+    import heldout_v3
 
     model = SentenceTransformer(MODEL_NAME)
     if args.mode == "heldout":
-        texts = [c["text"] for c in heldout_v2.CASES]
-        labels = [c["id"] for c in heldout_v2.CASES]
-        pool = list(CASES)
+        held = heldout_v2 if args.set == "heldout_v2" else heldout_v3
+        texts = [c["text"] for c in held.CASES]
+        labels = [c["id"] for c in held.CASES]
+        # Each held-out set is checked against every set written before it.
+        pool = list(CASES) if args.set == "heldout_v2" else list(CASES) + list(heldout_v2.CASES)
     else:
         if not args.sentences:
             parser.error("give at least one candidate sentence")
         texts = list(args.sentences)
         labels = [f"P{i + 1}" for i in range(len(texts))]
-        pool = list(CASES) + list(heldout_v2.CASES)
+        pool = list(CASES) + list(heldout_v2.CASES) + list(heldout_v3.CASES)
 
     rows = nearest(texts, pool, model)
     worst = 0.0
