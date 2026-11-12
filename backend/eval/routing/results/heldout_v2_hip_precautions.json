@@ -1,0 +1,1883 @@
+{
+  "meta": {
+    "label": "heldout_v2_hip_precautions",
+    "case_set": "heldout_v2",
+    "commit": "4286cd5",
+    "date": "2026-11-12",
+    "semantic_first": false,
+    "orchestrator": true,
+    "cases": 30,
+    "classifier_seconds": 20.4,
+    "orchestrator_seconds": 0.4,
+    "thresholds": {
+      "SEMANTIC_MIN_SCORE": 0.35,
+      "SEMANTIC_MIN_MARGIN": 0.04
+    }
+  },
+  "summary": {
+    "per_agent": {
+      "pain_symptoms": {
+        "classifier": {
+          "n": 2,
+          "correct": 2
+        },
+        "classifier_clear": {
+          "n": 0,
+          "correct": 0
+        },
+        "classifier_openings": {
+          "n": 2,
+          "correct": 2
+        },
+        "orchestrator": {
+          "n": 2,
+          "correct": 2
+        },
+        "orchestrator_strict": {
+          "n": 2,
+          "correct": 2
+        },
+        "orchestrator_openings": {
+          "n": 2,
+          "correct": 2
+        }
+      },
+      "recovery_progress": {
+        "classifier": {
+          "n": 5,
+          "correct": 5
+        },
+        "classifier_clear": {
+          "n": 4,
+          "correct": 4
+        },
+        "classifier_openings": {
+          "n": 5,
+          "correct": 5
+        },
+        "orchestrator": {
+          "n": 5,
+          "correct": 5
+        },
+        "orchestrator_strict": {
+          "n": 5,
+          "correct": 5
+        },
+        "orchestrator_openings": {
+          "n": 5,
+          "correct": 5
+        }
+      },
+      "rehabilitation": {
+        "classifier": {
+          "n": 5,
+          "correct": 5
+        },
+        "classifier_clear": {
+          "n": 4,
+          "correct": 4
+        },
+        "classifier_openings": {
+          "n": 5,
+          "correct": 5
+        },
+        "orchestrator": {
+          "n": 5,
+          "correct": 5
+        },
+        "orchestrator_strict": {
+          "n": 5,
+          "correct": 5
+        },
+        "orchestrator_openings": {
+          "n": 5,
+          "correct": 5
+        }
+      },
+      "wound_care": {
+        "classifier": {
+          "n": 2,
+          "correct": 2
+        },
+        "classifier_clear": {
+          "n": 2,
+          "correct": 2
+        },
+        "classifier_openings": {
+          "n": 2,
+          "correct": 2
+        },
+        "orchestrator": {
+          "n": 2,
+          "correct": 2
+        },
+        "orchestrator_strict": {
+          "n": 2,
+          "correct": 2
+        },
+        "orchestrator_openings": {
+          "n": 2,
+          "correct": 2
+        }
+      },
+      "medication": {
+        "classifier": {
+          "n": 8,
+          "correct": 8
+        },
+        "classifier_clear": {
+          "n": 5,
+          "correct": 5
+        },
+        "classifier_openings": {
+          "n": 8,
+          "correct": 8
+        },
+        "orchestrator": {
+          "n": 8,
+          "correct": 8
+        },
+        "orchestrator_strict": {
+          "n": 8,
+          "correct": 8
+        },
+        "orchestrator_openings": {
+          "n": 8,
+          "correct": 8
+        }
+      },
+      "daily_activity": {
+        "classifier": {
+          "n": 4,
+          "correct": 4
+        },
+        "classifier_clear": {
+          "n": 2,
+          "correct": 2
+        },
+        "classifier_openings": {
+          "n": 4,
+          "correct": 4
+        },
+        "orchestrator": {
+          "n": 4,
+          "correct": 4
+        },
+        "orchestrator_strict": {
+          "n": 4,
+          "correct": 4
+        },
+        "orchestrator_openings": {
+          "n": 4,
+          "correct": 4
+        }
+      },
+      "nutrition": {
+        "classifier": {
+          "n": 4,
+          "correct": 4
+        },
+        "classifier_clear": {
+          "n": 3,
+          "correct": 3
+        },
+        "classifier_openings": {
+          "n": 4,
+          "correct": 4
+        },
+        "orchestrator": {
+          "n": 4,
+          "correct": 4
+        },
+        "orchestrator_strict": {
+          "n": 4,
+          "correct": 4
+        },
+        "orchestrator_openings": {
+          "n": 4,
+          "correct": 4
+        }
+      }
+    },
+    "overall": {
+      "classifier": {
+        "n": 30,
+        "correct": 30
+      },
+      "classifier_clear": {
+        "n": 20,
+        "correct": 20
+      },
+      "classifier_openings": {
+        "n": 30,
+        "correct": 30
+      },
+      "orchestrator": {
+        "n": 30,
+        "correct": 30
+      },
+      "orchestrator_strict": {
+        "n": 30,
+        "correct": 30
+      },
+      "orchestrator_openings": {
+        "n": 30,
+        "correct": 30
+      },
+      "orchestrator_special": {
+        "n": 0,
+        "correct": 0
+      },
+      "multi_agent_turns": 2,
+      "pre_empted": {}
+    },
+    "miss_groups": {},
+    "decision_paths": {
+      "deterministic": 23,
+      "semantic": 5,
+      "fallback_low_margin": 1,
+      "fallback_low_confidence": 1
+    }
+  },
+  "rows": [
+    {
+      "id": "H001",
+      "text": "Itching all over my arms since the new tablets started",
+      "expected": "medication",
+      "acceptable": [
+        "medication"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "itching",
+            "tablets"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": false,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H002",
+      "text": "I feel dizzy about an hour after my painkiller",
+      "expected": "medication",
+      "acceptable": [
+        "medication"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "dizzy",
+            "painkiller"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": false,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H003",
+      "text": "Since I started the tramadol I am badly constipated",
+      "expected": "medication",
+      "acceptable": [
+        "medication",
+        "nutrition"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "constipated",
+            "tramadol"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": false,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H004",
+      "text": "Is feeling drowsy all day a side effect of gabapentin?",
+      "expected": "medication",
+      "acceptable": [
+        "medication"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "drowsy",
+            "gabapentin",
+            "side effect"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H005",
+      "text": "The blood thinner injection makes me light headed, is that expected?",
+      "expected": "medication",
+      "acceptable": [
+        "medication"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "blood thinner",
+            "light headed"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H006",
+      "text": "Tummy feels bloated ever since I began these pills",
+      "expected": "medication",
+      "acceptable": [
+        "medication",
+        "nutrition"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "bloated",
+            "pills"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": false,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H007",
+      "text": "Nausea comes after every dose, should I eat something first?",
+      "expected": "medication",
+      "acceptable": [
+        "medication",
+        "nutrition"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "dose",
+            "nausea"
+          ],
+          "rule_position": 0
+        },
+        {
+          "intent": "nutrition",
+          "keywords": [
+            "eat"
+          ],
+          "rule_position": 5
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication,nutrition",
+        "routed_intents": [
+          "medication",
+          "nutrition"
+        ],
+        "target_agent": "MedicationAgent,NutritionAgent",
+        "triage_level": "GREEN",
+        "engine": "Deterministic Multi-Agent Coordinator",
+        "pre_empted": null,
+        "multi_agent": true,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H008",
+      "text": "Queasy in the mornings after my medicine, what can I do?",
+      "expected": "medication",
+      "acceptable": [
+        "medication"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:med_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "medication",
+        "decision_path": "deterministic",
+        "top1_intent": "medication",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "medication",
+          "keywords": [
+            "medicine",
+            "queasy"
+          ],
+          "rule_position": 0
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "medication",
+        "routed_intents": [
+          "medication"
+        ],
+        "target_agent": "MedicationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H009",
+      "text": "The skin along my incision line is very itchy",
+      "expected": "wound_care",
+      "acceptable": [
+        "wound_care"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "wound_care",
+        "decision_path": "deterministic",
+        "top1_intent": "wound_care",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "wound_care",
+          "keywords": [
+            "incision"
+          ],
+          "rule_position": 2
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": false,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "wound_care",
+        "routed_intents": [
+          "wound_care"
+        ],
+        "target_agent": "WoundCareAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H010",
+      "text": "Itching near the stitches at night, does that mean it is healing?",
+      "expected": "wound_care",
+      "acceptable": [
+        "wound_care"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "wound_care",
+        "decision_path": "deterministic",
+        "top1_intent": "wound_care",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "wound_care",
+          "keywords": [
+            "stitches"
+          ],
+          "rule_position": 2
+        },
+        {
+          "intent": "recovery_progress",
+          "keywords": [
+            "healing"
+          ],
+          "rule_position": 7
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "wound_care",
+        "routed_intents": [
+          "wound_care"
+        ],
+        "target_agent": "WoundCareAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H011",
+      "text": "Feeling bloated and gassy after eating rice, what should I avoid?",
+      "expected": "nutrition",
+      "acceptable": [
+        "nutrition"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "nutrition",
+        "decision_path": "deterministic",
+        "top1_intent": "nutrition",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "nutrition",
+          "keywords": [
+            "eating"
+          ],
+          "rule_position": 5
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "nutrition",
+        "routed_intents": [
+          "nutrition"
+        ],
+        "target_agent": "NutritionAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H012",
+      "text": "Bloated after meals, which foods are lighter on the stomach?",
+      "expected": "nutrition",
+      "acceptable": [
+        "nutrition"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "nutrition",
+        "decision_path": "deterministic",
+        "top1_intent": "nutrition",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "nutrition",
+          "keywords": [
+            "foods"
+          ],
+          "rule_position": 5
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "nutrition",
+        "routed_intents": [
+          "nutrition"
+        ],
+        "target_agent": "NutritionAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H013",
+      "text": "I get dizzy when I stand up after physio",
+      "expected": "pain_symptoms",
+      "acceptable": [
+        "pain_symptoms",
+        "rehabilitation",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "deterministic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "rehabilitation",
+          "keywords": [
+            "physio"
+          ],
+          "rule_position": 3
+        },
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "stand"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation,daily_activity",
+        "routed_intents": [
+          "rehabilitation",
+          "daily_activity"
+        ],
+        "target_agent": "RehabilitationAgent,DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "Deterministic Multi-Agent Coordinator",
+        "pre_empted": null,
+        "multi_agent": true,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H014",
+      "text": "Feeling light-headed when I get out of bed in the morning",
+      "expected": "pain_symptoms",
+      "acceptable": [
+        "pain_symptoms",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "bed"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H015",
+      "text": "Constipated since the operation, which foods will help?",
+      "expected": "nutrition",
+      "acceptable": [
+        "nutrition"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "nutrition",
+        "decision_path": "deterministic",
+        "top1_intent": "nutrition",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "nutrition",
+          "keywords": [
+            "foods"
+          ],
+          "rule_position": 5
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "nutrition",
+        "routed_intents": [
+          "nutrition"
+        ],
+        "target_agent": "NutritionAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H016",
+      "text": "I feel nauseous when I smell cooking these days, what can I eat?",
+      "expected": "nutrition",
+      "acceptable": [
+        "nutrition",
+        "pain_symptoms"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "nutrition",
+        "decision_path": "deterministic",
+        "top1_intent": "nutrition",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "nutrition",
+          "keywords": [
+            "eat"
+          ],
+          "rule_position": 5
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "nutrition",
+        "routed_intents": [
+          "nutrition"
+        ],
+        "target_agent": "NutritionAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H017",
+      "text": "Very fatigued after walking to the gate and back, is that normal at this stage?",
+      "expected": "recovery_progress",
+      "acceptable": [
+        "recovery_progress",
+        "rehabilitation",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:nonmed_symptom",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "semantic",
+        "top1_intent": "recovery_progress",
+        "top1_score": 0.4758,
+        "top2_intent": "mental_wellbeing",
+        "top2_score": 0.4088,
+        "margin": 0.067,
+        "matched_prototype": "Am I recovering normally?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": true,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H018",
+      "text": "My physio wants a 90 degree bend by next week, how do I get there?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:rehab",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "deterministic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "rehabilitation",
+          "keywords": [
+            "bend",
+            "physio"
+          ],
+          "rule_position": 3
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation",
+        "routed_intents": [
+          "rehabilitation"
+        ],
+        "target_agent": "RehabilitationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H019",
+      "text": "Should I do the quad exercises before or after icing?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:rehab",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "deterministic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "rehabilitation",
+          "keywords": [
+            "exercises"
+          ],
+          "rule_position": 3
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation",
+        "routed_intents": [
+          "rehabilitation"
+        ],
+        "target_agent": "RehabilitationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H020",
+      "text": "How many times a day should I practise straightening the leg?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:rehab",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "semantic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 0.6869,
+        "top2_intent": "recovery_progress",
+        "top2_score": 0.3779,
+        "margin": 0.3089,
+        "matched_prototype": "Which exercises help the leg straighten out fully?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation",
+        "routed_intents": [
+          "rehabilitation"
+        ],
+        "target_agent": "RehabilitationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H021",
+      "text": "Can I start pedalling on the home exercise bike?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:rehab",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "deterministic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "rehabilitation",
+          "keywords": [
+            "exercise"
+          ],
+          "rule_position": 3
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation",
+        "routed_intents": [
+          "rehabilitation"
+        ],
+        "target_agent": "RehabilitationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H022",
+      "text": "The knee will not fully bend yet, what can I practise at home?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:rehab",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "deterministic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "rehabilitation",
+          "keywords": [
+            "bend"
+          ],
+          "rule_position": 3
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation",
+        "routed_intents": [
+          "rehabilitation"
+        ],
+        "target_agent": "RehabilitationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H023",
+      "text": "Can I sit cross-legged on the floor for puja?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:daily",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "sit"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H024",
+      "text": "When is it ok to travel by train for a family wedding?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "recovery_progress"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:daily",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "semantic",
+        "top1_intent": "daily_activity",
+        "top1_score": 0.5141,
+        "top2_intent": "recovery_progress",
+        "top2_score": 0.2834,
+        "margin": 0.2307,
+        "matched_prototype": "When can I travel by car or public transport?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H025",
+      "text": "Is a slow evening stroll in the colony park fine for me?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v2:daily",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "semantic",
+        "top1_intent": "daily_activity",
+        "top1_score": 0.4718,
+        "top2_intent": "recovery_progress",
+        "top2_score": 0.3551,
+        "margin": 0.1167,
+        "matched_prototype": "Can I step out of the house for a short stroll?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H026",
+      "text": "Is it fine to use an Indian-style toilet yet?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:daily",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "toilet"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H027",
+      "text": "Is it normal to still need the stick at three weeks?",
+      "expected": "recovery_progress",
+      "acceptable": [
+        "recovery_progress"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:recovery",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "deterministic",
+        "top1_intent": "recovery_progress",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "recovery_progress",
+          "keywords": [
+            "weeks"
+          ],
+          "rule_position": 7
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H028",
+      "text": "How far along should I be by the end of the first month?",
+      "expected": "recovery_progress",
+      "acceptable": [
+        "recovery_progress"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:recovery",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "semantic",
+        "top1_intent": "recovery_progress",
+        "top1_score": 0.4674,
+        "top2_intent": "medication",
+        "top2_score": 0.3778,
+        "margin": 0.0896,
+        "matched_prototype": "How long before I can move around like I used to?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H029",
+      "text": "My neighbour was walking freely by now, am I slow?",
+      "expected": "recovery_progress",
+      "acceptable": [
+        "recovery_progress"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:recovery",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "fallback_low_margin",
+        "top1_intent": "daily_activity",
+        "top1_score": 0.4655,
+        "top2_intent": "recovery_progress",
+        "top2_score": 0.4436,
+        "margin": 0.0219,
+        "matched_prototype": "Can I step out of the house for a short stroll?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "H030",
+      "text": "What should I be able to do by my six week check-up?",
+      "expected": "recovery_progress",
+      "acceptable": [
+        "recovery_progress"
+      ],
+      "confidence": "clear",
+      "kind": "opening",
+      "source": "heldout_v2:recovery",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "fallback_low_confidence",
+        "top1_intent": "recovery_progress",
+        "top1_score": 0.2666,
+        "top2_intent": "rehabilitation",
+        "top2_score": 0.2406,
+        "margin": 0.026,
+        "matched_prototype": "When can I expect to return to normal activities?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    }
+  ]
+}

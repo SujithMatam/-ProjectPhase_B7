@@ -143,6 +143,13 @@ _PROTOTYPE_SENTENCES = {
         # walk without a walking stick?" and fell to the low-margin default.
         "Can I step out of the house for a short stroll?",
         "When can I travel by car or public transport?",
+        # Hip precautions / movement restrictions. Without these, "What
+        # movements should I avoid after my hip replacement?" had no owner:
+        # top-1 Recovery 0.488, margin 0.023 over Mental Wellbeing, so it
+        # reached Recovery only through the low-margin default. Cosine
+        # <= 0.85 to every case in cases.py, heldout_v2 and heldout_v3.
+        "Which hip precautions should I follow in everyday life?",
+        "Are there postures or movements I must stay away from after the operation?",
     ],
 
     IntentLabel.NUTRITION: [
