@@ -1,0 +1,64 @@
+{
+  "id": "c19_recovery_unknown_twice",
+  "agent": "recovery",
+  "title": "Two 'I don't know' answers: flexion is left, the interview moves on and names the gap",
+  "tags": [],
+  "record": {
+    "patient_id": "EVAL-C19",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 19,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 20
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 6,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "How am I doing with my knee?"
+    },
+    {
+      "patient": "I don't know"
+    },
+    {
+      "patient": "no idea, sorry",
+      "must_not_collect": [
+        "rom_flexion_degrees"
+      ]
+    },
+    {
+      "patient": "about 5 degrees",
+      "must_collect": [
+        "rom_extension_degrees"
+      ]
+    },
+    {
+      "patient": "a walker",
+      "must_collect": [
+        "mobility_status"
+      ]
+    },
+    {
+      "patient": "10 minutes",
+      "must_collect": [
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "not yet",
+      "must_collect": [
+        "stairs"
+      ],
+      "reply_must_match": "(?i)flexion: I don't have a value"
+    }
+  ]
+}

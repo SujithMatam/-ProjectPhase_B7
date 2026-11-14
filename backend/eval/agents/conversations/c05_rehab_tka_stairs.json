@@ -1,0 +1,53 @@
+{
+  "id": "c05_rehab_tka_stairs",
+  "agent": "rehab",
+  "title": "TKA day 5 stairs: status from record, one safety question, sourced answer",
+  "source": "REHAB_AGENT_CHANGES.md section 2, TKA post-op day 5",
+  "tags": [
+    "transcript",
+    "memory"
+  ],
+  "record": {
+    "patient_id": "EVAL-C05",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 4,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [
+      {
+        "days_ago": 1,
+        "exercise_completed": 1,
+        "rom_flexion": 75,
+        "pain_score": 4
+      }
+    ],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 5
+  },
+  "record_fields": [
+    {
+      "field": "weight_bearing_status",
+      "source": "surgeries",
+      "evidence": "weight-bearing as tolerated"
+    }
+  ],
+  "expect": {
+    "max_questions": 1,
+    "completes": true,
+    "persist_min": 0
+  },
+  "turns": [
+    {
+      "patient": "Can I go up and down the stairs yet?"
+    },
+    {
+      "patient": "no, nothing sharp",
+      "must_collect": [
+        "exercise_safety"
+      ]
+    }
+  ]
+}

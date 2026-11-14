@@ -1,0 +1,60 @@
+{
+  "id": "c14_recovery_tka_day4_target",
+  "agent": "recovery",
+  "title": "TKA day 4: before the first checkpoint, the day-7 target is given",
+  "tags": [],
+  "record": {
+    "patient_id": "EVAL-C14",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 3,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 4
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 5,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "Am I on track with my knee?"
+    },
+    {
+      "patient": "about 60 degrees",
+      "must_collect": [
+        "rom_flexion_degrees"
+      ]
+    },
+    {
+      "patient": "about 10 degrees off straight",
+      "must_collect": [
+        "rom_extension_degrees"
+      ]
+    },
+    {
+      "patient": "I use a walker",
+      "must_collect": [
+        "mobility_status"
+      ]
+    },
+    {
+      "patient": "about 5 minutes",
+      "must_collect": [
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "not yet",
+      "must_collect": [
+        "stairs"
+      ]
+    }
+  ]
+}

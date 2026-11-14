@@ -1,0 +1,482 @@
+{
+  "version": 1,
+  "description": "Recovery checkpoints for the RecoveryProgressAgent. Every entry is taken from ONE passage of backend/eval/eval_corpus.json (EV-TKA-REC-*, EV-THA-REC-*, EV-TKA-REHAB-02/03, EV-THA-REHAB-04), except the two retained TKA-03 day-7 ROM entries from rag/data/seed_knowledge.json. Where the passage gives no number the expected state is stored in words only -- no number is ever invented. `quote` is a short verbatim fragment of the passage the entry rests on.",
+  "corpora": {
+    "eval/eval_corpus.json": "backend/eval/eval_corpus.json",
+    "rag/data/seed_knowledge.json": "backend/rag/data/seed_knowledge.json"
+  },
+  "checkpoint_days": [7, 14, 21, 42, 84],
+  "long_term_after_day": 84,
+  "vocabularies": {
+    "mobility_status": ["walker", "crutches", "cane", "independent"],
+    "stairs": ["not_yet", "one_at_a_time", "foot_over_foot"],
+    "daily_activities": ["need_help", "light_activities", "most_activities"],
+    "driving": ["not_driving", "driving"],
+    "return_to_work": ["not_yet", "returned"],
+    "hip_precautions": ["not_following", "following", "ended"]
+  },
+  "entries": [
+    {
+      "procedure": "TKA", "checkpoint": 7, "metric": "rom_flexion_degrees", "kind": "numeric",
+      "range_low": 70, "range_high": 90, "unit": "degrees",
+      "expected_state": "70-90 degrees of passive flexion",
+      "source_id": "TKA-03", "source_url": null, "source_corpus": "rag/data/seed_knowledge.json",
+      "quote": "By Post-Op Day 7, patients should aim for 70°-90° of passive flexion"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 7, "metric": "rom_extension_degrees", "kind": "numeric",
+      "range_low": 0, "range_high": 5, "unit": "degrees",
+      "expected_state": "near-full extension (0-5 degrees)",
+      "source_id": "TKA-03", "source_url": null, "source_corpus": "rag/data/seed_knowledge.json",
+      "quote": "near-full extension (0°-5°)"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 7, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["walker", "crutches", "cane"],
+      "expected_state": "walking with a frame, crutches or cane on a level surface",
+      "source_id": "EV-TKA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "walk with a frame, crutches or cane on a level surface"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 7, "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "walking little and often around the home",
+      "source_id": "EV-TKA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "the main tasks are walking little and often"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 7, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time"],
+      "expected_state": "managing two or three steps up and down with your aid",
+      "source_id": "EV-TKA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "manage two or three steps up and down"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 7, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["need_help"],
+      "expected_state": "still needing help with cooking, shopping, bathing and laundry",
+      "source_id": "EV-TKA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "You will probably need help with cooking, shopping, bathing and laundry for several weeks"
+    },
+
+    {
+      "procedure": "TKA", "checkpoint": 14, "metric": "rom_flexion_degrees", "kind": "numeric",
+      "range_low": 80, "range_high": null, "unit": "degrees",
+      "expected_state": "about 80 degrees or more of active bending, improving week by week",
+      "source_id": "EV-TKA-REHAB-02", "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf", "source_corpus": "eval/eval_corpus.json",
+      "quote": "about 80 degrees of active bending in sitting ... before patients move on from the first-week phase"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 14, "metric": "rom_extension_degrees", "kind": "numeric",
+      "range_low": 0, "range_high": 10, "unit": "degrees",
+      "expected_state": "straightening to within 10 degrees of fully straight",
+      "source_id": "EV-TKA-REHAB-02", "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf", "source_corpus": "eval/eval_corpus.json",
+      "quote": "the knee straightening to within 10 degrees of fully straight"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 14, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["walker", "crutches", "cane"],
+      "expected_state": "a frame or two crutches, moving to a single crutch or cane once you can stand and walk for more than ten minutes",
+      "source_id": "EV-TKA-REC-02", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "many people move from a frame or two crutches to a single crutch or cane at about two to three weeks, once they can walk and stand for more than ten minutes without leaning on the aid"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 14, "metric": "walking_duration_minutes", "kind": "numeric",
+      "range_low": 10, "range_high": null, "unit": "minutes",
+      "expected_state": "working towards standing and walking for more than ten minutes without leaning on the aid",
+      "source_id": "EV-TKA-REC-02", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "once they can walk and stand for more than ten minutes without leaning on the aid"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 14, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time"],
+      "expected_state": "one step at a time using the handrail; stepping foot over foot comes later",
+      "source_id": "EV-TKA-REHAB-03", "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "taking one step at a time and using the handrail"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 14, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["need_help", "light_activities"],
+      "expected_state": "managing more, but possibly still needing help with some household tasks",
+      "source_id": "EV-TKA-REC-02", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "You may still need help with some household tasks"
+    },
+
+    {
+      "procedure": "TKA", "checkpoint": 21, "metric": "rom_flexion_degrees", "kind": "state",
+      "expected_state": "bending improving week by week, working towards more than 110 degrees by the end of week six",
+      "source_id": "EV-TKA-REC-02", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Bending and straightening should be improving week by week with your exercises ... works towards more than 110 degrees of bending by the end of week six"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 21, "metric": "rom_extension_degrees", "kind": "state",
+      "expected_state": "straightening improving week by week, working towards a fully straight knee by the end of week six",
+      "source_id": "EV-TKA-REHAB-02", "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf", "source_corpus": "eval/eval_corpus.json",
+      "quote": "By the end of the phase covering weeks two to six it aims for more than 110 degrees of bending with the knee fully straight"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 21, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["crutches", "cane"],
+      "expected_state": "a single crutch or cane, once you can stand and walk for over ten minutes",
+      "source_id": "EV-TKA-REHAB-03", "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "changing to a single crutch or cane once you are able to stand and walk for over ten minutes ... often about two to three weeks after surgery"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 21, "metric": "walking_duration_minutes", "kind": "numeric",
+      "range_low": 10, "range_high": null, "unit": "minutes",
+      "expected_state": "able to stand and walk for over ten minutes",
+      "source_id": "EV-TKA-REHAB-03", "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "once you are able to stand and walk for over ten minutes"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 21, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time"],
+      "expected_state": "one step at a time with the handrail; foot over foot comes later, once walking is normal and the knee is strong",
+      "source_id": "EV-TKA-REHAB-03", "source_url": "https://www.orthoinfo.org/en/recovery/total-knee-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Stepping foot over foot on stairs usually comes later, once walking is normal and the knee is strong"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 21, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["need_help", "light_activities"],
+      "expected_state": "managing more, but possibly still needing help with some household tasks",
+      "source_id": "EV-TKA-REC-02", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "You may still need help with some household tasks"
+    },
+
+    {
+      "procedure": "TKA", "checkpoint": 42, "metric": "rom_flexion_degrees", "kind": "numeric",
+      "range_low": 110, "range_high": null, "unit": "degrees",
+      "expected_state": "more than 110 degrees of bending",
+      "source_id": "EV-TKA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "aims for more than 110 degrees of bending with the knee fully straight by the end of weeks two to six"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 42, "metric": "rom_extension_degrees", "kind": "numeric",
+      "range_low": 0, "range_high": 0, "unit": "degrees",
+      "expected_state": "knee fully straight",
+      "source_id": "EV-TKA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "more than 110 degrees of bending with the knee fully straight"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 42, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["crutches", "cane", "independent"],
+      "expected_state": "a normal walking pattern, with or without an aid; trying without an aid if you feel ready",
+      "source_id": "EV-TKA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "trying to walk without an aid after about six weeks if you feel ready, and rehabilitation guidelines aim for a normal walking pattern, with or without an aid"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 42, "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "walking stronger, with a normal walking pattern",
+      "source_id": "EV-TKA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Walking is usually stronger"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 42, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["light_activities", "most_activities"],
+      "expected_state": "back to most usual day-to-day activities, still avoiding heavy household jobs for the first three months",
+      "source_id": "EV-TKA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people are back to most of their usual day-to-day activities between three and six weeks after surgery"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 42, "metric": "driving", "kind": "categorical",
+      "accepted_values": ["not_driving", "driving"],
+      "expected_state": "resuming driving around four to six weeks (NHS: wait at least six weeks and check with your doctor), once off opioid pain medicine",
+      "source_id": "EV-TKA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-knee-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people resume driving about four to six weeks after surgery ... NHS guidance is to wait at least six weeks after a total knee replacement and to check with your doctor that you are fit to drive"
+    },
+
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "rom_flexion_degrees", "kind": "numeric",
+      "range_low": 110, "range_high": null, "unit": "degrees",
+      "expected_state": "more than 110 degrees with a fully straight knee; beyond 120 degrees is a later goal, mainly for demanding activities",
+      "source_id": "EV-TKA-REC-05", "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf", "source_corpus": "eval/eval_corpus.json",
+      "quote": "more than 110 degrees with a fully straight knee by around six weeks, and more than 120 degrees for people aiming to return to demanding activities"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "rom_extension_degrees", "kind": "numeric",
+      "range_low": 0, "range_high": 0, "unit": "degrees",
+      "expected_state": "fully straight; not being able to straighten fully is a reason to talk to your physiotherapist or surgeon",
+      "source_id": "EV-TKA-REC-05", "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Talk to your physiotherapist or surgeon ... if you cannot straighten the knee fully"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["cane", "independent"],
+      "expected_state": "walking further and more steadily, with less need for a walking aid",
+      "source_id": "EV-TKA-REC-05", "source_url": "https://www.hss.edu/globalassets/files/rehab/guidelines/hssrehabilitationclinicalguidelines-knee-totalkneearthroplasty-post-operative.pdf", "source_corpus": "eval/eval_corpus.json",
+      "quote": "walking further and more steadily, with less need for your walking aid"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "walking on flat and uneven ground as part of rehabilitation",
+      "source_id": "EV-TKA-REC-04", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "walking on flat and uneven ground"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["foot_over_foot"],
+      "expected_state": "climbing stairs step over step with little pain",
+      "source_id": "EV-TKA-REC-04", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "climbing stairs step over step with little pain"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["most_activities"],
+      "expected_state": "doing much more of the normal routine, including socks and shoelaces; still avoiding heavy lifting at home until about three months",
+      "source_id": "EV-TKA-REC-04", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people are doing much more of their normal routine ... putting on socks and tying shoelaces"
+    },
+    {
+      "procedure": "TKA", "checkpoint": 84, "metric": "return_to_work", "kind": "categorical",
+      "accepted_values": ["not_yet", "returned"],
+      "expected_state": "usually back at work after about six to twelve weeks, depending on the demands of the job",
+      "source_id": "EV-TKA-REC-04", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "people usually go back after about six to twelve weeks"
+    },
+
+    {
+      "procedure": "TKA", "checkpoint": "long_term", "metric": "rom_flexion_degrees", "kind": "state",
+      "expected_state": "some stiffness when bending the knee a long way is common; keep up the prescribed exercises",
+      "source_id": "EV-TKA-REC-06", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "some stiffness, particularly when bending the knee a long way"
+    },
+    {
+      "procedure": "TKA", "checkpoint": "long_term", "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["most_activities"],
+      "expected_state": "back to many previous activities, preferring low-impact ones",
+      "source_id": "EV-TKA-REC-06", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people can return to many of the activities they enjoyed before surgery"
+    },
+    {
+      "procedure": "TKA", "checkpoint": "long_term", "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "regular walking as a preferred low-impact activity",
+      "source_id": "EV-TKA-REC-06", "source_url": "https://www.nhs.uk/tests-and-treatments/knee-replacement/recovery/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "low-impact activities such as walking, swimming, golf and cycling are preferred"
+    },
+
+    {
+      "procedure": "THA", "checkpoint": 7, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["walker", "crutches"],
+      "expected_state": "crutches or a walking frame, on a level surface",
+      "source_id": "EV-THA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "using crutches or a walking frame at first"
+    },
+    {
+      "procedure": "THA", "checkpoint": 7, "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "walking regularly, as far as is comfortable",
+      "source_id": "EV-THA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "walk regularly as far as is comfortable"
+    },
+    {
+      "procedure": "THA", "checkpoint": 7, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time"],
+      "expected_state": "managing two or three steps up and down",
+      "source_id": "EV-THA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "manage two or three steps up and down"
+    },
+    {
+      "procedure": "THA", "checkpoint": 7, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["need_help"],
+      "expected_state": "needing help with cooking, shopping, bathing and laundry",
+      "source_id": "EV-THA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "You may need help for several days to several weeks with cooking, shopping, bathing and laundry"
+    },
+    {
+      "procedure": "THA", "checkpoint": 7, "metric": "hip_precautions", "kind": "categorical",
+      "accepted_values": ["following"],
+      "expected_state": "keeping to the hip precautions you were given",
+      "source_id": "EV-THA-REC-01", "source_url": "https://www.nhs.uk/tests-and-treatments/hip-replacement/recovering-from-a-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "keep to your precautions"
+    },
+
+    {
+      "procedure": "THA", "checkpoint": 14, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["walker", "crutches", "cane"],
+      "expected_state": "walking every day with a frame, crutches or a cane; moving to a single crutch or cane once you can stand and walk for over ten minutes",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people are walking every day with a frame, crutches or a cane"
+    },
+    {
+      "procedure": "THA", "checkpoint": 14, "metric": "walking_duration_minutes", "kind": "numeric",
+      "range_low": 10, "range_high": null, "unit": "minutes",
+      "expected_state": "getting a little further each week; over ten minutes is the mark for moving to a single crutch or cane",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "once you can stand and walk for over ten minutes"
+    },
+    {
+      "procedure": "THA", "checkpoint": 14, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time"],
+      "expected_state": "stairs one step at a time with a handrail",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "manage stairs one step at a time with a handrail"
+    },
+    {
+      "procedure": "THA", "checkpoint": 14, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["need_help", "light_activities"],
+      "expected_state": "managing more of your own care, though many still need help with cooking, shopping and laundry",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "managing more of their own care, although many still need help with tasks such as cooking, shopping and laundry"
+    },
+    {
+      "procedure": "THA", "checkpoint": 14, "metric": "driving", "kind": "categorical",
+      "accepted_values": ["not_driving"],
+      "expected_state": "not yet driving (too early; NHS guidance is to wait at least six weeks)",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "It is too early to drive: NHS guidance is to wait at least six weeks"
+    },
+    {
+      "procedure": "THA", "checkpoint": 14, "metric": "hip_precautions", "kind": "categorical",
+      "accepted_values": ["following"],
+      "expected_state": "still following the hip precautions, which usually last about the first six weeks",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "you are still following your hip precautions, which usually last for about the first six weeks"
+    },
+
+    {
+      "procedure": "THA", "checkpoint": 21, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["walker", "crutches", "cane"],
+      "expected_state": "one crutch or a cane once you can stand and walk for over ten minutes; there is no fixed date for giving up the aid",
+      "source_id": "EV-THA-REHAB-04", "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "changing to one crutch or a cane once you are able to stand and walk for over ten minutes ... There is no fixed date for giving up the walking aid"
+    },
+    {
+      "procedure": "THA", "checkpoint": 21, "metric": "walking_duration_minutes", "kind": "numeric",
+      "range_low": 10, "range_high": null, "unit": "minutes",
+      "expected_state": "able to stand and walk for over ten minutes",
+      "source_id": "EV-THA-REHAB-04", "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "once you are able to stand and walk for over ten minutes"
+    },
+    {
+      "procedure": "THA", "checkpoint": 21, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time", "foot_over_foot"],
+      "expected_state": "one step at a time with a handrail at first, foot over foot as you get stronger",
+      "source_id": "EV-THA-REHAB-04", "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "one step at a time at first ... As you become stronger you can begin climbing stairs foot over foot"
+    },
+    {
+      "procedure": "THA", "checkpoint": 21, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["need_help", "light_activities"],
+      "expected_state": "managing more of your own care, though many still need help with cooking, shopping and laundry",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "managing more of their own care, although many still need help with tasks such as cooking, shopping and laundry"
+    },
+    {
+      "procedure": "THA", "checkpoint": 21, "metric": "driving", "kind": "categorical",
+      "accepted_values": ["not_driving"],
+      "expected_state": "not yet driving (too early; NHS guidance is to wait at least six weeks)",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "It is too early to drive: NHS guidance is to wait at least six weeks"
+    },
+    {
+      "procedure": "THA", "checkpoint": 21, "metric": "hip_precautions", "kind": "categorical",
+      "accepted_values": ["following"],
+      "expected_state": "still following the hip precautions, which usually last about the first six weeks",
+      "source_id": "EV-THA-REC-02", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "you are still following your hip precautions, which usually last for about the first six weeks"
+    },
+
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["crutches", "cane", "independent"],
+      "expected_state": "reducing or stopping the walking aid when your physiotherapist advises",
+      "source_id": "EV-THA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "your physical therapist will advise when you can safely reduce or stop using your walking aid"
+    },
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "walking distance increasing",
+      "source_id": "EV-THA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Walking distance is usually increasing"
+    },
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "stairs", "kind": "categorical",
+      "accepted_values": ["one_at_a_time", "foot_over_foot"],
+      "expected_state": "one step at a time with a handrail at first, foot over foot as you get stronger",
+      "source_id": "EV-THA-REHAB-04", "source_url": "https://www.orthoinfo.org/en/recovery/total-hip-replacement-exercise-guide/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "As you become stronger you can begin climbing stairs foot over foot"
+    },
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["light_activities", "most_activities"],
+      "expected_state": "managing most light everyday activities",
+      "source_id": "EV-THA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people are managing most light everyday activities again between three and six weeks after surgery"
+    },
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "driving", "kind": "categorical",
+      "accepted_values": ["not_driving", "driving"],
+      "expected_state": "driving only from six weeks, once checked with your doctor and off opioid pain medicine",
+      "source_id": "EV-THA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "NHS guidance is to wait at least six weeks and check with your doctor that you are fit to drive"
+    },
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "return_to_work", "kind": "categorical",
+      "accepted_values": ["not_yet", "returned"],
+      "expected_state": "returning to work around six weeks (NHS), ranging from several weeks to several months depending on the job",
+      "source_id": "EV-THA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Returning to work usually takes about six weeks according to the NHS, although the AAOS notes it can range from several weeks to several months"
+    },
+    {
+      "procedure": "THA", "checkpoint": 42, "metric": "hip_precautions", "kind": "categorical",
+      "accepted_values": ["following", "ended"],
+      "expected_state": "precautions commonly apply for about the first six weeks; wait for your surgeon to confirm they have ended",
+      "source_id": "EV-THA-REC-03", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Hip precautions commonly apply for about the first six weeks ... wait for your surgeon to confirm that yours have ended"
+    },
+
+    {
+      "procedure": "THA", "checkpoint": 84, "metric": "mobility_status", "kind": "categorical",
+      "accepted_values": ["cane", "independent"],
+      "expected_state": "walking further and more steadily, with less reliance on the walking aid",
+      "source_id": "EV-THA-REC-05", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "walking further and more steadily, with less reliance on the walking aid"
+    },
+    {
+      "procedure": "THA", "checkpoint": 84, "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "walking further, with daily walking",
+      "source_id": "EV-THA-REC-04", "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people are walking further"
+    },
+    {
+      "procedure": "THA", "checkpoint": 84, "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["most_activities"],
+      "expected_state": "doing most everyday activities, and returning to work and hobbies",
+      "source_id": "EV-THA-REC-04", "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "doing most everyday activities, and returning to work and hobbies"
+    },
+    {
+      "procedure": "THA", "checkpoint": 84, "metric": "return_to_work", "kind": "categorical",
+      "accepted_values": ["not_yet", "returned"],
+      "expected_state": "returning to work and hobbies",
+      "source_id": "EV-THA-REC-04", "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "returning to work and hobbies"
+    },
+    {
+      "procedure": "THA", "checkpoint": 84, "metric": "hip_precautions", "kind": "categorical",
+      "accepted_values": ["following", "ended"],
+      "expected_state": "most restricted movements allowed again after six to eight weeks, once your surgeon agrees",
+      "source_id": "EV-THA-REC-04", "source_url": "https://www.orthoinfo.org/en/recovery/activities-after-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Most patients can do the movements restricted by their hip precautions after six to eight weeks, once their surgeon agrees"
+    },
+
+    {
+      "procedure": "THA", "checkpoint": "long_term", "metric": "hip_precautions", "kind": "categorical",
+      "accepted_values": ["following", "ended"],
+      "expected_state": "most previously restricted movements allowed after six to eight weeks; follow your surgeon's advice about when your precautions end",
+      "source_id": "EV-THA-REC-06", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "most people can do most previously restricted movements after six to eight weeks, but follow your surgeon's advice about when your precautions end"
+    },
+    {
+      "procedure": "THA", "checkpoint": "long_term", "metric": "daily_activities", "kind": "categorical",
+      "accepted_values": ["most_activities"],
+      "expected_state": "an active routine built around lower-impact activities",
+      "source_id": "EV-THA-REC-06", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Lower-impact activities such as walking, swimming, golf, cycling and doubles tennis put less stress on the hip and are generally preferred"
+    },
+    {
+      "procedure": "THA", "checkpoint": "long_term", "metric": "walking_duration_minutes", "kind": "state",
+      "expected_state": "regular walking as a preferred lower-impact activity",
+      "source_id": "EV-THA-REC-06", "source_url": "https://www.orthoinfo.org/en/treatment/total-hip-replacement/", "source_corpus": "eval/eval_corpus.json",
+      "quote": "Lower-impact activities such as walking, swimming, golf, cycling and doubles tennis ... are generally preferred"
+    }
+  ]
+}

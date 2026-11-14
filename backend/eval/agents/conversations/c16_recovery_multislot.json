@@ -1,0 +1,49 @@
+{
+  "id": "c16_recovery_multislot",
+  "agent": "recovery",
+  "title": "Multi-slot: flexion, walking aid and walking time in one message",
+  "tags": [
+    "multi-slot"
+  ],
+  "record": {
+    "patient_id": "EVAL-C16",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 14,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 15
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 2,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "I can bend my knee to 95 degrees and walk with a cane for about 20 minutes. How am I doing?",
+      "must_collect": [
+        "rom_flexion_degrees",
+        "mobility_status",
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "about 3 degrees",
+      "must_collect": [
+        "rom_extension_degrees"
+      ]
+    },
+    {
+      "patient": "foot over foot",
+      "must_collect": [
+        "stairs"
+      ]
+    }
+  ]
+}

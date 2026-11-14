@@ -1,0 +1,72 @@
+{
+  "id": "c06_rehab_tha_missed_days",
+  "agent": "rehab",
+  "title": "THA day 20: missed-days opener, barrier carried into the close, unknown status",
+  "source": "REHAB_AGENT_CHANGES.md section 2, THA post-op day 20",
+  "tags": [
+    "transcript",
+    "THA",
+    "memory"
+  ],
+  "record": {
+    "patient_id": "EVAL-C06",
+    "procedure": "THA",
+    "surgery_type": "Total Hip Arthroplasty (THA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 19,
+    "weight_bearing_status": null,
+    "metrics": [
+      {
+        "days_ago": 4,
+        "exercise_completed": 1
+      },
+      {
+        "days_ago": 3,
+        "exercise_completed": 0
+      },
+      {
+        "days_ago": 2,
+        "exercise_completed": 1
+      },
+      {
+        "days_ago": 1,
+        "exercise_completed": 0
+      }
+    ],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 20
+  },
+  "record_fields": [
+    {
+      "field": null,
+      "source": "metrics exercise log",
+      "evidence": "missed on 2 of the last 7 days"
+    }
+  ],
+  "expect": {
+    "max_questions": 2,
+    "completes": true,
+    "persist_min": 0,
+    "wb_record_unchanged": true
+  },
+  "turns": [
+    {
+      "patient": "What exercises should I be doing now?"
+    },
+    {
+      "patient": "the evenings are too sore to face them",
+      "must_collect": [
+        "exercise_barrier"
+      ]
+    },
+    {
+      "patient": "no sharp pain and no swelling",
+      "must_collect": [
+        "exercise_safety"
+      ],
+      "reply_must_not_match": "(?i)knee flexion|seated knee extension|swelling .* is normal"
+    }
+  ]
+}

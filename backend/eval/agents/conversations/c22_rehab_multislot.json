@@ -1,0 +1,42 @@
+{
+  "id": "c22_rehab_multislot",
+  "agent": "rehab",
+  "title": "Multi-slot: done today and no sharp pain in one message, answered at once",
+  "tags": [
+    "multi-slot"
+  ],
+  "record": {
+    "patient_id": "EVAL-C22",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 8,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 9
+  },
+  "record_fields": [
+    {
+      "field": "weight_bearing_status",
+      "source": "surgeries",
+      "evidence": "weight-bearing as tolerated"
+    }
+  ],
+  "expect": {
+    "max_questions": 0,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "I did my exercises this morning and nothing hurts, no sharp pain. What exercises should I add next?",
+      "must_collect": [
+        "exercises_done_today",
+        "exercise_safety"
+      ]
+    }
+  ]
+}

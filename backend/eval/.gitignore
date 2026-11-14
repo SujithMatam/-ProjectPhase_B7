@@ -1,0 +1,7 @@
+# Private copy of rag/data/chroma_db made by build_context.py (derived cache,
+# like the original, which is also git-ignored).
+.chroma_copy/
+# Scratch collections built by build_context.py --corpus.
+.chroma_corpus/
+__pycache__/
+*.tmp

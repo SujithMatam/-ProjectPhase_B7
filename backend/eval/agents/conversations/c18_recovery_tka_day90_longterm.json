@@ -1,0 +1,60 @@
+{
+  "id": "c18_recovery_tka_day90_longterm",
+  "agent": "recovery",
+  "title": "TKA day 90: compared with the long-term guidance",
+  "tags": [],
+  "record": {
+    "patient_id": "EVAL-C18",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 89,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 90
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 5,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "Is my recovery on track now?"
+    },
+    {
+      "patient": "115 degrees",
+      "must_collect": [
+        "rom_flexion_degrees"
+      ]
+    },
+    {
+      "patient": "0 degrees, it goes fully straight",
+      "must_collect": [
+        "rom_extension_degrees"
+      ]
+    },
+    {
+      "patient": "walking without any aid now",
+      "must_collect": [
+        "mobility_status"
+      ]
+    },
+    {
+      "patient": "about 60 minutes",
+      "must_collect": [
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "foot over foot",
+      "must_collect": [
+        "stairs"
+      ]
+    }
+  ]
+}

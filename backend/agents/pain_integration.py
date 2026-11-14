@@ -44,6 +44,17 @@ from agents import pain_logic
 
 # ============================================================================
 # ACKNOWLEDGMENT / QUESTION WORDING
+#
+# Every MID-INTERVIEW reply has the same shape, in under three sentences:
+#
+#     "{lead} -- so far: {what has been collected}. {next question} {indicator}"
+#
+# i.e. a one-line reflection of everything collected so far, exactly one
+# tracked question, and a short progress indicator such as "(one or two
+# more questions)". The lead is picked from a small pool (via `_pick`,
+# seeded from data already at hand -- never randomness) so consecutive
+# turns don't read identically. Pool entries carry NO trailing period; the
+# composer adds punctuation.
 # ============================================================================
 
 def _pick(pool: Tuple[str, ...], seed: int) -> str:
@@ -56,107 +67,251 @@ def _pick(pool: Tuple[str, ...], seed: int) -> str:
 # been acknowledged yet) -- a plain opening line, never a report-style
 # confirmation.
 _OPENING_ACK_POOL: Tuple[str, ...] = (
-    "Thanks for telling me. I'd like to understand this a little better.",
+    "Thanks for telling me -- I'd like to understand this a little better.",
     "Thanks for letting me know -- I'd like to ask a few quick questions.",
 )
 
 # Used instead of the generic pool when the OPENING message itself already
 # indicates a clear trend (worsening/improving) -- a small, subtle nod to
 # what the patient actually said, rather than a completely generic line.
-# Kept short and calm, not effusive (no "I'm so sorry" / repeated "thank
-# you so much").
 _OPENING_ACK_WORSENING_POOL: Tuple[str, ...] = (
     "Thanks for telling me -- I'd like to understand this change a little better.",
     "Thanks for flagging that -- I'd like to get a clearer picture of what's changed.",
 )
 _OPENING_ACK_IMPROVING_POOL: Tuple[str, ...] = (
-    "Good to hear it's easing up a little. I'd still like to understand where things stand now.",
+    "Good to hear it's easing up a little -- I'd still like to understand where things stand now.",
     "Glad that's settling down a bit -- I'd still like to get a clearer picture.",
 )
 
-# Field-specific acknowledgment, used when the reply just processed answered
-# a field the agent had actually asked about (a genuine attributed answer,
-# not just something volunteered mid-message).
+# Short lead-ins, keyed by the field the reply just answered. The collected
+# facts themselves (including the value just given) are stated once, in
+# the reflection that follows -- so the lead never repeats the value.
 _FIELD_ACK_POOL: Dict[str, Tuple[str, ...]] = {
-    pain_logic.PAIN_SCORE: (
-        "Okay, {value} out of 10 -- that helps me understand how strong the pain is.",
-        "Got it, {value} out of 10 -- that's useful to know.",
-    ),
-    pain_logic.ONSET: (
-        "Got it -- that's useful to know.",
-        "Thanks, that helps.",
-    ),
-    pain_logic.LOCATION: (
-        "Got it.",
-        "Thanks, that helps me narrow this down.",
-    ),
-    pain_logic.WORSENING_OR_IMPROVING: (
-        "Thanks, that's useful context.",
-        "Okay, thanks for that.",
-    ),
+    pain_logic.PAIN_SCORE: ("Okay, that helps me understand how strong it is", "Got it"),
+    pain_logic.ONSET: ("Got it", "Thanks, that helps"),
+    pain_logic.LOCATION: ("Got it", "Thanks, that helps me narrow this down"),
+    pain_logic.WORSENING_OR_IMPROVING: ("Thanks, that's useful context", "Okay, thanks for that"),
 }
 
-# Used specifically when PAIN_SCORE resolved to a CATEGORY ("mild"/
-# "moderate"/"severe") rather than an exact 0-10 number (see
-# pain_logic.severity_bucket / _extract_pain_score_category) -- never
-# plugs a category word into the numeric "{value} out of 10" template
-# (which would read as a fabricated exact score, e.g. "moderate out of
-# 10").
-_PAIN_SCORE_CATEGORY_ACK_POOL: Tuple[str, ...] = (
-    "Okay, {value} pain -- that helps me understand how strong it is.",
-    "Got it, {value} -- that's useful to know.",
-)
-
-# Generic fallback ack, used for any field without a specific pool entry
+# Generic fallback lead, used for any field without a specific pool entry
 # above (swelling, warmth, stiffness, numbness/weakness, fever, medication
 # effect, pain characteristics).
-_GENERIC_ACK_POOL: Tuple[str, ...] = (
-    "Thanks, that's useful to know.",
-    "Got it, thanks.",
-    "Okay, that's helpful.",
-)
+_GENERIC_ACK_POOL: Tuple[str, ...] = ("Thanks, that's useful to know", "Got it, thanks", "Okay, that's helpful")
 
-_RETRY_ACK_POOL: Tuple[str, ...] = ("No worries.", "That's okay.", "No worries if you're not sure.")
+_RETRY_ACK_POOL: Tuple[str, ...] = ("No worries", "That's okay", "No worries if you're not sure")
 
 # Used when a field was resolved as the literal "unknown" (patient was
-# genuinely uncertain even after the simplified rephrase) -- never plug
-# "unknown" into a field-specific template like "Okay, unknown out of 10"
-# (robotic/nonsensical); acknowledge the gap plainly instead and move on.
+# genuinely uncertain, or gave an answer that didn't fit, even after the
+# second ask) -- never plug "unknown" into a field template; acknowledge
+# the gap plainly and move on.
 _UNKNOWN_RESOLVED_ACK_POOL: Tuple[str, ...] = (
-    "No worries -- I'll leave that as unclear for now.",
-    "That's okay -- I'll note that as unclear and move on.",
+    "No worries -- I'll leave that as unclear for now",
+    "That's okay -- I'll note that as unclear and move on",
+)
+
+# Used when the patient declined the memory confirmation ("Your log says
+# 6/10 ... still about that?" -> "no") -- the normal question follows.
+_CONFIRM_DECLINED_ACK_POOL: Tuple[str, ...] = (
+    "Okay, let's get today's number then",
+    "No problem -- let's update it",
 )
 
 
-def _field_ack(field_name: str, value: Any, seed: int) -> str:
-    if field_name == pain_logic.PAIN_SCORE and not isinstance(value, (int, float)):
-        # Category answer ("mild"/"moderate"/"severe") -- never plug it
-        # into the numeric "{value} out of 10" template.
-        return _pick(_PAIN_SCORE_CATEGORY_ACK_POOL, seed).format(value=value)
+def _field_ack(field_name: str, seed: int) -> str:
     pool = _FIELD_ACK_POOL.get(field_name)
     if pool:
-        return _pick(pool, seed).format(value=value)
+        return _pick(pool, seed)
     return _pick(_GENERIC_ACK_POOL, seed)
 
 
-def opening_message(next_field: str, *, is_alt: bool = False, trend: Optional[str] = None) -> str:
-    """First turn of a fresh conversation -- a plain opening ack + the first
-    question. is_alt is always False here (nothing has been asked yet, so
-    there is nothing to be uncertain about).
+# ----------------------------------------------------------------------------
+# One-line reflection of what has been collected so far.
+# ----------------------------------------------------------------------------
 
-    `trend` is the worsening_or_improving value already extracted from the
-    patient's OWN opening message, if any (e.g. "My knee was hurting badly
-    earlier but it's actually feeling better now." -> "improving"). When
-    present, a subtly more specific acknowledgment is used instead of the
-    fully generic one -- kept short and calm, not effusive."""
-    if trend == "improving":
+_SHORT_YES_NO_LABELS: Dict[str, str] = {
+    pain_logic.SWELLING: "swelling",
+    pain_logic.WARMTH_OR_REDNESS: "warmth/redness",
+    pain_logic.STIFFNESS: "stiffness",
+    pain_logic.NUMBNESS_OR_WEAKNESS: "numbness/weakness",
+    pain_logic.FEVER_OR_TEMPERATURE: "fever",
+    pain_logic.MEDICATION_EFFECT: "medication helped",
+}
+
+_REFLECTION_ORDER: Tuple[str, ...] = (
+    pain_logic.PAIN_SCORE, pain_logic.ONSET, pain_logic.LOCATION,
+    pain_logic.WORSENING_OR_IMPROVING, pain_logic.PAIN_CHARACTERISTICS,
+    pain_logic.SWELLING, pain_logic.WARMTH_OR_REDNESS, pain_logic.STIFFNESS,
+    pain_logic.NUMBNESS_OR_WEAKNESS, pain_logic.FEVER_OR_TEMPERATURE,
+    pain_logic.MEDICATION_EFFECT,
+)
+
+
+def _short_fragment(field_name: str, value: Any) -> Optional[str]:
+    """A few words for one collected fact; None for an "unknown" value
+    (gaps are reported at the end, never mid-interview)."""
+    if value is None or value == "unknown":
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+
+    if field_name == pain_logic.PAIN_SCORE:
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return f"{int(value)}/10"
+        return f"{text} pain"
+    if field_name == pain_logic.ONSET:
+        if text == "sudden":
+            return "sudden onset"
+        if text == "gradual":
+            return "gradual onset"
+        return f"started {text}"
+    if field_name == pain_logic.LOCATION:
+        return text
+    if field_name == pain_logic.WORSENING_OR_IMPROVING:
+        return {"worsening": "getting worse", "improving": "getting better", "stable": "about the same"}.get(text, text)
+    if field_name == pain_logic.PAIN_CHARACTERISTICS:
+        return text if len(text) <= 40 else text[:37].rstrip() + "..."
+    label = _SHORT_YES_NO_LABELS.get(field_name, field_name.replace("_", " "))
+    lowered = text.lower()
+    if pain_logic._is_negative_answer(lowered):
+        return f"{label}: no"
+    if lowered in ("yes", "present", "yes, present") or pain_logic._is_affirmative_answer(lowered):
+        return f"{label}: yes"
+    short = text if len(text) <= 40 else text[:37].rstrip() + "..."
+    return f"{label}: {short}"
+
+
+def collected_summary_line(assessment: Dict[str, Any]) -> str:
+    """Comma-separated, plain-language one-liner of every collected fact,
+    e.g. "7/10, sudden onset, in the calf, swelling: yes". Empty string
+    when nothing usable has been collected yet."""
+    fragments: List[str] = []
+    for field_name in _REFLECTION_ORDER:
+        if field_name not in assessment:
+            continue
+        fragment = _short_fragment(field_name, assessment[field_name])
+        if fragment:
+            fragments.append(fragment)
+    return ", ".join(fragments)
+
+
+def _reflection_sentence(lead: str, collected: str) -> str:
+    """"{lead} -- so far: {collected}." (or just "{lead}." when nothing
+    has been collected yet). Uses ";" instead of "--" when the lead already
+    contains a dash, to avoid a doubled dash."""
+    lead = lead.strip().rstrip(".")
+    if not collected:
+        return f"{lead}."
+    joiner = ";" if "--" in lead else " --"
+    return f"{lead}{joiner} so far: {collected}."
+
+
+# ----------------------------------------------------------------------------
+# Progress indicator.
+# ----------------------------------------------------------------------------
+
+def progress_indicator(remaining_after_this: int, *, branch_deciding: bool = False) -> str:
+    """Short parenthetical for the end of a question. `remaining_after_this`
+    is a LOWER BOUND (see pain_logic.estimate_remaining_questions); while a
+    branch-deciding field is open the wording stays deliberately vague."""
+    if branch_deciding and remaining_after_this <= 1:
+        return "(one or two more questions)"
+    if remaining_after_this <= 0:
+        return "(last question)"
+    if remaining_after_this == 1:
+        return "(one more question after this)"
+    if remaining_after_this == 2:
+        return "(one or two more questions)"
+    return "(a few more questions)"
+
+
+# ----------------------------------------------------------------------------
+# Memory reference for the opening line.
+# ----------------------------------------------------------------------------
+
+def _previous_score_phrase(previous: Dict[str, Any]) -> Optional[str]:
+    score = previous.get("pain_score")
+    if score is not None:
+        try:
+            return f"{int(round(float(score)))}/10"
+        except (TypeError, ValueError):
+            pass
+    category = previous.get("pain_severity_category")
+    if category:
+        return f"{str(category).strip().lower()} pain"
+    return None
+
+
+def _trend_phrase(value: Any) -> Optional[str]:
+    text = str(value or "").strip().lower()
+    return {
+        "worsening": "it was getting worse",
+        "improving": "it was getting better",
+        "stable": "it was about the same",
+    }.get(text)
+
+
+def memory_reference_line(previous: Optional[Dict[str, Any]]) -> Optional[str]:
+    """"Last time you had 7/10 behind the knee and it was getting worse" --
+    built ONLY from a previously persisted assessment row; None when there
+    is no prior assessment or it holds nothing worth referencing."""
+    if not previous:
+        return None
+    score_phrase = _previous_score_phrase(previous)
+    location = str(previous.get("location") or "").strip()
+    if location.lower() == "unknown":
+        location = ""
+    trend = _trend_phrase(previous.get("worsening_or_improving"))
+
+    if not score_phrase and not location:
+        return None
+    parts = ["Last time you had"]
+    if score_phrase:
+        parts.append(score_phrase)
+    if location:
+        parts.append(location if score_phrase else f"pain {location}")
+    line = " ".join(parts)
+    if trend:
+        line += f" and {trend}"
+    return line
+
+
+# ----------------------------------------------------------------------------
+# Opening / follow-up composers.
+# ----------------------------------------------------------------------------
+
+def opening_message(
+    next_field: str,
+    *,
+    is_alt: bool = False,
+    trend: Optional[str] = None,
+    procedure: Optional[str] = None,
+    memory_reference: Optional[str] = None,
+    confirm_score: Optional[int] = None,
+    indicator: str = "",
+) -> str:
+    """First turn of a fresh conversation -- an opening line + the first
+    question. When the patient has a previous assessment on record,
+    `memory_reference` replaces the generic opening ("Last time you had
+    7/10 behind the knee and it was getting worse -- let's see where things
+    are now."). When today's log already has a pain score and the pain
+    score is what we'd ask first, `confirm_score` turns the question into a
+    confirmation ("Your log says 6/10 earlier today -- still about that?")
+    instead of asking from scratch."""
+    if memory_reference:
+        ack = f"{memory_reference.rstrip('.')} -- let's see where things are now."
+    elif trend == "improving":
         ack = _pick(_OPENING_ACK_IMPROVING_POOL, 0)
     elif trend == "worsening":
         ack = _pick(_OPENING_ACK_WORSENING_POOL, 0)
     else:
         ack = _pick(_OPENING_ACK_POOL, 0)
-    question = pain_logic.ALT_QUESTIONS[next_field] if is_alt else pain_logic.QUESTIONS[next_field]
-    return f"{ack} {question}"
+
+    if confirm_score is not None and next_field == pain_logic.PAIN_SCORE and not is_alt:
+        question = pain_logic.confirm_pain_score_question(confirm_score)
+    else:
+        question = pain_logic.question_text(next_field, procedure=procedure, alt=is_alt)
+    return " ".join(part for part in (ack, question, indicator.strip()) if part)
 
 
 def followup_message(
@@ -167,66 +322,119 @@ def followup_message(
     is_alt: bool,
     was_uncertain: bool,
     variation_seed: int,
+    assessment: Optional[Dict[str, Any]] = None,
+    procedure: Optional[str] = None,
+    is_clarify: bool = False,
+    confirm_declined: bool = False,
+    indicator: str = "",
 ) -> str:
     """
-    Ack (based on what was just answered) + the next question. Never
-    prepends "Thanks" mechanically -- an uncertain answer gets a "no
-    worries"-style ack instead, and if nothing was actually attributed this
-    turn (e.g. a volunteered fact was already known), a light generic ack is
-    still used since the conversation is continuing, not opening fresh.
+    One mid-interview reply: reflection line + exactly one question +
+    progress indicator, under three sentences. Which lead opens the
+    reflection depends on what just happened:
 
-    A field resolved as the literal "unknown" never has its value plugged
-    into a field-specific template (no "Okay, unknown out of 10").
+      - `is_clarify`: the reply didn't fit the question -> the CLARIFY
+        re-ask (its own "Sorry, I didn't catch..." lead) preceded by the
+        reflection only when something has been collected;
+      - `is_alt`: the reply was uncertain -> the ALT rephrase (its own "No
+        worries..." lead), same reflection rule;
+      - `answered_value == "unknown"`: the field was just resolved as
+        unclear -> the "I'll leave that as unclear" lead (checked BEFORE
+        `was_uncertain`, so a resolved gap never reads as a pending retry);
+      - `confirm_declined`: the patient said "no" to the logged score ->
+        "let's get today's number" lead + the normal question;
+      - otherwise a short field/generic lead.
 
-    When the NEXT question is itself an alt (simplified rephrase) --
-    i.e. the patient was just uncertain about that same field -- the alt
-    question text is returned on its own: every ALT_QUESTIONS entry already
-    opens with its own natural acknowledgment ("No worries...", "That's
-    okay...", "No problem..."), so prepending a second, separate ack would
-    read as a stilted double acknowledgment.
-
-    BRANCH PRIORITY: `answered_value == "unknown"` is checked BEFORE
-    `was_uncertain` -- once a field has actually been RESOLVED as
-    "unknown" (the patient was uncertain again on the simplified retry),
-    that resolution must win and produce the "I'll leave that as unclear"
-    acknowledgment, never the generic "no worries" retry ack (which reads
-    as though another attempt is still pending, when the conversation has
-    in fact already moved on to `next_field`). This does not change
-    first-uncertain-answer behaviour: on a FIRST "idk", the field is not
-    yet resolved (still in needs_alt, not yet a stored "unknown" value),
-    so `is_alt` is True for the very next question and the function
-    returns the ALT_QUESTIONS text above before either branch is reached.
+    An unresolved `answered_value` (None) is never interpolated anywhere --
+    the lead never names the value; the reflection states only what IS
+    collected.
     """
-    if is_alt:
-        return pain_logic.ALT_QUESTIONS[next_field]
+    collected = collected_summary_line(assessment or {})
+
+    if is_clarify or is_alt:
+        question = (
+            pain_logic.clarify_question_text(next_field, procedure=procedure)
+            if is_clarify
+            else pain_logic.question_text(next_field, procedure=procedure, alt=True)
+        )
+        reflection = f"So far: {collected}." if collected else ""
+        return " ".join(part for part in (reflection, question, indicator.strip()) if part)
 
     if answered_value == "unknown":
-        ack = _pick(_UNKNOWN_RESOLVED_ACK_POOL, variation_seed)
+        lead = _pick(_UNKNOWN_RESOLVED_ACK_POOL, variation_seed)
+    elif confirm_declined:
+        lead = _pick(_CONFIRM_DECLINED_ACK_POOL, variation_seed)
     elif was_uncertain:
-        ack = _pick(_RETRY_ACK_POOL, variation_seed)
-    elif answered_field is not None:
-        ack = _field_ack(answered_field, answered_value, variation_seed)
+        lead = _pick(_RETRY_ACK_POOL, variation_seed)
+    elif answered_field is not None and answered_value is not None:
+        lead = _field_ack(answered_field, variation_seed)
     else:
-        ack = _pick(_GENERIC_ACK_POOL, variation_seed)
+        lead = _pick(_GENERIC_ACK_POOL, variation_seed)
 
-    question = pain_logic.QUESTIONS[next_field]
-    return f"{ack} {question}"
+    reflection = _reflection_sentence(lead, collected)
+    question = pain_logic.question_text(next_field, procedure=procedure, alt=False)
+    return " ".join(part for part in (reflection, question, indicator.strip()) if part)
 
 
 # ============================================================================
-# RAG RETRIEVAL HINT -- mirrors recovery_integration.build_retrieval_query.
+# RAG RETRIEVAL QUERY -- built from the COLLECTED location and symptoms (not
+# from the raw patient message and not from the instruction block), plus a
+# branch hint mirroring recovery_integration.build_retrieval_query. This is
+# what ChatAgent.answer_question() receives as `user_message` on the final
+# turn, so it is BOTH the retrieval query and the "User's Question" slot of
+# the LLM prompt -- hence the question form.
 # ============================================================================
 
 _RETRIEVAL_HINTS: Dict[str, str] = {
     "calf": "calf swelling warmth postoperative deep vein thrombosis risk signs",
+    "thigh": "thigh swelling warmth after hip replacement deep vein thrombosis risk signs",
     "joint": "postoperative joint pain swelling stiffness recovery",
 }
 
+_SYMPTOM_QUERY_WORDS: Tuple[Tuple[str, str], ...] = (
+    (pain_logic.SWELLING, "swelling"),
+    (pain_logic.WARMTH_OR_REDNESS, "warmth or redness"),
+    (pain_logic.STIFFNESS, "stiffness"),
+    (pain_logic.NUMBNESS_OR_WEAKNESS, "numbness or weakness"),
+    (pain_logic.FEVER_OR_TEMPERATURE, "fever"),
+)
 
-def build_retrieval_query(user_message: str, assessment: Dict[str, Any]) -> str:
-    branch = pain_logic.classify_location_branch(str(assessment.get(pain_logic.LOCATION, "")))
+
+def build_retrieval_query(
+    assessment: Dict[str, Any],
+    *,
+    surgery_type: Optional[str] = None,
+    procedure: Optional[str] = None,
+    postop_day: Optional[int] = None,
+) -> str:
+    location = str(assessment.get(pain_logic.LOCATION) or "").strip()
+    if location.lower() == "unknown":
+        location = ""
+    severity = pain_logic.severity_bucket(assessment.get(pain_logic.PAIN_SCORE))
+    severity_word = severity if severity in ("mild", "moderate", "severe") else ""
+
+    present_symptoms = [
+        word for field_name, word in _SYMPTOM_QUERY_WORDS
+        if _field_reported_present(assessment, field_name)
+    ]
+    onset = assessment.get(pain_logic.ONSET)
+    onset_word = {"sudden": "sudden-onset", "gradual": "gradual-onset"}.get(str(onset or ""), "")
+    trend = assessment.get(pain_logic.WORSENING_OR_IMPROVING)
+    trend_word = {"worsening": "that is getting worse", "improving": "that is improving", "stable": "that is unchanged"}.get(str(trend or ""), "")
+
+    descriptor = " ".join(word for word in (severity_word, onset_word) if word)
+    subject = f"{descriptor} pain {location}".strip() if location else f"{descriptor} pain".strip()
+    if present_symptoms:
+        subject += " with " + ", ".join(present_symptoms)
+    if trend_word:
+        subject += f" {trend_word}"
+    context = f" after {surgery_type}" if surgery_type else ""
+    day = f" on day {postop_day}" if postop_day is not None else ""
+
+    branch = pain_logic.classify_location_branch(location, procedure)
     hint = _RETRIEVAL_HINTS.get(branch, "")
-    return f"{user_message} {hint}".strip()
+    query = f"What should I know about {subject}{context}{day}, and what should I do?"
+    return f"{query} {hint}".strip()
 
 
 # ============================================================================
@@ -304,25 +512,15 @@ def summarize_assessment(assessment: Dict[str, Any]) -> str:
 # HISTORICAL TREND NOTE -- purely factual, never required.
 # ============================================================================
 
-def build_trend_note(assessment: Dict[str, Any], prior_assessments: List[Dict[str, Any]]) -> Optional[str]:
-    """
-    A single, purely factual sentence comparing today's pain_score against
-    the most recently completed assessment's pain_score, if both are real
-    numbers. Returns None whenever there is nothing to compare (no prior
-    assessment, or either score missing/unknown) -- historical comparison
-    is additive only, never required for a fresh conversation to work.
-    """
-    if not prior_assessments:
-        return None
+def _score_comparison_sentence(assessment: Dict[str, Any], previous: Dict[str, Any]) -> Optional[str]:
     current_score = assessment.get(pain_logic.PAIN_SCORE)
-    if not isinstance(current_score, int):
+    if not isinstance(current_score, int) or isinstance(current_score, bool):
         return None
-    previous = prior_assessments[-1]
     previous_score = previous.get("pain_score")
     if previous_score is None:
         return None
     try:
-        previous_score = int(previous_score)
+        previous_score = int(round(float(previous_score)))
     except (TypeError, ValueError):
         return None
 
@@ -331,6 +529,69 @@ def build_trend_note(assessment: Dict[str, Any], prior_assessments: List[Dict[st
     if current_score < previous_score:
         return f"That's lower than the pain score of {previous_score}/10 recorded last time."
     return f"That's the same as the pain score of {previous_score}/10 recorded last time."
+
+
+_TREND_LABELS: Dict[str, str] = {
+    "worsening": "getting worse",
+    "improving": "getting better",
+    "stable": "about the same",
+}
+
+
+def _location_trend_comparison_sentence(
+    assessment: Dict[str, Any], previous: Dict[str, Any],
+) -> Optional[str]:
+    """"Last time it was behind the knee and getting worse; now it's in the
+    calf and about the same." -- states only what BOTH records actually
+    hold; returns None when neither location nor trend is comparable."""
+    def _clean(value: Any) -> str:
+        text = str(value or "").strip()
+        return "" if text.lower() == "unknown" else text
+
+    prev_location = _clean(previous.get("location"))
+    prev_trend = _TREND_LABELS.get(_clean(previous.get("worsening_or_improving")).lower(), "")
+    cur_location = _clean(assessment.get(pain_logic.LOCATION))
+    cur_trend = _TREND_LABELS.get(_clean(assessment.get(pain_logic.WORSENING_OR_IMPROVING)).lower(), "")
+
+    if not (prev_location or prev_trend):
+        return None
+
+    def _describe(location: str, trend: str) -> str:
+        parts: List[str] = []
+        if location:
+            parts.append(location)
+        if trend:
+            parts.append(trend)
+        return " and ".join(parts)
+
+    previous_text = _describe(prev_location, prev_trend)
+    current_text = _describe(cur_location, cur_trend)
+    if not current_text:
+        return f"Last time it was {previous_text}."
+    if prev_location and cur_location and prev_location.lower() == cur_location.lower() and not (prev_trend or cur_trend):
+        return f"It's still {cur_location}, the same place as last time."
+    return f"Last time it was {previous_text}; now it's {current_text}."
+
+
+def build_trend_note(assessment: Dict[str, Any], prior_assessments: List[Dict[str, Any]]) -> Optional[str]:
+    """
+    Purely factual comparison with the most recently completed assessment:
+    the pain SCORE sentence (when both scores are real numbers) plus a
+    LOCATION/TREND sentence (when the prior record holds either). Returns
+    None whenever there is nothing to compare -- historical comparison is
+    additive only, never required for a fresh conversation to work.
+    """
+    if not prior_assessments:
+        return None
+    previous = prior_assessments[-1]
+    sentences = [
+        sentence for sentence in (
+            _score_comparison_sentence(assessment, previous),
+            _location_trend_comparison_sentence(assessment, previous),
+        )
+        if sentence
+    ]
+    return " ".join(sentences) if sentences else None
 
 
 # ============================================================================
@@ -689,6 +950,15 @@ def build_final_turn_message(
     trend_note: Optional[str],
     retrieval_hint: Optional[str] = None,
 ) -> str:
+    """
+    Fenced final-turn instruction text. RETAINED for callers/tests that
+    build a complete final message in one string; PainSymptomsAgent itself
+    no longer sends this as ChatAgent's `user_message` -- that slot now
+    carries the collected-facts retrieval query (build_retrieval_query) and
+    all instruction/fenced data goes through
+    build_final_turn_domain_instruction instead, so the RAG query is never
+    the instruction block.
+    """
     data_block = _build_untrusted_data_block(assessment_summary, trend_note, retrieval_hint)
     return (
         "FINAL PAIN & SYMPTOMS RESPONSE.\n\n"
@@ -720,12 +990,39 @@ def build_final_turn_message(
     )
 
 
+# Appended VERBATIM to every final-turn domain instruction: the LLM must
+# abstain rather than improvise when the retrieved discharge notes do not
+# cover the question.
+ABSTENTION_INSTRUCTION = (
+    "Whenever the discharge notes do not cover the question, say you don't "
+    "have that information and ask the patient to check with their surgeon "
+    "or physiotherapist."
+)
+
+
 def build_final_turn_domain_instruction(
     base_domain_focus: str,
     assessment_summary: str,
     trend_note: Optional[str],
     has_unknown_fields: bool,
+    *,
+    latest_patient_message: Optional[str] = None,
+    record_context: Optional[str] = None,
 ) -> str:
+    """
+    The `domain_instruction` for the final ChatAgent call. Besides the
+    fenced assessment/trend data, it now also carries:
+      - the patient's LATEST raw message, fenced as untrusted data (it no
+        longer travels in `user_message`, which is the retrieval query --
+        see build_retrieval_query);
+      - `record_context` (e.g. weight-bearing status from the patient
+        record), fenced as data as well;
+      - ABSTENTION_INSTRUCTION, verbatim;
+      - a note that the system itself appends the deterministic triage
+        action protocol and the next step, so the LLM explains the
+        findings and gives grounded practical guidance without restating
+        or softening that protocol.
+    """
     uncertainty_clause = (
         "\n\nOne or more fields could not be determined even after a "
         "simplified follow-up question -- do not treat those as a normal "
@@ -736,6 +1033,14 @@ def build_final_turn_domain_instruction(
         else ""
     )
     data_block = _build_untrusted_data_block(assessment_summary, trend_note)
+    if latest_patient_message and latest_patient_message.strip():
+        data_block += "\n\n" + _wrap_untrusted_data(
+            "PATIENT'S LATEST MESSAGE", latest_patient_message.strip(),
+        )
+    if record_context and record_context.strip():
+        data_block += "\n\n" + _wrap_untrusted_data(
+            "PATIENT RECORD CONTEXT", record_context.strip(),
+        )
     return (
         f"{base_domain_focus}\n\n"
         "IMPORTANT: The conversational pain assessment is COMPLETE. This is "
@@ -769,6 +1074,14 @@ def build_final_turn_domain_instruction(
         "symptom they did not report is 'normal' -- reassurance about "
         "something is only appropriate for findings actually present in "
         "the assessment below.\n\n"
+        "The system itself appends the deterministic safety-triage action "
+        "protocol and one concrete next step after your answer, verbatim. "
+        "Do not restate, soften or contradict that protocol; focus on "
+        "explaining the reported findings and giving grounded practical "
+        "guidance from the retrieved discharge notes. When the triage "
+        "guidance already provided says the patient should contact their "
+        "care team, you may say so plainly.\n\n"
+        f"{ABSTENTION_INSTRUCTION}\n\n"
         f"{data_block}"
         f"{uncertainty_clause}"
     )
@@ -826,35 +1139,126 @@ def _render_action_guidance(
     return f"{lead} {protocol_text}"
 
 
+# ============================================================================
+# PROACTIVE CLOSE -- the final turn always ends the same way, whether the
+# body came from the LLM or from the deterministic fallback:
+#
+#     summary -> comparison with last time -> triage action protocol
+#     (verbatim) -> ONE concrete next step -> check-in offer
+# ============================================================================
+
+CHECK_IN_OFFER = "Say 'pain check' any time and I'll compare with today."
+
+_GREEN_NEXT_STEP = (
+    "Next step: note how the pain feels again this evening so we can "
+    "compare it with today."
+)
+_NO_PROTOCOL_NEXT_STEP = (
+    "Next step: let your surgical team know if anything changes before "
+    "your next check-in."
+)
+
+
+def _first_sentence(text: str) -> str:
+    parts = _split_sentences(text.strip())
+    return parts[0].strip() if parts and parts[0].strip() else text.strip()
+
+
+def next_step_line(triage_level: str, precomputed_triage: Optional[Dict[str, Any]]) -> str:
+    """
+    Exactly ONE concrete next step, never a second protocol of our own:
+      - YELLOW / RED: the FIRST sentence of SafetyTriageEngine's own
+        action_protocol, restated as "Next step: ..." (the full protocol is
+        rendered verbatim just above it);
+      - GREEN: a check-in step (log the pain again this evening) -- not a
+        clinical instruction;
+      - no usable protocol: a neutral "tell your team if anything changes".
+    """
+    protocol_text = ""
+    if precomputed_triage:
+        protocol_text = str(precomputed_triage.get("action_protocol") or "").strip()
+
+    if triage_level in ("YELLOW", "RED") and protocol_text:
+        first = _first_sentence(protocol_text).rstrip(".")
+        return f"Next step: {first[0].lower() + first[1:] if first else first}."
+    if triage_level == "GREEN":
+        return _GREEN_NEXT_STEP
+    return _NO_PROTOCOL_NEXT_STEP
+
+
+def _uncertainty_sentence(assessment: Dict[str, Any]) -> str:
+    unknown_fields = [field for field, value in assessment.items() if value == "unknown"]
+    if not unknown_fields:
+        return ""
+    readable = ", ".join(_FIELD_LABELS.get(field, field) for field in unknown_fields)
+    return (
+        f"You weren't able to tell about the following: {readable}. "
+        "Since that's not clear from what you described, it's worth "
+        "checking with your surgical team so nothing gets missed."
+    )
+
+
+_BLANK_RUN_RE = re.compile(r"\n[ \t]*\n(?:[ \t]*\n)+")
+
+
+def collapse_blank_lines(text: str) -> str:
+    """Normalise paragraph spacing in a final reply: every run of two or
+    more blank lines (including whitespace-only lines) becomes exactly ONE
+    empty line, so blocks are always separated the same way regardless of
+    which optional blocks (comparison, uncertainty, facts) were present."""
+    return _BLANK_RUN_RE.sub("\n\n", text).strip()
+
+
+def _closing_block(
+    assessment: Dict[str, Any],
+    precomputed_triage: Optional[Dict[str, Any]],
+    trend_note: Optional[str],
+) -> str:
+    """comparison -> protocol -> uncertainty -> next step + check-in offer."""
+    triage_level = "GREEN"
+    if precomputed_triage:
+        triage_level = precomputed_triage.get("triage_level", "GREEN")
+
+    paragraphs: List[str] = []
+    if trend_note:
+        paragraphs.append(f"Compared with last time: {trend_note}")
+    paragraphs.append(_render_action_guidance(triage_level, precomputed_triage))
+    uncertainty = _uncertainty_sentence(assessment)
+    if uncertainty:
+        paragraphs.append(uncertainty)
+    paragraphs.append(f"{next_step_line(triage_level, precomputed_triage)} {CHECK_IN_OFFER}")
+    return "\n\n".join(paragraph for paragraph in paragraphs if paragraph.strip())
+
+
+def compose_final_reply(
+    body: str,
+    assessment: Dict[str, Any],
+    precomputed_triage: Optional[Dict[str, Any]],
+    trend_note: Optional[str],
+) -> str:
+    """Final reply around an ACCEPTED LLM body: a one-line summary of what
+    was collected, the body, then the deterministic closing block."""
+    collected = collected_summary_line(assessment)
+    summary_line = f"Here's what you told me: {collected}." if collected else ""
+    parts = [part for part in (summary_line, body.strip()) if part]
+    return collapse_blank_lines(
+        "\n\n".join(parts + [_closing_block(assessment, precomputed_triage, trend_note)])
+    )
+
+
 def deterministic_summary(
     assessment: Dict[str, Any],
     precomputed_triage: Optional[Dict[str, Any]],
     trend_note: Optional[str],
 ) -> str:
-    triage_level = "GREEN"
-    if precomputed_triage:
-        triage_level = precomputed_triage.get("triage_level", "GREEN")
-
+    """Fully deterministic final reply (no LLM text): bullet summary of
+    every reported fact, then the same closing block as compose_final_reply
+    (comparison, verbatim action protocol, one next step, check-in offer)."""
     facts_summary = summarize_assessment(assessment)
-    action = _render_action_guidance(triage_level, precomputed_triage)
-
-    unknown_fields = [field for field, value in assessment.items() if value == "unknown"]
-    uncertainty_sentence = ""
-    if unknown_fields:
-        readable = ", ".join(_FIELD_LABELS.get(field, field) for field in unknown_fields)
-        uncertainty_sentence = (
-            f"\n\nYou weren't able to tell about the following: {readable}. "
-            "Since that's not clear from what you described, it's worth "
-            "checking with your surgical team so nothing gets missed."
-        )
-
-    trend_block = f" {trend_note}" if trend_note else ""
-
-    return (
+    return collapse_blank_lines(
         "Thanks for going through that with me. Based on what you've "
         f"told me:\n{facts_summary}\n\n"
-        f"{action}{trend_block}"
-        f"{uncertainty_sentence}\n\n"
+        f"{_closing_block(assessment, precomputed_triage, trend_note)}\n\n"
         "This is a preliminary read based on what you've described and "
         "isn't a diagnosis."
     )
@@ -918,12 +1322,12 @@ def persist_completed_assessment(
     temperature_c: Optional[float],
     precomputed_triage: Optional[Dict[str, Any]],
 ) -> None:
-    """Best-effort persistence into the existing patient database. Any
-    failure (e.g. an unseeded/unknown patient_id with no row in `patients`)
-    is caught and logged -- persistence must never interrupt or fail the
-    patient-facing conversation turn."""
+    """Best-effort persistence into the existing patient database (via
+    agents/patient_memory.py). Any failure (e.g. an unseeded/unknown
+    patient_id with no row in `patients`) is caught and logged --
+    persistence must never interrupt or fail the patient-facing turn."""
     try:
-        from patient_database import save_symptom_assessment
+        from agents import patient_memory
 
         record = build_persistable_record(
             assessment,
@@ -931,9 +1335,51 @@ def persist_completed_assessment(
             temperature_c=temperature_c,
             precomputed_triage=precomputed_triage,
         )
-        save_symptom_assessment(patient_id, record)
+        patient_memory.write_symptom_assessment(patient_id, record)
     except Exception as exc:
         print(f"[PAIN] symptom assessment persistence failed: {exc}")
+
+
+def persist_today_metrics(
+    patient_id: str,
+    assessment: Dict[str, Any],
+    *,
+    postop_day: Optional[int],
+    precomputed_triage: Optional[Dict[str, Any]],
+) -> bool:
+    """Best-effort write of today's `metrics` pain_score/swelling (via
+    agents/patient_memory.py). Only an exact numeric score is written --
+    a category or "unknown" leaves pain_score untouched. Swelling is
+    written as the patient's own answer ("yes"/"no"/their words)."""
+    try:
+        from agents import patient_memory
+
+        score_value = assessment.get(pain_logic.PAIN_SCORE)
+        pain_score: Optional[float] = None
+        if isinstance(score_value, (int, float)) and not isinstance(score_value, bool):
+            pain_score = float(score_value)
+
+        swelling_value = assessment.get(pain_logic.SWELLING)
+        swelling: Optional[str] = None
+        if swelling_value is not None and swelling_value != "unknown":
+            swelling = str(swelling_value).strip()[:80] or None
+
+        triage = None
+        if precomputed_triage:
+            triage = precomputed_triage.get("triage_level")
+
+        if pain_score is None and swelling is None:
+            return False
+        return patient_memory.write_today_metrics(
+            patient_id,
+            pain_score=pain_score,
+            swelling=swelling,
+            triage=triage,
+            postop_day=postop_day,
+        )
+    except Exception as exc:
+        print(f"[PAIN] today's metrics persistence failed: {exc}")
+        return False
 
 
 def load_recent_assessments(patient_id: str, limit: int = 3) -> List[Dict[str, Any]]:
@@ -941,9 +1387,9 @@ def load_recent_assessments(patient_id: str, limit: int = 3) -> List[Dict[str, A
     returns a list (empty on any failure or when none exist) -- a fresh
     conversation with no history must work identically to one with history."""
     try:
-        from patient_database import get_recent_symptom_assessments
+        from agents import patient_memory
 
-        return get_recent_symptom_assessments(patient_id, limit=limit)
+        return patient_memory.load_recent_assessments(patient_id, limit=limit)
     except Exception as exc:
         print(f"[PAIN] symptom history lookup failed: {exc}")
         return []

@@ -1,0 +1,44 @@
+{
+  "id": "c12_pain_abandoned",
+  "agent": "pain",
+  "title": "Abandoned interview: the patient stops after two answers, nothing persisted",
+  "tags": [
+    "abandoned"
+  ],
+  "record": {
+    "patient_id": "EVAL-C12",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 2,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 3
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 3,
+    "completes": false,
+    "abandoned": true
+  },
+  "turns": [
+    {
+      "patient": "My knee is throbbing."
+    },
+    {
+      "patient": "6",
+      "must_collect": [
+        "pain_score"
+      ]
+    },
+    {
+      "patient": "it came on suddenly",
+      "must_collect": [
+        "onset"
+      ]
+    }
+  ]
+}

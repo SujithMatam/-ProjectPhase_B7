@@ -1,0 +1,54 @@
+{
+  "id": "c20_rehab_direct_question",
+  "agent": "rehab",
+  "title": "Direct question naming an exercise: one question, today's log not re-asked",
+  "tags": [
+    "memory"
+  ],
+  "record": {
+    "patient_id": "EVAL-C20",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 7,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [
+      {
+        "days_ago": 0,
+        "exercise_completed": 1
+      }
+    ],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 8
+  },
+  "record_fields": [
+    {
+      "field": "weight_bearing_status",
+      "source": "surgeries",
+      "evidence": "weight-bearing as tolerated"
+    },
+    {
+      "field": "exercises_done_today",
+      "source": "metrics today",
+      "evidence": null
+    }
+  ],
+  "expect": {
+    "max_questions": 1,
+    "completes": true,
+    "persist_min": 0
+  },
+  "turns": [
+    {
+      "patient": "How do I do heel slides?"
+    },
+    {
+      "patient": "no, nothing hurts",
+      "must_collect": [
+        "exercise_safety"
+      ]
+    }
+  ]
+}

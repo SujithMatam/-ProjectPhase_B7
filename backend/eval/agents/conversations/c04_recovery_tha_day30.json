@@ -1,0 +1,58 @@
+{
+  "id": "c04_recovery_tha_day30",
+  "agent": "recovery",
+  "title": "THA day 30: walking aid, duration, stairs, hip precautions",
+  "source": "RECOVERY_AGENT_CHANGES.md section 2, THA post-op day 30",
+  "tags": [
+    "transcript",
+    "THA"
+  ],
+  "record": {
+    "patient_id": "EVAL-C04",
+    "procedure": "THA",
+    "surgery_type": "Total Hip Arthroplasty (THA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 29,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 30
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 4,
+    "completes": true,
+    "persist_min": 0
+  },
+  "turns": [
+    {
+      "patient": "How is my hip recovery going?"
+    },
+    {
+      "patient": "I'm still using one crutch",
+      "must_collect": [
+        "mobility_status"
+      ]
+    },
+    {
+      "patient": "about 20 minutes",
+      "must_collect": [
+        "walking_duration_minutes"
+      ]
+    },
+    {
+      "patient": "foot over foot now",
+      "must_collect": [
+        "stairs"
+      ]
+    },
+    {
+      "patient": "yes, still following them",
+      "must_collect": [
+        "hip_precautions"
+      ]
+    }
+  ]
+}

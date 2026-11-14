@@ -1,0 +1,91 @@
+{
+  "id": "c02_pain_tha_groin",
+  "agent": "pain",
+  "title": "THA groin case: hip wording, location asked, groin not stored as trend",
+  "source": "PAIN_AGENT_CHANGES.md section 2, THA groin case",
+  "tags": [
+    "transcript",
+    "THA",
+    "memory",
+    "bug-offtopic"
+  ],
+  "record": {
+    "patient_id": "EVAL-C02",
+    "procedure": "THA",
+    "surgery_type": "Total Hip Arthroplasty (THA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 8,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [
+      {
+        "days_ago": 0,
+        "pain_score": 4
+      }
+    ],
+    "prior_assessments": [
+      {
+        "days_ago": 3,
+        "pain_score": 5,
+        "onset": "gradual",
+        "location": "in the thigh",
+        "worsening_or_improving": "stable",
+        "triage_level": "GREEN"
+      }
+    ]
+  },
+  "request": {
+    "postop_day": 9
+  },
+  "record_fields": [
+    {
+      "field": "pain_score",
+      "source": "metrics today",
+      "evidence": "Your log says 4/10"
+    },
+    {
+      "field": null,
+      "source": "previous assessment",
+      "evidence": "Last time you had 5/10"
+    }
+  ],
+  "expect": {
+    "max_questions": 4,
+    "completes": true,
+    "persist_min": 1
+  },
+  "turns": [
+    {
+      "patient": "My hip is sore today."
+    },
+    {
+      "patient": "no, it's more like a 6",
+      "must_collect": [
+        "pain_score"
+      ]
+    },
+    {
+      "patient": "gradually",
+      "must_collect": [
+        "onset"
+      ]
+    },
+    {
+      "patient": "in the groin",
+      "must_collect": [
+        "location"
+      ],
+      "must_not_store": {
+        "worsening_or_improving": "groin"
+      }
+    },
+    {
+      "patient": "about the same",
+      "must_collect": [
+        "worsening_or_improving"
+      ],
+      "must_not_store": {
+        "location": "hip"
+      }
+    }
+  ]
+}
