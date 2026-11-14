@@ -985,6 +985,49 @@ override did for fevers; no such override was added here. The v2 training rows a
 were written by the same model family as everything else, so the challenge_v2 gains are partly
 gains on the same author's phrasing.
 
+## v3: short messages and RED signs inside routine questions (2026-11-14)
+
+**Problem** (`backend/eval/reports/2026-11-14_main-post-merge-tests.md`): with v2 as the default,
+short symptom messages are over-triaged ("My knee is swollen." -> RED, p(RED) 0.72; 9 agent tests
+and 19 symptom-assessment checks fail on such messages) and "I have severe calf pain and swelling,
+can I still do my exercises?" is GREEN (p(RED) 0.011).
+
+**Data, in this order** (each step committed before the next began):
+1. `data/integration_set.jsonl` (commit 2688e56): every patient message used in `backend/test_*.py`
+   (272 rows, labelled by guideline v1.1). Evaluation only. `data/INTEGRATION_SET_REPORT.md`.
+2. `data/challenge_v3.jsonl` (commit a7b15ea): 91 held-out rows (short single-symptom messages,
+   RED signs inside routine questions, mixed), written before any v3 training row and checked for
+   near-duplicates against every split, both earlier challenge sets, the v2 training rows and the
+   integration set. `data/CHALLENGE_V3_REPORT.md`.
+3. v3 training-only rows, written by separate writers that saw only the guideline and the
+   authoring README (`data/TRAIN_V3_REPORT.md`, `data/DATASET_CARD.md` "v3 additions").
+
+### Shipping rule (written and committed before any v3 training run)
+
+v3 = M2 (SetFit, all-MiniLM-L6-v2, num_iterations 3, the v2 settings) retrained on the frozen main
+train + the v2 training rows + the v3 training rows, 5 seeds, strictly sequential. Seed and
+thresholds are chosen **on val only**: for each seed t_red follows the v2 rule (lowest val
+over-triage among thresholds with pipeline val RED recall >= 0.93), t_yel and t_alert follow their
+v2 rules; the shipped seed is the one with the **lowest val over-triage at its own operating point**
+(ties: higher val RED recall, then higher val macro F1, then the lower seed number).
+
+Both versions are compared as the shipped hybrid pipeline (overrides + thresholded classifier,
+most serious level wins, text only): v2 = `m2_main_v2_it3_seed0` with `selection_v2.json`; v3 = the
+chosen v3 seed with its val thresholds. "Over-triage" = YELLOW->RED + GREEN->RED (non-RED rows
+called RED). The evaluation sets are main test, challenge, challenge_v2, challenge_v3, the
+unseen-scenario test (unseen-split models of each version, as before) and the integration set.
+
+> **Ship v3 only if all three hold, versus v2:**
+> 1. **Main test RED recall is not lower by more than 2 messages**: v3 RED rows called RED >=
+>    v2 RED rows called RED - 2 (of 104).
+> 2. **RED->GREEN is not higher on any set**: v3 RED->GREEN <= v2 RED->GREEN on each of the six
+>    evaluation sets.
+> 3. **Over-triage is lower on challenge_v3 and on the integration set**: v3 YELLOW->RED +
+>    GREEN->RED < v2 YELLOW->RED + GREEN->RED on each of the two (strictly lower).
+>
+> If any condition fails, v2 stays the default, the v3 weights are not committed, and the failing
+> condition is reported. No condition may be changed after the v3 numbers are seen.
+
 ## What this does not show
 
 - **Synthetic text.** Every message was written by an LLM (claude-opus-5-5), and the same model
