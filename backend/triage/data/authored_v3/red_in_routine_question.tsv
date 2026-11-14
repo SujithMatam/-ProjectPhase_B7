@@ -1,0 +1,121 @@
+# red_in_routine_question category (authored_v3). Guideline v1.1. Fields: LABEL SURGERY TAGS SCENARIOS TEXT
+RED	TKA	question	DVT_CALF,REHAB_EXERCISE	How many times a day should I do the heel slides? Asking because my calf has gone hot and hard since yesterday, probably just from the exercises
+RED	ANY	indirect,question	DVT_CALF,WALKING_AIDS	is it ok to walk to the shop with the stick now? only thing is the back of my lower leg is really tender to touch and kind of warm
+RED	ANY	indian_english,question	DVT_CALF,NORMAL_SWELLING	Doctor sir, kindly tell how many hours to keep leg elevated. Calf and ankle swelling is not reducing even after keeping leg up whole night
+RED	TKA	typo,question	DVT_CALF,REHAB_EXERCISE	can i start the exercise bike this wk? calf is red n swolen and hurts when i flex my foot, knee itself is fine
+RED	THA	carer,question	DVT_CALF,DAILY_ACTIVITY	My father wants to know if he can sit in his recliner for the cricket match. His left calf has been aching and looks fatter than the right for two days
+RED	ANY	question	DVT_CALF,DAILY_ACTIVITY	We're driving 4 hours to my daughter's on Sunday, any tips for the car? By the way my leg from the thigh down has swollen more since this morning and raising it isn't helping
+RED	ANY	hard_pos,indirect,question	DVT_CALF,MED_TIMING	Can I still wear the compression stockings if there's a painful tight spot in my calf? It's nowhere near the scar
+RED	TKA	question	DVT_CALF,STIFFNESS	Physio says push for 90 degrees of bend. Even though my calf is throbbing and warm I should still push through, right?
+RED	ANY	indirect,question	DVT_CALF,NUTRITION	does drinking more water help with clots? asking cos my calf feels like a hot brick and walking on it hurts
+RED	ANY	question	PE_CHEST,WALKING_AIDS	How many stairs should I be doing now? I got so breathless today going up just 5 steps and it hasn't settled even sitting down
+RED	ANY	indirect,question	PE_CHEST,REHAB_EXERCISE	Are the breathing exercises with the blue spirometer still needed? It hurts on the right side of my chest every time I breathe in deep, started last night
+RED	ANY	indian_english,question	PE_CHEST,MED_TIMING	Can I take cough syrup with my tablets? Having cough since 2 days and today some blood came in the sputum, kindly advise
+RED	ANY	carer,question	PE_CHEST,DAILY_ACTIVITY	Mum asked if she can have a bath yet. She nearly passed out getting up from the chair this morning, went grey, but says she is fine now
+RED	ANY	hard_pos,multi_symptom,question	PE_CHEST,FOLLOWUP_ADMIN	When can i go back to work at the office? probably nothing but my heart keeps racing and i feel short of breath just talking
+RED	ANY	typo,question	PE_CHEST,DAILY_ACTIVITY	sleeping on my back is ok still? only i keep waking up gasping like i cant get enuf air, never had that before
+RED	ANY	indirect,question	PE_CHEST,DAILY_ACTIVITY	Is it safe to fly home next week? Since yesterday it feels like I'm breathing through a straw, even lying still
+RED	ANY	question	PE_CHEST,NUTRITION	Quick one about diet, should I cut down on salt? Also I fainted in the kitchen this morning but came round straight away
+RED	ANY	question	PE_CHEST,FOLLOWUP_ADMIN	My follow-up is on the 20th, do I need to bring my x-rays? I also have a sharp pain in my chest when I cough, new since Tuesday
+RED	ANY	question	BLEEDING_ANTICOAG,NUTRITION	What foods are good for iron after surgery? I ask because my poo has been black and sticky like tar the last two days
+RED	ANY	indian_english,question	BLEEDING_ANTICOAG,MED_TIMING	Blood thinner injection to be taken morning or evening? Also today I vomited and it looked like coffee powder, what to do now
+RED	ANY	carer,question	BLEEDING_ANTICOAG,NUTRITION	Dad keeps asking how much water he should drink. His urine has turned red today, he's on the rivaroxaban
+RED	ANY	question	BLEEDING_ANTICOAG,DAILY_ACTIVITY	Can I shave my legs yet? I nicked my shin yesterday and it's still bleeding through every plaster I put on
+RED	TKA	question	BLEEDING_ANTICOAG,FOLLOWUP_ADMIN	Do the district nurses change the dressing or do I? It's soaked right through with blood and dripping onto the floor
+RED	ANY	hard_pos,question	BLEEDING_ANTICOAG,MED_TIMING	How long do I stay on the apixaban? I've got big purple bruises coming up on my arms and tummy and I haven't knocked anything
+RED	ANY	typo,question	BLEEDING_ANTICOAG,NUTRITION	is it ok to eat spicy food again? threw up this morning and there was fresh blood in it, prob from the spice lol
+RED	ANY	question	BLEEDING_ANTICOAG,DAILY_ACTIVITY	Can I go back to light gardening? Had a nosebleed an hour ago that still hasn't stopped, I'm on blood thinners
+RED	ANY	indian_english,question	BLEEDING_ANTICOAG,CONSTIPATION	Which laxative is best? Motion passed finally after 4 days but it is fully black in colour
+RED	TKA	question	SEPSIS_WOUND,DAILY_ACTIVITY	When can I get the knee wet in the shower? The bottom of the scar is leaking thick yellow stuff and smells bad
+RED	THA	question	WOUND_OPEN,HIP_PRECAUTIONS	Can I start sleeping on my side? Also the top end of my hip wound has come apart and I can see pink stuff inside
+RED	ANY	indirect,question	SEPSIS_WOUND,FOLLOWUP_ADMIN	is my staple removal still on friday? the redness round the wound has spread a lot since this morning, i drew a line and it's past it already
+RED	TKA	carer,multi_symptom,question	SEPSIS_WOUND,REHAB_EXERCISE	My husband's physio is tomorrow, should he still go? There's pus coming out of his knee wound and he's shivering with chills
+RED	ANY	typo,question	SEPSIS_WOUND,NUTRITION	wat protein shakes do u recomend? wound has started smelling really bad thru the dressing, kinda rotten
+RED	THA	question	WOUND_OPEN,DAILY_ACTIVITY	How soon can I drive? Small thing, two of the staples popped out and the cut is gaping open where they were
+RED	ANY	indian_english,question	SEPSIS_WOUND,MED_TIMING	Antibiotic course is over, should I continue it? Wound is giving greenish discharge since yesterday
+RED	TKA	hard_pos,question	SEPSIS_WOUND,STIFFNESS	Knee still won't bend past 80, is that normal at 3 weeks? The red patch round it has crept halfway down my shin since yesterday
+RED	ANY	temp_in_text,question	HIGH_FEVER,DAILY_ACTIVITY	When am I allowed to drive again? Temp was 38.7 this evening but otherwise feeling ok
+RED	ANY	temp_in_text,indian_english,multi_symptom,question	HIGH_FEVER,MED_TIMING	Paracetamol can be taken every 4 hours? Having fever 102 °F since night with shivering
+RED	ANY	temp_in_text,typo,question	HIGH_FEVER,NUTRITION	what shud i eat to get my strength back, temprature 101.5 this morning and no appetite
+RED	ANY	temp_in_text,carer,question	HIGH_FEVER,FOLLOWUP_ADMIN	Can we bring Mum's clinic appointment forward? Her temperature is 38.9°C today and she's very shivery
+RED	TKA	temp_in_text,question	HIGH_FEVER,REHAB_EXERCISE	Should I skip physio today? Thermometer says 38.5 and my knee feels hot
+RED	ANY	temp_in_text,question	HIGH_FEVER,MOOD_SLEEP	Any tips for sleeping better? I keep waking up drenched, it was 39.2 at 3am
+RED	THA	question	DISLOCATION,HIP_PRECAUTIONS	Is it ok to use a normal toilet seat now? I bent down for my sock, felt a clunk, and now I can't put any weight on that leg
+RED	THA	indirect,question	DISLOCATION,DAILY_ACTIVITY	How long before I can get in and out of a car on my own? Since I twisted getting in yesterday my right leg looks shorter and the foot is turned out
+RED	THA	carer,question	DISLOCATION,HIP_PRECAUTIONS	Dad wants to know if he can sleep on his side with a pillow. He heard a pop when he rolled over and now he's in agony in the groin and can't move the leg
+RED	THA	typo,question	DISLOCATION,WALKING_AIDS	when can i ditch the walker? hip went pop on the stairs and i cant lift the leg at all now
+RED	TKA	hard_pos,question	DISLOCATION,FALL_INJURY,REHAB_EXERCISE	Can I do my straight leg raises tonight? Knee gave way on the step, I went down, and now it looks bent the wrong way and I can't stand on it
+RED	ANY	indirect,question	NEUROVASCULAR,DAILY_ACTIVITY	How tight should the compression stockings be? My toes have gone white and cold and I can barely feel them
+RED	TKA	question	NEUROVASCULAR,REHAB_EXERCISE	Should I keep doing ankle pumps if I can't move my foot? It just won't go up since I woke up
+RED	ANY	indian_english,question	NEUROVASCULAR,MED_TIMING	Doctor, painkiller I should take before sleep or after food? Also toes are looking bluish and feeling dead from evening
+RED	THA	typo,question	NEUROVASCULAR,DAILY_ACTIVITY	can i put a hot water bottle on my foot? its numb n freezing cold, cant feel it at all
+RED	ANY	carer,question	NEUROVASCULAR,FOLLOWUP_ADMIN	My mother's surgeon review is next month, can we bring it earlier? Her foot on the operated side has gone pale and she can't wiggle her toes
+RED	TKA	question	COMPARTMENT,MED_TIMING	Can I take an extra oxycodone? The pain in my lower leg is unbearable, way worse than after surgery, and the tablets aren't touching it at all
+RED	ANY	indirect,question	COMPARTMENT,NORMAL_SWELLING	Does ice help when the leg feels tight like a drum? Whole shin is rock hard and the pain is off the scale even after my painkillers
+RED	TKA	hard_pos,question	COMPARTMENT,REHAB_EXERCISE	Is it fine to miss physio for a day? Pain since last night is way out of proportion, leg feels like it will burst, morphine hasn't helped
+RED	ANY	question	ALLERGIC_REACTION,MED_TIMING	What time should I take the new antibiotic tomorrow? After tonight's dose my lips and tongue have puffed up a bit
+RED	ANY	carer,multi_symptom,question	ALLERGIC_REACTION,NUTRITION	Can Dad have nuts for protein? He started the new painkiller and now his face is swelling and he says his throat feels tight
+RED	ANY	typo,question	ALLERGIC_REACTION,MED_TIMING	shud i take an antihistamine with my other meds? hives all over my body since the new tablet, chest and back and legs
+RED	ANY	carer,hard_pos,question	MOOD_SLEEP	Is it normal for her sleeping pattern to be off? Mum didn't recognise me this morning and keeps asking what year it is, she was sharp before the op
+RED	ANY	carer,indian_english,question	MED_TIMING	Night tablet to give before or after dinner? Since yesterday my father is talking nonsense and not knowing where he is, this is new
+RED	ANY	hard_pos,question	MOOD_SLEEP,FOLLOWUP_ADMIN	When can I go back to work? Honestly I keep thinking everyone would be better off without me and I've thought about taking all my tablets at once
+RED	ANY	indirect,question	MOOD_SLEEP	Any advice on getting comfortable at night? Lately I lie there thinking about ending it all, I'm just so tired of this
+RED	ANY	question	FALL_INJURY,MED_TIMING	Should I keep taking the apixaban as normal? I slipped in the bathroom and banged my head on the sink last night
+YELLOW	TKA	question	NORMAL_SWELLING,REHAB_EXERCISE	Can I start the exercise bike this week? The leg swelling has been worse this week than last, but it goes down when I put it up and my calf is fine
+YELLOW	TKA	question	CLEAR_DRAINAGE,DAILY_ACTIVITY	When can I get the knee wet in the shower? A bit of clear watery fluid is still coming from the bottom of the scar
+YELLOW	ANY	temp_in_text,question	LOW_FEVER,DAILY_ACTIVITY	When am I allowed to drive again? Temp was 37.9 this evening, otherwise feeling ok
+YELLOW	ANY	question	MISSED_DOSE,DAILY_ACTIVITY	Is it safe to fly home next week? I forgot yesterday's blood thinner injection, took today's as normal
+YELLOW	ANY	question	CONSTIPATION,NUTRITION	What foods are good to get things moving? Haven't opened my bowels for 4 days now on the codeine
+YELLOW	ANY	question	LOW_FEVER,MED_TIMING	Can I take my paracetamol and ibuprofen together? I've been running a temperature since lunch, haven't got a thermometer
+YELLOW	ANY	temp_in_text,indian_english,question	LOW_FEVER,FOLLOWUP_ADMIN	Kindly tell when stitches will be removed. Temp is 100.6 F since morning, slight body pain also
+YELLOW	ANY	temp_in_text,carer,question	LOW_FEVER,NUTRITION	Is Dad allowed a glass of wine at his birthday dinner? He's had a temp of 38.2 on and off today
+YELLOW	THA	typo,question	LOW_FEVER,HIP_PRECAUTIONS	how long b4 i can sleep on my side? also feelin a bit feverish tonite
+YELLOW	THA	question	CLEAR_DRAINAGE,DAILY_ACTIVITY	Do I need to keep the hip dressing on for the train tomorrow? It has a pinkish wet patch from the wound, no smell
+YELLOW	TKA	indian_english,question	CLEAR_DRAINAGE,WALKING_AIDS	Can I do my walking in the park daily? Little watery fluid is coming from knee wound since 2 days, dressing getting wet
+YELLOW	ANY	question	MINOR_BLEEDING,FOLLOWUP_ADMIN	When's my next dressing change due? The blood patch on it has got bigger since this morning, about the size of my palm now
+YELLOW	TKA	question	WOUND_IRRITATION,REHAB_EXERCISE	Is it ok to bend the knee fully during physio? The stitches feel like they're pulling at the top and the skin is puckering
+YELLOW	ANY	typo,question	WOUND_IRRITATION,DAILY_ACTIVITY	can i use moisturiser around the staples? theyre really irritated n pulling tight
+YELLOW	THA	hard_neg,question	WOUND_OPEN,DAILY_ACTIVITY	Can I go swimming yet? There's a tiny gap at one end of the hip scar, it's dry, no pus
+YELLOW	TKA	question	WOUND_REDNESS,DAILY_ACTIVITY	What's the best sleeping position for the knee? The skin along the scar is a little red and warm tonight
+YELLOW	THA	indian_english,question	WOUND_REDNESS,DAILY_ACTIVITY	Can I sit cross legged for puja? Around the hip stitches there is slight redness and swelling
+YELLOW	ANY	carer,question	CONSTIPATION,NUTRITION	What can Mum eat for more fibre? She hasn't been to the toilet in 3 days and her tummy is bloated
+YELLOW	ANY	indian_english,typo,question	CONSTIPATION,NUTRITION	is it ok to drink coconut water? motion not passed from 5 days, stomach is very tight
+YELLOW	ANY	question	MED_SIDE_EFFECT,MED_TIMING	Should I take the tramadol with food? It makes me feel sick and I threw up twice today
+YELLOW	ANY	question	MED_SIDE_EFFECT,WALKING_AIDS	When can I go up the stairs without someone behind me? I keep getting dizzy when I stand up since starting the new pills
+YELLOW	ANY	hard_neg,negation,question	MED_SIDE_EFFECT,DAILY_ACTIVITY	Can I use my usual body lotion? I've got an itchy rash on my arms since the new antibiotic, face and breathing are fine
+YELLOW	ANY	carer,question	MISSED_DOSE,MED_TIMING	What time should Dad take his next rivaroxaban? He completely forgot this morning's one and it's now 9pm
+YELLOW	ANY	typo,question	MISSED_DOSE,FOLLOWUP_ADMIN	can i take the enoxaparin later today? ran out this morning n pharmacy shut till tomorrow
+YELLOW	ANY	negation,question	UNCONTROLLED_PAIN,WALKING_AIDS	How far should I be walking by now? Pain has been getting worse each day this week instead of better, calf is fine
+YELLOW	ANY	indian_english,question	UNCONTROLLED_PAIN,REHAB_EXERCISE	Physio exercises to be done how many times? Pain is not controlling with the tablets, not able to sleep in night
+YELLOW	THA	question	UNCONTROLLED_PAIN,DAILY_ACTIVITY	When can I go back to my desk job? My hip pain has been creeping up every day, the painkillers just take the edge off
+YELLOW	TKA	question	IMPLANT_NOISE,REHAB_EXERCISE	Is cycling ok for the new knee? It's started clunking when I pedal and feels a bit loose and achy afterwards
+YELLOW	ANY	hard_neg,question	FALL_INJURY,REHAB_EXERCISE	Should I still go to hydrotherapy on Thursday? I had a slow slide off the bed last night but I'm walking just like before, nothing hurts more
+YELLOW	ANY	negation,question	MOOD_SLEEP	Any tips for sleep? I haven't slept properly in 5 nights, barely eating and feel really low, no thoughts of hurting myself though
+GREEN	TKA	negation,question	REHAB_EXERCISE	Can I start the exercise bike this week? No calf pain or swelling, knee is just a bit stiff in the mornings
+GREEN	TKA	negation,question	DAILY_ACTIVITY	When can I get the knee wet in the shower? Wound is dry and closed, no oozing at all
+GREEN	ANY	temp_in_text,question	DAILY_ACTIVITY	When am I allowed to drive again? Temp was 37.2 this evening and I feel fine
+GREEN	ANY	hard_neg,negation,question	DAILY_ACTIVITY,DVT_CALF	Is it safe to fly home next week? Breathing is fine, no chest pain, I just want to know about clot risk on the plane
+GREEN	ANY	hard_neg,negation,question	NUTRITION	What foods are good for iron after surgery? Not because of anything wrong, poo is normal, no black stools, just want to recover well
+GREEN	ANY	hard_neg,question	DVT_CALF,WALKING_AIDS	Before I start doing the stairs at home, what are the signs of a clot in the calf I should watch for?
+GREEN	ANY	hard_neg,question	CLEAR_DRAINAGE,DAILY_ACTIVITY	If my wound starts leaking after I shower, what should I do? It's fine at the moment, just planning ahead
+GREEN	ANY	hard_neg,negation,question	BLEEDING_ANTICOAG,NUTRITION	Which foods should I avoid on warfarin? Doctor said watch for black stool or blood in urine, so far nothing like that
+GREEN	ANY	hard_neg,question	PE_CHEST,WALKING_AIDS	I get a bit puffed after a full flight of stairs, same as before the op, and it settles in a minute. Should I do more stairs practice?
+GREEN	THA	hard_neg,negation,question	HIP_PRECAUTIONS,DISLOCATION	Can I sleep on my operated side yet? No pop or pain, hip feels stable, just want to follow the rules
+GREEN	ANY	question	NORMAL_SWELLING	My ankle puffs up by the evening but it's gone by morning when I keep it raised. How long should I keep doing the elevation?
+GREEN	ANY	temp_in_text,indian_english,question	DAILY_ACTIVITY	Is it ok to go to temple on Sunday? Checked temp, 99.1 F only, feeling fine
+GREEN	ANY	question	MED_TIMING,BLEEDING_ANTICOAG	How long do I need the tummy injections? Little bruises where they go in but nothing else
+GREEN	ANY	hard_neg,question	MINOR_BLEEDING,FOLLOWUP_ADMIN	When can I take the dressing off for good? There's a tiny dot of old blood on it from day one, not getting bigger
+GREEN	ANY	hard_neg,question	MINOR_BLEEDING,DAILY_ACTIVITY	District nurse said the bit of blood on my dressing was normal and it's stopped now, so can I shower tomorrow?
+GREEN	TKA	negation,question	IMPLANT_NOISE,DAILY_ACTIVITY	Is gardening on my knees allowed yet? The knee clicks a bit when I kneel but there's no pain or swelling
+GREEN	TKA	hard_neg,question	NEUROVASCULAR,DAILY_ACTIVITY	When can I drive? The numb patch beside the scar is the same as it's been since surgery, otherwise all good
+GREEN	ANY	question	REHAB_EXERCISE	How many reps of the sit-to-stand should I do? My thigh aches afterwards but it's gone within an hour
+GREEN	ANY	question	WOUND_IRRITATION,DAILY_ACTIVITY	Can I use bio oil on the scar now? It's fully healed, just itchy
+GREEN	ANY	carer,negation,question	DAILY_ACTIVITY	Can Mum go back to her yoga class? No fever, wound is clean, she's walking well with the stick
+GREEN	ANY	hard_neg,question	ALLERGIC_REACTION,MED_TIMING	What should I watch for in case I'm allergic to the new antibiotic? No reaction so far, just started it today
+GREEN	THA	carer,hard_neg,question	MOOD_SLEEP	Is it common for older people to get confused after a hip op? Dad is fully himself, just asking what to look out for at night
+GREEN	ANY	question	MOOD_SLEEP,FOLLOWUP_ADMIN	Any tips for getting back to work? I'm a bit down some days but managing, going for walks helps
+GREEN	TKA	question	STIFFNESS,WALKING_AIDS	Is it ok to climb the stairs one at a time? Knee feels like a tight band around it in the mornings
+GREEN	ANY	hard_neg,negation,question	DVT_CALF,DAILY_ACTIVITY	Can I stop wearing the compression stockings? Calf is soft, no pain, and the swelling goes down overnight
+GREEN	ANY	indian_english,negation,question	NUTRITION	Sir, when can I start eating non-veg? No fever, no pus, stitches are dry
+GREEN	ANY	typo,negation,question	PE_CHEST,REHAB_EXERCISE	can i go back 2 the gym? no chest pain or breathin probs, jus wanna know whats safe
+GREEN	ANY	hard_neg,question	BLEEDING_ANTICOAG,MED_TIMING	What counts as too much bleeding while on apixaban? Nothing happening, I just want to know before I start shaving again

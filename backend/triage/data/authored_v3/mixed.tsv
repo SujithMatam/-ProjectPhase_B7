@@ -1,0 +1,122 @@
+# mixed category (authored_v3). Guideline v1.1. Fields: LABEL SURGERY TAGS SCENARIOS TEXT
+GREEN	TKA	question	STIFFNESS,REHAB_EXERCISE	Knee is stiff in the mornings but loosens up after a few heel slides. Got to 95 degrees bend today, is that ok for week 3?
+GREEN	ANY	question	NORMAL_SWELLING,WALKING_AIDS	ankle puffs up a bit by evening, gone by morning with leg up on pillows. when can i switch from walker to stick?
+GREEN	ANY	multi_symptom,question	DAILY_ACTIVITY	Bruise on my thigh is turning yellow now and fading. Also can I shower without the plastic cover yet?
+GREEN	TKA	hard_neg,question	IMPLANT_NOISE,REHAB_EXERCISE	There's a little click in the knee when I go up stairs, doesn't hurt at all. How many sets of heel slides should I be doing now?
+GREEN	ANY	temp_in_text,question	LOW_FEVER,FOLLOWUP_ADMIN	Temp was 37.3 this evening, feeling fine otherwise. What time is my staple removal on Monday, the letter got lost
+GREEN	TKA	indian_english,question	STIFFNESS,REHAB_EXERCISE	Doctor sir, knee is feeling tight like a band around it but walking 200 metres now. Kindly tell when to start static cycling.
+GREEN	THA	question	HIP_PRECAUTIONS,MOOD_SLEEP	Sleeping badly and feeling a bit down, but talking to my daughter helps. Can I sleep on my operated side yet, it's week 5
+GREEN	ANY	typo,question	MED_TIMING	pain abt 3/10 most of day, bit more after physio then settles. can i stop the tramadol and just use paracetamol?
+GREEN	THA	carer,question	WALKING_AIDS,HIP_PRECAUTIONS	Writing for my mum (hip done 2 weeks ago). She managed the stairs with one crutch today, some soreness after that settled with rest. Is the raised toilet seat still needed?
+GREEN	TKA	hard_neg,negation	REHAB_EXERCISE	Knee sore after physio, settles in an hour with ice. No calf pain, no fever. Walked to the end of the road and back!
+GREEN	ANY	hard_neg,question	NEUROVASCULAR,STIFFNESS	Numb patch on the outer side of the scar is the same as it has been since surgery. Otherwise just stiff. Will the feeling come back?
+GREEN	TKA	question	REHAB_EXERCISE,FOLLOWUP_ADMIN	6 weeks today. 110 degrees bend, walking without the stick indoors, only a mild ache at night. Physio happy. When is the next x-ray?
+GREEN	THA	indian_english,question	DAILY_ACTIVITY	Hip is having mild pain only, 2-3 out of 10, tablets are working. My son is asking can I travel by car to Pune, 3 hours journey
+GREEN	ANY	typo,question	DAILY_ACTIVITY	bruisin on my thigh is going green n yellow, looks better than last wk. how long b4 i can drive
+GREEN	ANY	temp_in_text,question	NORMAL_SWELLING,LOW_FEVER	Checked temp 98.9F, feels normal. Leg up most of the afternoon and the ankle swelling has gone down. Should I keep the stockings on at night?
+GREEN	THA	question	HIP_PRECAUTIONS,MOOD_SLEEP,STIFFNESS	Feeling frustrated that progress is slow but I'm keeping up the exercises. Groin is a bit stiff first thing. How long until I can put my own socks on?
+GREEN	ANY	hard_neg,question	WOUND_IRRITATION	Healed scar itches like mad at night now, no redness, it's fully closed. Is bio-oil ok to use?
+GREEN	ANY	hard_neg,question	MINOR_BLEEDING,FOLLOWUP_ADMIN	Tiny spot of blood on the new dressing this morning, hasn't got any bigger since. Can I still go to my physio at 2?
+GREEN	TKA	question	STIFFNESS,REHAB_EXERCISE	Can't fully straighten the knee yet, about 5 degrees off. Sore after exercises but fine by evening. Any tips for the straightening exercise?
+GREEN	TKA	carer,indian_english,question	NUTRITION,MINOR_BLEEDING,WALKING_AIDS	Papa had his knee done 10 days back. Small bruise at the injection site on tummy, otherwise he is walking with walker inside house. What protein foods to give?
+GREEN	ANY	hard_neg,question	WOUND_IRRITATION,FOLLOWUP_ADMIN	Loose end of a stitch sticking out of the scar, no redness or ooze and it doesn't pull. Leave it for the nurse on Thursday?
+GREEN	TKA	question	REHAB_EXERCISE	I walked 1 km today, the knee ached afterwards but settled with ice and the leg up. Should I do that daily or every other day?
+GREEN	THA	typo,question	HIP_PRECAUTIONS	hip ok, bit sore when i get out of the chair but it goes. using the reacher for everythin lol. when can i bend to tie shoes
+GREEN	ANY	temp_in_text,question	LOW_FEVER,MED_TIMING	Temp 37.6 after my nap, no other problems. Is it ok to take paracetamol and ibuprofen together?
+GREEN	ANY	question	NORMAL_SWELLING,DAILY_ACTIVITY	Ankle and foot swell by the evening but next morning they're back to normal after sleeping with the leg raised. Could I fly to see my sister at 6 weeks?
+GREEN	TKA	indian_english,question	REHAB_EXERCISE,STIFFNESS	Knee is having tightness only, no other issue. Physio is making me do 20 quad sets, is that too much? Kindly advise.
+GREEN	ANY	hard_neg,negation,question	MED_TIMING	No chills, no calf pain, scar looks dry and clean. Just wanted to ask how long I need the blood thinner injections.
+GREEN	THA	question	DAILY_ACTIVITY,WALKING_AIDS	Week 8 after hip: walking 30 mins outdoors with a cane, mild ache at the end. Can I go back to my desk job part time?
+GREEN	ANY	question	MOOD_SLEEP	Bit teary some evenings and sleep is broken, but I'm managing and getting out in the garden. Is it normal to feel low after a joint replacement?
+GREEN	TKA	hard_neg,question	IMPLANT_NOISE,STIFFNESS	Clicking in the new knee when I bend it, no pain and no swelling with it. Also my bend is stuck at 90, should I push harder?
+GREEN	ANY	question	CONSTIPATION,MED_TIMING	Bowels are back to normal after the lactulose, went today. When should I stop the stool softener?
+GREEN	THA	carer,question	HIP_PRECAUTIONS,DAILY_ACTIVITY	My husband is 3 weeks post hip. Bruising down his thigh is fading and he's sleeping better. Can he sit in the front seat for a short car trip?
+GREEN	ANY	typo,question	NUTRITION,MED_TIMING	pain scor 4 today same as yday, tabs keep it ok. how much water shud i drink a day
+GREEN	TKA	hard_neg,question	REHAB_EXERCISE,WOUND_REDNESS	Physio said the warmth in the knee after exercise is normal and it's the same as last week. Bend is 105 now. Ok to start the exercise bike?
+GREEN	ANY	question	STIFFNESS	Stiff after sitting through a long film but it eases once I walk around. Any stretches for the evenings?
+GREEN	THA	indian_english,question	HIP_PRECAUTIONS,DAILY_ACTIVITY	Operation side thigh is little sore after walking, settles after rest. When I can sit cross-legged on floor for pooja?
+GREEN	ANY	hard_neg,question	DVT_CALF	The A&E doctor checked my calf on Sunday and the scan was clear, it feels fine now. Do I still keep wearing the stockings?
+GREEN	TKA	question	MOOD_SLEEP,DAILY_ACTIVITY	Sleeping poorly because I can't get comfy with the knee, otherwise doing okay. Can I put a pillow under it at night?
+GREEN	ANY	temp_in_text,typo,question	LOW_FEVER,DAILY_ACTIVITY	temp 99.5 F after a hot shower, back to 98.6 now. dressing dry. when can i get the wound wet properly
+GREEN	THA	-	WALKING_AIDS	Got up the full flight of stairs at home today, good leg first! A bit achy in the hip afterwards but gone after a cup of tea.
+GREEN	TKA	carer,question	NORMAL_SWELLING,DAILY_ACTIVITY	Mum's knee: she does her exercises 3 times a day and the ankle swelling goes down overnight. She wants to know if she can kneel to pray yet.
+GREEN	ANY	question	WOUND_REDNESS	Pinkish scar line is fading nicely, no discharge. Mild ache when the weather changes. Should I massage the scar?
+GREEN	ANY	indian_english,question	NUTRITION	Weight is increasing since surgery as I am sitting at home only. Pain is less now. What diet to follow, I am diabetic.
+GREEN	THA	question	STIFFNESS,DAILY_ACTIVITY	Hip feels a bit tight at the front when I stand up, loosens after a few steps. Is swimming allowed at 10 weeks?
+GREEN	ANY	hard_neg,question	CLEAR_DRAINAGE,FOLLOWUP_ADMIN	Nurse said the pink damp patch on the dressing was normal drainage. Still just a little damp and no bigger. When's the next dressing change?
+YELLOW	ANY	temp_in_text,question	LOW_FEVER,MED_TIMING	Temp 37.8 tonight, no other problems. Is it ok to take paracetamol and ibuprofen together?
+YELLOW	TKA	multi_symptom,question	WOUND_REDNESS,STIFFNESS	Knee is stiff in the mornings but I'm at 90 degrees. The bottom of the scar looks a bit red and warm though, is that normal?
+YELLOW	ANY	temp_in_text,indian_english	LOW_FEVER,WALKING_AIDS	Having fever 100.6 since evening, wound looks ok. Walking with walker in house. What to do now?
+YELLOW	ANY	multi_symptom,question	CLEAR_DRAINAGE,WALKING_AIDS	Clear watery fluid coming from the top of the incision, dressing a bit wet. Otherwise walking well with crutches. Do I change the dressing myself?
+YELLOW	TKA	typo	WOUND_IRRITATION,REHAB_EXERCISE	staples feel like theyre pulling when i bend, skin a bit puckered round one. physio going ok tho, 100 deg
+YELLOW	TKA	question	UNCONTROLLED_PAIN	My knee pain has been getting worse every day this week even with the tablets. Exercises are harder. Is this normal at 3 weeks?
+YELLOW	ANY	multi_symptom	MED_SIDE_EFFECT	Feeling sick after every dose of the pain tablets, only managed toast today. Wound looks fine and I'm walking around the house.
+YELLOW	TKA	indian_english	CONSTIPATION	Motion not passed from 4 days, stomach is tight. Knee is better, walking slowly. Kindly advise.
+YELLOW	THA	question	MED_SIDE_EFFECT	Got a bit dizzy standing up from the sofa twice today. Otherwise the hip is healing nicely. Should I be worried?
+YELLOW	ANY	negation,question	MED_SIDE_EFFECT,ALLERGIC_REACTION,FOLLOWUP_ADMIN	Itchy red rash on my arms since starting the new antibiotic, no swelling of the face and breathing is fine. Also when do I see the surgeon?
+YELLOW	ANY	question	MISSED_DOSE	Forgot last night's blood thinner tablet, only realised this morning. Do I take two today? Leg feels fine.
+YELLOW	TKA	multi_symptom	IMPLANT_NOISE	Knee clunks when I come down stairs and it hurts when it does. Feels like it might give way. Rest of recovery has been good.
+YELLOW	ANY	carer	MOOD_SLEEP	My dad hasn't slept properly for 4 nights and is barely eating, very flat in himself. Says he doesn't want to do the exercises. Wound is fine.
+YELLOW	THA	negation	NORMAL_SWELLING,WALKING_AIDS	Leg swelling has got worse over the last two weeks but it goes down overnight with the leg raised. No calf pain. Started walking outside.
+YELLOW	TKA	question	NORMAL_SWELLING,REHAB_EXERCISE	Knee is still swollen and sore. Can I start using the exercise bike?
+YELLOW	ANY	temp_in_text,question	LOW_FEVER	38.2 this afternoon, otherwise I feel ok and ate lunch fine. Is a temperature normal on day 6?
+YELLOW	ANY	indirect	LOW_FEVER,WALKING_AIDS	Feeling a bit feverish tonight, didn't check the temperature. Scar looks the same. Walked twice round the garden.
+YELLOW	THA	typo	UNCONTROLLED_PAIN,WALKING_AIDS	pain in hip is not controled even after the tabs, 7/10 most of the day. otherwise moving ok w walker
+YELLOW	TKA	indian_english	UNCONTROLLED_PAIN,REHAB_EXERCISE	Knee is paining more and more since 3 days, tablets giving relief only for 1 hour. Doing exercises as told. What to do?
+YELLOW	ANY	negation,question	WOUND_OPEN	Small gap at the bottom end of the scar where a scab came off, it's dry, no pus. Should I just cover it? Otherwise feeling good.
+YELLOW	ANY	question	MINOR_BLEEDING,REHAB_EXERCISE	Dressing ooze has spread from a small spot to most of the pad since yesterday. It's blood-coloured but not soaked through. Physio tomorrow still ok?
+YELLOW	THA	hard_neg	MINOR_BLEEDING	Had a nosebleed this morning that stopped after ten minutes. I'm on the blood thinner. Hip otherwise fine.
+YELLOW	ANY	-	FALL_INJURY,WALKING_AIDS	I slipped in the bathroom yesterday and landed on my bottom. Walking same as before with the frame, no new pain. Just letting you know.
+YELLOW	TKA	-	NEUROVASCULAR,REHAB_EXERCISE	Numb tingly area next to the scar seems bigger than last week. Bend is 100 degrees now, physio pleased.
+YELLOW	ANY	question	MED_SIDE_EFFECT,MED_TIMING	Threw up once after the morning tablets, kept lunch down. Wound is dry. Should I take the tablets with food?
+YELLOW	ANY	temp_in_text,negation,question	LOW_FEVER,REHAB_EXERCISE	temp 101 F with the wound looking fine, no chills. Can I still go to the outpatient physio class?
+YELLOW	ANY	temp_in_text,question	LOW_FEVER,NORMAL_SWELLING	Temperature 38.4 this evening. Ankle swelling goes down with the leg up as usual. Do I need to come in?
+YELLOW	THA	question	WOUND_REDNESS,HIP_PRECAUTIONS	Hip is a little red and warm around the incision, no discharge. Walking fine. Also, is the toilet seat raiser still needed at week 4?
+YELLOW	ANY	-	CLEAR_DRAINAGE,REHAB_EXERCISE	Pink fluid on the dressing again this morning, about the size of a coin. Got the exercises done though.
+YELLOW	TKA	carer,indian_english	UNCONTROLLED_PAIN,WALKING_AIDS	My mother's knee is paining a lot at night, she is crying, painkillers not helping much. During day she is walking with walker. Please advise.
+YELLOW	ANY	multi_symptom	CONSTIPATION,WALKING_AIDS	No poo for 3 days now even with the softener, feeling bloated. Pain is ok and the stairs went well.
+YELLOW	TKA	-	MISSED_DOSE	Ran out of my blood thinner injections yesterday and the pharmacy is closed till Monday. Feeling fine, knee doing well.
+YELLOW	THA	multi_symptom	WOUND_IRRITATION,WALKING_AIDS	Stitches at the top of the hip scar are irritated and catching on my clothes. Bruising has faded and I'm managing stairs.
+YELLOW	ANY	question	MED_SIDE_EFFECT,MED_TIMING	Feel woozy and dizzy since they increased the oxycodone. Pain much better though. Should I cut back?
+YELLOW	TKA	multi_symptom	IMPLANT_NOISE,WALKING_AIDS	Walking is going well, 500 m today. But the knee keeps feeling loose like it might buckle, and it's swollen afterwards.
+YELLOW	ANY	carer,temp_in_text,question	LOW_FEVER	Writing for my grandmother: she was 37.9 this morning, otherwise eating and walking to the bathroom with help. Do we need to bring her in?
+YELLOW	ANY	negation	MOOD_SLEEP	Feeling really low for the past week, crying a lot and not sleeping, can't face the exercises. No thoughts of hurting myself. The wound is healing well.
+YELLOW	TKA	negation	NORMAL_SWELLING,REHAB_EXERCISE	Swelling round my knee is worse this week than last, but goes down when I lie with it up. No calf pain. Bend is 95.
+YELLOW	ANY	indian_english,question	WOUND_REDNESS	Scar is little warm and swollen at one place, no pus. Today I walked till the gate. Should I put ice?
+YELLOW	ANY	temp_in_text,typo,question	LOW_FEVER,FOLLOWUP_ADMIN	temprature 37.9 C, feel ok otherwise. need to know when stitches come out
+YELLOW	THA	question	UNCONTROLLED_PAIN,MED_TIMING	My hip pain is a bit worse every day for the last week, now needing tablets before every walk. Can I go back on the stronger ones?
+YELLOW	ANY	hard_pos,indirect	REHAB_EXERCISE	Something about the scar is bothering me, it just looks different to yesterday though I can't say how. Otherwise I'm on track with exercises.
+YELLOW	TKA	question	FALL_INJURY	Had a fall on the stairs, caught myself on the rail, knee feels the same and I can still walk on it. Is there anything I should look out for?
+YELLOW	ANY	question	MED_SIDE_EFFECT	Feeling nauseous most afternoons. Otherwise the leg is better and the bruise is fading. Is it the antibiotics?
+YELLOW	THA	typo,question	HIP_PRECAUTIONS	hip swolen n achy today. also when can i lie on my side
+YELLOW	TKA	multi_symptom	UNCONTROLLED_PAIN,STIFFNESS	Pain about 6/10 and creeping up each day, despite taking everything on time. Bend has gone backwards from 100 to 90.
+YELLOW	TKA	carer	MISSED_DOSE,WALKING_AIDS	Mum took her rivaroxaban twice by mistake this morning, she seems fine. Her knee is doing well and she's walking with a stick.
+YELLOW	TKA	multi_symptom	CLEAR_DRAINAGE,REHAB_EXERCISE	Sore knee after physio which settles, but there's clear fluid seeping from one staple hole since this morning.
+YELLOW	ANY	indian_english,temp_in_text,question	LOW_FEVER,MED_TIMING	Fever 38 hai since morning, wound clean. Walking with stick. Should I take crocin?
+YELLOW	TKA	multi_symptom	WOUND_REDNESS,NORMAL_SWELLING	Ankle swelling is fine with the leg up, but the skin along the scar has gone a bit pink and hot today. Physio says carry on with bending.
+YELLOW	TKA	typo,question	FOLLOWUP_ADMIN	knee hurts today. what time is physio tmrw
+RED	TKA	multi_symptom,hard_pos	DVT_CALF,REHAB_EXERCISE	Exercises going well, bend at 100. My right calf has been hot and tender since yesterday though, not near the wound.
+RED	ANY	question	DVT_CALF,NORMAL_SWELLING,DAILY_ACTIVITY	Ankle and foot swell by the evening and stay just as big in the morning even after sleeping with the leg raised. Could I fly at 6 weeks?
+RED	ANY	multi_symptom,question	SEPSIS_WOUND,WALKING_AIDS	Thick yellow stuff coming out of the incision and it smells bad. Walking ok with crutches. Do I change the dressing myself?
+RED	ANY	temp_in_text,negation,question	HIGH_FEVER,REHAB_EXERCISE	temp 101.5 F with the wound looking fine, no chills. Can I still go to the physio class?
+RED	ANY	temp_in_text,question	HIGH_FEVER,NORMAL_SWELLING	Temperature 38.5 this evening. Ankle swelling goes down with the leg up as usual. Do I need to come in?
+RED	THA	indirect	DISLOCATION,WALKING_AIDS	Doing well at 3 weeks, walking with a stick. Bent down to pick up the remote, heard a pop and now can't put weight on the leg, it looks shorter.
+RED	ANY	hard_pos,indirect	PE_CHEST,WALKING_AIDS	Scar looks great and I'm walking further every day. Just puffed on the stairs today, which is new, and it hasn't eased after sitting down for 20 minutes.
+RED	ANY	multi_symptom,question	PE_CHEST,WALKING_AIDS	Quick update: stairs going well. Also had a sharp pain in my chest when I breathe in, started this afternoon. Should I mention it at physio?
+RED	TKA	indian_english,indirect	BLEEDING_ANTICOAG	Doctor sir knee is better, walking 300 steps. But since yesterday motion is coming black colour, I am on blood thinner. Kindly advise.
+RED	TKA	multi_symptom	NEUROVASCULAR,REHAB_EXERCISE	Exercises done, ice on. The toes on that foot have gone cold and pale and I can't really wiggle them.
+RED	THA	carer,hard_pos,indirect	-	Mum's hip is healing nicely but tonight she's confused, doesn't know what day it is and keeps asking for people who aren't there.
+RED	ANY	multi_symptom	BLEEDING_ANTICOAG	Bruise on my thigh is fading. Also my urine has gone pinky-red today and I haven't eaten beetroot. On apixaban.
+RED	ANY	temp_in_text,multi_symptom,hard_pos,question	HIGH_FEVER,SEPSIS_WOUND,WOUND_REDNESS	Shaking chills on and off all afternoon, temp 38.1, and the wound is a bit red. Is it just the weather?
+RED	ANY	multi_symptom	ALLERGIC_REACTION	Started the new antibiotic this morning. Pain is fine. My lips have swollen up and my throat feels tight.
+RED	TKA	typo	DVT_CALF,REHAB_EXERCISE	knee doin ok, bend 95. but calf is rock hard n really sore since this morn, not the scar bit
+RED	ANY	multi_symptom	BLEEDING_ANTICOAG,REHAB_EXERCISE	Physio went well today. Blood is coming through the dressing and has soaked the pad and my trousers, it won't stop.
+RED	ANY	indirect	WOUND_OPEN,NUTRITION	The bottom of the scar has opened up and I can see a gap with something deeper underneath. Otherwise feeling fine, eating well.
+RED	ANY	indian_english,temp_in_text	HIGH_FEVER,WOUND_REDNESS	Having fever 39 since last night and shivering also. Wound is little red. What to do now?
+RED	ANY	multi_symptom	SEPSIS_WOUND,REHAB_EXERCISE	Redness around the scar was a small patch this morning and now it's spread halfway up my thigh. Exercises done though.
+RED	ANY	carer	FALL_INJURY	Dad's recovery has been slow but steady. He fell in the hallway this evening and now can't stand on the operated leg at all.
+RED	ANY	multi_symptom,indirect	PE_CHEST,STIFFNESS	Stiff and sore as usual, nothing new really. Nearly fainted in the kitchen this morning, heart racing and I couldn't catch my breath.
+RED	TKA	-	COMPARTMENT	Pain is completely out of control tonight, way worse than anything since surgery, the whole leg is tight and hard and the morphine hasn't touched it.
+RED	TKA	indirect	MOOD_SLEEP	Mood has been really low and honestly some days I don't want to be here anymore. Knee is healing fine.
+RED	THA	-	FALL_INJURY,BLEEDING_ANTICOAG	Hit my head on the cupboard door, I'm on the blood thinner injections. Feel ok and the hip is fine, just thought I'd mention it.
+RED	ANY	multi_symptom	DVT_CALF,NORMAL_SWELLING	Swelling in my lower leg is worse this week and stays the same even when I keep it up all night. Calf aches a bit too.
