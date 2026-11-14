@@ -33,5 +33,19 @@ python backend/data/test_filter_qwen_sft_triage.py
 python backend/data/train_qwen_lora.py
 ```
 
+## T1 triage seed audit
+
+Build the versioned triage seed copies, leakage audit, clinician review queue,
+and isolated scenario-held-out and wording-held-out partitions with:
+
+```bash
+python backend/data/t1/build_t1_dataset.py
+python backend/data/t1/test_build_t1_dataset.py
+```
+
+These are review-pending dataset artifacts, not clinical validation or model
+training. See `backend/data/t1/README.md` for source overlap metrics, provenance,
+and the required clinical review workflow.
+
 The Qwen trainer requires the filtered train and validation files and fails
 with a setup error if they have not been generated.

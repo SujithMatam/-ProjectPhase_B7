@@ -1,0 +1,93 @@
+{
+  "clinical_status": "All source triage labels are pending clinician review. The repository contains implementation code but no standalone written clinical triage guideline; no clinical label corrections or synthetic examples were created.",
+  "label_correction_count": 0,
+  "normalization": "casefold; replace whole-word left/right with {side}; replace post-op day/postoperative day/day followed by an integer with {day}; collapse whitespace; preserve all other wording and punctuation",
+  "note": "This is a triage-seed audit/build, not model training, clinical validation, or a replacement for deterministic SafetyTriageEngine decisions. Qwen SFT exports are a separate dataset and are not included.",
+  "original_train_test_overlap": {
+    "exact_unique_message_intersection": 52,
+    "exact_unique_test_messages": 55,
+    "normalized_unique_message_intersection": 51,
+    "normalized_unique_test_messages": 51,
+    "scenario_group_intersection": 21,
+    "scenario_grouping_basis": "casefolded, punctuation/whitespace-normalized clinical_rationale",
+    "test_scenario_groups": 21,
+    "train_scenario_groups": 21
+  },
+  "provisional_grouping": {
+    "grouping_basis": "normalized clinical_rationale",
+    "review_status": "needs_manual_scenario_review",
+    "scenario_group_count": 21,
+    "scenario_groups_with_triage_label_conflicts": 0,
+    "wording_group_count": 63
+  },
+  "qwen_sft_rows_included": 0,
+  "scenario_held_out_partition": {
+    "evaluation": {
+      "groups": 4,
+      "rows": 97,
+      "triage_labels": {
+        "GREEN": 48,
+        "RED": 26,
+        "YELLOW": 23
+      }
+    },
+    "train": {
+      "groups": 17,
+      "rows": 413,
+      "triage_labels": {
+        "GREEN": 169,
+        "RED": 147,
+        "YELLOW": 97
+      }
+    }
+  },
+  "source_label_counts": {
+    "test": {
+      "GREEN": 40,
+      "RED": 31,
+      "YELLOW": 19
+    },
+    "train": {
+      "GREEN": 177,
+      "RED": 142,
+      "YELLOW": 101
+    }
+  },
+  "source_row_counts": {
+    "test": 90,
+    "train": 420
+  },
+  "source_total_rows": 510,
+  "source_unique_user_messages": {
+    "test": {
+      "exact_user_messages": 55,
+      "normalized_user_messages": 51
+    },
+    "train": {
+      "exact_user_messages": 82,
+      "normalized_user_messages": 63
+    }
+  },
+  "synthetic_candidate_count": 0,
+  "version": "t1-seed-v1",
+  "wording_held_out_partition": {
+    "evaluation": {
+      "groups": 12,
+      "rows": 98,
+      "triage_labels": {
+        "GREEN": 41,
+        "RED": 29,
+        "YELLOW": 28
+      }
+    },
+    "train": {
+      "groups": 51,
+      "rows": 412,
+      "triage_labels": {
+        "GREEN": 176,
+        "RED": 144,
+        "YELLOW": 92
+      }
+    }
+  }
+}

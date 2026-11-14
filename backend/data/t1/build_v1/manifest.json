@@ -1,0 +1,70 @@
+{
+  "clinical_guideline": null,
+  "corrections_applied": 0,
+  "label_status": "needs_clinical_review",
+  "output_files": {
+    "audit_report.json": {
+      "bytes": 2683,
+      "sha256": "526cfa853e8a2957958340a5603f666f7fc12418ff7d8c54af17c6fcc6ea014b"
+    },
+    "clinical_review_queue.jsonl": {
+      "bytes": 302815,
+      "sha256": "85e39e747de6abf202dada51155aa35badf69a90c0d448eb6edd80968da1a793"
+    },
+    "label_corrections.csv": {
+      "bytes": 91,
+      "sha256": "301ff914c248185545c7fe40f8598afde1cb9eee1217575870f9333e48388eb7"
+    },
+    "scenario_group_map.jsonl": {
+      "bytes": 13735,
+      "sha256": "3606a17a8e5f482ed3be20c5d4c92c9bb98e5d308e7a24552e81da188d73ff6c"
+    },
+    "scenario_held_out_eval.jsonl": {
+      "bytes": 82500,
+      "sha256": "021c0321b65fb3de9c9d8efe047deda8d64a9a60297fe30c34b6687fd7fce065"
+    },
+    "scenario_held_out_train.jsonl": {
+      "bytes": 347318,
+      "sha256": "ff420587ab0bc7e7072a925b7d4cdfb4bbe0f3e416d2531ef364ef2c63387020"
+    },
+    "wording_held_out_eval.jsonl": {
+      "bytes": 80727,
+      "sha256": "236918551d1cbd657a9bd9b0a0fbb02dd74eaa792ca125a47670a47a5c948c9e"
+    },
+    "wording_held_out_train.jsonl": {
+      "bytes": 339406,
+      "sha256": "1f305abaef30e79715dec9bcd7820409ec9e8b70b232b48abc356d1209f6ac90"
+    }
+  },
+  "seed_directory": "seed_v1",
+  "source_commit": "9f60dfe7bc7668418c3825d8bd88f1efc3e2b3e3",
+  "source_directory": "exports",
+  "source_files": {
+    "triage_intent_test.jsonl": {
+      "byte_identical": true,
+      "row_count": 90,
+      "seed_copy_sha256": "53f0e5774b83f3907cbca96326a5788b5e4e4cbcfaf542aea1016ca0d7e4ffca",
+      "sha256": "53f0e5774b83f3907cbca96326a5788b5e4e4cbcfaf542aea1016ca0d7e4ffca"
+    },
+    "triage_intent_train.jsonl": {
+      "byte_identical": true,
+      "row_count": 420,
+      "seed_copy_sha256": "cf04254622ddfa5ae097ea0b55ed7b727797172bfac3b4ebdeac76d671226980",
+      "sha256": "cf04254622ddfa5ae097ea0b55ed7b727797172bfac3b4ebdeac76d671226980"
+    }
+  },
+  "split_protocols": {
+    "scenario_held_out": {
+      "assignment": "stable SHA-256 order within expected_triage strata; at least one held out when a stratum has multiple groups",
+      "eval_fraction": 0.2,
+      "grouping": "normalized clinical_rationale, provisional and manual-review-needed"
+    },
+    "wording_held_out": {
+      "assignment": "stable SHA-256 order within expected_triage strata; at least one held out when a stratum has multiple groups",
+      "eval_fraction": 0.2,
+      "grouping": "casefolded user_message with only laterality and day-number normalization"
+    }
+  },
+  "synthetic_examples_generated": 0,
+  "version": "t1-seed-v1"
+}
