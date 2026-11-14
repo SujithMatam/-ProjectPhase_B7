@@ -35,7 +35,8 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ART, CACHE, EMBED_MODEL, LABELS, MAX_SEQ_LENGTH, SETFIT_DIR, SETFIT_SEEDS,  # noqa: E402
                     TRAIN_LOG, choose_thresholds, embed, labels_of, load_challenge,
-                    load_challenge_v2, load_split, load_train, macro_f1, seed_everything)
+                    load_challenge_v2, load_challenge_v3, load_integration, load_split, load_train,
+                    macro_f1, seed_everything)
 
 PREDS = CACHE / "preds"
 C_GRID = [float(c) for c in np.logspace(-3, 3, 13)]
@@ -43,8 +44,9 @@ SETFIT_ITERS = (1, 3)
 SETFIT_ARGS = {"batch_size": 32, "num_epochs": 1, "body_learning_rate": 2e-5}
 SPLITS = ("main", "unseen")
 TUNE_SPLIT = "main"
-DATA = "v1"            # set by --data; "v2" adds data/train_v2_extra.jsonl to TRAIN only
-V2_ITERS = 3           # v2 reuses num_iterations 3 (chosen for v1 on main val, seed 0)
+DATA = "v1"            # set by --data; "v2" adds data/train_v2_extra.jsonl to TRAIN only,
+                       # "v3" adds train_v2_extra.jsonl + train_v3_extra.jsonl to TRAIN only
+V2_ITERS = 3           # v2 and v3 reuse num_iterations 3 (chosen for v1 on main val, seed 0)
 
 
 def sfx() -> str:
@@ -65,6 +67,9 @@ def eval_sets(split: str) -> dict[str, list[dict]]:
         sets["challenge"] = load_challenge()
         if DATA != "v1":
             sets["challenge_v2"] = load_challenge_v2()
+        if DATA == "v3":                  # predicted for evaluation only, never trained on
+            sets["challenge_v3"] = load_challenge_v3()
+            sets["integration"] = load_integration()
     return sets
 
 
@@ -194,8 +199,8 @@ def select() -> dict:
 
 
 def run_all_v2() -> None:
-    """v2: M1 + SetFit (num_iterations 3; main seeds 0-4 saved, unseen seeds 0-2), one at a time.
-    Selection is done by select_v2.py (new operating-point rule)."""
+    """v2 / v3: M1 + SetFit (num_iterations 3; main seeds 0-4 saved, unseen seeds 0-2), one at a
+    time. Selection is done by select_v2.py / select_v3.py."""
     def child(*a: str) -> None:
         subprocess.run([sys.executable, str(Path(__file__).resolve()), "--data", DATA, *a],
                        check=True)
@@ -238,12 +243,12 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--iters", type=int, default=SETFIT_ITERS[-1])
     ap.add_argument("--save", action="store_true")
-    ap.add_argument("--data", choices=["v1", "v2"], default="v1")
+    ap.add_argument("--data", choices=["v1", "v2", "v3"], default="v1")
     a = ap.parse_args()
     global DATA
     DATA = a.data
     if a.cmd == "select" and DATA != "v1":
-        raise SystemExit("v2 selection: run select_v2.py")
+        raise SystemExit(f"{DATA} selection: run select_{DATA}.py")
     if a.cmd == "m1":
         for sp in SPLITS:
             train_m1(sp)
