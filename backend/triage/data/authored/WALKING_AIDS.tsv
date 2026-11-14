@@ -1,0 +1,46 @@
+GREEN	ANY	question	When can I go from two crutches to one, and which hand holds it?
+GREEN	ANY	question	Going up stairs, is it good leg first or bad leg first? I always forget.
+GREEN	ANY	indian_english,question	Can I use walker inside house and stick outside? Our house has 2 steps at entrance.
+GREEN	ANY	typo	walker is sooo slow, can i ditch it yet? wk 3
+GREEN	THA	question	The surgeon wrote partial weight bearing for my hip. How much weight is partial?
+GREEN	ANY	carer,question	What height should Dad's walking stick be? He's quite short and it looks too long for him.
+GREEN	ANY	hard_neg,negation	Walked to the end of the road with one crutch, no pain in the calf, just tired. Can I go further tomorrow?
+RED	ANY	hard_pos	Tripped over the walker leg, landed on my operated side and now I can't put any weight on it at all
+RED	TKA	hard_pos,multi_symptom	Question about crutches on stairs, but my calf has gone hot and hard since yesterday and it's very painful to walk on
+YELLOW	ANY	hard_pos	Fell onto the bed when the crutch slipped. Didn't hit anything hard and I can still walk, but the leg aches more now. Should someone check?
+GREEN	ANY	question	Is it safe to use crutches on wet pavement or should I wait for dry days?
+GREEN	ANY	indian_english	Kindly advise whether I can climb stairs to first floor. My bedroom is upstairs.
+GREEN	ANY	question	The rubber tips on my crutches are worn. Where do I get new ones?
+GREEN	TKA	question	Do I need the walker in the house if I can hold onto furniture?
+GREEN	ANY	-	First trip outside with the cane today, round the block and back. Felt good.
+GREEN	ANY	question	How do I carry a cup of tea while using a walker? It's driving me nuts.
+GREEN	ANY	indian_english,question	Walker with wheels or without wheels, which is better? Shop is giving both.
+GREEN	ANY	hard_neg,question	What happens if I put too much weight on the leg by accident when I'm meant to be partial?
+GREEN	THA	question	My hip feels strong. Am I allowed to walk without anything around the house at 5 weeks?
+GREEN	ANY	typo,question	hands r getting sore from the crutches, any tips??
+GREEN	ANY	carer	Mum is quite wobbly getting from the chair to her walker. Should she have more physio before she's left alone?
+GREEN	ANY	question	Should the walker handles be at wrist height?
+GREEN	ANY	question	Is a quad cane better than a normal stick for someone elderly?
+GREEN	ANY	indian_english,question	Can I go to temple with stick when there is crowd, or go with walker only? Lot of people pushing.
+GREEN	ANY	hard_neg,negation	Took a few steps without the cane by mistake, no pain, no wobble. Is that a sign I'm ready?
+GREEN	ANY	question	I'm limping a bit without the stick. Should I keep using it until the limp goes?
+GREEN	ANY	question	Escalators, safe with one crutch?
+GREEN	ANY	-	Weight bearing as much as I can and getting round the flat with just a stick now.
+GREEN	ANY	question	How do I step down a kerb with crutches?
+GREEN	ANY	typo	cn i use my late husbands old walking frame or do i need a new one
+GREEN	ANY	indian_english	Doctor sir, I am feeling more confident now. Can I go for morning walk in park without walker?
+YELLOW	ANY	hard_pos	Started walking without the cane and now the joint feels unstable, it gives way on and off with a clunk and hurts more than before.
+GREEN	ANY	question	Is it bad to rely on the stick for too long?
+GREEN	THA	question	Should I hold the cane in the hand opposite my new hip?
+GREEN	ANY	carer,question	My brother is going home to a house with steep stairs. Should we get a second banister fitted?
+GREEN	ANY	question	How far should I be walking each day at two weeks?
+GREEN	ANY	hard_neg	Get a bit puffed walking to the shop on crutches but it settles within a minute of resting. Just effort?
+GREEN	ANY	indian_english,typo	can i go in bus with crutchs, bus steps are very high
+GREEN	ANY	question	Can I use a supermarket trolley like a walker?
+GREEN	TKA	question	My knee doesn't bend much when I walk so I swing the leg round a bit. Will that improve?
+RED	THA	hard_pos,indian_english	Sir I slipped in bathroom while using walker, now leg is turned outside and bahut dard, cannot stand
+GREEN	ANY	question	How long do people usually need a cane after a hip or knee replacement?
+GREEN	ANY	-	Using the walker for night toilet trips only now.
+GREEN	ANY	question	Is it safe to sit on the rollator seat when I get tired?
+GREEN	ANY	hard_neg,question	If I start to fall with the walker, should I try to hold onto it or let go?
+GREEN	ANY	-	crutches finally gone!

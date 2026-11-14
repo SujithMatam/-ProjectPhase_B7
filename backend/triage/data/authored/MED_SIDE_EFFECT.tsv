@@ -1,0 +1,52 @@
+# MED_SIDE_EFFECT: nausea, vomiting, dizziness, drowsiness, itch without face swelling after medicines. Lead label YELLOW.
+YELLOW	ANY	-	Every time I take the oxycodone I feel sick within half an hour and have to go and lie down.
+YELLOW	ANY	indian_english	Feeling giddiness since starting new tablets, whole room is spinning when I get up. Kindly advise.
+RED	ANY	hard_pos,indirect	Took the new antibiotic an hour ago and my lips feel fat and my voice sounds strange.
+GREEN	ANY	question	Does tramadol usually make people feel sick, and does that wear off?
+YELLOW	ANY	hard_neg,negation	Itchy all over since they switched me to codeine. No rash on my face and my breathing is fine.
+YELLOW	ANY	typo	threw up twice after my tablets this morning, cant keep anything down
+RED	ANY	carer,hard_pos,indirect	Mum's been on the new painkillers two days and today she's talking nonsense and thinks she's still on the ward.
+YELLOW	TKA	multi_symptom	Light-headed, dry mouth and constipated since starting oxycodone. Knee pain is well controlled though.
+GREEN	ANY	hard_neg,negation	On the tramadol for a week, no nausea, no dizziness, all good. When can I start reducing it?
+YELLOW	ANY	indian_english	After taking pain killer tablet I am getting vomiting sensation and acidity the whole day. What to do?
+RED	ANY	multi_symptom	Hives spreading over my chest and arms after the new tablet and my throat feels like it's closing up.
+YELLOW	ANY	-	Mouth ulcers and a horrible metallic taste since starting the new tablets.
+YELLOW	ANY	hard_pos,indirect	I feel like I'm on a boat whenever I stand up since the new pills.
+GREEN	ANY	question	Will pantoprazole stop the painkillers upsetting my stomach?
+YELLOW	ANY	-	Pantoprazole gives me a pounding headache every single morning.
+RED	ANY	carer,hard_pos	Dad is very hard to wake since he took an extra oxycodone, and his breathing is slow and snory.
+YELLOW	ANY	typo,negation	got a itchy rash on my arms since the antibiotics started, lips n face r fine, breathing ok
+GREEN	ANY	hard_neg	Felt woozy the first night on tramadol but it's completely settled now, day five.
+YELLOW	ANY	indian_english,multi_symptom	Head is feeling heavy and I am having nausea since morning after the tramadol. Not able to eat anything.
+YELLOW	ANY	-	Vivid nightmares every night since starting tramadol, I wake up terrified and sweating.
+RED	ANY	hard_pos,indirect	Seeing insects crawling on the wall that aren't there since the morphine was increased.
+GREEN	ANY	question	Is it normal to feel a bit sleepy on tramadol?
+YELLOW	ANY	multi_symptom	Itchy, sweaty and can't sleep since I stopped the oxycodone suddenly.
+YELLOW	THA	carer,indian_english	My father is having vomiting two times after taking evening medicines, he is 74 and had hip operation. Please guide.
+YELLOW	THA	-	Dizzy every time I get up from my hip chair, and it's worse after the morning tablets.
+GREEN	ANY	question	What side effects should I look out for with rivaroxaban?
+RED	ANY	multi_symptom	Stomach pain from the ibuprofen all week and now I've vomited something that looks like coffee grounds.
+YELLOW	ANY	typo,hard_pos	feel rly wobbly n spaced out since the new painkiller, had to sit down in the shower
+YELLOW	ANY	-	Heartburn every night since they added the aspirin, even with the pantoprazole.
+GREEN	ANY	hard_neg,question	If I get a rash from the antibiotics, what should I look out for?
+YELLOW	ANY	indian_english,negation	Sir, after injection in stomach I am getting itching and small red spots on body, no swelling on face. Is it allergy?
+YELLOW	ANY	-	Can barely keep my eyes open during the day on the oxycodone, I keep missing my physio exercises.
+GREEN	ANY	-	Mild dry mouth from the tablets, I'm sipping water and it's fine. Just mentioning it.
+RED	ANY	multi_symptom	Very dizzy after the tablets and then I blacked out in the kitchen for a few seconds.
+YELLOW	ANY	indian_english	Doctor I am feeling very weak and giddy after taking tablets, BP also low 100/60. What to do now?
+GREEN	ANY	question	Can I take an anti-sickness tablet with my oxycodone if I need one?
+YELLOW	ANY	-	I've been retching every morning since the iron tablets were added and can't face breakfast.
+YELLOW	TKA	multi_symptom	Knee's fine but the tramadol is making me sweaty, shaky and sick.
+GREEN	ANY	hard_neg,negation	Bit itchy where the tape was on my back, no rash anywhere else, no swelling. Normal?
+YELLOW	ANY	carer	My husband has become really grumpy and sleepy on the oxycodone and he's been sick twice today.
+YELLOW	ANY	typo	dizzy n sick since takin the oxy, room spins when i turn my head
+GREEN	ANY	indian_english,question	Which tablet causes more acidity, the pain tablet or the blood thinner? Should I take Pan 40 before breakfast?
+YELLOW	ANY	hard_pos,indirect	Everything I eat comes back up within an hour since the new prescription.
+RED	ANY	carer,hard_pos	Mum took one of the new painkillers and now her eyelids and cheeks are puffing up.
+YELLOW	ANY	indian_english	Since starting tablets I am having loose motions 5-6 times daily and weakness. Kindly advise.
+GREEN	ANY	hard_neg	Took paracetamol on an empty stomach and felt slightly queasy for ten minutes, gone now.
+YELLOW	ANY	-	Nauseous all day. The oxy?
+YELLOW	ANY	-	Hiccups that won't stop for two days, started after I went home on the new medicines. Is that the tablets?
+RED	ANY	multi_symptom	Since the tramadol was doubled I've been shaking, my heart is pounding and I feel short of breath.
+GREEN	ANY	question	How long does tramadol dizziness usually last if it happens?
+GREEN	ANY	typo,question	does oxycodone make u itchy? my friend said it does

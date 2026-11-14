@@ -1,0 +1,6 @@
+# Only the shipped SetFit model (v2, seed 0, ~88 MB) is committed, so hybrid triage works on a
+# fresh clone. Other seeds, v1 weights and caches are not committed; rebuild them with train.py.
+artifacts/setfit/*
+!artifacts/setfit/m2_main_v2_it3_seed0/
+artifacts/cache/
+__pycache__/

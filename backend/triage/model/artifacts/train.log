@@ -1,0 +1,42 @@
+2026-11-12 02:01:11  === train.py all ===
+2026-11-12 02:01:17  m2_main_it1_seed0: start (1253 train rows, num_iterations 1, ~2506 pairs, max_seq_length 64)
+2026-11-12 02:02:39  m2_main_it1_seed0: done, val macro-F1 0.754 (1.3 min)
+2026-11-12 02:02:47  m2_main_it3_seed0: start (1253 train rows, num_iterations 3, ~7518 pairs, max_seq_length 64)
+2026-11-12 02:06:32  m2_main_it3_seed0: done, val macro-F1 0.772 (3.7 min)
+2026-11-12 02:06:33  num_iterations tuning on main val (seed 0): {1: 0.7543262827065448, 3: 0.7723823120539759} -> 3
+2026-11-12 02:06:33  m2_main_it3_seed0: predictions exist, skipped
+2026-11-12 02:06:39  m2_main_it3_seed1: start (1253 train rows, num_iterations 3, ~7518 pairs, max_seq_length 64)
+2026-11-12 02:10:24  m2_main_it3_seed1: done, val macro-F1 0.752 (3.7 min)
+2026-11-12 02:10:31  m2_main_it3_seed2: start (1253 train rows, num_iterations 3, ~7518 pairs, max_seq_length 64)
+2026-11-12 02:14:21  m2_main_it3_seed2: done, val macro-F1 0.775 (3.8 min)
+2026-11-12 02:14:29  m2_main_it3_seed3: start (1253 train rows, num_iterations 3, ~7518 pairs, max_seq_length 64)
+2026-11-12 02:18:38  m2_main_it3_seed3: done, val macro-F1 0.779 (4.1 min)
+2026-11-12 02:18:46  m2_main_it3_seed4: start (1253 train rows, num_iterations 3, ~7518 pairs, max_seq_length 64)
+2026-11-12 02:21:52  m2_main_it3_seed4: done, val macro-F1 0.781 (3.1 min)
+2026-11-12 02:22:00  m2_unseen_it3_seed0: start (1240 train rows, num_iterations 3, ~7440 pairs, max_seq_length 64)
+2026-11-12 02:24:50  m2_unseen_it3_seed0: done, val macro-F1 0.741 (2.8 min)
+2026-11-12 02:24:57  m2_unseen_it3_seed1: start (1240 train rows, num_iterations 3, ~7440 pairs, max_seq_length 64)
+2026-11-12 02:28:06  m2_unseen_it3_seed1: done, val macro-F1 0.718 (3.1 min)
+2026-11-12 02:28:14  m2_unseen_it3_seed2: start (1240 train rows, num_iterations 3, ~7440 pairs, max_seq_length 64)
+2026-11-12 02:32:36  m2_unseen_it3_seed2: done, val macro-F1 0.737 (4.4 min)
+2026-11-12 02:32:37  select main: M1 0.767, M2 (it 3) 0.772 -> best M2, shipped seed 4
+2026-11-12 02:32:37  select unseen: M1 0.706, M2 (it 3) 0.732 -> best M2, shipped seed 0
+2026-11-12 03:11:10  === train.py all --data v2 ===
+2026-11-12 03:11:18  M1 main_v2: C=1 val macro-F1 0.777
+2026-11-12 03:11:19  M1 unseen_v2: C=3.16228 val macro-F1 0.681
+2026-11-12 03:11:27  m2_main_v2_it3_seed0: start (1633 train rows, num_iterations 3, ~9798 pairs, max_seq_length 64)
+2026-11-12 03:16:03  m2_main_v2_it3_seed0: done, val macro-F1 0.783 (4.6 min)
+2026-11-12 03:16:11  m2_main_v2_it3_seed1: start (1633 train rows, num_iterations 3, ~9798 pairs, max_seq_length 64)
+2026-11-12 03:20:52  m2_main_v2_it3_seed1: done, val macro-F1 0.782 (4.7 min)
+2026-11-12 03:21:00  m2_main_v2_it3_seed2: start (1633 train rows, num_iterations 3, ~9798 pairs, max_seq_length 64)
+2026-11-12 03:25:38  m2_main_v2_it3_seed2: done, val macro-F1 0.763 (4.6 min)
+2026-11-12 03:25:46  m2_main_v2_it3_seed3: start (1633 train rows, num_iterations 3, ~9798 pairs, max_seq_length 64)
+2026-11-12 03:30:37  m2_main_v2_it3_seed3: done, val macro-F1 0.779 (4.8 min)
+2026-11-12 03:30:45  m2_main_v2_it3_seed4: start (1633 train rows, num_iterations 3, ~9798 pairs, max_seq_length 64)
+2026-11-12 03:36:44  m2_main_v2_it3_seed4: done, val macro-F1 0.770 (5.9 min)
+2026-11-12 03:36:51  m2_unseen_v2_it3_seed0: start (1397 train rows, num_iterations 3, ~8382 pairs, max_seq_length 64)
+2026-11-12 03:40:47  m2_unseen_v2_it3_seed0: done, val macro-F1 0.714 (3.9 min)
+2026-11-12 03:40:54  m2_unseen_v2_it3_seed1: start (1397 train rows, num_iterations 3, ~8382 pairs, max_seq_length 64)
+2026-11-12 03:44:28  m2_unseen_v2_it3_seed1: done, val macro-F1 0.744 (3.5 min)
+2026-11-12 03:44:37  m2_unseen_v2_it3_seed2: start (1397 train rows, num_iterations 3, ~8382 pairs, max_seq_length 64)
+2026-11-12 03:49:28  m2_unseen_v2_it3_seed2: done, val macro-F1 0.741 (4.8 min)

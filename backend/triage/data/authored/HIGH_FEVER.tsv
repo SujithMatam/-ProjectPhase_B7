@@ -1,0 +1,70 @@
+RED	ANY	temp_in_text,typo	temp 38.6 tonite
+RED	ANY	temp_in_text	Thermometer showed 102 this morning and I feel dreadful
+RED	TKA	temp_in_text	Knee replacement 9 days ago and I was doing really well with my exercises, but since teatime my temperature has been sitting between 38.8 and 39.1 and I just want to lie down
+RED	ANY	temp_in_text,indian_english	Having fever since 2 days, today it is 101.5 F. Kindly advise what to do
+RED	ANY	temp_in_text,question	Exactly 38.5 on the digital thermometer, should I wait till morning?
+RED	ANY	hard_pos,indirect	burning up and shaking so hard my teeth are rattling
+RED	THA	carer,temp_in_text,multi_symptom	My mother is 39.4 and not making sense when she talks, hip done last week
+RED	ANY	temp_in_text,typo,question	temp 101.3F what shud i do
+RED	ANY	temp_in_text,indian_english	Fever of 39 is there since lunchtime, what to do?
+RED	ANY	hard_pos,carer,multi_symptom	Dad is hot to touch, shivering under the blankets and keeps asking what day it is
+RED	THA	temp_in_text,multi_symptom	Hip patient, 3 weeks post op, 38.7C with sweats and chills
+RED	ANY	temp_in_text	reading 103.1 F, still climbing
+RED	ANY	temp_in_text,indian_english	Doctor sir, my temperature is 39 degree and body is shivering. Operation was 5 days back.
+RED	ANY	hard_pos,indirect	I'm so hot and cold at once, shaking uncontrollably, can't stop it
+RED	ANY	temp_in_text	Just took it again: 38.9. Paracetamol hasn't brought it down.
+RED	TKA	temp_in_text,indian_english,multi_symptom	Knee is swollen and hot, plus temperature of 101.8 also
+RED	ANY	temp_in_text,typo	temprature 38.5 since mornin and body aches
+RED	ANY	temp_in_text	forehead thermometer 102.4°F, ear one says 38.9
+RED	TKA	carer,temp_in_text,multi_symptom	My husband's temp is 38.6 and he's drowsy and muddled, he had his knee done Tuesday
+RED	ANY	temp_in_text,indian_english	Fever is coming and going, highest was 102 last night. Taking crocin but no relief.
+RED	ANY	hard_pos,indirect	Feel like I've got the worst flu of my life, rigors every couple of hours
+RED	ANY	temp_in_text,typo,question	39.6 is ths an emergency
+RED	ANY	temp_in_text,multi_symptom	My temp hit 38.5 and I'm breathing fast and feel faint
+RED	THA	temp_in_text,indian_english	Hip operation done on 2nd. From yesterday fever 38.8 and not able to eat anything.
+RED	ANY	temp_in_text	Woke up drenched, thermometer read 101.4
+RED	ANY	hard_pos,indirect,carer	Granny is flushed, burning hot and talking nonsense this evening
+RED	ANY	temp_in_text	Fever went from 37.9 at noon to 38.6 now
+RED	TKA	temp_in_text,negation	Fever 39.0, knee wound fine, but I feel awful
+RED	ANY	temp_in_text,typo	its 102 again after the tylenol wore off
+RED	ANY	hard_pos	uncontrollable shivering and a fever, can't hold my phone steady
+RED	ANY	temp_in_text,question	Is 101.6 high enough to worry about 2 weeks after joint replacement?
+RED	TKA	temp_in_text,indian_english,carer,multi_symptom	Papa is having 103 fever and he is not recognising us properly. Knee surgery was last week.
+RED	ANY	temp_in_text	38.7, 38.8, 38.6 over the last three checks
+RED	ANY	temp_in_text,multi_symptom	temp 39.3 and my calf hurts
+RED	ANY	temp_in_text	My smartwatch said my skin temp was up, so I checked properly: 38.5 under the tongue
+RED	ANY	hard_pos,multi_symptom	violent shivers, sweating through my sheets, and I keep forgetting what I was saying
+RED	ANY	temp_in_text,indian_english	Since morning temperature is 101.3 F, little shivering also there
+RED	THA	temp_in_text	Four weeks after my hip, came down with a 38.9 fever and my hip aches more than it did
+RED	ANY	temp_in_text,typo	39.1 n shaking, pls call
+RED	ANY	temp_in_text	Tympanic reading 38.6°C, oral reading 38.4°C
+RED	ANY	temp_in_text,indian_english	Fever touched 104F one hour back
+RED	ANY	carer,temp_in_text,multi_symptom	Writing for my aunt: she's 101.9 F, shaky, and her wound is pink
+RED	ANY	temp_in_text,question	My fever's 38.6 but I feel fine otherwise, can I just sleep it off?
+RED	ANY	hard_pos	Got a fever and I keep losing track of where I am
+RED	ANY	temp_in_text,indian_english,multi_symptom	Body temperature 38.6, feeling very weak and giddy. Pls suggest.
+RED	TKA	temp_in_text,indian_english	Day 4 after knee operation, 101.7 F temperature at night time
+RED	ANY	temp_in_text,multi_symptom	thermometer showed 102.2 and I've got a pounding headache
+RED	ANY	temp_in_text,question	Is 38.5 the cut-off? Because that's what I've got right now.
+RED	ANY	temp_in_text,carer	Mum's temperature is 39.8, she's barely responding and very hot
+RED	ANY	hard_pos,typo	fevr with full body shakes that come in waves
+YELLOW	ANY	temp_in_text,hard_neg,negation	temp 38.4, no chills, feeling ok
+YELLOW	ANY	temp_in_text	100.9F this afternoon
+YELLOW	ANY	temp_in_text,indian_english,question	Temperature showing 38.2 since evening. Should I take paracetamol?
+YELLOW	ANY	temp_in_text	101.2 F, just under what the leaflet says is urgent
+YELLOW	TKA	temp_in_text,hard_neg,negation	knee looks normal, wound dry, temp 38.0, no shaking
+YELLOW	ANY	temp_in_text	Running 37.9 tonight, a bit sweaty
+YELLOW	ANY	hard_neg,indian_english,negation	Feeling feverish since yesterday but no shivering, thermometer not available at home
+YELLOW	ANY	temp_in_text,typo	38.3 temp abt an hour ago, now 37.6 after panadol
+YELLOW	ANY	temp_in_text,hard_neg	had 39 last night but ED checked me, bloods fine, today it's 38.1
+GREEN	ANY	temp_in_text	37.2, just checking in as asked
+GREEN	THA	question	What temperature counts as a fever after a hip replacement?
+GREEN	ANY	temp_in_text,hard_neg	Was 38.9 two days ago, GP saw me and gave antibiotics, today 36.8 and I feel normal
+GREEN	ANY	question	If my temperature goes above 38.5 who do I call?
+GREEN	ANY	temp_in_text,indian_english,hard_neg	Temperature is 98.6 F only, no fever. Just wanted to confirm it is fine.
+GREEN	ANY	temp_in_text,question	99.5F, is that normal?
+GREEN	ANY	temp_in_text	37.7 tonight, feeling okay
+GREEN	ANY	hard_neg,negation	no fever, no chills, no sweats, just tired
+GREEN	ANY	question,typo	do i need to check my temp evry day after surgery?
+GREEN	ANY	temp_in_text,carer	Dad's temp was 99.9 F after his afternoon nap, no other symptoms
+GREEN	ANY	question	Can the joint itself cause a high fever or is it always infection?

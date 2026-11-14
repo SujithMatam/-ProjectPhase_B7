@@ -18,8 +18,24 @@ sequential/idiomatic (e.g. "shortness of breath", "coughing blood") since
 those aren't naturally reordered by patients.
 """
 
+import logging
+import os
 import re
 from typing import List, Dict, Any
+
+_LOGGER = logging.getLogger(__name__)
+_TRIAGE_MODES = ("rules", "hybrid")
+DEFAULT_TRIAGE_MODE = "hybrid"
+
+
+def triage_mode() -> str:
+    """TRIAGE_MODE env var: "hybrid" (the default, also when unset or empty) or "rules" (the
+    keyword engine, unchanged). Unknown values use the default and log a warning."""
+    mode = (os.getenv("TRIAGE_MODE") or "").strip().lower() or DEFAULT_TRIAGE_MODE
+    if mode not in _TRIAGE_MODES:
+        _LOGGER.warning("Unknown TRIAGE_MODE=%r; using %r", mode, DEFAULT_TRIAGE_MODE)
+        return DEFAULT_TRIAGE_MODE
+    return mode
 
 
 def _build_pattern(terms: List[str]) -> re.Pattern:
@@ -158,6 +174,20 @@ class SafetyTriageEngine:
 
     @classmethod
     def evaluate(cls, symptoms: str, temperature_c: float = None, post_op_day: int = 1) -> Dict[str, Any]:
+        """Triage one text. TRIAGE_MODE selects the engine (read on every call):
+
+        - "hybrid" (default, also for unset/unknown values): max(deterministic overrides,
+          learned classifier) with the doctor-alert gate; see triage/classifier_triage.py.
+        - "rules": the keyword engine below, unchanged (evaluate_rules).
+        No LLM decides triage in either mode.
+        """
+        if triage_mode() == "hybrid":
+            from triage.classifier_triage import evaluate as hybrid_evaluate
+            return hybrid_evaluate(symptoms, temperature_c=temperature_c, post_op_day=post_op_day)
+        return cls.evaluate_rules(symptoms, temperature_c=temperature_c, post_op_day=post_op_day)
+
+    @classmethod
+    def evaluate_rules(cls, symptoms: str, temperature_c: float = None, post_op_day: int = 1) -> Dict[str, Any]:
         symptom_lower = symptoms.lower()
         red_flags_detected: List[str] = []
         yellow_flags_detected: List[str] = []

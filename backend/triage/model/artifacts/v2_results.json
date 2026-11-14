@@ -1,0 +1,1444 @@
+{
+ "thresholds": {
+  "v1": {
+   "t_red": 0.21700508892536163,
+   "t_yel": 0.2371876835823059,
+   "t_alert": 0.6369696855545044
+  },
+  "v1_model_v2_rule": {
+   "t_red": 0.24430786073207855,
+   "t_yel": 0.23931750655174255,
+   "t_alert": 0.6369696855545044
+  },
+  "v2": {
+   "t_red": 0.35381320118904114,
+   "t_yel": 0.36271947622299194,
+   "t_alert": 0.6844116449356079
+  },
+  "unseen": {
+   "v1": {
+    "t_red": 0.0973334088921547,
+    "t_yel": 0.1720932424068451,
+    "t_alert": 0.6043161749839783
+   },
+   "v1_model_v2_rule": {
+    "t_red": 0.1472228616476059,
+    "t_yel": 0.1720932424068451,
+    "t_alert": 0.6043161749839783
+   },
+   "v2": {
+    "t_red": 0.15338954329490662,
+    "t_yel": 0.2598261833190918,
+    "t_alert": 0.7126470804214478
+   },
+   "v1_seed": 0,
+   "v2_seed": 1
+  }
+ },
+ "seeds": {
+  "v1": 4,
+  "v2": 0
+ },
+ "sets": {
+  "test": {
+   "rules": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 20,
+    "red_recall": 0.19230769230769232,
+    "red_recall_ci": [
+     0.12808145148564615,
+     0.27845476692320786
+    ],
+    "red_precision": 0.6666666666666666,
+    "macro_f1": 0.3569316175719643,
+    "red_to_green": 74,
+    "red_to_yellow": 10,
+    "yellow_to_red": 5,
+    "green_to_red": 5,
+    "yellow_to_green": 48,
+    "red_calls_per_100": 11.278195488721805,
+    "emails_per_100": 11.278195488721805,
+    "red_rows_emailed": 20,
+    "non_red_emails": 10,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.05,
+      "email": 0.05
+     },
+     "YELLOW": {
+      "red": 0.08064516129032258,
+      "email": 0.08064516129032258
+     },
+     "RED": {
+      "red": 0.19230769230769232,
+      "email": 0.19230769230769232
+     }
+    },
+    "adj_red_calls_per_100": 6.477667493796527,
+    "adj_emails_per_100": 6.477667493796527,
+    "adj_email_precision": 0.1484389963608504
+   },
+   "v1": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 100,
+    "red_recall": 0.9615384615384616,
+    "red_recall_ci": [
+     0.9052524856261187,
+     0.9849431867606003
+    ],
+    "red_precision": 0.7142857142857143,
+    "macro_f1": 0.7028536733454765,
+    "red_to_green": 0,
+    "red_to_yellow": 4,
+    "yellow_to_red": 34,
+    "green_to_red": 6,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 52.63157894736842,
+    "emails_per_100": 35.338345864661655,
+    "red_rows_emailed": 83,
+    "non_red_emails": 11,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.06,
+      "email": 0.03
+     },
+     "YELLOW": {
+      "red": 0.5483870967741935,
+      "email": 0.12903225806451613
+     },
+     "RED": {
+      "red": 0.9615384615384616,
+      "email": 0.7980769230769231
+     }
+    },
+    "adj_red_calls_per_100": 22.717369727047142,
+    "adj_emails_per_100": 9.316191066997519,
+    "adj_email_precision": 0.42832790640377694
+   },
+   "v1_model_v2_rule": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 99,
+    "red_recall": 0.9519230769230769,
+    "red_recall_ci": [
+     0.8923579714067601,
+     0.9792919578052354
+    ],
+    "red_precision": 0.7333333333333333,
+    "macro_f1": 0.7264268707089855,
+    "red_to_green": 0,
+    "red_to_yellow": 5,
+    "yellow_to_red": 30,
+    "green_to_red": 6,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 50.75187969924812,
+    "emails_per_100": 35.338345864661655,
+    "red_rows_emailed": 83,
+    "non_red_emails": 11,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.06,
+      "email": 0.03
+     },
+     "YELLOW": {
+      "red": 0.4838709677419355,
+      "email": 0.12903225806451613
+     },
+     "RED": {
+      "red": 0.9519230769230769,
+      "email": 0.7980769230769231
+     }
+    },
+    "adj_red_calls_per_100": 21.05638957816377,
+    "adj_emails_per_100": 9.316191066997519,
+    "adj_email_precision": 0.42832790640377694
+   },
+   "v2": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 96,
+    "red_recall": 0.9230769230769231,
+    "red_recall_ci": [
+     0.8555044531758775,
+     0.9605082465119483
+    ],
+    "red_precision": 0.8,
+    "macro_f1": 0.8034320034320035,
+    "red_to_green": 0,
+    "red_to_yellow": 8,
+    "yellow_to_red": 18,
+    "green_to_red": 6,
+    "yellow_to_green": 3,
+    "red_calls_per_100": 45.11278195488722,
+    "emails_per_100": 31.954887218045112,
+    "red_rows_emailed": 79,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.06,
+      "email": 0.02
+     },
+     "YELLOW": {
+      "red": 0.2903225806451613,
+      "email": 0.06451612903225806
+     },
+     "RED": {
+      "red": 0.9230769230769231,
+      "email": 0.7596153846153846
+     }
+    },
+    "adj_red_calls_per_100": 16.073449131513648,
+    "adj_emails_per_100": 6.810980148883375,
+    "adj_email_precision": 0.5576402867213757
+   },
+   "v2_m1": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 90,
+    "red_recall": 0.8653846153846154,
+    "red_recall_ci": [
+     0.7866494110837621,
+     0.9180888295557239
+    ],
+    "red_precision": 0.7377049180327869,
+    "macro_f1": 0.7504608812112585,
+    "red_to_green": 3,
+    "red_to_yellow": 11,
+    "yellow_to_red": 23,
+    "green_to_red": 9,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 45.86466165413534,
+    "emails_per_100": 30.451127819548873,
+    "red_rows_emailed": 75,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.09,
+      "email": 0.02
+     },
+     "YELLOW": {
+      "red": 0.3709677419354839,
+      "email": 0.06451612903225806
+     },
+     "RED": {
+      "red": 0.8653846153846154,
+      "email": 0.7211538461538461
+     }
+    },
+    "adj_red_calls_per_100": 19.901116625310173,
+    "adj_emails_per_100": 6.618672456575683,
+    "adj_email_precision": 0.5447873806154105
+   },
+   "v2_seeds": {
+    "red_recall": [
+     0.9096153846153847,
+     0.009805806756909197
+    ],
+    "red_to_green": [
+     0.0,
+     0.0
+    ],
+    "yellow_to_red": [
+     19.6,
+     2.244994432064365
+    ],
+    "green_to_red": [
+     5.0,
+     0.8944271909999159
+    ],
+    "emails_per_100": [
+     33.7593984962406,
+     1.529848868374122
+    ],
+    "adj_emails_per_100": [
+     7.669342431761787,
+     0.9487748015196596
+    ],
+    "adj_red_calls_per_100": [
+     15.951302729528539,
+     1.2802292031566314
+    ],
+    "macro_f1": [
+     0.7923585417794082,
+     0.013122159275971287
+    ]
+   },
+   "live_check": {
+    "model_used": "M2:m2_main_v2_it3_seed0",
+    "mismatches": [],
+    "max_abs_p_red_diff": 8.046627044677734e-07
+   }
+  },
+  "challenge": {
+   "rules": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 14,
+    "red_recall": 0.2413793103448276,
+    "red_recall_ci": [
+     0.1495887429887828,
+     0.36529980358343395
+    ],
+    "red_precision": 0.4375,
+    "macro_f1": 0.33258519340650305,
+    "red_to_green": 39,
+    "red_to_yellow": 5,
+    "yellow_to_red": 6,
+    "green_to_red": 12,
+    "yellow_to_green": 27,
+    "red_calls_per_100": 21.333333333333332,
+    "emails_per_100": 21.333333333333332,
+    "red_rows_emailed": 14,
+    "non_red_emails": 18,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.2222222222222222,
+      "email": 0.2222222222222222
+     },
+     "YELLOW": {
+      "red": 0.15789473684210525,
+      "email": 0.15789473684210525
+     },
+     "RED": {
+      "red": 0.2413793103448276,
+      "email": 0.2413793103448276
+     }
+    },
+    "adj_red_calls_per_100": 20.70982052833232,
+    "adj_emails_per_100": 20.70982052833232,
+    "adj_email_precision": 0.0582765335929893
+   },
+   "v1": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 58,
+    "red_recall": 1.0,
+    "red_recall_ci": [
+     0.9378821432937142,
+     0.9999999999999999
+    ],
+    "red_precision": 0.6444444444444445,
+    "macro_f1": 0.6269611351578565,
+    "red_to_green": 0,
+    "red_to_yellow": 0,
+    "yellow_to_red": 26,
+    "green_to_red": 6,
+    "yellow_to_green": 2,
+    "red_calls_per_100": 60.0,
+    "emails_per_100": 44.0,
+    "red_rows_emailed": 54,
+    "non_red_emails": 12,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.1111111111111111,
+      "email": 0.037037037037037035
+     },
+     "YELLOW": {
+      "red": 0.6842105263157895,
+      "email": 0.2631578947368421
+     },
+     "RED": {
+      "red": 1.0,
+      "email": 0.9310344827586207
+     }
+    },
+    "adj_red_calls_per_100": 29.88304093567251,
+    "adj_emails_per_100": 13.82671237480675,
+    "adj_email_precision": 0.33667963052989786
+   },
+   "v1_model_v2_rule": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 58,
+    "red_recall": 1.0,
+    "red_recall_ci": [
+     0.9378821432937142,
+     0.9999999999999999
+    ],
+    "red_precision": 0.6590909090909091,
+    "macro_f1": 0.6376525554607747,
+    "red_to_green": 0,
+    "red_to_yellow": 0,
+    "yellow_to_red": 25,
+    "green_to_red": 5,
+    "yellow_to_green": 2,
+    "red_calls_per_100": 58.666666666666664,
+    "emails_per_100": 44.0,
+    "red_rows_emailed": 54,
+    "non_red_emails": 12,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.09259259259259259,
+      "email": 0.037037037037037035
+     },
+     "YELLOW": {
+      "red": 0.6578947368421053,
+      "email": 0.2631578947368421
+     },
+     "RED": {
+      "red": 1.0,
+      "email": 0.9310344827586207
+     }
+    },
+    "adj_red_calls_per_100": 27.928849902534115,
+    "adj_emails_per_100": 13.82671237480675,
+    "adj_email_precision": 0.33667963052989786
+   },
+   "v2": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 57,
+    "red_recall": 0.9827586206896551,
+    "red_recall_ci": [
+     0.9085914181442059,
+     0.9969499615876563
+    ],
+    "red_precision": 0.7402597402597403,
+    "macro_f1": 0.7358404558404558,
+    "red_to_green": 0,
+    "red_to_yellow": 1,
+    "yellow_to_red": 17,
+    "green_to_red": 3,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 51.333333333333336,
+    "emails_per_100": 41.333333333333336,
+    "red_rows_emailed": 53,
+    "non_red_emails": 9,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.05555555555555555,
+      "email": 0.0
+     },
+     "YELLOW": {
+      "red": 0.4473684210526316,
+      "email": 0.23684210526315788
+     },
+     "RED": {
+      "red": 0.9827586206896551,
+      "email": 0.9137931034482759
+     }
+    },
+    "adj_red_calls_per_100": 19.986892518652954,
+    "adj_emails_per_100": 10.490018148820326,
+    "adj_email_precision": 0.4355536332179932
+   },
+   "v2_m1": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 56,
+    "red_recall": 0.9655172413793104,
+    "red_recall_ci": [
+     0.8827085444155522,
+     0.9904920717544576
+    ],
+    "red_precision": 0.7,
+    "macro_f1": 0.7362030427572283,
+    "red_to_green": 1,
+    "red_to_yellow": 1,
+    "yellow_to_red": 16,
+    "green_to_red": 8,
+    "yellow_to_green": 2,
+    "red_calls_per_100": 53.333333333333336,
+    "emails_per_100": 40.0,
+    "red_rows_emailed": 51,
+    "non_red_emails": 9,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.14814814814814814,
+      "email": 0.07407407407407407
+     },
+     "YELLOW": {
+      "red": 0.42105263157894735,
+      "email": 0.13157894736842105
+     },
+     "RED": {
+      "red": 0.9655172413793104,
+      "email": 0.8793103448275862
+     }
+    },
+    "adj_red_calls_per_100": 25.724272366740603,
+    "adj_emails_per_100": 12.871210593533641,
+    "adj_email_precision": 0.3415802804397211
+   },
+   "v2_seeds": {
+    "red_recall": [
+     0.9827586206896551,
+     0.0
+    ],
+    "red_to_green": [
+     0.0,
+     0.0
+    ],
+    "yellow_to_red": [
+     19.4,
+     2.870540018881465
+    ],
+    "green_to_red": [
+     2.6,
+     0.4898979485566356
+    ],
+    "emails_per_100": [
+     41.333333333333336,
+     1.5202339001321836
+    ],
+    "adj_emails_per_100": [
+     10.644383948376689,
+     1.3195961491752592
+    ],
+    "adj_red_calls_per_100": [
+     21.047321368555487,
+     2.1409832468398937
+    ],
+    "macro_f1": [
+     0.705695084432763,
+     0.034575576591275636
+    ]
+   },
+   "live_check": {
+    "model_used": "M2:m2_main_v2_it3_seed0",
+    "mismatches": [],
+    "max_abs_p_red_diff": 5.662441253662109e-07
+   }
+  },
+  "challenge_v2": {
+   "rules": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 13,
+    "red_recall": 0.5,
+    "red_recall_ci": [
+     0.32060593402470916,
+     0.6793940659752908
+    ],
+    "red_precision": 0.38235294117647056,
+    "macro_f1": 0.44907644217107134,
+    "red_to_green": 7,
+    "red_to_yellow": 6,
+    "yellow_to_red": 10,
+    "green_to_red": 11,
+    "yellow_to_green": 12,
+    "red_calls_per_100": 37.77777777777778,
+    "emails_per_100": 37.77777777777778,
+    "red_rows_emailed": 13,
+    "non_red_emails": 21,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.34375,
+      "email": 0.34375
+     },
+     "YELLOW": {
+      "red": 0.3125,
+      "email": 0.3125
+     },
+     "RED": {
+      "red": 0.5,
+      "email": 0.5
+     }
+    },
+    "adj_red_calls_per_100": 34.375,
+    "adj_emails_per_100": 34.375,
+    "adj_email_precision": 0.07272727272727272
+   },
+   "v1": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 26,
+    "red_recall": 1.0,
+    "red_recall_ci": [
+     0.871271076371412,
+     1.0
+    ],
+    "red_precision": 0.5306122448979592,
+    "macro_f1": 0.6214328993695243,
+    "red_to_green": 0,
+    "red_to_yellow": 0,
+    "yellow_to_red": 19,
+    "green_to_red": 4,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 54.44444444444444,
+    "emails_per_100": 33.333333333333336,
+    "red_rows_emailed": 21,
+    "non_red_emails": 9,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.125,
+      "email": 0.09375
+     },
+     "YELLOW": {
+      "red": 0.59375,
+      "email": 0.1875
+     },
+     "RED": {
+      "red": 1.0,
+      "email": 0.8076923076923077
+     }
+    },
+    "adj_red_calls_per_100": 28.59375,
+    "adj_emails_per_100": 15.288461538461537,
+    "adj_email_precision": 0.2641509433962264
+   },
+   "v1_model_v2_rule": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 26,
+    "red_recall": 1.0,
+    "red_recall_ci": [
+     0.871271076371412,
+     1.0
+    ],
+    "red_precision": 0.5416666666666666,
+    "macro_f1": 0.6359652115151575,
+    "red_to_green": 0,
+    "red_to_yellow": 0,
+    "yellow_to_red": 18,
+    "green_to_red": 4,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 53.333333333333336,
+    "emails_per_100": 33.333333333333336,
+    "red_rows_emailed": 21,
+    "non_red_emails": 9,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.125,
+      "email": 0.09375
+     },
+     "YELLOW": {
+      "red": 0.5625,
+      "email": 0.1875
+     },
+     "RED": {
+      "red": 1.0,
+      "email": 0.8076923076923077
+     }
+    },
+    "adj_red_calls_per_100": 27.8125,
+    "adj_emails_per_100": 15.288461538461537,
+    "adj_email_precision": 0.2641509433962264
+   },
+   "v2": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 25,
+    "red_recall": 0.9615384615384616,
+    "red_recall_ci": [
+     0.8110722092608273,
+     0.9931780150820144
+    ],
+    "red_precision": 0.6756756756756757,
+    "macro_f1": 0.7417432470064048,
+    "red_to_green": 0,
+    "red_to_yellow": 1,
+    "yellow_to_red": 10,
+    "green_to_red": 2,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 41.111111111111114,
+    "emails_per_100": 31.11111111111111,
+    "red_rows_emailed": 22,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.0625,
+      "email": 0.03125
+     },
+     "YELLOW": {
+      "red": 0.3125,
+      "email": 0.15625
+     },
+     "RED": {
+      "red": 0.9615384615384616,
+      "email": 0.8461538461538461
+     }
+    },
+    "adj_red_calls_per_100": 16.995192307692307,
+    "adj_emails_per_100": 10.32451923076923,
+    "adj_email_precision": 0.40977881257275905
+   },
+   "v2_m1": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 21,
+    "red_recall": 0.8076923076923077,
+    "red_recall_ci": [
+     0.6212374271797887,
+     0.9149293890487726
+    ],
+    "red_precision": 0.6176470588235294,
+    "macro_f1": 0.7565072302558399,
+    "red_to_green": 1,
+    "red_to_yellow": 4,
+    "yellow_to_red": 8,
+    "green_to_red": 5,
+    "yellow_to_green": 1,
+    "red_calls_per_100": 37.77777777777778,
+    "emails_per_100": 25.555555555555557,
+    "red_rows_emailed": 18,
+    "non_red_emails": 5,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.15625,
+      "email": 0.0625
+     },
+     "YELLOW": {
+      "red": 0.25,
+      "email": 0.09375
+     },
+     "RED": {
+      "red": 0.8076923076923077,
+      "email": 0.6923076923076923
+     }
+    },
+    "adj_red_calls_per_100": 21.225961538461537,
+    "adj_emails_per_100": 10.180288461538462,
+    "adj_email_precision": 0.3400236127508855
+   },
+   "v2_seeds": {
+    "red_recall": [
+     0.9692307692307693,
+     0.015384615384615375
+    ],
+    "red_to_green": [
+     0.0,
+     0.0
+    ],
+    "yellow_to_red": [
+     11.0,
+     1.4142135623730951
+    ],
+    "green_to_red": [
+     3.2,
+     0.9797958971132712
+    ],
+    "emails_per_100": [
+     31.555555555555554,
+     0.5443310539518171
+    ],
+    "adj_emails_per_100": [
+     10.91826923076923,
+     0.8523863560616162
+    ],
+    "adj_red_calls_per_100": [
+     20.439903846153847,
+     3.190100386676101
+    ],
+    "macro_f1": [
+     0.7322933482180848,
+     0.015053291071964785
+    ]
+   },
+   "live_check": {
+    "model_used": "M2:m2_main_v2_it3_seed0",
+    "mismatches": [],
+    "max_abs_p_red_diff": 6.556510925292969e-07
+   }
+  },
+  "unseen_test": {
+   "rules": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 6,
+    "red_recall": 0.05714285714285714,
+    "red_recall_ci": [
+     0.026449634282568767,
+     0.11909654861610877
+    ],
+    "red_precision": 0.5,
+    "macro_f1": 0.27299593830206076,
+    "red_to_green": 81,
+    "red_to_yellow": 18,
+    "yellow_to_red": 2,
+    "green_to_red": 4,
+    "yellow_to_green": 54,
+    "red_calls_per_100": 4.363636363636363,
+    "emails_per_100": 4.363636363636363,
+    "red_rows_emailed": 6,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.037037037037037035,
+      "email": 0.037037037037037035
+     },
+     "YELLOW": {
+      "red": 0.03225806451612903,
+      "email": 0.03225806451612903
+     },
+     "RED": {
+      "red": 0.05714285714285714,
+      "email": 0.05714285714285714
+     }
+    },
+    "adj_red_calls_per_100": 3.6847584912101037,
+    "adj_emails_per_100": 3.6847584912101037,
+    "adj_email_precision": 0.0775394877020705
+   },
+   "v1": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 102,
+    "red_recall": 0.9714285714285714,
+    "red_recall_ci": [
+     0.9193437087803026,
+     0.9902361610372342
+    ],
+    "red_precision": 0.6666666666666666,
+    "macro_f1": 0.6404177433247201,
+    "red_to_green": 1,
+    "red_to_yellow": 2,
+    "yellow_to_red": 38,
+    "green_to_red": 13,
+    "yellow_to_green": 3,
+    "red_calls_per_100": 55.63636363636363,
+    "emails_per_100": 36.72727272727273,
+    "red_rows_emailed": 80,
+    "non_red_emails": 21,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.12037037037037036,
+      "email": 0.018518518518518517
+     },
+     "YELLOW": {
+      "red": 0.6129032258064516,
+      "email": 0.3064516129032258
+     },
+     "RED": {
+      "red": 0.9714285714285714,
+      "email": 0.7619047619047619
+     }
+    },
+    "adj_red_calls_per_100": 28.605649428230073,
+    "adj_emails_per_100": 12.767110428400752,
+    "adj_email_precision": 0.29838574913940036
+   },
+   "v1_model_v2_rule": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 102,
+    "red_recall": 0.9714285714285714,
+    "red_recall_ci": [
+     0.9193437087803026,
+     0.9902361610372342
+    ],
+    "red_precision": 0.7083333333333334,
+    "macro_f1": 0.6626852681617194,
+    "red_to_green": 1,
+    "red_to_yellow": 2,
+    "yellow_to_red": 34,
+    "green_to_red": 8,
+    "yellow_to_green": 3,
+    "red_calls_per_100": 52.36363636363637,
+    "emails_per_100": 36.72727272727273,
+    "red_rows_emailed": 80,
+    "non_red_emails": 21,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.07407407407407407,
+      "email": 0.018518518518518517
+     },
+     "YELLOW": {
+      "red": 0.5483870967741935,
+      "email": 0.3064516129032258
+     },
+     "RED": {
+      "red": 0.9714285714285714,
+      "email": 0.7619047619047619
+     }
+    },
+    "adj_red_calls_per_100": 23.752005461682877,
+    "adj_emails_per_100": 12.767110428400752,
+    "adj_email_precision": 0.29838574913940036
+   },
+   "v2": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 100,
+    "red_recall": 0.9523809523809523,
+    "red_recall_ci": [
+     0.8933383335512599,
+     0.9794908344554671
+    ],
+    "red_precision": 0.7194244604316546,
+    "macro_f1": 0.7079004783922818,
+    "red_to_green": 1,
+    "red_to_yellow": 4,
+    "yellow_to_red": 32,
+    "green_to_red": 7,
+    "yellow_to_green": 2,
+    "red_calls_per_100": 50.54545454545455,
+    "emails_per_100": 32.0,
+    "red_rows_emailed": 71,
+    "non_red_emails": 17,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.06481481481481481,
+      "email": 0.009259259259259259
+     },
+     "YELLOW": {
+      "red": 0.5161290322580645,
+      "email": 0.25806451612903225
+     },
+     "RED": {
+      "red": 0.9523809523809523,
+      "email": 0.6761904761904762
+     }
+    },
+    "adj_red_calls_per_100": 22.20216760539341,
+    "adj_emails_per_100": 10.480713432326336,
+    "adj_email_precision": 0.32258799964173174
+   }
+  }
+ },
+ "categories": {
+  "challenge_v2:negation": {
+   "n": 30,
+   "R": 6,
+   "Y": 8,
+   "G": 16,
+   "rules_ok": 8,
+   "v1_ok": 20,
+   "v2_ok": 23,
+   "v1_red_tp": 6,
+   "v2_red_tp": 5,
+   "v1_over_red": 6,
+   "v2_over_red": 2,
+   "v1_under": 1,
+   "v2_under": 2
+  },
+  "challenge_v2:wound_minimal_pair": {
+   "n": 36,
+   "R": 18,
+   "Y": 18,
+   "G": 0,
+   "rules_ok": 17,
+   "v1_ok": 22,
+   "v2_ok": 28,
+   "v1_red_tp": 18,
+   "v2_red_tp": 18,
+   "v1_over_red": 14,
+   "v2_over_red": 8,
+   "v1_under": 0,
+   "v2_under": 0
+  },
+  "challenge_v2:routine_multi_topic": {
+   "n": 24,
+   "R": 2,
+   "Y": 6,
+   "G": 16,
+   "rules_ok": 16,
+   "v1_ok": 16,
+   "v2_ok": 16,
+   "v1_red_tp": 2,
+   "v2_red_tp": 2,
+   "v1_over_red": 3,
+   "v2_over_red": 2,
+   "v1_under": 3,
+   "v2_under": 3
+  },
+  "challenge:negation": {
+   "n": 20,
+   "R": 4,
+   "Y": 4,
+   "G": 12,
+   "rules_ok": 6,
+   "v1_ok": 15,
+   "v2_ok": 18,
+   "v1_red_tp": 4,
+   "v2_red_tp": 4,
+   "v1_over_red": 3,
+   "v2_over_red": 1,
+   "v1_under": 0,
+   "v2_under": 0
+  },
+  "challenge:keyword_free_red": {
+   "n": 20,
+   "R": 20,
+   "Y": 0,
+   "G": 0,
+   "rules_ok": 0,
+   "v1_ok": 20,
+   "v2_ok": 20,
+   "v1_red_tp": 20,
+   "v2_red_tp": 20,
+   "v1_over_red": 0,
+   "v2_over_red": 0,
+   "v1_under": 0,
+   "v2_under": 0
+  },
+  "challenge:indian_english": {
+   "n": 21,
+   "R": 7,
+   "Y": 7,
+   "G": 7,
+   "rules_ok": 12,
+   "v1_ok": 16,
+   "v2_ok": 18,
+   "v1_red_tp": 7,
+   "v2_red_tp": 6,
+   "v1_over_red": 4,
+   "v2_over_red": 2,
+   "v1_under": 0,
+   "v2_under": 1
+  },
+  "challenge:typo_or_slang": {
+   "n": 21,
+   "R": 8,
+   "Y": 7,
+   "G": 6,
+   "rules_ok": 9,
+   "v1_ok": 14,
+   "v2_ok": 14,
+   "v1_red_tp": 8,
+   "v2_red_tp": 8,
+   "v1_over_red": 5,
+   "v2_over_red": 5,
+   "v1_under": 2,
+   "v2_under": 2
+  },
+  "challenge:numeric_in_text": {
+   "n": 21,
+   "R": 7,
+   "Y": 7,
+   "G": 7,
+   "rules_ok": 9,
+   "v1_ok": 14,
+   "v2_ok": 15,
+   "v1_red_tp": 7,
+   "v2_red_tp": 7,
+   "v1_over_red": 4,
+   "v2_over_red": 3,
+   "v1_under": 0,
+   "v2_under": 1
+  },
+  "challenge:multi_symptom": {
+   "n": 20,
+   "R": 9,
+   "Y": 8,
+   "G": 3,
+   "rules_ok": 9,
+   "v1_ok": 11,
+   "v2_ok": 15,
+   "v1_red_tp": 9,
+   "v2_red_tp": 9,
+   "v1_over_red": 8,
+   "v2_over_red": 3,
+   "v1_under": 0,
+   "v2_under": 0
+  },
+  "challenge:benign_scary_word": {
+   "n": 20,
+   "R": 0,
+   "Y": 3,
+   "G": 17,
+   "rules_ok": 13,
+   "v1_ok": 10,
+   "v2_ok": 12,
+   "v1_red_tp": 0,
+   "v2_red_tp": 0,
+   "v1_over_red": 5,
+   "v2_over_red": 3,
+   "v1_under": 0,
+   "v2_under": 1
+  },
+  "challenge:audit_regression": {
+   "n": 7,
+   "R": 3,
+   "Y": 2,
+   "G": 2,
+   "rules_ok": 0,
+   "v1_ok": 3,
+   "v2_ok": 4,
+   "v1_red_tp": 3,
+   "v2_red_tp": 3,
+   "v1_over_red": 3,
+   "v2_over_red": 3,
+   "v1_under": 0,
+   "v2_under": 0
+  }
+ },
+ "audit_rows": [
+  {
+   "id": "CH-144",
+   "text": "No chest pain, no chills",
+   "label": "GREEN",
+   "rules": "RED",
+   "v1": "YELLOW",
+   "v1_p_red": 0.08189640939235687,
+   "v1_email": false,
+   "v2": "GREEN",
+   "v2_p_red": 0.02487318404018879,
+   "v2_email": false,
+   "v2_reason_codes": [
+    "classifier"
+   ],
+   "v2_reasons": [
+    "the symptoms you described"
+   ]
+  },
+  {
+   "id": "CH-145",
+   "text": "I don't have shortness of breath",
+   "label": "GREEN",
+   "rules": "RED",
+   "v1": "RED",
+   "v1_p_red": 0.7439946532249451,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.6733327507972717,
+   "v2_email": false,
+   "v2_reason_codes": [
+    "classifier"
+   ],
+   "v2_reasons": [
+    "the symptoms you described"
+   ]
+  },
+  {
+   "id": "CH-146",
+   "text": "I cannot breathe properly",
+   "label": "RED",
+   "rules": "GREEN",
+   "v1": "RED",
+   "v1_p_red": 0.9192712903022766,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.9283933639526367,
+   "v2_email": true,
+   "v2_reason_codes": [
+    "classifier"
+   ],
+   "v2_reasons": [
+    "the symptoms you described"
+   ]
+  },
+  {
+   "id": "CH-147",
+   "text": "I can\u2019t breathe",
+   "label": "RED",
+   "rules": "GREEN",
+   "v1": "RED",
+   "v1_p_red": 0.9663057923316956,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.9759057760238647,
+   "v2_email": true,
+   "v2_reason_codes": [
+    "classifier"
+   ],
+   "v2_reasons": [
+    "the symptoms you described"
+   ]
+  },
+  {
+   "id": "CH-148",
+   "text": "fever of 39",
+   "label": "RED",
+   "rules": "GREEN",
+   "v1": "RED",
+   "v1_p_red": 0.6953675746917725,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.6817014217376709,
+   "v2_email": true,
+   "v2_reason_codes": [
+    "high_fever",
+    "classifier"
+   ],
+   "v2_reasons": [
+    "a temperature of 38.5 \u00b0C or higher",
+    "the symptoms you described"
+   ]
+  },
+  {
+   "id": "CH-149",
+   "text": "My knee is a little red and swollen",
+   "label": "YELLOW",
+   "rules": "RED",
+   "v1": "RED",
+   "v1_p_red": 0.9204655885696411,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.8531078100204468,
+   "v2_email": true,
+   "v2_reason_codes": [
+    "classifier"
+   ],
+   "v2_reasons": [
+    "the symptoms you described"
+   ]
+  },
+  {
+   "id": "CH-150",
+   "text": "fluid coming from my incision",
+   "label": "YELLOW",
+   "rules": "GREEN",
+   "v1": "RED",
+   "v1_p_red": 0.6691246032714844,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.6776203513145447,
+   "v2_email": false,
+   "v2_reason_codes": [
+    "classifier"
+   ],
+   "v2_reasons": [
+    "the symptoms you described"
+   ]
+  }
+ ],
+ "orchestration_messages": [
+  {
+   "text": "Since I didn't take my medicine yesterday, my knee wound is worse",
+   "rules": "GREEN",
+   "v1": "RED",
+   "v1_p_red": 0.7402352094650269,
+   "v1_email": true,
+   "v2": "RED",
+   "v2_p_red": 0.7557745575904846,
+   "v2_email": true
+  },
+  {
+   "text": "I am anxious, my knee hurts, and I need help with exercises",
+   "rules": "GREEN",
+   "v1": "RED",
+   "v1_p_red": 0.5392453074455261,
+   "v1_email": false,
+   "v2": "YELLOW",
+   "v2_p_red": 0.25168532133102417,
+   "v2_email": false
+  }
+ ],
+ "v2_red_misses": [
+  {
+   "set": "test",
+   "id": "ALLERGIC_REACTION-013",
+   "text": "Wheezy and chest tight since the tramadol, never had asthma",
+   "v2": "YELLOW",
+   "p_red": 0.059,
+   "v1": "YELLOW"
+  },
+  {
+   "set": "test",
+   "id": "BLEEDING_ANTICOAG-037",
+   "text": "My mother is passing blood with stool and she is on blood thinner after knee replacement. Kindly guide.",
+   "v2": "YELLOW",
+   "p_red": 0.202,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-012",
+   "text": "My father is shouting with pain in leg after knee surgery. Tramadol given 1 hour back but no relief. Leg is tight.",
+   "v2": "YELLOW",
+   "p_red": 0.08,
+   "v1": "YELLOW"
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-058",
+   "text": "Is so much pain normal on day 2? Leg is very tight and stiff like wood and no medicine is working.",
+   "v2": "YELLOW",
+   "p_red": 0.058,
+   "v1": "YELLOW"
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-059",
+   "text": "The pain is getting worse hour by hour and it's out of all proportion. I've had the other knee done and it was nothing like this.",
+   "v2": "YELLOW",
+   "p_red": 0.197,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "LOW_FEVER-040",
+   "text": "Mum's mild temp of 38.2 but she's muddled and forgetting things today",
+   "v2": "YELLOW",
+   "p_red": 0.164,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "SRC-SEPSIS_WOUND-03",
+   "text": "The redness around the surgical cut has spread 4 inches with burning pain and fever.",
+   "v2": "YELLOW",
+   "p_red": 0.316,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "WOUND_OPEN-030",
+   "text": "When I bend the knee the cut gapes and I can see right into it; when I straighten it closes again",
+   "v2": "YELLOW",
+   "p_red": 0.194,
+   "v1": "YELLOW"
+  },
+  {
+   "set": "challenge",
+   "id": "CH-061",
+   "text": "Thoda chest mein dard hai and saans lene mein problem, since one hour",
+   "v2": "YELLOW",
+   "p_red": 0.295,
+   "v1": "RED"
+  },
+  {
+   "set": "challenge_v2",
+   "id": "CH2-030",
+   "text": "Not dizzy, but I've had black tarry poo twice since starting the blood thinner",
+   "v2": "YELLOW",
+   "p_red": 0.282,
+   "v1": "RED"
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-013",
+   "text": "Wheezy and chest tight since the tramadol, never had asthma",
+   "v2": "YELLOW",
+   "p_red": 0.028,
+   "v1": "YELLOW"
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-017",
+   "text": "Itchy everywhere, lips fat, and feel dizzy since taking the first amoxicillin",
+   "v2": "YELLOW",
+   "p_red": 0.1,
+   "v1": "RED"
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-028",
+   "text": "Lumpy itchy welts head to toe since the new tablets yesterday",
+   "v2": "YELLOW",
+   "p_red": 0.083,
+   "v1": "RED"
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-032",
+   "text": "Is it normal for my throat to feel tight after the antibiotic?",
+   "v2": "GREEN",
+   "p_red": 0.004,
+   "v1": "GREEN"
+  },
+  {
+   "set": "unseen_test",
+   "id": "FOLLOWUP_ADMIN-014",
+   "text": "Waiting for my wound check next week but the dressing has soaked right through with blood twice today.",
+   "v2": "YELLOW",
+   "p_red": 0.031,
+   "v1": "YELLOW"
+  }
+ ],
+ "v2_new_red_to_lower": [
+  {
+   "set": "test",
+   "id": "BLEEDING_ANTICOAG-037",
+   "text": "My mother is passing blood with stool and she is on blood thinner after knee replacement. Kindly guide.",
+   "v2": "YELLOW",
+   "p_red": 0.202,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-059",
+   "text": "The pain is getting worse hour by hour and it's out of all proportion. I've had the other knee done and it was nothing like this.",
+   "v2": "YELLOW",
+   "p_red": 0.197,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "LOW_FEVER-040",
+   "text": "Mum's mild temp of 38.2 but she's muddled and forgetting things today",
+   "v2": "YELLOW",
+   "p_red": 0.164,
+   "v1": "RED"
+  },
+  {
+   "set": "test",
+   "id": "SRC-SEPSIS_WOUND-03",
+   "text": "The redness around the surgical cut has spread 4 inches with burning pain and fever.",
+   "v2": "YELLOW",
+   "p_red": 0.316,
+   "v1": "RED"
+  },
+  {
+   "set": "challenge",
+   "id": "CH-061",
+   "text": "Thoda chest mein dard hai and saans lene mein problem, since one hour",
+   "v2": "YELLOW",
+   "p_red": 0.295,
+   "v1": "RED"
+  },
+  {
+   "set": "challenge_v2",
+   "id": "CH2-030",
+   "text": "Not dizzy, but I've had black tarry poo twice since starting the blood thinner",
+   "v2": "YELLOW",
+   "p_red": 0.282,
+   "v1": "RED"
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-017",
+   "text": "Itchy everywhere, lips fat, and feel dizzy since taking the first amoxicillin",
+   "v2": "YELLOW",
+   "p_red": 0.1,
+   "v1": "RED"
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-028",
+   "text": "Lumpy itchy welts head to toe since the new tablets yesterday",
+   "v2": "YELLOW",
+   "p_red": 0.083,
+   "v1": "RED"
+  }
+ ],
+ "model_info": {
+  "model_used": "M2:m2_main_v2_it3_seed0",
+  "t_red": 0.35381320118904114,
+  "t_yel": 0.36271947622299194,
+  "t_alert": 0.6844116449356079,
+  "load_error": null,
+  "selection_file": "selection_v2.json"
+ }
+}

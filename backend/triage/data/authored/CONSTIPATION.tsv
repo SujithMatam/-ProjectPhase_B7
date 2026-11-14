@@ -1,0 +1,54 @@
+# CONSTIPATION: no bowel movement 3+ days, bloating, straining on painkillers. Lead label YELLOW.
+YELLOW	ANY	-	Haven't had a bowel movement since I got home on Saturday and it's Wednesday now. Taking the oxycodone four times a day.
+YELLOW	ANY	indian_english	Motion not passed since 4 days after coming home from hospital. Stomach is feeling tight. Kindly advise.
+YELLOW	ANY	hard_pos,indirect	Day five of sitting on the loo for ages with nothing happening. Belly like a drum.
+GREEN	ANY	question	Which foods help keep things moving while I'm on strong painkillers?
+GREEN	ANY	hard_neg,negation	Was blocked up for a few days but went this morning after the senna, feel much lighter now. No pain at all.
+YELLOW	TKA	multi_symptom	Knee is doing ok but I've not opened my bowels in 4 days, I feel bloated and a bit sick whenever I eat.
+RED	ANY	multi_symptom	Not been for 5 days, then finally went and it was black and sticky like tar. I'm on rivaroxaban.
+YELLOW	ANY	typo	havent pooed in 3 days, tramadol is blocking me up, wat can i take
+YELLOW	THA	carer	My mum had her hip done last week and hasn't had a bowel movement since the operation. She's refusing food because she feels so full.
+GREEN	ANY	question	Is it ok to take lactulose and senna at the same time?
+YELLOW	ANY	indian_english	Doctor sir, stomach is very heavy and gas is forming, no latrine from 3 days. What to do now?
+YELLOW	THA	-	Straining so hard on the toilet that I'm scared I'll damage my new hip, only tiny hard bits coming out for four days.
+GREEN	ANY	hard_neg	Went yesterday and today, all normal. Just want to know if I should keep taking the Movicol or stop now.
+YELLOW	ANY	hard_pos,indirect	Tummy is swollen and hard and I keep feeling like I need to go but nothing comes. Been like this since Friday.
+RED	ANY	hard_pos,multi_symptom	Nearly passed out on the toilet while straining, my husband had to help me back to bed. Still nothing out after four days.
+YELLOW	ANY	multi_symptom	Constipated six days now and vomited once this afternoon.
+GREEN	ANY	question	How many prunes a day is sensible? Trying to avoid getting constipated on the oxycodone.
+YELLOW	ANY	indian_english	I took Cremaffin syrup two times but still motion is not coming, it is the 5th day. Please suggest.
+YELLOW	THA	-	Home three days after my hip replacement and nothing yet. The hospital gave me docusate but it isn't doing a thing.
+GREEN	ANY	-	Bit sluggish, last went two days ago, drinking lots of water. Anything else I should be doing?
+RED	ANY	hard_pos,indirect	Bowels haven't moved in a week and now I'm bringing up dark brown gritty stuff that looks like used coffee.
+YELLOW	ANY	typo	constipashun really bad, 4 dys nothing, cramping on n off
+YELLOW	TKA	carer	Dad is 82 and had his knee replaced 10 days ago. No bowel movement for at least 4 days and he's gone right off his food.
+RED	ANY	carer,multi_symptom	My father hasn't opened his bowels in 5 days and since this morning he's not making sense, keeps asking where he is.
+GREEN	ANY	question	Can I use a glycerin suppository at home or do I need to ask first?
+YELLOW	ANY	-	Only managing rabbit-pellet sized bits for the last three days, with a lot of straining.
+YELLOW	ANY	indian_english	Since operation I am not able to pass stool properly, only gas is coming. It is 4 days. Is it due to the tablets?
+GREEN	ANY	hard_neg,negation	No bloating, no pain, went fine this morning. Should I keep the fibre sachets going while I'm on tramadol?
+YELLOW	TKA	-	Honestly the constipation is the worst part. Five days blocked and the stomach cramps hurt more than my knee.
+YELLOW	ANY	-	Laxatives not working. Day 4.
+RED	ANY	multi_symptom	Finally passed a stool but there was a lot of dark red blood with it and it keeps coming. I'm on apixaban.
+GREEN	ANY	question	Does the stool softener need to be taken with food?
+YELLOW	ANY	typo	stil havent been since the op on monday, its thurs night, feel so bloated n uncomfy
+YELLOW	ANY	indian_english	Bahut problem hai, toilet not happening from Monday. Today is Friday. Pet is also paining.
+YELLOW	THA	hard_pos	Sitting on the raised toilet seat for half an hour every morning and nothing. Four days of this now.
+GREEN	ANY	hard_neg	Was a bit constipated yesterday but kiwi and porridge did the trick.
+YELLOW	ANY	hard_pos,indirect	I feel full all the time, can only manage a few spoonfuls, and I can't remember when I last went. Sunday maybe?
+YELLOW	ANY	multi_symptom	Blocked up 3 days, mild nausea, and leaking a bit of watery stuff even though I can't actually go.
+GREEN	ANY	question	How long does the constipation from oxycodone usually last once I stop taking it?
+YELLOW	TKA	carer,indian_english	Writing for my mother-in-law, she had knee surgery. No motion since 4 days, she is having gas trouble and not eating.
+RED	ANY	multi_symptom	Straining on the toilet and suddenly got a crushing pain across my chest and couldn't get my breath.
+YELLOW	ANY	-	It's been 72 hours without a bowel movement. Is it time for something stronger than the senna?
+GREEN	ANY	hard_neg,question	What if I get constipated on the oxycodone, what should I do?
+YELLOW	ANY	typo	3rd day no bm, tummy cramps. on oxy + paracetamol. pls help
+YELLOW	ANY	multi_symptom	Hard painful stools for days, I have to strain a lot, and there's a streak of bright red on the paper each time.
+GREEN	ANY	indian_english,question	Can I take isabgol with warm water at night along with my pain tablets?
+YELLOW	ANY	indian_english	Sir I am getting stomach pain and no motion from last 3 days, eating very less also. What should I do?
+GREEN	ANY	hard_neg	Bowels back to normal now that I'm off the tramadol, thanks for the advice last week.
+YELLOW	ANY	hard_pos,indirect	Everything is backed up down there and my stomach is so tight I can't do my exercises. Since the weekend.
+YELLOW	ANY	-	4 days no poo
+GREEN	ANY	question	Should I stop the laxative if I get diarrhoea?
+YELLOW	TKA	indian_english,typo	pls tell any medicine for constipation, not gone to toilet since 3 days after knee operation
+GREEN	ANY	typo,question	is it ok to drink prune juice evry day while on painkillers

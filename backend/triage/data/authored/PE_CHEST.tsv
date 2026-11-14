@@ -1,0 +1,72 @@
+# PE_CHEST: breathlessness, chest pain on breathing/coughing, coughing blood, fainting, racing heart
+RED	ANY	hard_pos,indirect	Can't get a full breath in, it's like someone's sitting on my chest
+RED	ANY	-	Sharp stab under my right ribs every time I breathe in, started an hour ago
+RED	THA	carer	My wife just went grey and nearly passed out getting off the toilet, she's 8 days after her hip op
+RED	ANY	typo	cant catch my breth just sitting here, heart going rly fast
+GREEN	ANY	hard_neg,negation,question	No chest pain or breathlessness, just wondering how many breaths an hour I should do on the spirometer thing
+RED	ANY	indian_english	Since morning I am having breathing problem and chest is paining when I take deep breath. Kindly advise.
+RED	ANY	-	Coughed this morning and there were streaks of blood in what came up
+RED	ANY	hard_pos,indirect	I get out of breath just talking on the phone now, wasn't like that yesterday
+RED	TKA	multi_symptom	Calf has been sore for 2 days and now my chest hurts when I breathe in after my knee op
+RED	ANY	-	Fainted in the kitchen about 20 minutes ago. Came round quickly but feel shaky.
+GREEN	ANY	hard_neg	Get a bit puffed climbing the stairs but it settles after a minute sitting down, same as before the op
+RED	ANY	hard_pos,indirect	Heart is pounding and I feel like I can't get enough air even lying still
+RED	THA	carer,indian_english	My mother had hip replacement 2 weeks back. She is coughing and some blood is coming with cough. What to do?
+RED	ANY	indian_english	Doing cough and side of chest is paining, and breathlessness is more than in the morning.
+RED	ANY	typo	chest pain wen i cough, short of breath, scared
+RED	ANY	hard_pos	Everything went black for a second when I stood up from bed and I had to grab the frame
+RED	THA	indian_english	Doctor sir, operation done 6 days back. Today heart beating very fast and feeling suffocation. Please reply.
+GREEN	ANY	question	What are the warning signs of a clot in the lung?
+RED	ANY	multi_symptom,temp_in_text	Breathless, chest feels tight, and temp is 37.6
+RED	ANY	typo	suddenly v breathles
+RED	ANY	hard_pos,indirect	I keep having to stop halfway through sentences to breathe
+RED	ANY	-	Coughing up pink frothy stuff this evening
+RED	TKA	carer	Dad's lips look a bit blue and he's breathing really fast. Knee op was last Thursday.
+GREEN	ANY	hard_neg,indian_english	Chest pain was there last week, they did ECG and CT, all normal. Now no pain. Can I start walking outside?
+RED	ANY	question,multi_symptom	Is it normal to feel this breathless walking to the bathroom? It came on today and I'm also a bit dizzy.
+RED	ANY	hard_pos,indirect	There's a catch in my chest every time I take a deep breath, like something's snagging
+RED	ANY	indian_english	Feeling giddy and ghabrahat, heart racing since half hour, breathing also fast
+RED	ANY	-	Racing heart and I'm sweating and breathless, not doing anything, just watching TV
+RED	TKA	typo,multi_symptom	leg was swolen yday now cant breath properly n chest hurts
+GREEN	ANY	hard_neg,question	If I got sudden chest pain would I ring for an ambulance or call the ward first?
+RED	ANY	-	I'm probably overreacting but my chest hurts on the left when I breathe and it won't go away
+RED	ANY	hard_pos	Woke up gasping and couldn't settle my breathing for ages, still feel tight in the chest
+RED	ANY	-	Coughed up a small clot of blood. No cold or anything.
+RED	THA	-	Nearly collapsed on the walker this afternoon, legs went and the room spun, my husband caught me
+GREEN	THA	hard_neg	Heart sped up a bit doing the stairs with the physio, slowed back down in a couple of minutes, breathing fine
+RED	ANY	indian_english,question	Breath is not coming properly when I lie down, and chest is paining on right side. Is it gas or serious?
+RED	ANY	multi_symptom	Heart is fluttering, I'm breathless and my calf is still aching from yesterday
+RED	ANY	hard_pos,indirect	My chest feels like it's being squeezed and I can't walk across the room without stopping
+RED	ANY	temp_in_text,multi_symptom	Temp 38.2, coughing, and sharp pain in my chest when I breathe
+RED	ANY	typo	heart racin like mad an i feel faint
+GREEN	ANY	question	How often should I be doing the deep breathing and coughing exercises at home?
+RED	TKA	carer,multi_symptom	Grandma is confused about where she is and breathing really fast, she had her knee replaced last week
+RED	ANY	-	Every time I lie flat I get breathless and have to sit up, started two nights ago
+RED	ANY	indian_english,question	Little blood came while coughing in morning. Is it because of throat dryness or something else?
+RED	ANY	hard_pos	Can't climb three steps without stopping to gasp, and that's new since yesterday
+YELLOW	ANY	hard_neg,negation,temp_in_text	No breathing problems or chest pain, but I've got a dry cough and temp is 37.9C
+RED	ANY	-	Pain under my shoulder blade when I breathe in, and my breathing is quick and shallow
+RED	ANY	hard_pos,indirect	I feel really odd, lightheaded, heart thumping, like I might go down
+RED	THA	multi_symptom	Hip's fine but since lunchtime I'm breathless, coughing, and there's a pain in my chest that's worse when I cough
+RED	ANY	indian_english	Became unconscious for few seconds in toilet this morning.
+RED	ANY	indian_english	Chest is very tight and not able to talk full sentence. Operation on 3rd of this month.
+YELLOW	ANY	hard_neg,negation	Felt a bit dizzy after my morning tablets, didn't faint, breathing normal, chest fine
+RED	ANY	typo	breathless all of a suden, pls help
+RED	TKA	carer,indian_english	Sir my wife is having chest pain and sweating after knee surgery. BP machine showing pulse 130. Please guide.
+RED	ANY	-	Heart rate on my watch keeps showing 125 while I'm resting and I feel breathless
+GREEN	ANY	hard_neg,typo	had a sneezin fit, no chest pain, breathin totally normal, just checking i can take antihistamines with my tablets
+RED	ANY	hard_pos,indirect	Feels like there's a weight on my chest and I'm yawning constantly trying to get air
+RED	ANY	-	Breathing hurts. Right side. Since I woke.
+RED	ANY	multi_symptom	Felt faint, sat down, heart was racing for about ten minutes, still a bit breathless
+RED	TKA	-	Was doing my exercises and suddenly couldn't breathe properly, chest went tight and I had to stop. 3 weeks after knee replacement.
+GREEN	ANY	hard_neg	My heart raced when I saw what the hospital parking cost, ha. Seriously though, when's my follow-up?
+RED	ANY	question	Why would my chest hurt when I cough? It started today and I'm also more puffed than usual.
+RED	ANY	indian_english	Feeling very weak and almost fainted while going to bathroom. Head is spinning still.
+RED	ANY	hard_pos	I just don't feel right. Breathing's off and my heart keeps skipping and then racing.
+GREEN	TKA	hard_neg,indian_english,question	Not having any breathing trouble, just asking is it ok to do pranayama after knee surgery?
+RED	ANY	-	Sudden sharp chest pain at 2am, worse when breathing in, can't get back to sleep
+RED	THA	carer,typo	my mum is v breathless tonite and says her chest hurts, she had her hip done last week
+GREEN	ANY	carer,question	Should my husband still be using the breathing device now he's walking around a lot?
+RED	ANY	hard_pos,indirect	My fingertips look a bit blue and I'm gulping for air
+YELLOW	ANY	hard_neg,negation	Haven't slept properly for four nights, worrying constantly and off my food, but no chest pain or breathlessness
+RED	ANY	-	Suddenly very breathless.

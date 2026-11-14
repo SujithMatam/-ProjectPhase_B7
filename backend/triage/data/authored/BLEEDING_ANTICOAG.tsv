@@ -1,0 +1,70 @@
+RED	ANY	typo	pooed black sticky stuff twice today, im on rivaroxaban
+RED	ANY	hard_pos,indirect	My poo looks like tar and smells really strange
+RED	ANY	hard_pos,indirect	Brought up dark brown gritty bits when I was sick this morning
+RED	ANY	-	vomited bright red blood after breakfast
+RED	ANY	hard_pos,negation	My wee is pink-red and I haven't eaten beetroot or anything like that
+RED	TKA	-	Knee dressing has soaked right through and blood is dripping on the floor
+RED	ANY	indian_english	Blood is coming from wound continuously since one hour, not stopping even with pressure. Kindly help.
+RED	ANY	-	I'm on apixaban and there are huge purple bruises on my back and arms I can't explain
+RED	ANY	carer	Mum's urine in the commode is dark red today, she's on blood thinner injections
+RED	ANY	typo	nosebleed wont stop, been 40 mins, on xarelto
+RED	THA	-	Hip dressing completely saturated with fresh blood within an hour of the nurse changing it
+RED	ANY	hard_pos,indirect	toilet bowl was full of red after I passed water
+RED	ANY	indian_english	Motion is coming black colour since yesterday. I am taking blood thinner tablet. What to do?
+RED	ANY	indian_english	Small cut while shaving, it is 20 minutes and still blood is pouring
+RED	ANY	hard_pos,indirect	bruise the size of a dinner plate appeared on my tummy overnight
+RED	TKA	carer,multi_symptom	My father is on warfarin after his knee op and we've been managing fine at home, but since yesterday he's been passing black stools and tonight he looks very pale and says the room is spinning
+RED	ANY	-	spat out a mouthful of blood after brushing my teeth and it's still oozing 30 min later
+RED	ANY	typo,question	blood in my pee, on blood thinners, is that bad
+RED	ANY	-	Sick twice, both times streaked with blood
+RED	THA	indian_english	From hip wound blood is coming and bandage is fully wet. Changed twice already.
+RED	ANY	hard_pos,multi_symptom	Feel faint every time I stand and my stools have gone very dark
+RED	ANY	carer	Grandma has new dark bruises all over her shins and forearms and she hasn't knocked anything, she's on dalteparin
+RED	TKA	multi_symptom	knee wound bleeding through two pads, and I feel lightheaded
+RED	ANY	hard_pos,indirect	My urine is the colour of cola since this morning
+RED	THA	indian_english	sir blood is coming in urine since morning, I am on ecosprin after hip surgery, pls advise
+RED	ANY	indian_english	Wound is continuously dribbling blood since three hours
+RED	ANY	typo	black tarry poo agian
+RED	ANY	carer,hard_pos,indirect	Husband vomited something that looked like dark sludge and he's on rivaroxaban
+RED	ANY	multi_symptom	Took my warfarin twice by mistake and now my nose and gums are bleeding non-stop
+RED	THA	multi_symptom	A massive bruise has spread from my hip all the way round to my groin and lower back and it's swelling up
+RED	ANY	indian_english	Vomiting blood since evening, two times happened. Please tell urgently.
+RED	ANY	hard_pos	My pants are wet with blood from the wound and I only noticed when I stood up
+RED	ANY	typo,multi_symptom	pee is red and burning, on clexane, should i b worried
+RED	ANY	multi_symptom	on blood thinners, black stools, and my heart is pounding
+RED	ANY	-	There's blood seeping out of the injection site on my belly and it won't stop even after pressing for 15 min
+RED	TKA	hard_pos	The dressing on my knee went from dry to dripping in the space of one TV programme
+RED	TKA	carer,indian_english	My mother is passing blood with stool and she is on blood thinner after knee replacement. Kindly guide.
+RED	ANY	hard_pos	every time I blow my nose it fills the tissue with blood and then keeps running
+RED	ANY	-	Large dark bruise, maybe 15cm, appeared on my upper arm and I don't remember hitting it
+RED	ANY	indian_english,typo	pls help, bleeding not stoping from stitches, cloth fully red
+RED	ANY	hard_pos,indirect	my poo came out black and shiny like liquorice
+RED	ANY	multi_symptom	I'm on aspirin and apixaban, peeing blood and my back aches
+RED	THA	-	Since my hip surgery I've had a leaking wound; tonight it's pumping out bright blood
+RED	ANY	carer,multi_symptom	Dad's sick bowl has dark red clots in it and he's very sleepy
+RED	ANY	-	heavy bleeding from where my drain was taken out, the dressing's soaked
+RED	ANY	hard_pos	Fresh blood dripping through my compression stocking
+RED	TKA	indian_english	After physio my knee started bleeding from wound and it is still coming after half hour. I am on blood thinner injection.
+RED	ANY	typo	keep throwin up n theres blood in it
+RED	ANY	-	Blood clots in my urine this morning
+RED	ANY	hard_pos,multi_symptom	my stool is darker than I've ever seen, almost purple-black, and I feel washed out
+RED	ANY	question	Is it normal to bleed this much? The pad is soaked every hour.
+RED	ANY	carer	Mum is on warfarin and has a bruise across her whole chest she can't explain
+RED	ANY	multi_symptom	Bleeding from my gums and from a scratch on my hand that just won't clot
+RED	ANY	indian_english,multi_symptom	Last two days stool is coming black like coal. Also feeling weakness.
+RED	ANY	hard_pos	Woke up with blood on my pillow, nose still trickling an hour later
+YELLOW	ANY	typo	small ooze of blood on the dressin, about the size of a 10p
+YELLOW	ANY	hard_neg	Nosebleed this morning on apixaban, stopped after 5 minutes of pinching
+YELLOW	TKA	hard_neg,negation	bruising tracking down my shin to the ankle from the knee, I'm on blood thinners, no other bleeding
+YELLOW	ANY	hard_neg,negation	Gums bled a little when brushing, stopped quickly, no other bleeding, on rivaroxaban
+YELLOW	ANY	indian_english,negation	Small red spot of blood on dressing is increasing slowly, no pain, no fever. Is it ok?
+GREEN	ANY	hard_neg	Ate a big bowl of beetroot salad last night and my wee's pink this morning, I'm guessing that's the beetroot
+GREEN	ANY	hard_neg	small bruise where I do my injections, same as every day
+GREEN	ANY	hard_neg	Nurse said a spot of blood on the dressing is fine and it hasn't spread since yesterday
+GREEN	ANY	question	What signs of bleeding should I watch for on rivaroxaban?
+GREEN	TKA	question,indian_english	Doctor sir, how many days I have to take blood thinner injection after knee replacement?
+GREEN	ANY	hard_neg,negation	No black stools, no blood in urine, bruising fading nicely, just a question about stockings
+GREEN	ANY	question	If I cut myself while on blood thinners, how long should I press on it?
+GREEN	THA	hard_neg	The yellow-green bruise on my hip is fading, much smaller than last week
+GREEN	ANY	hard_neg,typo	red poo scared me but i had beetroot juice yday, it's back to normal colour now
+GREEN	ANY	hard_neg,carer	Dad's bleeding at the drain site was checked by the nurse yesterday, it's stopped and dry today

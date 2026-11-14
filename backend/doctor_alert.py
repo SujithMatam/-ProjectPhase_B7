@@ -64,6 +64,16 @@ _ALERT_EXECUTOR = concurrent.futures.ThreadPoolExecutor(
 )
 
 
+def alert_suppressed(triage: Dict[str, Any]) -> bool:
+    """True when the triage result itself says no doctor email should go out.
+
+    Only the hybrid triage path (TRIAGE_MODE=hybrid, triage/classifier_triage.py) sets
+    ``doctor_alert`` = False: a classifier RED below the val-chosen t_alert keeps the RED
+    patient advice but is flagged "alert_suppressed_low_confidence". Rules-mode results have
+    no ``doctor_alert`` key, so every rules RED still sends an email exactly as before."""
+    return isinstance(triage, dict) and triage.get("doctor_alert") is False
+
+
 class DoctorAlertNotifier:
     """Best-effort emailer for RED-triage doctor alerts."""
 
@@ -111,7 +121,12 @@ class DoctorAlertNotifier:
     ) -> bool:
         """Send the RED alert email. Never raises: any failure is caught,
         logged, and reported back as False so the caller's patient-facing
-        RED response is never affected."""
+        RED response is never affected. Returns False without sending when
+        the triage result is flagged alert_suppressed (hybrid mode gate)."""
+        if alert_suppressed(triage):
+            LOGGER.info("Doctor RED-triage alert suppressed for patient %s (%s)",
+                        patient_id, ", ".join(triage.get("flags") or []))
+            return False
         try:
             self._send(
                 patient_id=patient_id,
@@ -144,7 +159,12 @@ class DoctorAlertNotifier:
         already catches and logs every send failure internally, so nothing
         it raises can reach this caller; scheduling itself is also wrapped
         so that even an executor-level failure can never propagate.
+        A result flagged alert_suppressed (hybrid mode gate) is not scheduled.
         """
+        if alert_suppressed(triage):
+            LOGGER.info("Doctor RED-triage alert suppressed for patient %s (%s)",
+                        patient_id, ", ".join(triage.get("flags") or []))
+            return None
         try:
             return _ALERT_EXECUTOR.submit(
                 self.notify_red_triage,

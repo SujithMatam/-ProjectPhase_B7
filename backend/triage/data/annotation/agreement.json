@@ -1,0 +1,70 @@
+{
+  "all": {
+    "n": 450,
+    "agreement": 0.9867,
+    "kappa": 0.98,
+    "kappa_ci95": [
+      0.9633,
+      0.9933
+    ],
+    "weighted_kappa": 0.9853,
+    "confusion": {
+      "RED->RED": 158,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 132,
+      "YELLOW->GREEN": 5,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 1,
+      "GREEN->GREEN": 154
+    }
+  },
+  "split rows": {
+    "n": 300,
+    "agreement": 0.9867,
+    "kappa": 0.98,
+    "kappa_ci95": [
+      0.9599,
+      0.995
+    ],
+    "weighted_kappa": 0.9851,
+    "confusion": {
+      "RED->RED": 100,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 96,
+      "YELLOW->GREEN": 4,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 0,
+      "GREEN->GREEN": 100
+    }
+  },
+  "challenge rows": {
+    "n": 150,
+    "agreement": 0.9867,
+    "kappa": 0.9796,
+    "kappa_ci95": [
+      0.9485,
+      1.0
+    ],
+    "weighted_kappa": 0.9858,
+    "confusion": {
+      "RED->RED": 58,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 36,
+      "YELLOW->GREEN": 1,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 1,
+      "GREEN->GREEN": 54
+    }
+  },
+  "disagreements": 6,
+  "pairs": {
+    "YELLOW->GREEN": 5,
+    "GREEN->YELLOW": 1
+  }
+}

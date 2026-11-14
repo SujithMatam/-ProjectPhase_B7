@@ -1,0 +1,61 @@
+# FALL_INJURY: fell and now cannot bear weight / new deformity / head injury on a blood thinner / new confusion
+RED	ANY	-	Slipped on the wet kitchen floor and now I can't put any weight on my operated leg
+RED	TKA	hard_pos,indirect	Tripped over the cat, landed on my knee and it looks a really strange shape now
+RED	ANY	indian_english	I fell in bathroom this morning, now not able to stand on leg. Please tell what to do.
+RED	THA	carer	Found Mum on the bedroom floor, she says she can't stand up and her hip hurts badly
+YELLOW	ANY	hard_neg	Had a fall in the kitchen, got up ok and I'm walking fine, just a bit sore and shaken
+RED	ANY	typo	fell off the step, cant stand on my leg now, its killin me
+RED	ANY	multi_symptom	Fell and hit my head on the door frame, I'm on blood thinners and now I've got a bad headache
+RED	THA	-	Lost my balance with the walker and went down on my hip side, leg's twisted and I can't move it
+RED	ANY	carer,multi_symptom	Dad fell in the night and he's muddled this morning, not making sense, he's on rivaroxaban
+GREEN	ANY	question	What's the safest way to get up off the floor if I fall?
+RED	TKA	indian_english	Slipped from bed while getting down, knee hit floor, now knee is swollen and bent, not straightening.
+RED	ANY	hard_pos	Had a tumble on the path. I can hop on my good leg but the other one won't take anything.
+RED	ANY	multi_symptom	Fell backwards into the bath and banged my head, I take apixaban, there's a big lump and I feel drowsy
+RED	THA	typo	fell over in garden, hip hurts like hell n leg looks shorter
+RED	ANY	indian_english,carer	My father fell from chair while having food. Now he is not able to walk and saying pain in operated leg.
+YELLOW	TKA	hard_neg,indian_english	Fell in bathroom yesterday but walking normally only. Knee is little sore. Should I show to doctor?
+RED	ANY	hard_pos,indirect	Since I fell my leg just won't hold me, it gives way the moment I try
+RED	TKA	-	Went down hard on the knee getting out of the car and there's a dent where there shouldn't be one
+RED	ANY	typo	crutch slipd on the tiles, i fell, now cant get up off the floor
+RED	ANY	question	I fell this morning and since then I can't stand on my leg. Should I wait and see?
+GREEN	ANY	hard_neg	Nearly fell when the walker caught on the rug, but I caught myself and didn't land, no harm done
+RED	ANY	carer	My wife fell and hit her head, she's on blood thinners and she keeps asking the same questions over and over
+RED	THA	hard_pos,indirect	Had a fall, my foot's pointing outwards now and it wasn't before
+RED	ANY	indian_english	Fell on stairs, leg is paining a lot and I am unable to put foot on ground. Kindly advise urgently.
+RED	ANY	multi_symptom	Fell onto my wound, it's split open and bleeding
+GREEN	ANY	hard_neg,question	How can I make the bathroom safer so I don't fall?
+RED	ANY	typo	had a fall, cant weight bare at all now, pain is bad
+RED	THA	-	Tripped on the rug, landed on my bad hip, now I can't lift my leg or stand
+RED	TKA	multi_symptom	Fell in the shower, knee swelled up fast and I can't bend it or put weight on it
+RED	ANY	hard_pos	I fell about an hour ago. At first I thought I was fine but now I can't walk at all.
+YELLOW	ANY	hard_neg,carer	Mum slid off the bed onto her bottom, she got back up and is walking about normally, no pain she says
+RED	ANY	carer,indian_english,multi_symptom	Mother slipped in bathroom and hit head on wall. She is taking blood thinner injection. Now vomited once.
+RED	ANY	-	Fell, hit my head on the coffee table, I'm on warfarin. Bit of a headache.
+RED	THA	indian_english	While climbing stairs I fell on operated hip side. Now leg is turned inside and very much pain.
+RED	TKA	hard_pos,indirect	Since I fell my kneecap seems to be sitting somewhere different
+GREEN	ANY	question	If I fall and can't get up, what should I do?
+RED	ANY	multi_symptom	Fell off the commode, can't bear weight, and my foot's gone cold and numb
+RED	ANY	typo,carer	mum fell n now shes confused, keeps calling me by my dads name
+RED	ANY	-	Slipped on ice at the door, operated leg folded under me, can't stand
+RED	ANY	hard_pos	Fell yesterday and thought I'd sleep it off but I still can't put the foot down this morning
+GREEN	ANY	hard_neg,typo	almost fell on the stairs but grabbed the rail, all good, no fall. how long b4 i can ditch the stick
+RED	THA	carer	Husband fell getting out of the recliner, he says his new hip is agony and the leg's lying funny
+RED	ANY	question,indian_english	Fell from sofa, now leg is not taking any weight. Is fracture possible?
+RED	ANY	-	I fell and now there's a big lump on the side of my thigh and I can't walk on it
+RED	ANY	multi_symptom	Took a fall, banged my head and knee, I'm on blood thinners and I feel dizzy and sick
+YELLOW	ANY	hard_neg,multi_symptom	Fell onto my good side last night, walked to bed fine, there's a bruise on my arm. No head knock.
+RED	ANY	hard_pos,typo	cant get up. fell by the bed.
+RED	TKA	typo	fell n landed on my new knee, its swollen n bent funny, cant walk
+RED	TKA	indian_english	Fell while doing walking practice, now not able to bear weight and leg is looking deformed near knee.
+RED	ANY	-	Fainted and fell in the hallway, hit my head
+GREEN	ANY	hard_neg,indian_english,question	No fall till now, only I am feeling scared of falling in bathroom. Should I keep a chair inside?
+RED	ANY	hard_pos,indirect	I fell an hour ago. Now there's a bend in my thigh that isn't on the other side.
+RED	ANY	carer	Grandma slipped off the toilet seat, she's sitting on the floor and screams if we try to move her leg
+RED	ANY	multi_symptom,temp_in_text	Fell this morning, now can't put weight on the leg, and I've got a temperature of 38.7
+YELLOW	ANY	hard_neg,temp_in_text	Tripped but didn't fall, all fine, though my temp is 37.9 tonight
+RED	THA	-	Fell on my bum, sharp hip pain, can't take a step now
+RED	ANY	indian_english	Head hit on floor when I fell, I am on blood thinner tablets, now feeling sleepy and headache.
+RED	THA	question	Fell in the garden, hip feels out of place and I can't bear weight. Can I wait for my clinic tomorrow?
+GREEN	THA	hard_neg,negation	Fall last week, they X-rayed my hip and the implant is fine, walking well now, when can I stop the walker?
+RED	ANY	hard_pos	Dog knocked me over. Leg won't take my weight and it's swelling up.

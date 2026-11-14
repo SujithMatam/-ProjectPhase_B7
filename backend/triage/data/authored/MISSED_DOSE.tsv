@@ -1,0 +1,52 @@
+# MISSED_DOSE: missed or doubled blood-thinner dose, vomited a tablet, ran out of medicine. Lead label YELLOW.
+YELLOW	ANY	-	Forgot last night's rivaroxaban completely, only realised at lunchtime today.
+YELLOW	ANY	indian_english	Yesterday I missed the blood thinning tablet by mistake. Today should I take two? Kindly advise.
+YELLOW	ANY	-	I think I took my apixaban twice this morning, can't remember if I'd already had it before breakfast.
+GREEN	ANY	hard_neg,question	What should I do if I ever miss a dose of my blood thinner?
+GREEN	ANY	hard_neg	Missed my vitamin D yesterday, does that matter?
+YELLOW	ANY	typo	ran out of my clot injections 2 days ago, pharmacy says they need a new script
+YELLOW	ANY	-	Brought up my breakfast about twenty minutes after the rivaroxaban, I think the tablet came up with it. Do I take another?
+RED	ANY	multi_symptom	Missed my blood thinner for three days over the weekend and now my calf is tight, hot and swollen.
+YELLOW	ANY	carer	Dad's evening apixaban rolled under the fridge and it was the last one in the pack, so he's missed tonight's.
+GREEN	ANY	hard_neg	Missed my morning paracetamol, pain is fine, I'll just carry on at the next time. Is that ok?
+YELLOW	ANY	indian_english	Tablets finished yesterday, the blood thinner one. Chemist is not having stock. What to do now?
+YELLOW	ANY	hard_pos,indirect	The little syringe box is empty and I've still got a week left on my chart.
+RED	ANY	multi_symptom	Accidentally took a double dose of apixaban yesterday and now I've had a nosebleed for over an hour that won't stop.
+YELLOW	ANY	-	Wasn't sure if I'd done the injection last night so I did another one this morning on top of the usual.
+GREEN	ANY	question	Is it better to take rivaroxaban in the morning or the evening so I don't forget it?
+YELLOW	ANY	typo,indian_english	forgot to take ecosprin since 2 days, now remembered. shall i continue?
+YELLOW	ANY	carer	My mother refused her injection yesterday because her tummy is all bruised, so she's missed one.
+GREEN	ANY	hard_neg,negation	Took my tablets exactly on time, haven't missed any. Just checking how many weeks the course lasts.
+YELLOW	ANY	-	Been taking the aspirin once a day instead of twice for the whole week, I've only just read the label properly.
+YELLOW	ANY	multi_symptom	Took my oxycodone at 2pm and again at 4pm by mistake, feeling a bit spaced out.
+RED	ANY	carer,hard_pos	Mum took a whole day's oxycodone in one go by mistake and now she's really hard to wake.
+YELLOW	ANY	indian_english	Sir, by mistake I took the blood thinner tablet two times today, morning and afternoon. Is it dangerous?
+YELLOW	ANY	-	Travelled to my daughter's and left my enoxaparin in the fridge at home. Missed today's.
+GREEN	ANY	hard_neg	Forgot my stool softener yesterday, bowels are fine. Do I just restart it?
+YELLOW	ANY	hard_pos	Pharmacy gave me 2.5mg apixaban instead of the 5mg I was on, I've been taking the wrong strength for four days.
+YELLOW	ANY	typo	missed 2 doses of the blood thinner cos i was asleep, feel fine tho
+RED	ANY	multi_symptom	Stopped the rivaroxaban early because I ran out, and since last night I'm short of breath and my chest hurts when I breathe in.
+GREEN	ANY	hard_neg	Missed my iron tablet last night. Should I take two today?
+YELLOW	ANY	-	Ran out of oxycodone on Friday and the pain is keeping me up all night.
+GREEN	ANY	hard_neg	Ran out of the tramadol but honestly the paracetamol is enough now, pain's mild. Do I need more?
+YELLOW	ANY	indian_english,carer	My father is not taking his medicines properly, he is skipping the blood thinner injection since 2 days. Please help.
+YELLOW	ANY	hard_pos,indirect	I stopped the pink tablets because I thought they were just for in hospital. Turns out they were for clots. That was ten days ago.
+RED	ANY	multi_symptom	Took my rivaroxaban twice yesterday and this morning my poo came out black.
+GREEN	ANY	question,indian_english	If I miss pain tablet at night, can I take it early morning with tea?
+YELLOW	TKA	-	Physio ran late, I skipped my midday painkiller and now the knee is screaming and won't settle.
+GREEN	ANY	hard_neg	Skipped one pantoprazole by accident, stomach feels fine.
+YELLOW	ANY	carer	Grandma's carer forgot to give her the evening apixaban, we only noticed this morning.
+YELLOW	ANY	typo,hard_pos	syringe went in at a funny angle and half the stuff squirted out, does that count as a dose
+YELLOW	ANY	-	Can't get a repeat prescription for my aspirin until Monday, so I'll go three days without.
+GREEN	ANY	hard_neg,negation	Didn't miss anything, just confused about whether the aspirin is meant to be 75 or 150.
+YELLOW	ANY	indian_english	Doctor told 35 days injection but hospital pharmacy gave only 28. Injection finished, what to do now?
+RED	ANY	multi_symptom	Hadn't been doing my injections for a week because I hate needles, and now my whole leg is swollen and doesn't go down when I lie with it up.
+YELLOW	ANY	-	Accidentally took my husband's blood pressure tablet instead of my apixaban this morning.
+GREEN	ANY	question	How long can I go past my injection time before it counts as a missed dose?
+YELLOW	ANY	-	Missed one dose. Apixaban. Now what?
+YELLOW	ANY	indian_english	Aspirin tablet I forgot whole of last week, leg is fine only. Should I start again?
+GREEN	ANY	typo,question	can i skip the paracetamol when im not sore or do i hav to take it every 6 hrs
+YELLOW	ANY	-	Dropped the needle on the carpet before I could inject and I don't have a spare.
+GREEN	ANY	hard_neg	Doubled up on my multivitamin by mistake, any harm?
+YELLOW	ANY	multi_symptom	Missed yesterday's rivaroxaban and I've been a bit dizzy today as well.
+RED	ANY	carer,multi_symptom	Gran took extra blood thinner tablets thinking she'd missed them, and now huge purple bruises are appearing on her arms and belly.

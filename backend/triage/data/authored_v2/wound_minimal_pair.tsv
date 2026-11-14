@@ -1,0 +1,126 @@
+# wound_minimal_pair: YELLOW/RED minimal pairs on incision/drain/dressing findings (consecutive lines), plus GREEN wound contrast rows. Guideline v1.1.
+YELLOW	TKA	minimal_pair,question	WOUND_REDNESS	My knee is a little red along the stitches, day 5. Is this normal?
+RED	TKA	minimal_pair,question	SEPSIS_WOUND,WOUND_REDNESS	My knee is red along the stitches and since this morning the redness has spread halfway down my shin, day 5. Is this normal?
+YELLOW	THA	minimal_pair	CLEAR_DRAINAGE	small amount of clear watery fluid coming out of the bottom of my hip wound, dressing a bit damp
+RED	THA	minimal_pair	SEPSIS_WOUND	thick yellowish fluid coming out of the bottom of my hip wound and it smells bad, dressing a bit damp
+YELLOW	ANY	minimal_pair,indian_english,temp_in_text	LOW_FEVER,WOUND_REDNESS	Doctor sir, temp is 38.1 and the wound looks slightly red at the top. Kindly advise.
+RED	ANY	minimal_pair,indian_english,temp_in_text	HIGH_FEVER,WOUND_REDNESS	Doctor sir, temp is 38.9 and the wound looks slightly red at the top. Kindly advise.
+YELLOW	THA	minimal_pair,carer	WOUND_REDNESS	Writing for my mum, 2 weeks after her hip. The skin around her staples is pink and a bit warm to touch, she feels fine otherwise.
+RED	THA	minimal_pair,carer,multi_symptom	SEPSIS_WOUND,WOUND_REDNESS,HIGH_FEVER	Writing for my mum, 2 weeks after her hip. The skin around her staples is pink and warm, and now she is shivering uncontrollably under two blankets.
+YELLOW	TKA	minimal_pair,typo,hard_neg,negation	WOUND_OPEN	theres a tiny gap at the lower end of my knee incision, maybe 2mm, dry, no pus
+RED	TKA	minimal_pair	WOUND_OPEN	the lower end of my knee incision has pulled apart, maybe 3cm open, and I can see yellow stuff deep inside
+YELLOW	ANY	minimal_pair	MINOR_BLEEDING,CLEAR_DRAINAGE	The ooze on my dressing has spread a bit since lunch, it's pinkish and about the size of a coin now
+RED	ANY	minimal_pair	BLEEDING_ANTICOAG	The ooze on my dressing has spread since lunch, it's bright red, soaked right through the pad and dripping on the sheet
+YELLOW	TKA	minimal_pair,indian_english,question	WOUND_IRRITATION	Staples are pulling when I bend the knee, little bit paining near them. Is it ok?
+RED	TKA	minimal_pair,indian_english,question	WOUND_OPEN,WOUND_IRRITATION	Staples are pulling when I bend knee, today two came out and wound has opened in middle. What to do?
+YELLOW	THA	minimal_pair,negation	WOUND_REDNESS	hip scar feels warm compared to the other side, not very red, week 3
+RED	THA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	hip scar feels really hot, angry red, and the redness has crept round to my buttock overnight, week 3
+YELLOW	TKA	minimal_pair,question	CLEAR_DRAINAGE	Bit of straw-coloured fluid on the gauze this morning from my knee wound. Day 4. Should I be worried?
+RED	TKA	minimal_pair,question	SEPSIS_WOUND	Bit of greenish fluid on the gauze this morning from my knee wound and a nasty smell. Day 4. Should I be worried?
+YELLOW	ANY	minimal_pair,temp_in_text,typo	LOW_FEVER,WOUND_REDNESS	wound a lil pink, temprature 100.6F
+RED	ANY	minimal_pair,temp_in_text,typo	HIGH_FEVER,WOUND_REDNESS	wound a lil pink, temprature 102F n shivering
+YELLOW	THA	minimal_pair	CLEAR_DRAINAGE,WOUND_REDNESS	The old drain hole on my hip is a bit red and still leaking a few drops of clear fluid
+RED	THA	minimal_pair	SEPSIS_WOUND	The old drain hole on my hip is red and leaking cloudy creamy fluid that smells off
+YELLOW	TKA	minimal_pair,indian_english	WOUND_IRRITATION,WOUND_REDNESS	Stitches are itching and looking little irritated, skin around is slight red. Kindly tell what cream to apply
+RED	TKA	minimal_pair,indian_english	SEPSIS_WOUND,WOUND_IRRITATION	Stitches are itching and skin around is red, today pus is coming from one stitch. Kindly tell what to do
+YELLOW	TKA	minimal_pair,carer	WOUND_REDNESS	Dad's knee incision is slightly swollen and pink but he is eating and chatting as normal
+RED	TKA	minimal_pair,carer,hard_pos	SEPSIS_WOUND,WOUND_REDNESS	Dad's knee incision is slightly swollen and pink and today he is muddled, doesn't know what day it is and very drowsy
+YELLOW	ANY	minimal_pair,typo	WOUND_REDNESS	incision bit red n puffy
+RED	ANY	minimal_pair,typo	SEPSIS_WOUND	incision red n puffy n pus comin out
+YELLOW	THA	minimal_pair,temp_in_text,question	LOW_FEVER,WOUND_REDNESS	Is 38.4 a worry? My hip wound is a little warm but dry
+RED	THA	minimal_pair,temp_in_text,question	HIGH_FEVER,WOUND_REDNESS	Is 38.6 a worry? My hip wound is a little warm but dry
+YELLOW	TKA	minimal_pair	CLEAR_DRAINAGE	Day 2 home and there's pink watery stuff seeping from the knee incision onto the dressing pad
+RED	TKA	minimal_pair	BLEEDING_ANTICOAG	Day 2 home and bright red blood keeps pouring from the knee incision, I've pressed on it 20 minutes and it won't stop
+YELLOW	THA	minimal_pair,negation	WOUND_REDNESS	3 weeks out, a small pink patch has appeared at one end of my hip scar, no discharge
+RED	THA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	3 weeks out, a pink patch at one end of my hip scar has turned into a red streak running up towards my groin
+YELLOW	ANY	minimal_pair,indian_english,negation,question	WOUND_REDNESS	Having little swelling and redness near operation wound from 2 days, no fever. What to do?
+RED	ANY	minimal_pair,indian_english,temp_in_text,question,multi_symptom	HIGH_FEVER,SEPSIS_WOUND,WOUND_REDNESS	Having swelling and redness near operation wound from 2 days and now fever 39 with shivering. What to do?
+YELLOW	TKA	minimal_pair	WOUND_IRRITATION,WOUND_REDNESS	Steri-strips on my knee are lifting and the skin underneath is a bit pink and sore
+RED	TKA	minimal_pair	WOUND_OPEN	Steri-strips on my knee came off and the wound underneath has split wide open
+YELLOW	THA	minimal_pair	CLEAR_DRAINAGE,WOUND_REDNESS	Changed my own dressing, the hip wound has a faint pink rim and a tiny bit of clear ooze on the old pad
+RED	THA	minimal_pair	SEPSIS_WOUND	Changed my own dressing, the hip wound has a dark red rim and the old pad is full of thick green muck
+YELLOW	TKA	minimal_pair,temp_in_text	LOW_FEVER,CLEAR_DRAINAGE	temp 37.9 this evening and my knee wound is still weeping clear fluid
+RED	TKA	minimal_pair,temp_in_text	SEPSIS_WOUND,LOW_FEVER	temp 37.9 this evening and my knee wound is weeping cloudy fluid with a smell
+YELLOW	THA	minimal_pair	WOUND_REDNESS	Dear nurse, I have noticed some mild redness about the hip incision, approximately a finger's width either side. I remain otherwise well.
+RED	THA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	Dear nurse, the redness about my hip incision, which was a finger's width this morning, now covers most of my thigh. I feel rather poorly.
+YELLOW	TKA	minimal_pair	WOUND_IRRITATION	skin is puckering round a couple of the staples and it stings when I straighten my leg
+RED	TKA	minimal_pair	SEPSIS_WOUND,WOUND_IRRITATION	skin is puckering round a couple of the staples and when I pressed it yellow pus squeezed out
+YELLOW	ANY	minimal_pair,typo,question	WOUND_REDNESS	is it normal for the wound to be abit warm and swolen 10 days after?
+RED	ANY	minimal_pair,typo,question	SEPSIS_WOUND	wound is warm and swolen 10 days after and now its leaking smelly brown stuff, is that normal?
+YELLOW	TKA	minimal_pair,carer,indian_english	CLEAR_DRAINAGE,WOUND_REDNESS	My father's knee operation wound is having slight redness and little watery discharge. He is otherwise fine only. Please advise.
+RED	TKA	minimal_pair,carer,indian_english,multi_symptom	SEPSIS_WOUND,CLEAR_DRAINAGE,WOUND_REDNESS,HIGH_FEVER	My father's knee operation wound is having redness and watery discharge, and since evening he is shivering badly and not answering properly.
+YELLOW	THA	minimal_pair,hard_neg,negation	WOUND_OPEN	one small spot along my hip incision has come slightly apart, just a few mm, no pus and not bleeding
+RED	THA	minimal_pair	WOUND_OPEN	one spot along my hip incision has come apart and now it's a deep hole I could fit my fingertip in
+YELLOW	ANY	minimal_pair,typo	CLEAR_DRAINAGE	bit of clear leak frm the scar today
+RED	ANY	minimal_pair,typo	SEPSIS_WOUND	pus leakin from the scar today
+YELLOW	TKA	minimal_pair,temp_in_text	LOW_FEVER,WOUND_REDNESS	Running 38.2 since afternoon and the skin around my knee incision is a bit swollen and pink
+RED	TKA	minimal_pair,temp_in_text,hard_pos,multi_symptom	SEPSIS_WOUND,LOW_FEVER,WOUND_REDNESS	Running 38.2 since afternoon, skin around my knee incision is swollen and pink, and I've had teeth-chattering chills twice
+YELLOW	THA	minimal_pair	MINOR_BLEEDING	the patch of old blood on my hip dressing is a bit bigger than yesterday, still within the pad
+RED	THA	minimal_pair	BLEEDING_ANTICOAG	the patch of blood on my hip dressing has gone right through the pad and onto my nightie, still wet
+YELLOW	ANY	minimal_pair	CLEAR_DRAINAGE,MINOR_BLEEDING	On rivaroxaban and the wound edge is seeping a bit of pink fluid, the stain on the pad is slowly getting larger
+RED	ANY	minimal_pair	BLEEDING_ANTICOAG	On rivaroxaban and the wound edge is bleeding steadily, I've changed the pad three times since breakfast and each one is soaked
+YELLOW	TKA	minimal_pair	WOUND_REDNESS,WOUND_IRRITATION	Six weeks post op and a small red bump has come up on my knee scar, a bit tender
+RED	TKA	minimal_pair	SEPSIS_WOUND	Six weeks post op and a red bump on my knee scar burst and is draining pus
+YELLOW	THA	minimal_pair,indian_english,negation,question	WOUND_REDNESS	Wound on hip is little red and slightly warm, no fever. Is this normal or should I show?
+RED	THA	minimal_pair,indian_english,temp_in_text,question,multi_symptom	HIGH_FEVER,SEPSIS_WOUND,WOUND_REDNESS	Wound on hip is red and very hot, bahut dard, and fever 101.8. Should I come?
+YELLOW	TKA	minimal_pair	CLEAR_DRAINAGE	the drain site plaster has a damp watery mark on it, otherwise knee looks ok
+RED	TKA	minimal_pair	SEPSIS_WOUND	the drain site plaster is soaked with thick creamy fluid and the skin around it is hot and dark red
+YELLOW	THA	minimal_pair,question	WOUND_IRRITATION,WOUND_REDNESS,FOLLOWUP_ADMIN	Staples due out Friday but a few look irritated and red at the holes. Can it wait till then?
+RED	THA	minimal_pair,question	SEPSIS_WOUND,WOUND_IRRITATION,FOLLOWUP_ADMIN	Staples due out Friday but the holes around a few are oozing yellow pus. Can it wait till then?
+YELLOW	THA	minimal_pair,carer,typo,negation	WOUND_REDNESS	mums hip wound is a tad pink round the edges, she says it feels warmish, no temp
+RED	THA	minimal_pair,carer,typo,temp_in_text	HIGH_FEVER,WOUND_REDNESS	mums hip wound is pink round the edges and shes got a temp of 39.2 and keeps shivering
+YELLOW	TKA	minimal_pair,negation	WOUND_REDNESS	Sorry to bother you, I'm about ten days after my knee. The incision has been fine but tonight I noticed the bottom end looks a bit redder and slightly puffy. No fever, I feel fine, just wanted to check.
+RED	TKA	minimal_pair	SEPSIS_WOUND,WOUND_OPEN	Sorry to bother you, I'm about ten days after my knee. The incision was fine but tonight the bottom end burst open and a gush of smelly fluid came out. I feel dreadful.
+YELLOW	ANY	minimal_pair,temp_in_text	LOW_FEVER,WOUND_REDNESS	fever of 38 and slightly sore pink wound
+RED	ANY	minimal_pair,temp_in_text	HIGH_FEVER,WOUND_REDNESS	fever of 39 and slightly sore pink wound
+YELLOW	THA	minimal_pair,negation	WOUND_REDNESS	the area just around my hip incision is a bit swollen and tender, not spreading, day 8
+RED	THA	minimal_pair	SEPSIS_WOUND	the area around my hip incision is swollen and a hard red lump has formed that's leaking pus, day 8
+YELLOW	ANY	minimal_pair,question	CLEAR_DRAINAGE	what does it mean if the fluid on my dressing is light pink and thin like water?
+RED	ANY	minimal_pair,question	SEPSIS_WOUND	what does it mean if the fluid on my dressing is thick and greeny-yellow?
+YELLOW	TKA	minimal_pair	WOUND_REDNESS	I drew round the red bit by my knee scar last night with a pen as the nurse suggested, it's the same size this morning
+RED	TKA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	I drew round the red bit by my knee scar last night with a pen, this morning the redness is way past the line, nearly to my ankle
+YELLOW	TKA	minimal_pair,indian_english,negation,question	CLEAR_DRAINAGE	Light yellow thin water is coming from knee stitches since morning, no smell. Is it serious?
+RED	TKA	minimal_pair,indian_english,question	SEPSIS_WOUND	Thick yellow discharge with bad smell is coming from knee stitches since morning. Is it serious?
+YELLOW	THA	minimal_pair	WOUND_IRRITATION,WOUND_REDNESS	My hip incision itches like mad and there's a faint red line along the stitches
+RED	THA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	My hip incision itches and the red along it has fanned out into streaks going down my thigh
+YELLOW	TKA	minimal_pair	WOUND_OPEN	after the staples were taken out yesterday a little gap opened at the top, dry and clean
+RED	TKA	minimal_pair	WOUND_OPEN	after the staples were taken out yesterday the whole top third of the wound has opened up and is weeping
+YELLOW	TKA	minimal_pair,question	WOUND_REDNESS,NORMAL_SWELLING	is it ok that my knee is still warm and a bit puffy around the cut at 2 weeks?
+RED	TKA	minimal_pair,question,multi_symptom	SEPSIS_WOUND,WOUND_REDNESS,HIGH_FEVER	is it ok that my knee is burning hot, red right round to the back, and I'm sweating and shaking at 2 weeks?
+YELLOW	ANY	minimal_pair,indian_english	CLEAR_DRAINAGE,MINOR_BLEEDING,DAILY_ACTIVITY	After bath, dressing is having pinkish wet patch which is becoming bigger slowly
+RED	ANY	minimal_pair,indian_english	BLEEDING_ANTICOAG,DAILY_ACTIVITY	After bath, blood is continuously coming from under dressing and flowing down leg, not stopping
+YELLOW	THA	minimal_pair,indian_english,question	WOUND_REDNESS	Doctor, stitches line is looking little pinkish and slightly swelled. Pain is same as before. Need to show?
+RED	THA	minimal_pair,indian_english,question	SEPSIS_WOUND,WOUND_OPEN	Doctor, stitches line has opened and white pus is coming out. Pain is more. Need to show?
+YELLOW	ANY	minimal_pair	WOUND_REDNESS	the wound is slightly red but honestly I feel completely well in myself
+RED	ANY	minimal_pair,hard_pos	SEPSIS_WOUND,WOUND_REDNESS,HIGH_FEVER	the wound is slightly red and I feel awful, can barely get out of bed, hot and cold sweats
+YELLOW	TKA	minimal_pair,typo,negation	WOUND_IRRITATION,WOUND_REDNESS	knee stiches look a bit pink n irritated, nothing comin out
+RED	TKA	minimal_pair,typo	SEPSIS_WOUND	knee stiches look pink n irritated n theres green stuff comin out
+YELLOW	TKA	minimal_pair	WOUND_IRRITATION,WOUND_REDNESS	A few small blisters have come up near my knee incision under the tape, clear fluid in them, skin a bit red
+RED	TKA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	The blisters near my knee incision under the tape have burst, the skin is going dark red and the redness is spreading fast up my thigh
+YELLOW	THA	minimal_pair,carer,question	CLEAR_DRAINAGE	My husband's hip wound has a small dribble of clear fluid at the bottom, he's comfortable. Do we need to come in?
+RED	THA	minimal_pair,carer,question	SEPSIS_WOUND	My husband's hip wound is dribbling yellow fluid at the bottom and the room smells of it, he's very sleepy. Do we need to come in?
+YELLOW	THA	minimal_pair	MINOR_BLEEDING,CLEAR_DRAINAGE	the wet ring on my hip dressing has crept out by about a centimetre since this morning
+RED	THA	minimal_pair	BLEEDING_ANTICOAG,CLEAR_DRAINAGE	the wet ring on my hip dressing has spread to the edges and it's leaking out of the sides now
+YELLOW	TKA	minimal_pair,indian_english	WOUND_REDNESS,UNCONTROLLED_PAIN	Wound is looking little red and knee pain is increasing day by day even after tablets
+RED	TKA	minimal_pair,indian_english	SEPSIS_WOUND,UNCONTROLLED_PAIN	Wound is red and pus is coming, and knee pain is increasing day by day even after tablets
+YELLOW	THA	minimal_pair	WOUND_IRRITATION,WOUND_REDNESS	a stitch end is poking out of my hip wound and the skin round it has gone pink and sore
+RED	THA	minimal_pair	SEPSIS_WOUND	a stitch end is poking out of my hip wound and there's a yellow pus spot round it with red streaks
+YELLOW	THA	minimal_pair,carer,indian_english	WOUND_REDNESS,WALKING_AIDS	Mother's hip operation done 3 weeks back. Near the scar there is mild swelling and little warmth, she is walking with walker nicely.
+RED	THA	minimal_pair,carer,indian_english,multi_symptom	SEPSIS_WOUND,HIGH_FEVER,WOUND_REDNESS	Mother's hip operation done 3 weeks back. Scar has become very hot and red, she is having high fever and not able to get up from bed.
+YELLOW	ANY	minimal_pair,typo,question	CLEAR_DRAINAGE	wats a normal amount of clear leakage? mine has dampened half the pad today
+RED	ANY	minimal_pair,typo,question	BLEEDING_ANTICOAG,CLEAR_DRAINAGE	wats a normal amount of leakage? mine has soaked thru the pad and the sheets twice today
+YELLOW	TKA	minimal_pair	WOUND_REDNESS	The nurse said the pinkness by my knee scar was fine on Monday but today it looks a touch redder and warmer
+RED	TKA	minimal_pair	SEPSIS_WOUND,WOUND_REDNESS	The nurse said the pinkness by my knee scar was fine on Monday but today it's bright red, hot and spreading quickly up my leg
+YELLOW	ANY	minimal_pair	CLEAR_DRAINAGE,WOUND_REDNESS	I'm diabetic and my incision has a slight pink edge and a little clear weep, sugars are fine
+RED	ANY	minimal_pair	SEPSIS_WOUND	I'm diabetic, my incision edge has turned dusky and black and it smells rotten, sugars are high
+GREEN	ANY	question	WOUND_IRRITATION	my scar is fully healed but it itches a lot at night, is that ok?
+GREEN	TKA	negation,question,hard_neg	WOUND_IRRITATION	small dry scab at the top of my knee scar, no redness or leaking, can I put cream on it?
+GREEN	ANY	hard_neg	MINOR_BLEEDING	tiny spot of blood on the dressing this morning, it hasn't got any bigger all day
+GREEN	ANY	question	SEPSIS_WOUND	how would I know if my wound was getting infected?
+GREEN	THA	indian_english,question,hard_neg,negation	SEPSIS_WOUND	What are the signs of pus infection in hip wound? Just want to know, wound is dry only.
+GREEN	ANY	hard_neg	WOUND_REDNESS	nurse checked my wound yesterday and said the faint pink line is normal healing, it looks the same today
+GREEN	ANY	question	DAILY_ACTIVITY	when can I get my incision wet in the shower?
+GREEN	TKA	typo,question	WOUND_REDNESS	scar is fadin from red to pink at 3 months, no probs, just curious if it'll go white
+GREEN	ANY	question,hard_neg	CLEAR_DRAINAGE,FOLLOWUP_ADMIN	what if my wound starts leaking, who do I call?
+GREEN	THA	negation,question,hard_neg	WOUND_IRRITATION	loose bit of stitch thread sticking out of my hip scar, no redness or discharge, can I snip it?
+GREEN	ANY	temp_in_text,negation	LOW_FEVER	temp 37.3, wound dry and clean, no redness, just logging as asked

@@ -1,0 +1,71 @@
+# COMPARTMENT: severe pain out of proportion, leg tight/rock hard, prescribed pain relief not working
+RED	ANY	hard_pos	Pain in my lower leg is way worse than anything since the op, I've taken everything I'm allowed and it hasn't touched it
+RED	TKA	-	My shin feels like it's about to split, tight and shiny
+RED	ANY	indian_english	Leg pain is unbearable, painkiller also not working. Leg is very tight like stone. Please help.
+RED	ANY	typo	pain is insane, leg rock hard, meds doin nothin
+GREEN	TKA	hard_neg	Leg feels tight and sore after physio but eases off after an hour with my feet up
+RED	ANY	carer	My brother is crying with pain in his leg, he's had all his tablets and nothing's helping. It feels hard as a board.
+RED	ANY	hard_pos,indirect	Something is very wrong with my leg, the pain is ten out of ten and getting worse every hour
+RED	THA	-	Thigh is swollen really tight and the pain is out of this world, nothing like the hip pain I had before
+RED	ANY	-	Even moving my toes gently makes my calf scream with pain, and it feels hard
+RED	TKA	multi_symptom	Leg feels tight and full below the knee, pain's off the scale, and my foot's tingling
+GREEN	ANY	hard_neg,negation,question	My leg isn't hard or anything, just achy after walking. How long before I can drop the painkillers?
+RED	TKA	carer,indian_english	My father is shouting with pain in leg after knee surgery. Tramadol given 1 hour back but no relief. Leg is tight.
+RED	TKA	hard_pos	I've never felt pain like this. Not the knee, the whole lower leg.
+RED	ANY	-	Took my oxycodone and paracetamol 2 hours ago and the pain in my leg is still unbearable and the muscle is rock solid
+RED	ANY	hard_pos,indirect	My leg feels like it's in a vice that keeps tightening
+YELLOW	ANY	hard_neg,negation	Pain's getting worse each day this week and the tablets only take the edge off, but the leg is soft and not tight
+RED	ANY	typo	lower leg sooo tight n painfull cant even touch it
+RED	ANY	indian_english	Doctor madam, pain is increasing every hour, skin of leg is stretched and shining. Medicines not giving any relief.
+RED	ANY	question	How much pain is too much? My leg is hard and the strongest tablets aren't doing anything.
+RED	THA	multi_symptom	Thigh feels like it's going to burst, pain is unbearable and my foot is starting to go numb
+GREEN	ANY	question	What is compartment syndrome? The nurse mentioned it.
+RED	ANY	-	I'm in agony. Leg's tight. Pills useless.
+RED	ANY	hard_pos	I can't lie still, can't sleep, can't think, the leg pain is just relentless even after my meds
+RED	ANY	carer	My mum's leg is swollen up tight and she says the pain is worse than labour. She's had her full dose.
+RED	TKA	hard_pos,indirect	The front of my shin is throbbing and hard to press, and stretching my toes down makes it unbearable
+GREEN	THA	hard_neg	Thigh feels tight like a band when I first get up, loosens after a few steps
+RED	ANY	indian_english	Bahut zyada dard in leg, even injection in hospital didn't help and now at home it is worse. Leg is tight.
+RED	TKA	-	Pain started a couple of hours after the compression bandage went on and it's getting way worse, nothing helps
+RED	ANY	hard_pos	Pain is so bad I'm shaking and sweating. The leg feels packed solid.
+RED	ANY	typo,multi_symptom	calf n shin both rock hard, pain 10/10, toes feel weird
+YELLOW	TKA	hard_neg,negation,indian_english	Pain is not controlling with given tablets, knee is paining whole night. No tightness in leg, no numbness.
+RED	ANY	multi_symptom,temp_in_text	Leg swelling fast, skin tight and shiny, pain unbearable, temp 38.6
+RED	ANY	hard_pos,indirect	My whole lower leg feels like it's full of concrete and it's agony
+RED	THA	indian_english	Hip operation done 3 days back. Now thigh is swelling hard and pain is too much, tablets are useless.
+GREEN	ANY	hard_neg	Sore muscles after doing the exercises twice today, but it settled with ice and rest
+RED	ANY	question	Is it normal for the pain to get worse even though I've taken all my painkillers? My leg is very tight and I'm in tears.
+RED	ANY	-	Pain way out of proportion to anything they warned me about, and it's not the scar, it's the muscle
+RED	TKA	-	After physio today my shin went hard and the pain hasn't eased with rest, ice or tablets, it's getting worse
+RED	ANY	carer,typo	my wifes leg is rlly hard n swollen, shes screamin wen u touch it
+YELLOW	ANY	hard_neg,typo	pain keeps me up at nite, tabs not lasting till next dose, leg not hard or anything
+RED	ANY	hard_pos	Even the weight of the sheet on my leg is unbearable
+RED	ANY	multi_symptom	Leg feels pumped up and hard, pain getting worse, and my foot's going pins and needles
+RED	ANY	indian_english,question	Pain is not reducing with any tablet. Leg is feeling very heavy and hard from knee to ankle. What to do now?
+GREEN	ANY	hard_neg,question	If the pain ever got way out of control, at what point should I go to A&E?
+RED	ANY	hard_pos,indirect	I'm used to pain but this is different, deep and crushing and nothing touches it
+RED	ANY	-	2am, can't stop crying, leg pain is beyond anything and the morphine did nothing
+RED	TKA	temp_in_text,multi_symptom	Temp 37.5, but my calf is rock hard and the pain is unbearable even with my tablets
+GREEN	ANY	hard_neg	Thought my calf had gone rock hard but it was just cramp from sitting awkwardly, stretched it and it's gone
+RED	ANY	-	The pain keeps going up and up despite tablets every 4 hours, and the leg is solid to touch
+RED	ANY	hard_pos,typo	omg the pain. leg hard. nothin helps
+RED	THA	carer,indian_english	Uncle had hip replacement, now thigh is very tight and he is not tolerating pain even after injection. Kindly guide.
+YELLOW	ANY	hard_neg,negation,temp_in_text	Leg not tight and pain is manageable, but temperature 100.4F this afternoon
+RED	ANY	hard_pos	It hurts far more when I try to stretch my foot back, and it's way past normal sore
+RED	ANY	typo	leg feels like its gonna explode
+RED	THA	multi_symptom	Groin and thigh pain is excruciating, thigh is hard and tense, painkillers aren't doing a thing
+GREEN	ANY	hard_neg,indian_english,question	Leg is little stiff after walking in evening but after rest it becomes alright. Is ice good or hot water?
+RED	ANY	hard_pos,indirect	Felt fine yesterday. Today my leg feels like it's being crushed and I'm sobbing.
+RED	ANY	indian_english,question	Is so much pain normal on day 2? Leg is very tight and stiff like wood and no medicine is working.
+RED	TKA	-	The pain is getting worse hour by hour and it's out of all proportion. I've had the other knee done and it was nothing like this.
+GREEN	TKA	question	Should I take my painkiller before the physio session so I can bend further?
+RED	ANY	multi_symptom	Muscle in my shin is swollen rock hard, toes are cold, and the pain makes me feel sick
+RED	ANY	hard_pos	I keep taking the pills on time but the pain is climbing and the leg just keeps getting tighter
+GREEN	ANY	hard_neg,carer,question	Mum says the leg's tight after her walk but it eases off when she lies down, is that ok?
+RED	ANY	typo	pain unbearble even after meds, leg v tight
+RED	ANY	carer	Dad's leg is so tight the skin looks stretched, he won't let anyone near it and his painkillers aren't working
+YELLOW	ANY	hard_neg	Pain's been gradually creeping up over 3 days, not severe, leg feels normal to touch, just not as good as last week
+RED	ANY	indian_english	Sir, whole night I was awake due to leg pain. Taken all tablets as per schedule but pain is only increasing and leg is tight.
+RED	ANY	hard_pos,indirect	My lower leg feels like a sausage about to burst its skin
+GREEN	ANY	hard_neg,negation,question	Pain is a 3 out of 10, no tightness, no swelling. When can I go back to work?
+RED	ANY	indian_english	Pain is 10 out of 10 since one hour and increasing, not from wound side.

@@ -1,0 +1,51 @@
+RED	ANY	-	lips swelling up after the new antibiotic
+RED	ANY	hard_pos,indirect	My tongue feels too big for my mouth since I took the tablet an hour ago
+RED	ANY	multi_symptom	Throat feels tight and I'm wheezing after my first dose of the new painkiller
+RED	ANY	indian_english	After taking new tablet my face is swelling and eyes are puffy. Kindly advise urgent.
+RED	ANY	carer	Mum took the first antibiotic tablet the hospital sent home with her about an hour ago, and now her lips are huge, her eyes are puffy and she's struggling to get her words out
+RED	ANY	typo	face puffin up after codeine, feels weird to swallow
+RED	ANY	hard_pos,indirect	My voice has gone hoarse and squeaky and it's hard to swallow, started after the new pills
+RED	ANY	multi_symptom	Hives all over my chest, back and legs and my lips are tingling
+RED	ANY	hard_pos,indirect	Feels like someone is squeezing my throat, started 20 minutes after the injection
+RED	ANY	indian_english,multi_symptom	Whole body red rashes and itching after cefuroxime, also breathing difficulty
+RED	ANY	-	eyelids so swollen I can barely see, only change is the new antibiotic
+RED	ANY	carer,indian_english	My father got swelling on lips and face after taking painkiller given at discharge. What to do now?
+RED	ANY	-	Wheezy and chest tight since the tramadol, never had asthma
+RED	ANY	typo	throat closin up i think, took antibiotic 30 min ago
+RED	ANY	hard_pos,indirect	my cheeks and lips look like I've been punched, no injury, I started a new tablet today
+RED	ANY	-	Big raised welts spreading across my whole body after the IV antibiotic at the clinic
+RED	ANY	multi_symptom	Itchy everywhere, lips fat, and feel dizzy since taking the first amoxicillin
+RED	ANY	indian_english	Tongue is swelling and I am not able to speak properly after medicine. Please help fast.
+RED	ANY	multi_symptom	Can't catch my breath and my skin is covered in hives, took a new pill this morning
+RED	ANY	carer	My wife's face has swollen up on one side since she started the new blood thinner
+RED	ANY	hard_pos,indirect	lips feel numb and puffy and my mouth is itchy inside
+RED	ANY	typo,multi_symptom	hives + swollen eyes after the antibiotic, help
+RED	ANY	hard_pos,indirect	There's a whistling sound when I breathe out, began after the new medication
+RED	ANY	indian_english,typo,multi_symptom	sir after injection my body full red n itching, throat also feeling tight
+RED	ANY	hard_pos,indirect	my rings are suddenly tight and my lips feel thick, about half an hour after the antibiotic
+RED	ANY	carer,multi_symptom	Dad's tongue is swollen and he's drooling, he had his first dose of a new antibiotic for his wound
+RED	ANY	-	Wheezing, can't talk in full sentences, took ibuprofen for the first time since surgery
+RED	ANY	-	Lumpy itchy welts head to toe since the new tablets yesterday
+RED	ANY	hard_pos,indirect	my face looks like a balloon
+RED	ANY	indian_english,multi_symptom	Allergy reaction came after antibiotic, lips swollen, little breathless also. Kindly guide.
+RED	ANY	typo,multi_symptom	breathin is hard n lips swole after tablets
+RED	ANY	question	Is it normal for my throat to feel tight after the antibiotic?
+RED	ANY	hard_pos	Half an hour after the morning tablets my whole face went red, hot and puffy
+RED	ANY	multi_symptom	Coughing and wheezing with a rash spreading over my neck, started after the new pills
+RED	ANY	carer,multi_symptom	My mum has hives across her whole body and her voice sounds strange since her new medicine
+RED	ANY	hard_pos,indirect	can't swallow my own spit properly since the tablet
+RED	ANY	indian_english	Eyes and lips both are swelled after taking pain killer tablet in night
+RED	ANY	-	puffy lips after antibiotic
+RED	ANY	-	Probably overreacting, but my tongue is tingling and swelling slightly after the new tablet
+RED	ANY	multi_symptom	The itching started on my arms but now I've got hives on my face, neck and tummy and my eyes are puffing up
+YELLOW	ANY	hard_neg,negation	Small itchy rash on my wrists since the new antibiotic, no swelling of face, breathing fine
+YELLOW	ANY	indian_english,negation,question	Little itching rash on stomach after new tablet, no breathing problem, no face swelling. Should I stop?
+YELLOW	ANY	-	A few red itchy bumps on my forearm after starting the painkiller
+YELLOW	ANY	carer,hard_neg,negation	Dad has an itchy patch on his back since the new pills, lips and face look normal
+YELLOW	ANY	typo,negation	itchy spotty rash on my legs since tramadol, no swellin
+YELLOW	ANY	hard_neg	Had a swollen lip last week after the antibiotic, A&E treated it and stopped the drug, now just a faint itchy rash left
+GREEN	ANY	hard_neg	the skin under the plaster tape is itchy and a bit red, the rest of me is fine
+GREEN	ANY	question	What are the signs of an allergic reaction to antibiotics?
+GREEN	ANY	question	If my lips swell after a medicine, do I call an ambulance?
+GREEN	TKA	hard_neg,negation	Old knee scar is itchy as it heals, no rash anywhere, no swelling
+GREEN	THA	question,indian_english	I am allergic to penicillin, kindly tell which painkillers are safe after hip surgery

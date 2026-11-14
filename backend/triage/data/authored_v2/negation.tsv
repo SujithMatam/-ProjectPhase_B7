@@ -1,0 +1,129 @@
+# negation category (authored_v2): negated RED symptoms; GREEN=only negations, YELLOW=negation+YELLOW finding, RED=negation+different RED finding. Guideline v1.1. Fields: LABEL SURGERY TAGS SCENARIOS TEXT
+GREEN	ANY	negation,hard_neg,question	PE_CHEST,FOLLOWUP_ADMIN	I don't have shortness of breath or any chest pain. Just confirming my follow-up is still on Thursday morning?
+GREEN	TKA	negation,hard_neg,question	DVT_CALF,REHAB_EXERCISE	no calf pain at all, knee bends to about 90 now. how many times a day should I do the heel slides?
+GREEN	THA	negation,hard_neg,question	DISLOCATION,HIP_PRECAUTIONS	Hip hasn't popped or given way, all good. Can I sleep on my non-operated side with a pillow between my knees yet?
+GREEN	ANY	negation,hard_neg,indian_english,question	HIGH_FEVER,DAILY_ACTIVITY	Doctor sir, no fever no chills since discharge. When can I take head bath?
+GREEN	ANY	negation,hard_neg	SEPSIS_WOUND,WOUND_REDNESS	Wound is dry, no pus, no smell, no redness at all. Just letting you know it looks good.
+GREEN	ANY	negation,hard_neg,typo,question	PE_CHEST,MED_TIMING	dont have no chest pain or nothing, just wanna know can i take paracetmol with my blood thinner
+GREEN	TKA	negation,hard_neg	NEUROVASCULAR,STIFFNESS	Toes are warm and pink and I can wiggle them fine. Knee is just stiff first thing in the morning, which the physio said is expected.
+GREEN	ANY	negation,hard_neg,carer,temp_in_text,question	HIGH_FEVER,NUTRITION	Writing for my father. He hasn't had any temperature, it was 36.9 this morning. What protein foods should he be eating?
+GREEN	ANY	negation,hard_neg,indian_english,question	BLEEDING_ANTICOAG,MED_TIMING	No black stool, no blood in urine, nothing like that. Rivaroxaban how many days more I have to take?
+GREEN	ANY	negation,hard_neg	MOOD_SLEEP	Feeling a bit down some evenings but definitely no thoughts of hurting myself, I'm managing ok with my family around
+GREEN	THA	negation,hard_neg,question	DISLOCATION,WALKING_AIDS	Never heard any pop from the hip and the leg looks the same length as the other. When can I swap the walker for a stick?
+GREEN	ANY	negation,hard_neg,question	WOUND_OPEN,FOLLOWUP_ADMIN	wound hasn't opened anywhere, staples all in place. who removes them, GP practice nurse or the hospital?
+GREEN	TKA	negation,hard_neg,indian_english,question	DVT_CALF,NORMAL_SWELLING	Calf is soft and not paining. Little swelling at ankle by evening but it is going down after keeping leg up. This is normal na?
+GREEN	ANY	negation,hard_neg	PE_CHEST	Breathing is completely normal, no tightness in the chest even on the stairs. Week 3 and feeling stronger.
+GREEN	ANY	negation,hard_neg,question	ALLERGIC_REACTION,MED_TIMING	No rash, no swelling of lips or face after the new tablets. Should I take them before or after food?
+GREEN	ANY	negation,hard_neg,typo,question	SEPSIS_WOUND,HIGH_FEVER,DAILY_ACTIVITY	no fevr, no pus, scar lookin fine. can i go in the shower now or still need the waterproof cover
+GREEN	TKA	negation,hard_neg,question	COMPARTMENT,REHAB_EXERCISE	Leg isn't tight or rock hard, it's just the usual ache after physio that goes in an hour. Is it ok to use the exercise bike?
+GREEN	ANY	negation,hard_neg,carer	NEUROVASCULAR,MOOD_SLEEP	Mum's feet are warm and she can move all her toes. She's just not sleeping well because of the strange bed, but she's coping.
+GREEN	ANY	negation,hard_neg,temp_in_text	HIGH_FEVER	temp 37.3, no chills, no sweats. All fine, just logging it like you asked
+GREEN	THA	negation,hard_neg,indian_english,question	DISLOCATION,HIP_PRECAUTIONS	Hip is not jumping out or anything, no sudden pain. Can I sit cross legged on floor for pooja?
+GREEN	ANY	negation,hard_neg,question	BLEEDING_ANTICOAG,FOLLOWUP_ADMIN	No bleeding from gums or nose on the injections. Where do I return the sharps box when the course ends?
+GREEN	ANY	negation,hard_neg	PE_CHEST	Not coughing anything up, definitely no blood. Just a dry throat from the hospital air conditioning.
+GREEN	TKA	negation,hard_neg,typo,question	DVT_CALF,WALKING_AIDS	zero calf pain, zero swelling below the knee. am i alowed up stairs without the rail?
+GREEN	ANY	negation,hard_neg,multi_symptom,question	PE_CHEST,DVT_CALF,HIGH_FEVER,SEPSIS_WOUND	Checklist from the leaflet: chest pain no, breathless no, calf pain no, fever no, wound discharge no. Everything ok?
+GREEN	ANY	negation,hard_neg,indian_english,question	FALL_INJURY,DAILY_ACTIVITY	I have not fallen anywhere sir, walking slowly inside house only. When I can go to office by auto?
+GREEN	ANY	negation,hard_neg,indian_english,question	HIGH_FEVER,MED_TIMING	Have not taken any paracetamol for fever because there is no fever only. Can I stop the night tablet now?
+GREEN	THA	negation,hard_neg	DISLOCATION,STIFFNESS	The leg isn't turned out and it's not shorter, I measured against the other. Groin feels tight when I lift it, that's all.
+GREEN	ANY	negation,hard_neg,question	SEPSIS_WOUND,WOUND_REDNESS	No redness spreading from the scar, it's actually paler than last week. How long until it fades properly?
+GREEN	ANY	negation,hard_neg,typo	NEUROVASCULAR	foot not numb, not cold, not blue. just wanted to say thank u to the team
+GREEN	ANY	negation,hard_neg,carer,question	MOOD_SLEEP,DAILY_ACTIVITY	My husband has never talked about wanting to harm himself, he's just bored at home. Is a short car ride as a passenger ok?
+GREEN	ANY	negation,hard_neg	BLEEDING_ANTICOAG,CONSTIPATION	Poo is a normal brown colour, not black or tarry. Bowels moving every day.
+GREEN	TKA	negation,hard_neg,question	DVT_CALF,STIFFNESS	The back of my calf isn't hot or hard, it's behind the knee that feels tight when I straighten. Normal at 2 weeks?
+GREEN	ANY	negation,hard_neg,indian_english,question	PE_CHEST,NUTRITION	No breathing problem sir, no chest pain. Can I take ghee and dal, or I should avoid oily food?
+GREEN	ANY	negation,hard_neg	ALLERGIC_REACTION	throat not tight, no wheeze, tongue normal. took the new antibiotic an hour ago and all fine
+GREEN	ANY	negation,hard_neg,question	WOUND_OPEN,DAILY_ACTIVITY	Scar is fully closed, no gaps, no weeping. Can I use bio-oil on it now?
+GREEN	THA	negation,hard_neg,question	DISLOCATION,DAILY_ACTIVITY	I can bear weight fine and nothing has clicked out of place. How soon can I drive an automatic?
+GREEN	ANY	negation,hard_neg,temp_in_text,question	HIGH_FEVER	Temperature hasn't gone above 37.5 at all this week. Do I still need to check it twice a day?
+GREEN	ANY	negation,hard_neg,typo,question	DVT_CALF,PE_CHEST,MED_TIMING	no calf swellin no breathlessnes, how many more days of the injecshuns
+GREEN	ANY	negation,hard_neg	NEUROVASCULAR,STIFFNESS	Can feel all my toes and move them. Numb patch on the outer side of the scar is the same as it's been since surgery.
+GREEN	ANY	negation,hard_neg,carer,indian_english	HIGH_FEVER,SEPSIS_WOUND,FOLLOWUP_ADMIN	Mother has no fever from last 5 days and wound is clean, no pus. Dressing change on Monday, we will come.
+GREEN	ANY	negation,hard_neg	MOOD_SLEEP	No dark thoughts, no wanting to give up. Sleep is patchy but improving and I'm in good spirits overall
+GREEN	TKA	negation,hard_neg,question	COMPARTMENT,UNCONTROLLED_PAIN,MED_TIMING	The pain isn't out of control, painkillers are working well. Can I take the second dose a bit earlier before physio?
+GREEN	ANY	negation,hard_neg	BLEEDING_ANTICOAG,MINOR_BLEEDING	Dressing isn't soaked, just one small dot of old blood from day one that hasn't spread.
+GREEN	ANY	negation,hard_neg,question	PE_CHEST,MED_SIDE_EFFECT,DAILY_ACTIVITY	Haven't fainted or felt dizzy at all. Heart rate is 72 on my watch. Is it fine to walk to the corner shop?
+GREEN	THA	negation,hard_neg,indian_english,question	DISLOCATION,HIP_PRECAUTIONS	Hip is not coming out, no pop sound. Using western toilet with raised seat. Indian toilet when I can use?
+GREEN	ANY	negation,hard_neg	SEPSIS_WOUND	No funny smell from the wound at all, my wife checked closely. Looks clean and dry.
+GREEN	ANY	negation,hard_neg,indian_english,question	HIGH_FEVER,FOLLOWUP_ADMIN	No chills, no shivering. Kindly tell who will give fitness certificate for my office?
+GREEN	TKA	negation,hard_neg,typo	DVT_CALF,REHAB_EXERCISE	calf feels totaly normal, not tender when i squeeze it. knee just sore after excercises like the physio said
+GREEN	ANY	negation,hard_neg,question	NEUROVASCULAR,DAILY_ACTIVITY	Foot is not pale or cold even after sitting for long. Is a 3 hour flight ok at 6 weeks?
+GREEN	ANY	negation,hard_neg,multi_symptom	PE_CHEST,BLEEDING_ANTICOAG,MOOD_SLEEP,REHAB_EXERCISE	Quick update: no chest pain, no unusual bleeding, mood ok. Walking 15 minutes twice a day now.
+GREEN	THA	negation,hard_neg	DISLOCATION,FALL_INJURY	Slipped slightly on the bathroom mat but caught the rail, did not fall at all. Hip feels exactly the same.
+GREEN	ANY	negation,hard_neg,indian_english,question	HIGH_FEVER,MED_TIMING	Fever nahi hai, no shivering. Antibiotic course finished yesterday, should I continue anything else?
+GREEN	ANY	negation,hard_neg,question	ALLERGIC_REACTION,WOUND_IRRITATION	No hives anywhere, the itching is only on the old healed scar. Any cream you recommend?
+GREEN	TKA	negation,hard_neg,question	WOUND_OPEN,REHAB_EXERCISE	The incision didn't split when I bent past 100 degrees, it's well healed. Can I push the bend further?
+GREEN	ANY	negation,hard_neg	PE_CHEST	Puffed going up the stairs but no chest pain, and it settles in under a minute, same as before the op.
+GREEN	ANY	negation,hard_neg,carer,typo,question	NEUROVASCULAR,WALKING_AIDS	dads toes arnt cold or numb, he can move them all. can he use his old walking stick or does he need new one
+GREEN	ANY	negation,hard_neg,question	BLEEDING_ANTICOAG,MED_SIDE_EFFECT,MED_TIMING	Haven't vomited at all, so no coffee-ground stuff. Can I take the aspirin together with omeprazole in the morning?
+GREEN	ANY	negation,hard_neg	MOOD_SLEEP	Never had any self-harm thoughts, before or after the operation. Just a bit teary on the bad days, which I'm told is common
+GREEN	TKA	negation,hard_neg,indian_english,question	DVT_CALF,REHAB_EXERCISE	Pindli mein koi dard nahi, calf is soft. How many km walking per day is okay now?
+GREEN	ANY	negation,hard_neg,question	SEPSIS_WOUND,HIGH_FEVER,FOLLOWUP_ADMIN	No signs of infection that I can see and no temperature. Do I still need the 6-week x-ray?
+GREEN	THA	negation,hard_neg	DISLOCATION,COMPARTMENT,HIP_PRECAUTIONS	No sudden groin pain, no locking, just the expected ache when I stand from a low chair. Using the raised one now.
+GREEN	ANY	negation,hard_neg,typo,question	PE_CHEST,DVT_CALF,DAILY_ACTIVITY	not breathles, no calf ache. is it worth gettin compression socks for the train jurney home
+GREEN	ANY	negation,hard_neg,question	PE_CHEST,FOLLOWUP_ADMIN	They scanned my lungs in hospital and said all clear. The chest discomfort has not come back since. When do I see the consultant?
+YELLOW	ANY	negation,hard_neg,temp_in_text,question	HIGH_FEVER,LOW_FEVER	No shivering or chills but my temperature is 38.1 this evening. Should I worry?
+YELLOW	ANY	negation,hard_neg	SEPSIS_WOUND,CLEAR_DRAINAGE	There's no pus and it doesn't smell, but clear watery fluid keeps coming from the bottom of the scar
+YELLOW	TKA	negation,hard_neg,indian_english,question	DVT_CALF,CONSTIPATION	Calf is fine, no pain no swelling. But motion not passed from 4 days, stomach is tight. What to do?
+YELLOW	ANY	negation,hard_neg	PE_CHEST,MED_SIDE_EFFECT	No chest pain or breathing trouble, but I've been sick twice since starting the new painkillers
+YELLOW	ANY	negation,hard_neg,indian_english,question	BLEEDING_ANTICOAG,MISSED_DOSE	No bleeding anywhere. But I forgot to take blood thinner tablet last night, what to do now?
+YELLOW	TKA	negation,hard_neg	COMPARTMENT,NEUROVASCULAR,UNCONTROLLED_PAIN	Leg isn't hard or tight and toes are fine, but the pain keeps getting worse each day even with the oxycodone
+YELLOW	ANY	negation,hard_neg	SEPSIS_WOUND,WOUND_REDNESS	redness isn't spreading, it's just a pink rim about a centimetre wide around the top staples, bit warm to touch
+YELLOW	THA	negation,hard_neg	DISLOCATION,IMPLANT_NOISE	No pop and I can walk on it, but there's a clunk in the hip now with a sharp twinge each time
+YELLOW	ANY	negation,hard_neg	MOOD_SLEEP	I'm not thinking of hurting myself, please don't worry about that, but I haven't slept or eaten properly for 5 days and cry most of the day
+YELLOW	ANY	negation,hard_neg,typo,temp_in_text	HIGH_FEVER,LOW_FEVER	no rigors no sweats but temprature 100.6F twice today
+YELLOW	ANY	negation,hard_neg,carer,indian_english	SEPSIS_WOUND,CLEAR_DRAINAGE	Papa's wound has no pus, no bad smell, but pinkish water is coming on the dressing since yesterday. Kindly advise.
+YELLOW	ANY	negation,hard_neg	NEUROVASCULAR	My foot is warm and I can move my toes, but a tingly numb strip next to the scar is new this week and getting bigger
+YELLOW	ANY	negation,hard_neg	FALL_INJURY	Fell onto the bed from standing, didn't hit my head and no new pain, walking just like before. Thought I should report it
+YELLOW	ANY	negation,hard_neg,question	PE_CHEST,MED_SIDE_EFFECT	Not breathless, heart's not racing, but I get really dizzy every time I stand up since the dose went up. Is that the tablets?
+YELLOW	TKA	negation,hard_neg	DVT_CALF,NORMAL_SWELLING	No calf pain at all. Knee swelling has been creeping up over the last two weeks, though it does go down when I lie with it raised
+YELLOW	ANY	negation,hard_neg	WOUND_OPEN,WOUND_IRRITATION	Nothing has opened up, but two of the stitches are pulling and the skin around them looks puckered and sore
+YELLOW	ANY	negation,hard_neg,indian_english	HIGH_FEVER,LOW_FEVER	Not high fever sir, but feverish feeling since afternoon, body is warm. Thermometer not at home.
+YELLOW	ANY	negation,hard_neg	ALLERGIC_REACTION,MED_SIDE_EFFECT	My lips and face aren't swollen and breathing is fine, but there's an itchy red rash on both forearms since the new antibiotic
+YELLOW	ANY	negation,hard_neg	BLEEDING_ANTICOAG,MINOR_BLEEDING	Dressing isn't soaked through, but the blood patch on it has doubled in size since this morning
+YELLOW	THA	negation,hard_neg	DISLOCATION,UNCONTROLLED_PAIN	Leg looks normal length and I can still weight-bear, no pop. The hip pain though isn't controlled by the tablets anymore, can't sleep
+YELLOW	ANY	negation,hard_neg,typo	CONSTIPATION,BLEEDING_ANTICOAG	no blood in poo or anything, just havent been at all since sat, its tuesday now and im bloated
+YELLOW	ANY	negation,hard_neg,temp_in_text	SEPSIS_WOUND,HIGH_FEVER,LOW_FEVER	Wound looks clean, no discharge. Temp 37.9 though, and I feel a bit off
+YELLOW	ANY	negation,hard_neg,question	BLEEDING_ANTICOAG,MISSED_DOSE,MED_SIDE_EFFECT	Haven't had any bruising or bleeding. I vomited about 20 minutes after taking my apixaban though, do I repeat it?
+YELLOW	TKA	negation,hard_neg,indian_english	DVT_CALF,IMPLANT_NOISE	No pain in pindli, but knee is giving way and some clicking with pain while climbing steps. Please tell what to do
+YELLOW	ANY	negation,hard_neg,carer	MOOD_SLEEP	My wife says she has no thoughts of ending things, I asked her directly. But she's stopped eating and barely gets out of bed for a week now
+YELLOW	ANY	negation,hard_neg	WOUND_OPEN,SEPSIS_WOUND	There's a tiny gap at the lower end, maybe 3mm, but it's dry, no pus and not opening any further
+YELLOW	ANY	negation,hard_neg,indian_english	PE_CHEST,MED_SIDE_EFFECT,NUTRITION	Chest is fine, breathing fine. But vomiting feeling whole day, not able to eat breakfast from two days.
+YELLOW	ANY	negation,hard_neg,temp_in_text,question	HIGH_FEVER,LOW_FEVER	It's not 38.5 or anything, 38.3 at the highest, no chills. What should I do?
+YELLOW	TKA	negation,hard_neg	COMPARTMENT,UNCONTROLLED_PAIN,MOOD_SLEEP	It isn't unbearable and the leg is soft, but the knee pain has gone up every day this week and I'm awake half the night with it
+YELLOW	ANY	negation,hard_neg,typo	SEPSIS_WOUND,WOUND_REDNESS	no pus no smell but bit of redness n warmth along the scar since yday, not spreading
+YELLOW	THA	negation,hard_neg,indian_english,question	DISLOCATION,FALL_INJURY	Hip not dislocated I think, I can walk same as before. But I slipped in bathroom and sat down hard. Should I come for check?
+YELLOW	ANY	negation,hard_neg	BLEEDING_ANTICOAG,MISSED_DOSE,DVT_CALF	Ran out of my rivaroxaban yesterday and the pharmacy can't get it till Monday. No bleeding or clot symptoms though
+YELLOW	ANY	negation,hard_neg,typo,multi_symptom	PE_CHEST,DVT_CALF,MED_SIDE_EFFECT,CONSTIPATION	No chest pain, no calf pain. main thing is i feel queezy all the time and havent been to the loo since friday
+YELLOW	ANY	negation,hard_neg,temp_in_text,indian_english,question	HIGH_FEVER,LOW_FEVER	Fever is 100.2 only, no shivering, no cough. Taking crocin. Should I inform doctor?
+YELLOW	ANY	negation,hard_neg	ALLERGIC_REACTION,MED_SIDE_EFFECT	Throat is fine and there are no hives, but I keep dozing off in my chair all day on the new tramadol
+YELLOW	TKA	negation,hard_neg	SEPSIS_WOUND,CLEAR_DRAINAGE	No discharge with colour or smell, just a damp clear patch on the dressing every morning that wasn't there last week
+YELLOW	ANY	negation,hard_neg,question	PE_CHEST,UNCONTROLLED_PAIN	No breathlessness. Is it normal the paracetamol and codeine barely touch the pain now? It's worse than last week.
+YELLOW	ANY	negation,hard_neg,carer,typo	NEUROVASCULAR,MED_SIDE_EFFECT	mums toes r warm n she can move them but shes been throwing up since lunch after her tablets
+YELLOW	THA	negation,hard_neg	WOUND_OPEN,WOUND_IRRITATION,CLEAR_DRAINAGE	The wound hasn't come apart, but the steri-strips have lifted and the edges look irritated with a bit of clear weeping
+RED	TKA	negation,typo,multi_symptom	HIGH_FEVER,DVT_CALF	no fever, but my calf is hot n hard since this mornin
+RED	ANY	negation,multi_symptom	DVT_CALF,PE_CHEST	Calf is fine, no swelling there, but I get a sharp stab in my chest when I breathe in deeply
+RED	ANY	negation,multi_symptom,temp_in_text	SEPSIS_WOUND,HIGH_FEVER	Wound looks ok, no pus, but temp is 38.9 and I'm shaking
+RED	ANY	negation,indian_english,multi_symptom	PE_CHEST,BLEEDING_ANTICOAG	No chest pain sir, breathing ok. But motion is coming black colour like tar since morning
+RED	THA	negation,multi_symptom	HIGH_FEVER,DISLOCATION	No temperature or anything. I heard a pop getting out of the car and now can't put weight on the leg
+RED	ANY	negation,multi_symptom	DVT_CALF,NEUROVASCULAR	No calf pain at all, but my foot has gone white and cold and I can't feel my toes
+RED	ANY	negation,multi_symptom	PE_CHEST,SEPSIS_WOUND	Breathing is fine, no chest pain. The wound smells really bad today and there's thick yellow stuff on the dressing
+RED	ANY	negation,carer,multi_symptom	HIGH_FEVER,MOOD_SLEEP	Dad has no fever and his wound is good. But last night he told me he doesn't want to live anymore and has been thinking of ending it
+RED	ANY	negation,typo,multi_symptom	HIGH_FEVER,SEPSIS_WOUND	no fever no chills but the red bit round my scar has spread rite down my shin since this mornin
+RED	ANY	negation	ALLERGIC_REACTION	I don't have a rash anywhere, but my lips and tongue are swelling up since I took the new antibiotic
+RED	TKA	negation,multi_symptom	WOUND_OPEN,COMPARTMENT,BLEEDING_ANTICOAG	Wound is intact, no bleeding, but the whole lower leg has gone rock hard and the pain is unbearable even after morphine
+RED	ANY	negation,indian_english,multi_symptom	DVT_CALF,PE_CHEST	Leg swelling is not there, calf also fine. But since one hour heart is racing and saans is not coming properly even sitting.
+RED	ANY	negation,indian_english,multi_symptom	BLEEDING_ANTICOAG	No bleeding from wound. But urine is coming red colour since afternoon and I am on blood thinner, not eaten beetroot.
+RED	TKA	negation,multi_symptom	PE_CHEST,FALL_INJURY	Never had any chest problems. I fell in the kitchen and now my knee looks bent the wrong way and I can't stand
+RED	ANY	negation,multi_symptom,temp_in_text	DVT_CALF,HIGH_FEVER	Calf's soft, no pain there. Thermometer says 102F though and I feel awful
+RED	THA	negation,multi_symptom	DVT_CALF,NORMAL_SWELLING,DISLOCATION	No calf or ankle swelling, but my operated leg is suddenly shorter and turned outwards after I bent to pick up the remote
+RED	ANY	negation,multi_symptom	HIGH_FEVER,WOUND_OPEN	I don't have a fever, but the wound has split open in the middle and I can see inside
+RED	ANY	negation,multi_symptom	PE_CHEST,BLEEDING_ANTICOAG	Not short of breath. Coughed up a few streaks of blood twice this morning, and it's not from a nosebleed
+RED	ANY	negation,carer,multi_symptom	HIGH_FEVER,FALL_INJURY,BLEEDING_ANTICOAG	Grandma has no fever and no pain, but she bumped her head on the cupboard this morning and she's on blood thinners
+RED	ANY	negation,multi_symptom	WOUND_REDNESS,SEPSIS_WOUND,BLEEDING_ANTICOAG	Scar has no redness or pus. Dressing is soaked right through with blood again and it won't stop
+RED	TKA	negation,indian_english,multi_symptom	HIGH_FEVER,DVT_CALF	Bukhar nahi hai, but calf is very paining and red, hard to touch, swelling not going down even after keeping leg up
+RED	ANY	negation,multi_symptom	PE_CHEST,NEUROVASCULAR	No chest pain, but I've suddenly lost movement in my foot, can't lift my toes up at all
+RED	ANY	negation,carer,multi_symptom	SEPSIS_WOUND,WOUND_REDNESS,HIGH_FEVER	Mum's wound isn't red or leaking, but she's suddenly confused, doesn't know where she is, and burning hot
+RED	ANY	negation,typo,multi_symptom	PE_CHEST,BLEEDING_ANTICOAG	no chest pain or breathin trouble but i threw up something that looks like coffee grounds
+RED	ANY	negation,multi_symptom	DVT_CALF,HIGH_FEVER,PE_CHEST	No calf pain and no fever, but I nearly fainted in the bathroom and my heart is pounding
+RED	THA	negation,multi_symptom	WOUND_REDNESS,DISLOCATION	No redness or swelling at the hip, but sudden agonising groin pain when I turned in bed and I can't move the leg

@@ -1,0 +1,47 @@
+GREEN	ANY	question	How much protein should I be aiming for each day while I heal?
+GREEN	ANY	indian_english,question	I am pure vegetarian. Which foods for protein? Dal and paneer is enough?
+GREEN	ANY	question	Is a glass of wine with dinner fine, given I'm on blood thinners?
+GREEN	ANY	question	I'm type 2 diabetic. Should my diet change while the wound heals?
+GREEN	ANY	typo	appetites a bit low since the op but im eating small meals, normal?
+GREEN	ANY	question	Should I take iron tablets? They said my blood count was a bit low in hospital.
+GREEN	ANY	hard_neg,negation	Eating fine, bowels opening every day, no nausea. Just want to know if I should take vitamin D.
+GREEN	ANY	indian_english	Doctor sir, can I eat non-veg like chicken and egg? Some relatives saying it will cause pus in wound.
+GREEN	ANY	question	Are there foods I should avoid while I'm on warfarin?
+GREEN	ANY	carer,question	My mum has lost interest in food since coming home, though she does eat a bit. What's easy and nourishing to give her?
+GREEN	ANY	question	Does coffee count towards my fluids or does it dehydrate me?
+GREEN	TKA	question	Will losing some weight now take pressure off my new knee?
+GREEN	ANY	indian_english,question	Can I take turmeric milk (haldi doodh) daily? I am on blood thinner tablet.
+GREEN	ANY	question	Is collagen powder worth taking?
+GREEN	ANY	typo,question	ok to have protien shakes instead of a meal sometimes?
+YELLOW	ANY	hard_pos	Haven't been able to keep any food down for two days, everything comes back up after the tablets
+YELLOW	ANY	hard_pos,indian_english	Motion not passed from 4 days, stomach is tight. Eating papaya also. What to do?
+RED	ANY	hard_pos	Was going to ask what to eat to help bruising but I've just been sick and it was dark brown and gritty
+GREEN	ANY	question	Is it ok to drink alcohol with the painkillers they gave me?
+GREEN	ANY	question	What high-fibre foods help with constipation from codeine?
+GREEN	ANY	-	Lost 3 kilos since surgery without trying. Probably just not snacking.
+GREEN	THA	indian_english	Please suggest diet chart after hip operation. I am 68 years, BP and sugar patient.
+GREEN	ANY	question	Can I have grapefruit juice with my medications?
+GREEN	ANY	hard_neg,question	Could not drinking enough make a clot more likely? How would I know I'm getting too little?
+GREEN	ANY	carer,indian_english	Father is not taking milk because of acidity. What else to give for calcium? Kindly suggest.
+GREEN	ANY	question	Should I carry on with my calcium tablets after the joint replacement?
+GREEN	TKA	typo	trying to lose weight b4 my other knee gets done, best diet?
+GREEN	ANY	question	Is green tea ok with rivaroxaban?
+GREEN	ANY	question	How many calories does someone recovering from an operation need?
+GREEN	ANY	indian_english,question	My mother is making ghee and dry fruits laddoo for my strength. Is it good or too heavy?
+GREEN	ANY	hard_neg,negation	Wound looks good, dry, no sign of infection, and I'm eating loads of eggs. Anything else that helps the scar?
+GREEN	ANY	question	Does zinc help wound healing?
+GREEN	ANY	question	I'm vegan. Are plant protein powders fine, and do I need B12 as well?
+GREEN	ANY	question	Is a multivitamin enough or do I need separate supplements?
+YELLOW	ANY	hard_pos,typo	feel dizzy n sick after every meal since starting the new tablets, not eating much now
+GREEN	ANY	-	Eating small meals five times a day because big ones make me feel stuffed. Sound ok?
+GREEN	ANY	question	Can I eat normally the night before my clinic visit, or is there a fasting blood test?
+GREEN	TKA	indian_english	Can I eat curd rice at night? Elders are saying it causes swelling in knee.
+GREEN	ANY	question	Does salt make the swelling worse?
+GREEN	ANY	carer,question	My husband only wants toast and tea since the op. How do I sneak in more protein?
+GREEN	ANY	hard_neg,question	Is it true that vitamin K foods stop my blood thinner from working?
+GREEN	ANY	typo	whats the best snacks for healing, im always hungry now lol
+GREEN	ANY	question	Should I stop my fish oil capsules while on the blood thinners?
+GREEN	TKA	indian_english,question	Navratri fasting is coming. Can I keep fast after knee operation?
+RED	ANY	hard_pos,multi_symptom	I'm not on any iron, but my poo has been jet black and sticky since yesterday and I feel faint when I stand up
+GREEN	ANY	hard_neg	Doctor said the dark stools are from the iron tablets and my blood count is fine. Can I take them with orange juice?
+GREEN	ANY	-	more fruit or more veg?
