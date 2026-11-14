@@ -1,0 +1,94 @@
+# challenge_v3: written 2026-11-14 BEFORE any v3 training data, labelled by LABELLING_GUIDELINE.md v1.1.
+# Frozen: never train or tune on these rows. Columns: category, label, pair, surgery, text.
+# category: short_single_symptom | red_in_routine_question | mixed. pair is "-" (no minimal pairs in v3).
+short_single_symptom	GREEN	-	TKA	Knee is stiff first thing in the morning.
+short_single_symptom	GREEN	-	ANY	scar is itchy, all healed over
+short_single_symptom	GREEN	-	ANY	Little bruise on my tummy where the injections go.
+short_single_symptom	GREEN	-	ANY	Ankle puffs up by evening, gone by morning.
+short_single_symptom	GREEN	-	ANY	Temp is 37.2 today.
+short_single_symptom	GREEN	-	THA	Hip clicks sometimes, doesn't hurt.
+short_single_symptom	GREEN	-	ANY	Thigh feels tight like a band.
+short_single_symptom	GREEN	-	ANY	Bit achy after my physio session, settles with rest.
+short_single_symptom	GREEN	-	ANY	Numb patch next to the scar, same as since the op.
+short_single_symptom	GREEN	-	ANY	Feeling a bit low today but managing.
+short_single_symptom	GREEN	-	ANY	Bruise on my thigh is turning yellow.
+short_single_symptom	GREEN	-	ANY	Not sleeping great, but coping.
+short_single_symptom	GREEN	-	ANY	tiny dot of blood on the dressing, not growing
+short_single_symptom	YELLOW	-	TKA	My knee is puffy.
+short_single_symptom	YELLOW	-	THA	Hip looks swollen today.
+short_single_symptom	YELLOW	-	ANY	Running 38.1 on the thermometer since lunch.
+short_single_symptom	YELLOW	-	ANY	Clear fluid leaking from the bottom of the cut.
+short_single_symptom	YELLOW	-	ANY	Stitches are pulling and sore.
+short_single_symptom	YELLOW	-	ANY	Haven't managed to open my bowels since Monday and it's Friday now.
+short_single_symptom	YELLOW	-	ANY	Feel sick after my painkillers.
+short_single_symptom	YELLOW	-	ANY	Itchy rash on my chest since the new pills.
+short_single_symptom	YELLOW	-	ANY	Pain gets a little worse every day.
+short_single_symptom	YELLOW	-	ANY	Forgot yesterday's blood thinner injection.
+short_single_symptom	YELLOW	-	TKA	Knee clunks and feels like it might give way.
+short_single_symptom	YELLOW	-	ANY	Edge of the scar is a bit red and warm.
+short_single_symptom	YELLOW	-	ANY	Feeling feverish tonight.
+short_single_symptom	YELLOW	-	ANY	Dizzy when I stand up.
+short_single_symptom	YELLOW	-	TKA	Knee aches more today.
+short_single_symptom	YELLOW	-	ANY	Wound feels hot.
+short_single_symptom	RED	-	ANY	Back of my calf is rock hard and burning.
+short_single_symptom	RED	-	ANY	Toes have gone white and cold.
+short_single_symptom	RED	-	ANY	Breathless just sitting still.
+short_single_symptom	RED	-	ANY	Thermometer says 102.4F.
+short_single_symptom	RED	-	ANY	Wound has burst open.
+short_single_symptom	RED	-	THA	Hip went pop, can't stand on it.
+short_single_symptom	RED	-	ANY	Peeing blood since this morning.
+short_single_symptom	RED	-	ANY	Coughed up blood just now.
+red_in_routine_question	RED	-	TKA	Can I still do my heel slides? My calf has been swollen and tender since yesterday and raising it doesn't help.
+red_in_routine_question	RED	-	ANY	Is it fine to go to physio tomorrow even though my chest hurts when I take a deep breath?
+red_in_routine_question	RED	-	ANY	What's a good iron-rich diet? I've had black sticky stools twice since starting the blood thinner.
+red_in_routine_question	RED	-	ANY	How many laps of the corridor should I do? I got really breathless and nearly passed out on the first one.
+red_in_routine_question	RED	-	TKA	Should I keep icing my knee? The wound has opened up and there's yellow stuff in the gap.
+red_in_routine_question	RED	-	ANY	Can I shower today? The dressing is soaked through with blood and it keeps coming.
+red_in_routine_question	RED	-	ANY	Which foods help with nausea? I vomited and it looked like coffee grounds.
+red_in_routine_question	RED	-	ANY	Is cycling allowed yet? My lower leg on the operated side is red, hot and swollen.
+red_in_routine_question	RED	-	ANY	When do I start the stairs exercise? Also my foot has gone numb and cold since this afternoon.
+red_in_routine_question	RED	-	THA	Do I need to keep the pillow between my legs at night? I heard a pop when I turned and now my leg looks shorter.
+red_in_routine_question	RED	-	ANY	Can I eat normally? I've had a temperature of 38.8 since last night.
+red_in_routine_question	RED	-	ANY	What stretches help with stiffness? My heart is racing and I feel short of breath.
+red_in_routine_question	RED	-	ANY	Should I still take my walk today? My calf hurts when I flex my foot and it's warmer than the other side.
+red_in_routine_question	RED	-	ANY	My physio said 3 sets of 10, is that too much? The pain is unbearable, the leg feels tight as a drum and the tablets do nothing.
+red_in_routine_question	RED	-	ANY	Can I have a glass of wine tonight? There's thick greenish pus from the incision and it smells bad.
+red_in_routine_question	RED	-	ANY	How much protein do I need? I keep getting a nosebleed that won't stop, I'm on the blood thinner.
+red_in_routine_question	RED	-	ANY	Can I sit in the recliner? My lips and tongue started swelling after the new antibiotic.
+red_in_routine_question	RED	-	ANY	Is it okay to drive to my physio appointment? I fainted in the kitchen this morning.
+red_in_routine_question	RED	-	ANY	dr sir can i continue exercises, leg is paining in calf and swelling not going down even after keeping leg up
+red_in_routine_question	RED	-	TKA	shud i still do the quad sets? wound split open when i bent it, can see inside
+red_in_routine_question	YELLOW	-	ANY	Can I still do my exercises with a temperature of 38.2?
+red_in_routine_question	YELLOW	-	ANY	Is it okay to walk more? There's some pink watery fluid on the dressing.
+red_in_routine_question	YELLOW	-	ANY	What can I eat to help? Haven't opened my bowels for 4 days on the painkillers.
+red_in_routine_question	YELLOW	-	ANY	Should I still go to physio? The stitches feel tight and a little red.
+red_in_routine_question	YELLOW	-	ANY	Can I keep doing my walks? I missed my blood thinner tablet this morning.
+red_in_routine_question	GREEN	-	ANY	No calf pain or swelling at all, can I add a second walk each day?
+red_in_routine_question	GREEN	-	ANY	Not short of breath, no chest pain, just asking when I can swim again.
+red_in_routine_question	GREEN	-	ANY	What are the signs of a clot I should watch for while I'm exercising?
+red_in_routine_question	GREEN	-	ANY	If my wound starts leaking, should I stop my exercises?
+red_in_routine_question	GREEN	-	ANY	The bruising on my thigh is fading nicely. Can I start the exercise bike?
+mixed	GREEN	-	TKA	Knee's a bit swollen after my walk but goes down when I put it up. How long should I ice for?
+mixed	GREEN	-	ANY	It hurts after my exercises but settles within the hour, is that normal?
+mixed	YELLOW	-	TKA	Knee is swollen and warm around the scar. Also when's my follow-up?
+mixed	GREEN	-	ANY	Pain is 5/10 today, about the same as yesterday. Can I take paracetamol with my other tablets?
+mixed	YELLOW	-	ANY	Pain's been going up each day this week even with my tablets. Should I still go to physio?
+mixed	YELLOW	-	THA	My hip is sore and the skin along the scar is a bit red and warm. Can I still drive next week?
+mixed	YELLOW	-	ANY	Felt a bit dizzy this morning after the tramadol, fine now. What time should I take the next one?
+mixed	YELLOW	-	ANY	Leg swelling is worse than last week but goes down overnight, no calf pain. Should I wear the stockings more?
+mixed	RED	-	TKA	Knee is swollen and the calf is tight and painful, can't put weight on it. What should I do?
+mixed	GREEN	-	ANY	I'm sore after the stairs and my calf is fine. Can I go up twice a day?
+mixed	RED	-	ANY	Feeling hot and shivery, temp 38.6, and the wound is red. Should I take paracetamol?
+mixed	YELLOW	-	TKA	Knee feels warm along the incision, temp 37.6. Normal?
+mixed	GREEN	-	TKA	Sore knee today, 3/10, not swollen. How many heel slides?
+mixed	GREEN	-	ANY	My ankle is a bit puffy at night and better in the morning; also can I have coffee?
+mixed	YELLOW	-	ANY	There's a small gap at the end of the scar, dry, no pus. Can I shower?
+mixed	YELLOW	-	TKA	Clicking in my knee when I walk and it hurts and swells after. Is that the implant?
+mixed	YELLOW	-	THA	Ache in my hip at night is stopping me sleeping, painkillers barely help. Can I take an extra one?
+mixed	YELLOW	-	ANY	I feel low and haven't really eaten or slept for four days. Also what protein should I eat?
+mixed	RED	-	ANY	Wound looks fine but I suddenly can't catch my breath on the stairs and my chest feels tight.
+mixed	YELLOW	-	TKA	Knee swelled up more after my walk and is throbbing. Should I rest or keep going?
+mixed	YELLOW	-	ANY	Bruise down my shin keeps spreading on the blood thinner, and when can I stop the injections?
+mixed	GREEN	-	THA	Hip a bit sore today after the longer walk. Is it okay to sleep on my side yet?
+mixed	RED	-	ANY	Calf is sore and swollen, and my knee is stiff. Can I do my stretches?
+mixed	RED	-	TKA	Mum's knee is swollen and she seems confused today. Kindly advise.
