@@ -985,6 +985,206 @@ override did for fevers; no such override was added here. The v2 training rows a
 were written by the same model family as everything else, so the challenge_v2 gains are partly
 gains on the same author's phrasing.
 
+## v3: short messages and RED signs inside routine questions (2026-11-14, NOT shipped: failed its shipping rule, v2 stays the default)
+
+**Problem** (`backend/eval/reports/2026-11-14_main-post-merge-tests.md`): with v2 as the default,
+short symptom messages are over-triaged ("My knee is swollen." -> RED, p(RED) 0.72; 9 agent tests
+and 19 symptom-assessment checks fail on such messages) and "I have severe calf pain and swelling,
+can I still do my exercises?" is GREEN (p(RED) 0.011).
+
+**Data, in this order** (each step committed before the next began):
+1. `data/integration_set.jsonl` (commit 2688e56): every patient message used in `backend/test_*.py`
+   (272 rows, labelled by guideline v1.1). Evaluation only. `data/INTEGRATION_SET_REPORT.md`.
+2. `data/challenge_v3.jsonl` (commit a7b15ea): 91 held-out rows (short single-symptom messages,
+   RED signs inside routine questions, mixed), written before any v3 training row and checked for
+   near-duplicates against every split, both earlier challenge sets, the v2 training rows and the
+   integration set. `data/CHALLENGE_V3_REPORT.md`.
+3. v3 training-only rows, written by separate writers that saw only the guideline and the
+   authoring README (`data/TRAIN_V3_REPORT.md`, `data/DATASET_CARD.md` "v3 additions").
+
+### Shipping rule (written and committed before any v3 training run)
+
+v3 = M2 (SetFit, all-MiniLM-L6-v2, num_iterations 3, the v2 settings) retrained on the frozen main
+train + the v2 training rows + the v3 training rows, 5 seeds, strictly sequential. Seed and
+thresholds are chosen **on val only**: for each seed t_red follows the v2 rule (lowest val
+over-triage among thresholds with pipeline val RED recall >= 0.93), t_yel and t_alert follow their
+v2 rules; the shipped seed is the one with the **lowest val over-triage at its own operating point**
+(ties: higher val RED recall, then higher val macro F1, then the lower seed number).
+
+Both versions are compared as the shipped hybrid pipeline (overrides + thresholded classifier,
+most serious level wins, text only): v2 = `m2_main_v2_it3_seed0` with `selection_v2.json`; v3 = the
+chosen v3 seed with its val thresholds. "Over-triage" = YELLOW->RED + GREEN->RED (non-RED rows
+called RED). The evaluation sets are main test, challenge, challenge_v2, challenge_v3, the
+unseen-scenario test (unseen-split models of each version, as before) and the integration set.
+
+> **Ship v3 only if all three hold, versus v2:**
+> 1. **Main test RED recall is not lower by more than 2 messages**: v3 RED rows called RED >=
+>    v2 RED rows called RED - 2 (of 104).
+> 2. **RED->GREEN is not higher on any set**: v3 RED->GREEN <= v2 RED->GREEN on each of the six
+>    evaluation sets.
+> 3. **Over-triage is lower on challenge_v3 and on the integration set**: v3 YELLOW->RED +
+>    GREEN->RED < v2 YELLOW->RED + GREEN->RED on each of the two (strictly lower).
+>
+> If any condition fails, v2 stays the default, the v3 weights are not committed, and the failing
+> condition is reported. No condition may be changed after the v3 numbers are seen.
+
+### Training and val choice
+
+`train.py --data v3 all` (2026-11-14, `artifacts/train.log`): main train 1,994 rows (1,253 + 380 v2 +
+361 v3), 5 M2 seeds, then the unseen-scenario split (1,608 rows) with 3 seeds, one run at a time
+(~5-7 min each). `select_v3.py` -> `artifacts/selection_v3.json` (val only):
+
+| seed | t_red | t_yel | t_alert | val RED recall | val YELLOW->RED | val GREEN->RED | val over-triage | val macro F1 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **0 (chosen)** | 0.422 | 0.405 | 0.605 | 0.932 | 14 | 3 | **17** | 0.823 |
+| 1 | 0.364 | 0.491 | 0.571 | 0.942 | 20 | 3 | 23 | 0.806 |
+| 2 | 0.359 | 0.402 | 0.590 | 0.932 | 17 | 3 | 20 | 0.804 |
+| 3 | 0.368 | 0.377 | 0.585 | 0.932 | 18 | 3 | 21 | 0.831 |
+| 4 | 0.404 | 0.379 | 0.581 | 0.932 | 15 | 3 | 18 | 0.810 |
+| v2 shipped (for reference) | 0.354 | 0.363 | 0.684 | 0.942 | 24 | 5 | 29 | 0.783 |
+
+(The v2 seed rule, best val macro F1, would have picked seed 3.) Unseen-scenario split: seed 2
+(val over-triage 29, tie with seed 0 broken on val macro F1).
+
+### Result: v3 fails the shipping rule; v2 stays the default
+
+`model/evaluate_v3.py` (`artifacts/v3_results.json`, full output `model/v3_report.md`). Same method as
+`evaluate_v2.py`: text only, SMTP / DOCTOR_ALERT variables removed, every row through
+`classifier_triage.combine`.
+
+| condition | v2 | v3 | pass |
+|---|---|---|---|
+| 1. main test RED rows called RED (v3 >= v2 - 2) | 96/104 | 93/104 | **no** |
+| 2. RED->GREEN not higher: main test / challenge / challenge_v2 | 0 / 0 / 0 | 0 / 0 / 0 | yes |
+| 2. RED->GREEN not higher: challenge_v3 | 2 | 3 | **no** |
+| 2. RED->GREEN not higher: integration set / unseen-scenario test | 1 / 1 | 1 / 1 | yes |
+| 3. over-triage lower: challenge_v3 | 8 | 2 | yes |
+| 3. over-triage lower: integration set | 75 | 40 | yes |
+
+**v3 is not shipped.** `selection_v2.json` and `m2_main_v2_it3_seed0` stay the default and stay in
+git; the v3 weights (`artifacts/setfit/m2_main_v3_it3_seed*`) are not committed (gitignored) and
+can be rebuilt with the commands under "Reproduce". `classifier_triage.py` is unchanged.
+
+| set | pipeline | RED recall | 95% CI | RED->GREEN | RED->YELLOW | YELLOW->RED | GREEN->RED | RED prec. | macro F1 | RED calls / 100 | emails / 100 | RED rows emailed |
+|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| main test (R 104 / Y 62 / G 100) | v2 (default) | 0.923 | 0.856-0.961 | 0 | 8 | 18 | 6 | 0.800 | 0.803 | 45.1 | 32.0 | 79/104 |
+| main test | v3 | 0.894 | 0.820-0.940 | 0 | 11 | 15 | 4 | 0.830 | 0.809 | 42.1 | 35.0 | 84/104 |
+| challenge (R 58 / Y 38 / G 54) | v2 (default) | 0.983 | 0.909-0.997 | 0 | 1 | 17 | 3 | 0.740 | 0.736 | 51.3 | 41.3 | 53/58 |
+| challenge | v3 | 0.948 | 0.859-0.982 | 0 | 3 | 12 | 1 | 0.809 | 0.763 | 45.3 | 38.0 | 53/58 |
+| challenge_v2 (R 26 / Y 32 / G 32) | v2 (default) | 0.962 | 0.811-0.993 | 0 | 1 | 10 | 2 | 0.676 | 0.742 | 41.1 | 31.1 | 22/26 |
+| challenge_v2 | v3 | 0.962 | 0.811-0.993 | 0 | 1 | 8 | 1 | 0.735 | 0.755 | 37.8 | 32.2 | 23/26 |
+| challenge_v3 (R 33 / Y 33 / G 25) | v2 (default) | 0.636 | 0.466-0.778 | 2 | 10 | 5 | 3 | 0.724 | 0.696 | 31.9 | 16.5 | 13/33 |
+| challenge_v3 | v3 | 0.758 | 0.590-0.872 | 3 | 5 | 1 | 1 | 0.926 | 0.779 | 29.7 | 26.4 | 23/33 |
+| integration set (R 22 / Y 83 / G 167) | v2 (default) | 0.955 | 0.782-0.992 | 1 | 0 | 59 | 16 | 0.219 | 0.466 | 35.3 | 21.7 | 21/22 |
+| integration set | v3 | 0.955 | 0.782-0.992 | 1 | 0 | 32 | 8 | 0.344 | 0.616 | 22.4 | 16.9 | 21/22 |
+| unseen-scenario test (R 105 / Y 62 / G 108) | v2 (default) | 0.952 | 0.893-0.979 | 1 | 4 | 32 | 7 | 0.719 | 0.708 | 50.5 | 32.0 | 71/105 |
+| unseen-scenario test | v3 | 0.876 | 0.800-0.926 | 1 | 12 | 28 | 4 | 0.742 | 0.651 | 45.1 | 29.8 | 68/105 |
+
+Prevalence-adjusted (per-class rates re-weighted to 5% RED / 25% YELLOW / 70% GREEN):
+
+| set | v2 RED calls / 100 | v3 RED calls / 100 | v2 emails / 100 | v3 emails / 100 | v2 email precision | v3 email precision |
+|---|---:|---:|---:|---:|---:|---:|
+| main test | 16.1 | 13.3 | 6.8 | 8.3 | 0.56 | 0.49 |
+| challenge | 20.0 | 13.9 | 10.5 | 7.2 | 0.44 | 0.63 |
+| challenge_v2 | 17.0 | 13.2 | 10.3 | 10.5 | 0.41 | 0.42 |
+| challenge_v3 | 15.4 | 7.3 | 5.5 | 6.3 | 0.36 | 0.55 |
+| integration set | 29.3 | 17.8 | 16.9 | 13.0 | 0.28 | 0.37 |
+| unseen-scenario test | 22.2 | 18.3 | 10.5 | 9.1 | 0.32 | 0.35 |
+
+v3 seed spread (5 seeds, each with its own val thresholds): main test RED rows called RED 93 / 94 /
+95 / 93 / 94 for seeds 0-4 (v2 96; condition 1 needs >= 94), challenge_v3 RED->GREEN 3 / 3 / 2 / 2 /
+2 (condition 2 needs <= 2), integration over-triage 51.8 ± 6.3, challenge_v3 over-triage 2.6 ± 0.8.
+So the failure is partly seed luck: seeds 2 and 4 would have met conditions 1 and 2 on these two
+sets. The seed was fixed on val before any test number was computed, and picking another seed now
+would be choosing on test, so the decision stands. It also shows the margin: every v3 seed loses
+1-3 main-test RED rows against v2.
+
+**Finding T1: v3 halves the over-triage it was built for.** Integration set YELLOW->RED + GREEN->RED
+75 -> 40 (prevalence-adjusted RED calls 29.3 -> 17.8 per 100), challenge_v3 8 -> 2, and it is lower
+on every other set too (test 24 -> 19, challenge 20 -> 13, challenge_v2 12 -> 9, unseen 39 -> 32).
+Short messages: "My knee is swollen." RED 0.721 -> YELLOW 0.349; "My knee is swollen and sore.",
+"My knee hurts.", "My hip has started aching today.", "My knee is sore." also leave RED. Red signs
+inside routine questions: challenge_v3 red_in_routine_question RED caught 9/20 -> 17/20.
+
+**Finding T2: it pays for that with RED recall, which is why it fails.** v3's val operating point
+has t_red 0.422 (v2 0.354), and the RED rows near the boundary fall below it. Main test loses 3
+RED rows v2 caught (nearly passed out while straining; thigh swelling growing and not settling
+when raised; redness past the pen line) -> 93/104. On challenge_v3, v3 newly sends "Breathless just
+sitting still." and "Calf is sore and swollen, and my knee is stiff. Can I do my stretches?" to
+GREEN (v2: RED / YELLOW) while fixing "I fainted in the kitchen this morning" (GREEN -> RED), so
+RED->GREEN goes 2 -> 3. The unseen-scenario test drops 0.952 -> 0.876 (RED->YELLOW 4 -> 12, nearly
+all allergic reactions: lips / throat / face swelling after a new drug). None of the failing rows
+is among the 3 blind-annotation disagreements that involve RED (`data/ANNOTATION_AGREEMENT_V3.md`),
+so the outcome does not depend on a disputed label.
+
+**Finding T3: the calf message is not fixed by either version.** "I have severe calf pain and
+swelling, can I still do my exercises?" is GREEN in v2 (p(RED) 0.011) and in v3 (0.016), although
+v3 catches most other RED-in-routine-question rows. The same words without the question ("I have
+severe calf pain and swelling in my calf.") are RED in both (0.79 / 0.75).
+
+The calf message and the short messages from the 2026-11-14 test run (integration set; bold =
+differs from the guideline label):
+
+| message | label | v2 | v2 p(RED) | v2 email | v3 | v3 p(RED) | v3 email |
+|---|---|---|---:|---|---|---:|---|
+| I have severe calf pain and swelling, can I still do my exercises? | RED | **GREEN** | 0.011 | no | **GREEN** | 0.016 | no |
+| My knee is swollen. | YELLOW | **RED** | 0.721 | yes | YELLOW | 0.349 | no |
+| My knee pain suddenly got much worse today. | YELLOW | **RED** | 0.762 | yes | **RED** | 0.555 | no |
+| My pain suddenly got much worse today. | YELLOW | **RED** | 0.739 | yes | **RED** | 0.553 | no |
+| My knee is more swollen today and hurts. | YELLOW | **RED** | 0.809 | yes | **RED** | 0.559 | no |
+| My knee is swollen and sore. | YELLOW | **RED** | 0.740 | yes | YELLOW | 0.359 | no |
+| My hip is swollen and sore. | YELLOW | **RED** | 0.771 | yes | **RED** | 0.441 | no |
+| My ankle is swollen and sore. | YELLOW | **RED** | 0.844 | yes | **RED** | 0.722 | yes |
+| My hip has started aching today. | YELLOW | **RED** | 0.665 | no | YELLOW | 0.336 | no |
+| My knee is sore. | GREEN | **RED** | 0.570 | no | **YELLOW** | 0.133 | no |
+| My knee hurts. | YELLOW | **RED** | 0.725 | yes | YELLOW | 0.298 | no |
+| My pain suddenly got worse today, and it's mostly behind the knee. | YELLOW | **RED** | 0.544 | no | YELLOW | 0.400 | no |
+| My knee pain is 6 out of 10, it started suddenly behind the knee and it is swollen. | YELLOW | **RED** | 0.877 | yes | **RED** | 0.780 | yes |
+| My incision hurts and there is yellow fluid coming out. | RED | RED | 0.894 | yes | RED | 0.884 | yes |
+| My wound looks more red today and it's leaking some fluid. | YELLOW | **RED** | 0.740 | yes | **RED** | 0.690 | yes |
+| Since I didn't take my medicine yesterday, my knee wound is worse | YELLOW | **RED** | 0.756 | yes | **RED** | 0.548 | no |
+| I cannot keep fluids down and I am hardly urinating. | YELLOW | **RED** | 0.782 | yes | **RED** | 0.674 | yes |
+| I feel hopeless and cannot function. | YELLOW | **RED** | 0.753 | yes | **RED** | 0.527 | no |
+| I feel scared to move my leg. | GREEN | **RED** | 0.601 | no | **RED** | 0.632 | yes |
+| My calf is swollen. | RED | RED | 0.858 | yes | RED | 0.815 | yes |
+
+"My incision hurts and there is yellow fluid coming out." is labelled RED here by guideline rule 6
+(`data/INTEGRATION_SET_REPORT.md`); `test_pain_symptoms_agent.py` expects the rules engine's YELLOW.
+
+**What this does not settle.** The shipping rule weighs RED recall over over-triage; with it, the
+v3 data plus the v2 operating-point rule trade recall for precision in the wrong proportion. Two
+directions were not tried here (each would need its own pre-stated rule): keeping v2's t_red
+target but with a stricter recall floor for the v3 model, and a deterministic override for RED
+signs inside a question (the calf message) like the temperature and self-harm overrides. The
+integration set measures what the tests send, not real traffic, and has only 22 RED rows.
+
+### Test suites on this branch (v2 still the default)
+
+Because v3 was not shipped, the default stays v2 and the step "re-run every suite with v3 as the
+default" does not apply. Every suite was still run on the final branch state (TRIAGE_MODE unset,
+SMTP* / DOCTOR_ALERT* removed, a new temporary `PATIENT_DATABASE_PATH` per suite, one suite at a
+time). Startup line in each: `classifier loaded: M2:m2_main_v2_it3_seed0 (t_red=0.354 t_yel=0.363
+t_alert=0.684)`. Results are identical to the run on unchanged main (7fee34e) the same day:
+
+| suite | result | cause |
+|---|---|---|
+| `run_agent_tests.py` (pain, recovery, rehab) | 9 failed / 101 passed | 8 over-triage of short messages + the calf message GREEN (Finding T3) |
+| `test_symptom_assessment_agent.py` | 19 check failures | over-triage of short pain / swelling messages |
+| `test_phase4_agents.py` | 3 check failures | "My knee is more swollen today and hurts." RED |
+| `test_nutrition_wellbeing_agents.py` | 3/9 failing | "cannot keep fluids down", "hopeless", "scared to move" RED |
+| `test_multi_agent_orchestration.py` | 1/5 failing | "Since I didn't take my medicine yesterday, my knee wound is worse" RED |
+| `test_doctor_alert.py` | 2 check failures | "My wound looks a bit red today." RED |
+| `test_fallback_procedure_isolation.py` | 5/10 failing | not triage (`_generate_smart_reply` signature) |
+| `test_specialized_assigned.py` | 3/4 failing | not triage (known) |
+| `test_phase3_rag.py` | 5 check failures | not triage (reindex returns `None`; rehab agent asks before retrieving) |
+| `test_phase2_intent.py`, `test_intent_medication_symptoms.py` (59), `test_medication_proactive.py` (21/21), `test_medication_schedule.py`, `triage/test_*.py` (153) | pass | |
+
+With v3 as the default the triage-caused failures above would have changed (v3 calls "My knee is
+swollen.", "My knee is swollen and sore.", "My knee hurts.", "My hip has started aching today."
+non-RED, but still RED for "My knee is more swollen today and hurts.", the wound / medicine
+messages, and GREEN for the calf message); those suites were not run with v3 as the default
+because v3 did not pass the rule.
+
 ## What this does not show
 
 - **Synthetic text.** Every message was written by an LLM (claude-opus-5-5), and the same model
@@ -1026,4 +1226,12 @@ backend/.venv/Scripts/python backend/triage/model/train.py --data v2 all   # M1 
 backend/.venv/Scripts/python backend/triage/model/select_v2.py             # val-only choices -> selection_v2.json
 backend/.venv/Scripts/python backend/triage/model/evaluate_v2.py           # v1 vs v2 -> v2_report.md
 TRIAGE_MODEL_VERSION=v1  # pin the v1 model in hybrid mode
+
+# v3 (not shipped; run from backend/triage/data, then the repo root)
+../../.venv/Scripts/python build_integration_set.py       # integration_source.tsv -> integration_set.jsonl (eval only)
+../../.venv/Scripts/python build_challenge_v3.py          # frozen held-out set (a7b15ea)
+../../.venv/Scripts/python build_train_v3.py              # authored_v3/ -> train_v3_extra.jsonl
+backend/.venv/Scripts/python backend/triage/model/train.py --data v3 all   # M1 + 5 + 3 SetFit runs, sequential
+backend/.venv/Scripts/python backend/triage/model/select_v3.py             # val-only choices -> selection_v3.json
+backend/.venv/Scripts/python backend/triage/model/evaluate_v3.py           # v2 vs v3 + shipping rule -> v3_report.md
 ```

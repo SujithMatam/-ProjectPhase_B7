@@ -1,0 +1,107 @@
+{
+  "all": {
+    "n": 363,
+    "agreement": 0.9449,
+    "kappa": 0.9065,
+    "kappa_ci95": [
+      0.8656,
+      0.9435
+    ],
+    "weighted_kappa": 0.9271,
+    "red_binary_agreement": 0.9917,
+    "confusion": {
+      "RED->RED": 54,
+      "RED->YELLOW": 1,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 2,
+      "YELLOW->YELLOW": 100,
+      "YELLOW->GREEN": 14,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 3,
+      "GREEN->GREEN": 189
+    }
+  },
+  "challenge_v3 (all)": {
+    "n": 91,
+    "agreement": 0.978,
+    "kappa": 0.9668,
+    "kappa_ci95": [
+      0.9159,
+      1.0
+    ],
+    "weighted_kappa": 0.9747,
+    "red_binary_agreement": 0.989,
+    "confusion": {
+      "RED->RED": 33,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 1,
+      "YELLOW->YELLOW": 31,
+      "YELLOW->GREEN": 1,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 0,
+      "GREEN->GREEN": 25
+    }
+  },
+  "challenge_v3:mixed": {
+    "n": 24,
+    "agreement": 0.9583,
+    "kappa": 0.9342,
+    "kappa_ci95": [
+      0.7785,
+      1.0
+    ],
+    "weighted_kappa": 0.9457,
+    "red_binary_agreement": 0.9583
+  },
+  "challenge_v3:red_in_routine_question": {
+    "n": 30,
+    "agreement": 1.0,
+    "kappa": 1.0,
+    "kappa_ci95": [
+      1.0,
+      1.0
+    ],
+    "weighted_kappa": 1.0,
+    "red_binary_agreement": 1.0
+  },
+  "challenge_v3:short_single_symptom": {
+    "n": 37,
+    "agreement": 0.973,
+    "kappa": 0.9581,
+    "kappa_ci95": [
+      0.8666,
+      1.0
+    ],
+    "weighted_kappa": 0.9663,
+    "red_binary_agreement": 1.0
+  },
+  "integration": {
+    "n": 272,
+    "agreement": 0.9338,
+    "kappa": 0.8708,
+    "kappa_ci95": [
+      0.8074,
+      0.9224
+    ],
+    "weighted_kappa": 0.8923,
+    "red_binary_agreement": 0.9926,
+    "confusion": {
+      "RED->RED": 21,
+      "RED->YELLOW": 1,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 1,
+      "YELLOW->YELLOW": 69,
+      "YELLOW->GREEN": 13,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 3,
+      "GREEN->GREEN": 164
+    }
+  },
+  "disagreements": 20,
+  "disagreements_involving_red": [
+    "CH3-088",
+    "INT-121",
+    "INT-133"
+  ]
+}

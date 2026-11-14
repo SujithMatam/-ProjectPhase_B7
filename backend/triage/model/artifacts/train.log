@@ -40,3 +40,22 @@
 2026-11-12 03:44:28  m2_unseen_v2_it3_seed1: done, val macro-F1 0.744 (3.5 min)
 2026-11-12 03:44:37  m2_unseen_v2_it3_seed2: start (1397 train rows, num_iterations 3, ~8382 pairs, max_seq_length 64)
 2026-11-12 03:49:28  m2_unseen_v2_it3_seed2: done, val macro-F1 0.741 (4.8 min)
+2026-11-14 18:11:34  === train.py all --data v3 ===
+2026-11-14 18:11:44  M1 main_v3: C=0.316228 val macro-F1 0.781
+2026-11-14 18:11:45  M1 unseen_v3: C=3.16228 val macro-F1 0.670
+2026-11-14 18:11:52  m2_main_v3_it3_seed0: start (1994 train rows, num_iterations 3, ~11964 pairs, max_seq_length 64)
+2026-11-14 18:17:26  m2_main_v3_it3_seed0: done, val macro-F1 0.823 (5.5 min)
+2026-11-14 18:17:33  m2_main_v3_it3_seed1: start (1994 train rows, num_iterations 3, ~11964 pairs, max_seq_length 64)
+2026-11-14 18:23:02  m2_main_v3_it3_seed1: done, val macro-F1 0.806 (5.4 min)
+2026-11-14 18:23:10  m2_main_v3_it3_seed2: start (1994 train rows, num_iterations 3, ~11964 pairs, max_seq_length 64)
+2026-11-14 18:30:49  m2_main_v3_it3_seed2: done, val macro-F1 0.804 (7.6 min)
+2026-11-14 18:30:56  m2_main_v3_it3_seed3: start (1994 train rows, num_iterations 3, ~11964 pairs, max_seq_length 64)
+2026-11-14 18:37:31  m2_main_v3_it3_seed3: done, val macro-F1 0.831 (6.5 min)
+2026-11-14 18:37:38  m2_main_v3_it3_seed4: start (1994 train rows, num_iterations 3, ~11964 pairs, max_seq_length 64)
+2026-11-14 18:43:25  m2_main_v3_it3_seed4: done, val macro-F1 0.810 (5.7 min)
+2026-11-14 18:43:32  m2_unseen_v3_it3_seed0: start (1608 train rows, num_iterations 3, ~9648 pairs, max_seq_length 64)
+2026-11-14 18:49:07  m2_unseen_v3_it3_seed0: done, val macro-F1 0.738 (5.6 min)
+2026-11-14 18:49:15  m2_unseen_v3_it3_seed1: start (1608 train rows, num_iterations 3, ~9648 pairs, max_seq_length 64)
+2026-11-14 18:54:39  m2_unseen_v3_it3_seed1: done, val macro-F1 0.747 (5.4 min)
+2026-11-14 18:54:47  m2_unseen_v3_it3_seed2: start (1608 train rows, num_iterations 3, ~9648 pairs, max_seq_length 64)
+2026-11-14 18:58:54  m2_unseen_v3_it3_seed2: done, val macro-F1 0.741 (4.1 min)

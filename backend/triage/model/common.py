@@ -72,17 +72,28 @@ def load_challenge_v2() -> list[dict]:
     return load_jsonl(DATA / "challenge_v2.jsonl")
 
 
+def load_challenge_v3() -> list[dict]:
+    return load_jsonl(DATA / "challenge_v3.jsonl")
+
+
+def load_integration() -> list[dict]:
+    """Every patient message used in backend/test_*.py. EVALUATION ONLY: never train, tune or
+    choose a threshold on it (data/INTEGRATION_SET_REPORT.md)."""
+    return load_jsonl(DATA / "integration_set.jsonl")
+
+
 V2_EXTRA = DATA / "train_v2_extra.jsonl"     # origin "generated_v2", TRAIN only (build_train_v2.py)
+V3_EXTRA = DATA / "train_v3_extra.jsonl"     # origin "generated_v3", TRAIN only (build_train_v3.py)
+EXTRA_FILES = {"v1": (), "v2": (V2_EXTRA,), "v3": (V2_EXTRA, V3_EXTRA)}
 
 
 def load_train(which: str, data: str = "v1") -> list[dict]:
-    """Training rows. v2 = the frozen split's train + the generated_v2 rows. For the
-    unseen-scenario split only the v2 rows flagged ``unseen_split_ok`` are added (no topic of an
-    unseen val/test scenario and no near-duplicate of an unseen val/test row)."""
+    """Training rows. v2 = the frozen split's train + the generated_v2 rows; v3 = v2 + the
+    generated_v3 rows. For the unseen-scenario split only the extra rows flagged
+    ``unseen_split_ok`` are added (no topic of an unseen val/test scenario and no near-duplicate
+    of an unseen val/test row)."""
     rows = load_split(which, "train")
-    if data == "v1":
-        return rows
-    extra = load_jsonl(V2_EXTRA)
+    extra = [r for f in EXTRA_FILES[data] for r in load_jsonl(f)]
     if which == "unseen":
         extra = [r for r in extra if r["unseen_split_ok"]]
     return rows + extra

@@ -5,8 +5,11 @@ total hip (THA) replacement. Built to replace `backend/data/exports/triage_inten
 problems are measured in `AUDIT.md`. v1.1 = v1 with 12 labels adjudicated (`ADJUDICATION.md`); no
 row moved between splits. **v2** (2026-11-12) adds a second held-out set (`challenge_v2.jsonl`, 90
 rows) and 380 training-only rows (`train_v2_extra.jsonl`, origin `generated_v2`); val, test,
-challenge and every existing label and row are unchanged (see "v2 additions" below). Models
-trained on it: `backend/triage/REPORT.md`.
+challenge and every existing label and row are unchanged (see "v2 additions" below). **v3**
+(2026-11-14) adds an evaluation-only integration set (`integration_set.jsonl`, 272 rows: every
+patient message in `backend/test_*.py`), a third held-out set (`challenge_v3.jsonl`, 91 rows) and
+361 training-only rows (`train_v3_extra.jsonl`, origin `generated_v3`); again no existing label or
+row changed (see "v3 additions"). Models trained on it: `backend/triage/REPORT.md`.
 
 ## Files
 
@@ -19,6 +22,13 @@ trained on it: `backend/triage/REPORT.md`.
 | `train_v2_extra.jsonl` | **v2**: 380 training-only rows (`origin: generated_v2`); `model/common.py load_train(split, "v2")` appends them to train |
 | `challenge_v2_source.tsv`, `build_challenge_v2.py`, `CHALLENGE_V2_REPORT.md` | v2 held-out set: source, builder (near-duplicate check), report |
 | `authored_v2/*.tsv`, `build_train_v2.py`, `TRAIN_V2_REPORT.md` | v2 training rows: source, builder (near-duplicate drops), report with every dropped row |
+| `integration_set.jsonl` | **v3**: 272 patient messages used in `backend/test_*.py`, labelled by the guideline; **evaluation only** (never train, tune or pick thresholds on it) |
+| `integration_source.tsv`, `build_integration_set.py`, `INTEGRATION_SET_REPORT.md` | integration set: source, builder (checks every text occurs in a test file), report with the inclusion rules |
+| `challenge_v3.jsonl` | **v3**: 91-row held-out set (short single-symptom, RED sign inside a routine question, mixed), committed (a7b15ea) before any v3 training data; never train or tune on it |
+| `challenge_v3_source.tsv`, `build_challenge_v3.py`, `CHALLENGE_V3_REPORT.md` | v3 held-out set: source, builder (near-duplicate check), report |
+| `train_v3_extra.jsonl` | **v3**: 361 training-only rows (`origin: generated_v3`); `load_train(split, "v3")` appends the v2 and v3 rows to train |
+| `authored_v3/*.tsv`, `build_train_v3.py`, `TRAIN_V3_REPORT.md` | v3 training rows: source, builder (near-duplicate drops), report with every dropped row |
+| `ANNOTATION_AGREEMENT_V3.md`, `annotation/v3/`, `annotation/build_annotation_sample_v3.py`, `annotation/compute_agreement_v3.py` | blind second annotation of challenge_v3 + the integration set |
 | `LABELLING_GUIDELINE.md` | the label definitions and rules (v1.1) |
 | `ADJUDICATION.md`, `adjudication.tsv` | v1.1 label changes; applied by the builders after split assignment |
 | `RELABEL_CHANGES.md` | re-labelling of the 63 original sentences |
@@ -207,6 +217,51 @@ clinician or a blind second annotator. challenge_v2 was blind-annotated by a fre
 subagent (guideline + shuffled texts only): 90/90 agreement, kappa 1.000 overall and in every
 category (`ANNOTATION_AGREEMENT_V2.md`; no label changed). That shows the guideline is reproducible
 on these prototypical messages, not that the labels are clinically right.
+
+## v3 additions (integration set, challenge_v3, training-only data)
+
+Why: with v2 as the default, short symptom messages from the test suites were over-triaged
+("My knee is swollen." -> RED, p(RED) 0.72) and a RED sign inside a routine question was missed
+("I have severe calf pain and swelling, can I still do my exercises?" -> GREEN, p(RED) 0.011);
+`backend/eval/reports/2026-11-14_main-post-merge-tests.md`.
+
+Order, so neither evaluation set could be shaped by the new training data:
+1. `integration_set.jsonl` (commit 2688e56): the patient messages used in the 15 backend test
+   suites, found by a static scan of the test files plus a runtime capture of every text that
+   reached triage during a test run, curated by stated rules (`INTEGRATION_SET_REPORT.md`), and
+   labelled by claude-opus-5-5 from the guideline. Labels follow the guideline, not the test
+   expectations. Evaluation only.
+2. `challenge_v3.jsonl` (commit a7b15ea): 91 rows written by claude-opus-5-5 from the guideline,
+   with 0 exact and 0 cosine > 0.92 matches to every split, challenge, challenge_v2, the v2 training
+   rows and the integration set (highest 0.886). Committed alone. SHA-256 in `CHALLENGE_V3_REPORT.md`.
+3. Both sets were blind-annotated together (363 pooled, shuffled items) by a fresh claude-sonnet
+   subagent: 94.5% agreement, kappa 0.907 (challenge_v3 0.967, integration 0.871), RED vs non-RED
+   99.2%; 3 disagreements involve RED, none RED<->GREEN (`ANNOTATION_AGREEMENT_V3.md`). No label
+   was changed.
+4. Then three claude-opus-5-5 writers, one per category, were given only `LABELLING_GUIDELINE.md`
+   and `authored/README.md` (told not to open any challenge, split, integration, report or test
+   file) and wrote 367 rows (`authored_v3/`). The categories match challenge_v3's; the prompts gave
+   no example message from either evaluation set.
+5. `build_train_v3.py` dropped exact duplicates, rows with cosine > 0.92 to any row of main val,
+   main test, challenge, challenge_v2, challenge_v3 or the integration set, and rows labelled below
+   their stated temperature: **6 dropped** (3 near challenge_v3, 1 near the integration set, 1 near
+   challenge, 1 near test), **361 kept**; highest cosine of a kept row to a protected row 0.920.
+   The writers' labels were read in full by the main session; none was changed or dropped on review.
+
+| set | rows | RED | YELLOW | GREEN | notes |
+|---|---:|---:|---:|---:|---|
+| integration_set | 272 | 22 | 83 | 167 | evaluation only; 66 rows reached triage during the 2026-11-14 test run |
+| challenge_v3 | 91 | 33 | 33 | 25 | short_single_symptom 37 (8/16/13), red_in_routine_question 30 (20/5/5), mixed 24 (5/12/7) |
+| train_v3_extra | 361 | 114 | 132 | 115 | short_single_symptom 120, red_in_routine_question 120, mixed 121 |
+
+Main-split train for v3 = 1,253 frozen rows + 380 v2 rows + 361 v3 rows = 1,994 rows. The
+unseen-scenario split gets the 157 v2 and 211 v3 rows flagged `unseen_split_ok`.
+
+Limitations specific to v3: the integration set is what the tests send, not real traffic; many
+of its rows are short follow-up answers or routine questions, so its RED rows are few (22). Its
+labels are the guideline's reading of each message on its own; several (bare "my knee hurts",
+"yellow fluid") are judgement calls, documented in `INTEGRATION_SET_REPORT.md`. The same model
+family wrote the guideline, challenge_v3, the integration labels and the training rows.
 
 ## Split and leakage checks
 
