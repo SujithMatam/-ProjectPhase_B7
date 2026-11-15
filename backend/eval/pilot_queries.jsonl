@@ -1,0 +1,10 @@
+{"id": "p01", "domain": "pain", "procedure": "TKA", "postop_day": 3, "answerability": "full", "query": "my knee is paining a lot when I bend it, is that normal", "reference_answer": ""}
+{"id": "p02", "domain": "pain", "procedure": "THA", "postop_day": 7, "answerability": "full", "query": "how long will the pain in my hip last after surgery", "reference_answer": ""}
+{"id": "p03", "domain": "pain", "procedure": "TKA", "postop_day": 21, "answerability": "partial", "query": "pain is fine in the day but at night it is worse, what can I do", "reference_answer": ""}
+{"id": "p04", "domain": "pain", "procedure": "THA", "postop_day": 42, "answerability": "none", "query": "can I take ibuprofen along with my blood thinner", "reference_answer": ""}
+{"id": "p05", "domain": "rehab", "procedure": "TKA", "postop_day": 7, "answerability": "full", "query": "which exercises should I do this week for my knee", "reference_answer": ""}
+{"id": "p06", "domain": "rehab", "procedure": "THA", "postop_day": 21, "answerability": "full", "query": "when can I start walking without the walker", "reference_answer": ""}
+{"id": "p07", "domain": "rehab", "procedure": "TKA", "postop_day": 42, "answerability": "partial", "query": "can I start cycling on a stationary bike now", "reference_answer": ""}
+{"id": "p08", "domain": "rehab", "procedure": "THA", "postop_day": 84, "answerability": "none", "query": "is it ok to go back to playing cricket", "reference_answer": ""}
+{"id": "p09", "domain": "recovery", "procedure": "THA", "postop_day": 14, "answerability": "full", "query": "what should I be able to do by two weeks after hip replacement", "reference_answer": ""}
+{"id": "p10", "domain": "recovery", "procedure": "THA", "postop_day": 42, "answerability": "partial", "query": "I still have swelling after 6 weeks, is my recovery slow", "reference_answer": ""}

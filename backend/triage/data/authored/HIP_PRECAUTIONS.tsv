@@ -1,0 +1,46 @@
+GREEN	THA	question	How long do I have to sleep on my back with the pillow between my knees?
+GREEN	THA	question	Is 90 degrees the limit, and how do I tell when I'm at 90 sitting on a chair?
+GREEN	THA	indian_english,question	Can I sit cross-legged on floor for pooja after hip replacement? It is 6 weeks now.
+GREEN	THA	indian_english,question	Is it ok to use Indian toilet or only western commode? We have only Indian style at home.
+GREEN	THA	question	Our sofa is really low. Is it safer to put a firm cushion on it or just avoid it?
+GREEN	THA	question	How do I get socks on without bending past 90? The sock aid keeps slipping off my foot.
+GREEN	THA	typo	cant reach my feet to cut toenails lol, who does that now??
+GREEN	THA	carer,question	Mum keeps forgetting and crossing her legs in bed. How worried should I be, and any tips to stop her?
+GREEN	THA	hard_neg,question	What would a dislocation actually feel like? Just want to know what to look out for.
+GREEN	THA	hard_neg,negation	Hip is clicking quietly when I walk but there's no pain at all. Does that mean it's loose?
+RED	THA	hard_pos	Bent down to grab the remote and felt a clunk in my groin, now my leg's turned out and I can't stand on it
+YELLOW	THA	hard_pos	Crossed my legs without thinking last night and since then the hip aches more and feels a bit unstable when I walk. No pop. Should I be seen?
+GREEN	THA	question	Is the raised toilet seat needed forever or just for the first few weeks?
+GREEN	THA	question	Can I roll onto my operated side to sleep yet? Week 7.
+GREEN	THA	indian_english	Doctor sir, kindly tell when I can sit on floor for eating with family. Now I am using chair.
+GREEN	THA	question	The grabber is great but how do I pick up something heavier, like the cat's water bowl?
+GREEN	THA	-	Pillow between my knees keeps falling out in the night. Is a foam wedge better?
+GREEN	THA	question	I had the anterior approach. Do I still have precautions, or are they only for posterior?
+GREEN	THA	question	Am I allowed to lean forward to put shoes on if I keep my knee out to the side?
+GREEN	THA	typo,question	when can i stop using the toilet raiser, its so annoying, wk 8 now
+GREEN	THA	carer,indian_english	My father had hip surgery, he wants to do namaz on the floor. When will it be safe? Please advise.
+GREEN	THA	question	Can I get into the bath if I use a bath board, or is it shower only?
+GREEN	THA	hard_neg,negation	Hip feels great, no pain at all, so is it ok to start relaxing the precautions a little?
+GREEN	THA	question	What's the right way to get into the passenger seat of a car without breaking the rules?
+GREEN	THA	question	Is turning my foot inwards when I stand also something to avoid?
+GREEN	THA	indian_english,question	Is squatting allowed for washing clothes? I am housewife and have to do all the work.
+GREEN	THA	question	How long before I can bend down to load the dishwasher like normal?
+RED	THA	hard_pos,typo	was putting my sock on and hip went pop, leg looks shorter now and i cant move it, pls help
+YELLOW	THA	hard_pos,question	When I sit in the low armchair I get a deep twinge in the groin and it feels like the hip might slip. No pop, I can walk. Is it something?
+GREEN	THA	-	I keep a folded towel under my bottom on the sofa so I don't sink. Is that ok?
+GREEN	THA	question	Should the bed be higher? Ours is quite low and I have to bend a lot getting out.
+GREEN	THA	question	Is a high chair with arms better for me than a recliner?
+GREEN	THA	indian_english	Mine is posterior approach. Can I sleep on left side with pillow in between legs? Operated side is right.
+GREEN	THA	hard_neg,question	My friend dislocated her hip after surgery. Is that common and what usually causes it?
+GREEN	THA	carer,question	I'm helping my wife shower. Can she sit on a plastic stool or does it need to be a tall one?
+GREEN	THA	typo	hip precautions r driving me mad, how long realy?
+GREEN	THA	question	Am I allowed to pick up my grandson if I keep my back straight?
+GREEN	THA	-	Precautions are fine, just struggling to get trousers on. Any tricks?
+GREEN	THA	indian_english,question	Can I travel by auto rickshaw? The seat is low and there is lot of jerking. 5 weeks over.
+GREEN	THA	question	What do the three hip rules actually mean in plain English?
+RED	THA	hard_pos,carer	asking about toilet frames, but Dad slipped off the low toilet this morning and his hip is in terrible pain, he can't lift the leg at all
+GREEN	THA	question	Is it bending at the hip or bending at the waist I need to watch? I don't really get the difference.
+GREEN	THA	hard_neg,negation	Accidentally bent quite far picking up a pen yesterday. No pain or clunk afterwards and walking fine today. Do I need to do anything?
+GREEN	THA	question	When are hip precautions usually lifted?
+GREEN	THA	indian_english,typo	sir can i bend for tieing shoe lace or i should use slip on chappals only?
+GREEN	THA	-	no low chairs, got it

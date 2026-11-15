@@ -1,0 +1,2 @@
+# Keep the shipped model byte-for-byte (no CRLF conversion of tokenizer/config files on Windows).
+artifacts/setfit/** -text

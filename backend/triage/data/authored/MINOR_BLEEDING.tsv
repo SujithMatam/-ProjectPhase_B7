@@ -1,0 +1,52 @@
+YELLOW	ANY	-	A small spot of fresh blood has come through my dressing, about the size of a fingernail.
+YELLOW	TKA	-	Bruising from my knee has spread right down to my ankle since starting the rivaroxaban.
+GREEN	ANY	hard_neg	There was a smear of blood on the pad after my first shower. I rang the ward, they said that's fine, and nothing since.
+YELLOW	ANY	indian_english	Little blood is coming on bandage from evening. I am taking blood thinner injection. Kindly advise.
+YELLOW	ANY	-	Had a nosebleed this morning, stopped after ten minutes of pinching. I'm on apixaban.
+YELLOW	THA	hard_pos,indirect	My thigh has gone a mottled purple-green right down to the knee and it's still spreading.
+RED	ANY	multi_symptom	The dressing is completely soaked with blood and it's running down my leg.
+YELLOW	ANY	typo,question	bit of blood on my plaster agn, not much, shud i change it
+GREEN	ANY	question	Is it normal to bruise a lot while on blood thinners?
+YELLOW	ANY	carer	Dad's gums bled a little when he brushed his teeth tonight. He's on the clot injections. It stopped quickly.
+RED	ANY	-	Bleeding from the wound won't stop, I've been pressing on it for half an hour.
+RED	ANY	hard_pos,indirect,multi_symptom	My poo has been black and sticky for two days and I feel completely washed out.
+GREEN	ANY	hard_neg	The pink in the toilet was from the beetroot salad I had at lunch, it's back to normal now.
+YELLOW	TKA	-	Week 2. The pad over my knee has a small fresh red streak this evening after I walked more than usual.
+YELLOW	ANY	indian_english,question	Doctor, from the stitches some drops of blood came after I was walking. Now it is less. Should I worry?
+YELLOW	ANY	multi_symptom	Small ooze of blood on the dressing and a new bruise on my tummy where I inject.
+GREEN	ANY	hard_neg	Small bruise where I do the injection in my tummy, the leaflet said that's expected.
+RED	ANY	temp_in_text,multi_symptom	A bit of blood on the dressing but I've also got a fever of 38.8 and the shakes.
+YELLOW	ANY	typo	cut myself shaving n it bled for ages b4 stopping, im on the thinner tabs
+GREEN	ANY	question	What should I do if I get a nosebleed while on blood thinners?
+YELLOW	ANY	carer,indian_english,question	My mother's leg is showing blue-black patches from thigh to ankle after operation. She is on blood thinner. Is this normal?
+YELLOW	ANY	hard_pos,indirect	The gauze has a reddish ring that has grown a bit since breakfast.
+GREEN	ANY	hard_neg,negation	Dressing changed today, no blood on it at all and no new bruising.
+YELLOW	TKA	hard_pos	I've had to put an extra pad on top of the knee dressing because spots keep showing through.
+YELLOW	ANY	-	Couple of drops of blood when a staple got nicked by my trousers.
+YELLOW	THA	indian_english,question	Bruise on hip side is becoming bigger and going down to knee. Taking Ecosprin as told. What to do sir?
+RED	ANY	multi_symptom	There's blood in my wee and big purple bruises on my arms that I can't explain.
+GREEN	ANY	hard_neg	There was blood on the old dressing when the nurse took it off, but she said the wound is dry and closed underneath.
+YELLOW	ANY	temp_in_text	A thin line of blood along the edge of the dressing. Temp 37.1, feel OK.
+YELLOW	ANY	question	How much blood on the dressing is too much? There's a patch about 3 cm across today.
+YELLOW	ANY	typo	dressing has a red blotch on it, wasnt there this mornin
+YELLOW	THA	carer	My husband's nose started bleeding during dinner and took twenty minutes to stop. He's on warfarin after his hip.
+GREEN	ANY	question	Do I need to stop my blood thinner before a dental check-up?
+YELLOW	ANY	hard_pos,indirect	Purple marks keep showing up on my shins and I don't remember knocking them.
+RED	ANY	hard_pos,indirect	Brought up some brown gritty stuff this morning, looked like used tea leaves.
+YELLOW	TKA	indian_english,multi_symptom,question	Small blood spot on dressing and some bruise also near knee. Is it due to the injection they are giving?
+YELLOW	ANY	-	My scar bled a bit when I knocked it on the car door, it stopped with pressure after five minutes.
+GREEN	TKA	hard_neg	Bruising on my knee is going yellow-green now and shrinking, much better than last week.
+YELLOW	ANY	hard_pos	Still a fresh red dot on the gauze every single day, and it's been over a week.
+GREEN	ANY	question	Why do they give blood thinners after joint replacement?
+YELLOW	THA	-	Small bleed from the hip wound after I got out of the car awkwardly. Dabbed it and it's slowed.
+YELLOW	ANY	indian_english,typo	blood thinner tablet started, now small small bruises coming on legs. normal or not??
+GREEN	ANY	hard_neg,temp_in_text	Urine looked dark this morning but I hadn't drunk much, it's pale again after some water. Temp 36.9.
+YELLOW	ANY	-	Blood under the clear film dressing is spreading out like a little red puddle, not leaking out though.
+YELLOW	ANY	carer,indian_english	Myself his son. Papa's wound is having some blood oozing since afternoon, we put cotton and it reduced. Please suggest.
+GREEN	ANY	question	Can I take ibuprofen with my blood thinner?
+YELLOW	ANY	hard_pos,indirect	Every time I peel the dressing back there's a little bead of red sitting at one end of the wound.
+YELLOW	ANY	indian_english	Nose was bleeding little bit in the morning, now stopped. I am on Xarelto 10 mg. Inform doctor please.
+YELLOW	ANY	multi_symptom	Spotting on the dressing and my bruise has crept round to the back of my knee.
+GREEN	ANY	hard_neg,question	Surgeon checked the bit of blood on my bandage yesterday and said it's old and fine, nothing new since. Can I shower tomorrow?
+YELLOW	TKA	indian_english,typo,question	knee dressing pe thoda blood stain aa gaya, i am on clexane injection. shud i change dressing?
+YELLOW	ANY	typo	lil bit of blood frm the staple line wen i stood up, seems to of stopped now

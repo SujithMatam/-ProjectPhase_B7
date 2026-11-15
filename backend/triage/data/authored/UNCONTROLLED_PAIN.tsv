@@ -1,0 +1,57 @@
+YELLOW	TKA	-	Taking the oxycodone and paracetamol exactly as prescribed and my knee pain is still an 8 most of the day.
+YELLOW	THA	-	The hip pain is worse every day this week, not better. I'm on day 9.
+YELLOW	ANY	indian_english	Doctor, pain is not reducing even after taking tablets. Whole night I could not sleep. Kindly suggest something.
+GREEN	ANY	hard_neg	Thigh muscles ached after I walked further than usual yesterday, gone by this morning.
+YELLOW	ANY	hard_pos,indirect	I watch the clock waiting for the next tablet, they wear off after about an hour.
+YELLOW	ANY	typo	pain meds not touchin it, been up all nite again
+RED	ANY	hard_pos,indirect	Since this afternoon my lower leg feels like it's about to burst and nothing I take makes any difference.
+RED	ANY	multi_symptom	The pain has moved down into my calf and the calf is hot and hard to the touch.
+GREEN	ANY	question	What's the best way to space out paracetamol and ibuprofen?
+YELLOW	ANY	carer	My mother is crying with pain at night even after her painkillers. She's been like this for three nights.
+YELLOW	THA	indian_english	Hip pain is bahut zyada since yesterday, medicine is not working. What to do?
+YELLOW	ANY	-	Pain was improving last week but has crept back up and the tablets aren't keeping on top of it.
+GREEN	ANY	hard_neg,question	My pain is well controlled now, 2 or 3 out of 10. When should I start cutting down the oxycodone?
+YELLOW	TKA	hard_pos,indirect	I can't get comfortable in any position, I've slept in the armchair three nights running because of the knee.
+RED	THA	multi_symptom	Hip pain went from manageable to agony when I bent to put my sock on, and now that leg looks shorter.
+RED	ANY	multi_symptom	Pain is way worse and my foot has gone cold and pale.
+YELLOW	ANY	temp_in_text,multi_symptom	Pain much worse over the last two days and I'm 38.1 this evening.
+RED	ANY	temp_in_text,multi_symptom	Pain getting worse by the hour, temp 39.2 and I can't stop shivering.
+YELLOW	ANY	typo,question	is it normal to still be in this much pain 3 wks out?? meds barely help
+YELLOW	TKA	-	The nerve block wore off this morning and the knee is far worse than they said it would be, tablets only take the edge off.
+GREEN	THA	question	How long does pain usually last after a hip replacement?
+YELLOW	ANY	hard_pos	I've been taking extra paracetamol on top of what the hospital gave me just to get through the day.
+YELLOW	ANY	indian_english,carer	My father is having severe pain in operated leg and not able to sleep from 2 days. Painkiller giving only half hour relief. Please advise sir.
+GREEN	ANY	hard_neg,negation	A bit achy tonight but no calf pain, no swelling, and the tablets are doing their job.
+YELLOW	THA	-	Burning ache deep in the hip wakes me every couple of hours, even with the night-time dose.
+YELLOW	ANY	multi_symptom	Pain isn't controlled, I can't do my exercises, and I've stopped eating properly because I feel so rubbish.
+YELLOW	ANY	-	Every day the pain is a little worse than the day before.
+GREEN	TKA	hard_neg	Physio really pushed my bend today so it throbbed, but it eased off after I rested with the leg up.
+YELLOW	ANY	hard_pos,indirect	I dread night time. Lying down makes it throb so I end up pacing, and nothing helps.
+YELLOW	THA	question	The tramadol isn't doing much for my hip pain, can I have something stronger?
+YELLOW	ANY	carer	Hubby's pain seems out of control since we got home, he's miserable and won't do his exercises.
+RED	TKA	hard_pos,indirect	Knee pain was bad all week, then something gave when I stood up and now it's bent at a weird angle.
+YELLOW	ANY	indian_english	Pain is coming and going but at night it is very much. Sleeping tablet also not helping. Kindly do the needful.
+GREEN	ANY	question	Is it OK to take my painkiller half an hour before physio?
+YELLOW	TKA	typo	cant straighten my knee coz of the pain, its worse then last wk
+RED	ANY	multi_symptom	Pain everywhere today and now my chest hurts when I breathe in.
+YELLOW	ANY	-	I ran out of my strong painkillers yesterday and the pain is back with a vengeance.
+YELLOW	THA	hard_pos,indirect	My groin aches all the time now, even resting, and it's starting to get me down. Two weeks post-op.
+GREEN	ANY	hard_neg	Last week I said my pain wasn't controlled but the new dose sorted it, I'm sleeping through now.
+YELLOW	ANY	temp_in_text	Pain no better on the new tablets. Temperature is normal, 37.0.
+YELLOW	TKA	indian_english,question	After knee replacement 5 days, pain is very high while walking and also at rest. Is it normal or should I come?
+YELLOW	ANY	multi_symptom	The pain medication isn't working and it's making me sick as well.
+YELLOW	ANY	carer,typo	mums in agony since the weekend, tablets do nothin, shes 79 and cant sleep
+GREEN	ANY	question	Can I use a hot water bottle for the pain or should it only be ice?
+YELLOW	THA	-	It hurts to lie on my back, my side, anywhere. The pills give me maybe two hours.
+YELLOW	ANY	hard_pos	I've scored my pain 7 or above every morning on the app for a week now.
+RED	THA	indirect	Something clunked in my hip turning over in bed, the pain is horrific and I can't lift the leg at all.
+YELLOW	ANY	hard_neg,negation	Pain is constant and I can't settle, though there's no swelling in my calf and no fever.
+YELLOW	TKA	-	Knee pain 9/10 despite meds.
+GREEN	ANY	indian_english,question	What is the correct timing for taking pain tablet and gas tablet together? Please tell.
+YELLOW	TKA	indian_english,question	Bahut dard hai in the knee since three days, tablets are not working properly. Should I increase dose?
+GREEN	TKA	hard_neg	Six weeks out and the pain is mostly gone, just a twinge going downstairs.
+YELLOW	ANY	hard_pos,indirect	I thought by week 4 I'd be off the strong stuff, but I need it more than ever.
+YELLOW	ANY	indian_english,question	Sir, pain killer I am taking three times daily but still pain is there full day. Can I take one more?
+YELLOW	ANY	indian_english	Since operation, pain in thigh is increasing daily, not decreasing. Is something wrong?
+YELLOW	ANY	typo	so sore cant even get to the loo, painkillers useless
+GREEN	ANY	hard_neg	Sharp pain on day 2 scared me but the ward doubled my regular dose and it's been fine since.

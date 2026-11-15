@@ -1,0 +1,45 @@
+GREEN	ANY	question	When can I get back behind the wheel, and does it matter which leg was done?
+GREEN	TKA	question	Can I sleep on my side with a pillow between my knees, or is it back only?
+GREEN	ANY	indian_english,question	Is it ok to use Indian toilet now or should I continue commode chair? 8 weeks over.
+GREEN	TKA	indian_english,question	Can I sit cross-legged on floor during family function? 3 months completed.
+GREEN	THA	question	When is it safe to have sex again after a hip replacement? Any positions to avoid?
+GREEN	ANY	question	How many weeks before I can climb a stepladder to change a light bulb?
+GREEN	ANY	question	Can I fly long-haul at 6 weeks? What should I do on the plane?
+GREEN	ANY	typo	when cn i go back to the office, desk job, 2 trains each way
+GREEN	TKA	carer,question	My mother wants to go to a wedding 3 weeks after her knee op. Long car ride. Is it ok if we stop often?
+GREEN	ANY	hard_neg,negation	Wound's fully healed, no oozing or redness. Can I go in the sea on holiday next month?
+GREEN	ANY	question	Can I have a bath yet or is it showers only until the clips come out?
+GREEN	ANY	indian_english	Doctor sir, can I squat for washing vessels in kitchen? My maid has left.
+GREEN	ANY	question	When can I go back to golf?
+GREEN	THA	question	Is it ok to drive an automatic with a left hip replacement?
+GREEN	ANY	question	Can I do the shopping myself now, carrying a light bag?
+RED	ANY	hard_pos	Went for my first drive today and since getting home I've been really short of breath and my heart is pounding
+YELLOW	ANY	hard_pos,temp_in_text	Want to go back to work Monday but I had 100.4F tonight and feel a bit rough. Should I still go?
+GREEN	TKA	question	Will the metal knee set off the airport scanner? Do I need a card?
+GREEN	ANY	indian_english,question	Can I do pilgrimage to Tirupati after 2 months? There is lot of walking and steps.
+GREEN	ANY	-	Back to cooking dinners now, sitting on a high stool for the chopping.
+GREEN	ANY	typo,question	is it ok 2 sleep in the recliner every night? bed is to low
+GREEN	ANY	hard_neg,question	Is a long flight a risk for blood clots? What should I watch for afterwards?
+GREEN	THA	question	Can I put my own shoes and socks on now or do I still need the gadget?
+GREEN	TKA	carer	Grandad wants to get back to his allotment. He's 9 weeks after the knee. What's sensible?
+GREEN	ANY	question	How soon can I go back to dance classes?
+GREEN	TKA	indian_english,question	Can I ride two-wheeler scooter after knee replacement? When it is allowed?
+GREEN	ANY	question	Can I shower standing up if I have a grab rail?
+GREEN	ANY	hard_neg,negation	No pain on long walks now and no swelling either. Could I try tennis doubles?
+RED	TKA	hard_pos,multi_symptom,indian_english	I want to ask about joining office but since yesterday my calf is paining badly and it is hot and red also
+GREEN	ANY	typo	can i hoover yet lol house is a tip
+GREEN	ANY	question	Can I use a hot tub once the wound is closed?
+GREEN	ANY	question	When can I go back to my warehouse job? It's a lot of lifting boxes.
+GREEN	ANY	indian_english	Kindly advise when I can join back school duty. I am teacher and have to stand whole day.
+GREEN	TKA	question	Is sleeping on my front ok now at 3 months?
+GREEN	ANY	carer,question	My husband is desperate to drive. He says his leg is fine. How do we know when it's really safe?
+GREEN	ANY	-	Managed a full day out at the garden centre. Legs tired but fine.
+GREEN	ANY	hard_neg,question	If I get a little cut on my leg while gardening, is that an infection risk for the new joint?
+GREEN	THA	question	Can I sit in cinema seats yet? They're quite low.
+GREEN	ANY	question	Any rules about lifting the grandchildren?
+GREEN	ANY	indian_english,typo	can i do pooja sitting on chair or must sit on flor, pandit ji is asking
+YELLOW	ANY	hard_pos	Went on a long day trip yesterday and today there's clear fluid seeping from the wound onto my trousers. Is that from overdoing it?
+GREEN	ANY	question	When can I get back to swimming lengths?
+GREEN	ANY	typo	wat about mowing the lawn, its a push mower
+GREEN	ANY	-	Bins out by myself today.
+GREEN	ANY	carer,hard_neg	My mum is on the blood thinner injections and wants to fly home next week. The nurse said her leg looks fine. Anything she needs for the flight?

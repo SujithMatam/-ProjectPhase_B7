@@ -1,0 +1,46 @@
+GREEN	TKA	question	Can't get my knee fully straight yet, about 5 degrees off. Will that come?
+GREEN	TKA	-	Knee like concrete first thing in the morning, loosens after ten minutes of moving about.
+GREEN	ANY	question	How many months does the stiffness last after a joint replacement?
+GREEN	TKA	indian_english	Knee is jammed in morning, after walking little bit it opens up. Is it normal sir?
+GREEN	TKA	typo	feels like theres a strap pulled tight round my knee all day, physio says keep going but its frustrating
+GREEN	THA	question	Hip goes stiff after sitting through a film. Should I get up every half hour?
+GREEN	TKA	hard_neg,negation	Stiff and sore after a long car ride but no swelling in the calf and no redness, just tight. Ok to do a gentle stretch?
+GREEN	TKA	question	What is manipulation under anaesthetic and when do they do it?
+GREEN	TKA	carer	Dad's knee is still stiff at 8 weeks and he's getting fed up. Is slow progress common in older people?
+GREEN	TKA	question	Does a hot water bottle help with stiffness, or should I stick to ice?
+GREEN	TKA	indian_english,question	Can I do warm oil massage around the knee for stiffness? Scar is fully healed now.
+YELLOW	TKA	hard_pos	Knee is getting stiffer instead of better and the pain keeps building every day, painkillers barely touch it now
+RED	TKA	hard_pos,multi_symptom	Was going to ask about stiffness but my lower leg has suddenly gone rock hard and the pain is unbearable even after my tablets
+GREEN	TKA	hard_neg	It's stiff, and the knee feels warmer than the other side, but the physio checked and said that's normal for months. Anything to loosen it?
+GREEN	ANY	question	Is it scar tissue that makes it stiff?
+GREEN	THA	-	Hip stiff getting out of bed, groin feels tight for the first few steps then ok.
+GREEN	TKA	question	Bend has stalled at 95 for a fortnight. Is that a plateau that passes?
+GREEN	TKA	indian_english	Week 6 completed. Bending is only 90. Neighbour uncle had 120 at same time. Kindly advise.
+GREEN	TKA	typo	cant kneel at all yet, will i ever b able to kneel to garden?
+GREEN	ANY	question	Does cold weather make the joint stiffer? Seems worse on chilly mornings.
+GREEN	TKA	hard_neg,negation	Stiff, yes, but no fever, wound's dry and the swelling's going down. Just slow. How do I stay motivated?
+GREEN	ANY	question	Does resting too much make the stiffness worse?
+GREEN	TKA	question	How many times a day should I rest my heel on a stool to let the knee straighten?
+GREEN	TKA	carer,indian_english	My mother is not able to bend knee more than 80. Exercises she is doing. When will it improve? Kindly guide.
+GREEN	THA	question	Struggling to lift my leg into the car. Is that hip stiffness or weak muscles?
+GREEN	TKA	-	Knee seized up a bit after sleeping with it straight. Takes ages to bend again in the morning.
+GREEN	TKA	question	What's the band-like feeling across the front of my knee when I bend it?
+GREEN	ANY	temp_in_text,hard_neg	Temp 36.7, nothing else wrong, only the stiffness. Can I do the exercises twice as often?
+GREEN	TKA	question	Will the tight pulling behind my knee when I straighten it go away?
+GREEN	TKA	indian_english,question	Stiffness is less in afternoon and more in night time. Why it is like this?
+GREEN	TKA	typo	3 months n still stiff going down stairs, is that normal or am i just slow
+GREEN	ANY	question	Does the stiffness ever completely go, or is some of it permanent?
+GREEN	TKA	hard_neg	It's tight and a bit creaky but there's no swelling now and the clicking doesn't hurt. Just checking that's fine.
+GREEN	TKA	question	Should I use a foam roller on my thigh to help the stiffness?
+GREEN	ANY	-	I'm stiff all over, not just the new joint. All the lying in bed, I suppose.
+YELLOW	TKA	hard_pos	Stiffness has got much worse this week and the whole knee is swelling more and feels hot all round. No fever that I know of.
+GREEN	TKA	question	Do people wear a brace at night for stiffness?
+GREEN	TKA	question	Will I get a full bend back like before the arthritis?
+GREEN	THA	indian_english	After hip operation feeling stiffness in thigh and back side also. Is it from operation only?
+GREEN	TKA	carer,question	He's 6 weeks after his knee and still can't straighten it fully. The physio says it should be straight by now. What next?
+GREEN	ANY	question	Is morning stiffness a sign the arthritis is coming back?
+GREEN	TKA	question	Rocking back and forth on the bike when I can't do a full turn, does that help?
+GREEN	ANY	typo,question	stiff every time i sit more then 20 mins, getting up is a struggle, tips?
+RED	ANY	hard_pos,temp_in_text	Stiff and achy everywhere, shaking with chills, and my temp just read 39.0. Is that from the joint?
+GREEN	TKA	-	tight but improving
+GREEN	THA	indian_english,question	Hip is feeling stiff when I get up from chair. Doing exercises regularly. How many weeks it will take to become free?

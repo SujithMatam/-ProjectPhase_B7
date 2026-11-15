@@ -1,0 +1,88 @@
+{
+  "all": {
+    "n": 90,
+    "agreement": 1.0,
+    "kappa": 1.0,
+    "kappa_ci95": [
+      1.0,
+      1.0
+    ],
+    "weighted_kappa": 1.0,
+    "confusion": {
+      "RED->RED": 26,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 32,
+      "YELLOW->GREEN": 0,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 0,
+      "GREEN->GREEN": 32
+    }
+  },
+  "negation": {
+    "n": 30,
+    "agreement": 1.0,
+    "kappa": 1.0,
+    "kappa_ci95": [
+      1.0,
+      1.0
+    ],
+    "weighted_kappa": 1.0,
+    "confusion": {
+      "RED->RED": 6,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 8,
+      "YELLOW->GREEN": 0,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 0,
+      "GREEN->GREEN": 16
+    }
+  },
+  "routine_multi_topic": {
+    "n": 24,
+    "agreement": 1.0,
+    "kappa": 1.0,
+    "kappa_ci95": [
+      1.0,
+      1.0
+    ],
+    "weighted_kappa": 1.0,
+    "confusion": {
+      "RED->RED": 2,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 6,
+      "YELLOW->GREEN": 0,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 0,
+      "GREEN->GREEN": 16
+    }
+  },
+  "wound_minimal_pair": {
+    "n": 36,
+    "agreement": 1.0,
+    "kappa": 1.0,
+    "kappa_ci95": [
+      1.0,
+      1.0
+    ],
+    "weighted_kappa": 1.0,
+    "confusion": {
+      "RED->RED": 18,
+      "RED->YELLOW": 0,
+      "RED->GREEN": 0,
+      "YELLOW->RED": 0,
+      "YELLOW->YELLOW": 18,
+      "YELLOW->GREEN": 0,
+      "GREEN->RED": 0,
+      "GREEN->YELLOW": 0,
+      "GREEN->GREEN": 0
+    }
+  },
+  "disagreements": 0,
+  "pairs": {}
+}

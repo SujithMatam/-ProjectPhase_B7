@@ -1,0 +1,38 @@
+{
+  "id": "c17_recovery_abandoned",
+  "agent": "recovery",
+  "title": "Abandoned interview: flexion given, then the patient leaves; nothing persisted",
+  "tags": [
+    "abandoned"
+  ],
+  "record": {
+    "patient_id": "EVAL-C17",
+    "procedure": "TKA",
+    "surgery_type": "Total Knee Arthroplasty (TKA)",
+    "affected_limb": "Right",
+    "surgery_days_ago": 11,
+    "weight_bearing_status": "Weight Bearing as Tolerated (WBAT)",
+    "metrics": [],
+    "prior_assessments": []
+  },
+  "request": {
+    "postop_day": 12
+  },
+  "record_fields": [],
+  "expect": {
+    "max_questions": 2,
+    "completes": false,
+    "abandoned": true
+  },
+  "turns": [
+    {
+      "patient": "How is my knee recovery going?"
+    },
+    {
+      "patient": "about 90 degrees",
+      "must_collect": [
+        "rom_flexion_degrees"
+      ]
+    }
+  ]
+}

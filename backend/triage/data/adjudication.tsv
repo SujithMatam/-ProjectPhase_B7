@@ -1,0 +1,16 @@
+# Label adjudication (see ADJUDICATION.md). Applied by build_dataset.py, build_split_clustered.py
+# and build_challenge.py AFTER split assignment, which still uses the pre-adjudication labels, so
+# no row moves between splits. The authored/*.tsv and challenge_source.tsv keep the original labels.
+# ID<TAB>OLD<TAB>NEW<TAB>DECIDED_BY<TAB>RULE
+MINOR_BLEEDING-029	YELLOW	GREEN	adjudicator	GREEN: small spot or line of blood on the dressing, not spreading
+MINOR_BLEEDING-036	YELLOW	GREEN	adjudicator	GREEN: small blood spot on dressing; small bruise near the operated joint / injection site
+SEPSIS_WOUND-060	YELLOW	GREEN	adjudicator	Rule 3 addition: clinician called the pink drainage fine and it is unchanged
+WOUND_IRRITATION-021	YELLOW	GREEN	adjudicator	GREEN: loose suture end with no redness, pulling or discharge
+CH-131	GREEN	YELLOW	adjudicator	Rule 7: pinkish urine is a reported finding; the patient's own explanation does not lower it
+MINOR_BLEEDING-001	YELLOW	GREEN	rule search	GREEN: small (fingernail-size) spot of blood on the dressing, not spreading
+MINOR_BLEEDING-008	YELLOW	GREEN	rule search	GREEN: a bit of blood on the plaster, "not much", not spreading
+MINOR_BLEEDING-014	YELLOW	GREEN	rule search	GREEN: small red streak (line) on the pad, not spreading
+MINOR_BLEEDING-016	YELLOW	GREEN	rule search	GREEN: small ooze of blood on the dressing + bruise at the injection site
+MINOR_BLEEDING-051	YELLOW	GREEN	rule search	GREEN: small ("thoda") blood stain on the dressing, not spreading
+BLEEDING_ANTICOAG-056	YELLOW	GREEN	rule search	GREEN: small (10p-size) ooze of blood on the dressing, not spreading
+WOUND_IRRITATION-017	YELLOW	GREEN	rule search	GREEN: loose suture end sticking out, no redness, pulling or discharge

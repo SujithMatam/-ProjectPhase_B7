@@ -1,0 +1,93 @@
+# challenge_v2: written 2026-11-12 BEFORE any v2 training data, labelled by LABELLING_GUIDELINE.md v1.1.
+# Frozen: never train or tune on these rows. Columns: category, label, pair, surgery, text.
+# category: negation | wound_minimal_pair | routine_multi_topic. pair = minimal-pair id (wound_minimal_pair only), else "-".
+negation	GREEN	-	ANY	I don't have any shortness of breath, I just wanted to ask how long I need the blood thinner injections.
+negation	GREEN	-	ANY	No calf pain, no swelling in the leg. When can I stop wearing the stockings at night?
+negation	GREEN	-	ANY	Not feverish at all, temp was 36.9 this morning. Is it okay to shower yet?
+negation	GREEN	-	ANY	my wound is not red and there's nothing coming out of it, just itchy where it's healed
+negation	GREEN	-	ANY	There's no chest pain and I'm breathing fine, but I feel tired after the walks
+negation	GREEN	-	ANY	No pus, no smell, dressing is dry. Do I change it myself or wait for the nurse?
+negation	GREEN	-	ANY	I haven't had any chills or sweats, just checking when my staples come out
+negation	GREEN	-	ANY	Toes are warm and pink and I can wiggle them fine, the nurse told me to keep checking. All good?
+negation	GREEN	-	THA	Hip hasn't popped or given way, no sudden pain. How long do I keep the pillow between my knees?
+negation	GREEN	-	ANY	Not coughing up anything, no blood. I just have a dry throat from the oxygen they gave me in hospital.
+negation	GREEN	-	ANY	No dizziness, no fainting, no racing heart. Can I drive to physio next week?
+negation	GREEN	-	ANY	the calf isnt hot or hard or anything, only my thigh feels bruised and it's going yellow now
+negation	GREEN	-	ANY	I'm not having any thoughts of hurting myself, I'm just a bit fed up with being stuck indoors
+negation	GREEN	-	ANY	Sir no breathing problem, no chest pain. Only asking diet for faster healing.
+negation	GREEN	-	ANY	zero swelling in the foot, no numbness, I just want to know if I can climb stairs yet
+negation	GREEN	-	ANY	Never had any bleeding from the wound, it's sealed now. Is bio-oil ok on the scar?
+negation	YELLOW	-	ANY	No shortness of breath or chest pain, but I've been feeling sick and vomited twice since starting the new painkiller
+negation	YELLOW	-	ANY	Temp is 38.1, no shivering, no pus from the wound, I feel okay otherwise
+negation	YELLOW	-	ANY	There's no pus and no smell, but clear watery fluid is still leaking onto the dressing on day 6
+negation	YELLOW	-	ANY	Calf is soft and not sore, but my ankle swelling is worse this week, though it does go down overnight with my leg up
+negation	YELLOW	-	ANY	I'm not bleeding anywhere and no black stools, but I forgot my rivaroxaban last night
+negation	YELLOW	-	ANY	no fever, no redness, but the pain isn't controlled by the tablets anymore and keeps getting worse each day
+negation	YELLOW	-	ANY	Not having any dark thoughts or anything like that, but I've barely slept or eaten for 4 days and feel very low
+negation	YELLOW	-	THA	No pop and the leg looks normal length, but there's a clunk in the hip when I stand and it hurts a bit
+negation	RED	-	ANY	Haven't had a temperature, but since lunchtime the back of my lower leg has gone tight and warm and it really hurts when I press it
+negation	RED	-	ANY	I'm not in much pain, but I've coughed up a bit of blood twice this morning
+negation	RED	-	ANY	No chest pain, but I got really breathless just walking to the toilet, which is new
+negation	RED	-	ANY	the wound doesn't hurt, but it's opened up and I can see inside it
+negation	RED	-	THA	Didn't fall or anything, but my hip suddenly went with a pop and now I can't put weight on it
+negation	RED	-	ANY	Not dizzy, but I've had black tarry poo twice since starting the blood thinner
+wound_minimal_pair	YELLOW	P01	TKA	My knee incision is a little pink and slightly warm around the edges
+wound_minimal_pair	RED	P01	TKA	The redness around my knee incision has spread up my thigh since this morning and it's hot
+wound_minimal_pair	YELLOW	P02	THA	a bit of clear fluid is seeping from the bottom of my hip wound
+wound_minimal_pair	RED	P02	THA	thick green stuff is coming out of the bottom of my hip wound and it smells
+wound_minimal_pair	YELLOW	P03	ANY	skin around the stitches is slightly swollen and pink, no discharge, I feel fine
+wound_minimal_pair	RED	P03	ANY	skin around the stitches is swollen and red and I've got shivers and a temperature of 38.9
+wound_minimal_pair	YELLOW	P04	ANY	There's a small pink patch next to the scar, about the size of a coin, not spreading
+wound_minimal_pair	RED	P04	ANY	The red patch next to the scar was coin-sized yesterday, now it's the size of my hand
+wound_minimal_pair	YELLOW	P05	ANY	Watery pinkish fluid on the dressing again today, about the same as yesterday
+wound_minimal_pair	RED	P05	ANY	Cloudy yellow pus is oozing from the wound and the dressing smells bad
+wound_minimal_pair	YELLOW	P06	TKA	Knee wound feels a bit warm to touch and slightly puffy
+wound_minimal_pair	RED	P06	TKA	Knee wound is red-hot, very swollen and I've been shaking with chills all night
+wound_minimal_pair	YELLOW	P07	ANY	Mild redness along the staples, they feel like they're pulling
+wound_minimal_pair	RED	P07	ANY	Red streaks are running up my leg from the staples
+wound_minimal_pair	YELLOW	P08	ANY	Small gap at one end of the incision, couple of mm, no pus, edges look clean
+wound_minimal_pair	RED	P08	TKA	The incision has split open along most of its length after I bent the knee
+wound_minimal_pair	YELLOW	P09	THA	The skin around my hip wound is a little red and I feel otherwise well, temp 37.2
+wound_minimal_pair	RED	P09	THA	The skin around my hip wound is a little red but I've been shivering and my temperature is 39.1
+wound_minimal_pair	YELLOW	P10	THA	slight swelling and pinkness round the drain site, bit of clear ooze
+wound_minimal_pair	RED	P10	THA	drain site is leaking pus and the redness has spread across my hip
+wound_minimal_pair	YELLOW	P11	ANY	Doctor, little redness and swelling near the stitches, no fever, please advise
+wound_minimal_pair	RED	P11	ANY	Doctor, redness near stitches is spreading very fast since morning and pus is coming, high fever also
+wound_minimal_pair	YELLOW	P12	ANY	Wound has been weeping clear fluid for two days, a bit more than before
+wound_minimal_pair	RED	P12	ANY	Wound has been weeping and now it's turned brown and smells rotten
+wound_minimal_pair	YELLOW	P13	TKA	knee is a bit warmer than the other one and slightly red over the scar
+wound_minimal_pair	RED	P13	TKA	knee is hot, red and swollen over the scar, I feel hot and shivery and my temp is 38.7
+wound_minimal_pair	YELLOW	P14	THA	a little pinkness and puffiness along the scar since yesterday, no fluid
+wound_minimal_pair	RED	P14	THA	the pink along the scar has turned dark red and is spreading towards my groin, and it's very hot
+wound_minimal_pair	YELLOW	P15	ANY	some bloody fluid has spread a bit further across the dressing since this morning
+wound_minimal_pair	RED	P15	ANY	blood has soaked right through the dressing and onto the bed sheets and it's still coming
+wound_minimal_pair	YELLOW	P16	ANY	One stitch looks irritated and a little red, nothing coming out
+wound_minimal_pair	RED	P16	ANY	One stitch area has a yellow pus bubble and the skin around it is hot and spreading red
+wound_minimal_pair	YELLOW	P17	ANY	Temperature 37.9 and the wound is a bit red
+wound_minimal_pair	RED	P17	ANY	Temperature 38.6 and the wound is a bit red
+wound_minimal_pair	YELLOW	P18	TKA	mild swelling round the knee cut, I can still see the skin creases, no heat
+wound_minimal_pair	RED	P18	TKA	my whole leg below the knee cut has swelled up, the calf is tight and painful and it won't go down when I raise it
+routine_multi_topic	GREEN	-	ANY	Feeling a bit anxious about going home, my knee aches after exercises but settles, and can you remind me how many leg raises I should do?
+routine_multi_topic	GREEN	-	ANY	I took my morning paracetamol a couple of hours late, should I still take the lunchtime one? Also, is it ok to get the dressing wet in the shower?
+routine_multi_topic	GREEN	-	TKA	I'm worried about my recovery, the knee is sore after physio but it eases with ice, and I'd like to know when I can start the bike
+routine_multi_topic	GREEN	-	ANY	Two quick things: what time should I take my iron tablet, and can I sleep on my side yet?
+routine_multi_topic	GREEN	-	ANY	My mood's been up and down, the stiffness is annoying in the mornings, and I'm not sure if I'm doing the heel slides right
+routine_multi_topic	GREEN	-	ANY	forgot my stool softener yesterday, no problems going though. also when is my follow-up appointment?
+routine_multi_topic	GREEN	-	THA	Bit nervous about the stairs at home, hip aches a little at night, what exercises help most this week?
+routine_multi_topic	GREEN	-	ANY	I skipped my vitamin D tablet yesterday and the scar is itching now that it's healed, is that normal?
+routine_multi_topic	GREEN	-	ANY	Anxious and not sleeping great but managing; pain is 3/10 with tablets; can I walk to the shops with one crutch?
+routine_multi_topic	GREEN	-	TKA	Took my evening painkiller late, my knee is stiff, and I want to know how far I should be bending it by week 3
+routine_multi_topic	GREEN	-	ANY	Feeling down some days, my ankle is puffy by evening but fine in the morning, and what foods help healing?
+routine_multi_topic	GREEN	-	THA	I'm stressed about work, my hip is sore after walking but settles, and can I go back to driving at 6 weeks?
+routine_multi_topic	GREEN	-	ANY	Took my tablets an hour late this morning, wound looks fine and dry, should I do the exercises before or after the painkiller?
+routine_multi_topic	GREEN	-	ANY	Feeling a bit low, the bruise on my thigh is going green, and I need help with the exercise sheet
+routine_multi_topic	GREEN	-	ANY	Quick questions: is it ok that I missed yesterday's walk, my knee aches after exercise but goes, and when do the stitches come out?
+routine_multi_topic	GREEN	-	ANY	nervous about my first physio session, knee is sore but manageable, and is it normal to feel tired in the afternoons?
+routine_multi_topic	YELLOW	-	ANY	I missed my apixaban dose last night, my wound looks fine, and when should I take the next one?
+routine_multi_topic	YELLOW	-	ANY	Since I forgot my laxative I haven't opened my bowels for 4 days, and also can I shower with the dressing?
+routine_multi_topic	YELLOW	-	ANY	I'm anxious, my knee pain isn't touched by the tablets anymore and I can't do my exercises because of it
+routine_multi_topic	YELLOW	-	ANY	Missed a dose of my painkiller and now the wound looks a bit pink and warm, also when is my next physio?
+routine_multi_topic	YELLOW	-	ANY	Feeling low for a week, not eating much and not sleeping, and the exercises feel impossible
+routine_multi_topic	YELLOW	-	ANY	Skipped my blood thinner injection this morning because I was scared of the needle, also is it normal for my knee to click?
+routine_multi_topic	RED	-	ANY	I'm a bit anxious, I missed my evening tablets, and since this afternoon my calf has gone hot and swollen and hurts to touch
+routine_multi_topic	RED	-	ANY	Questions about exercises and diet, but also I've been short of breath since this morning and my chest hurts when I breathe in

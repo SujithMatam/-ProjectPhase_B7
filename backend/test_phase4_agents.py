@@ -6,10 +6,8 @@ Run directly:
 
 Plain-Python script (no pytest dependency), consistent with
 test_phase2_intent.py / test_phase3_rag.py. Mocks the shared
-ChatAgent.answer_question() response-generation layer so routing/dispatch
-can be verified without a generative model -- the mock records exactly which
-domain_instruction (i.e. which specialized agent) was actually invoked,
-proving dispatch is real rather than cosmetic.
+ChatAgent.answer_question() generation layer for agents that use it, while
+also verifying deterministic agents execute independently of that layer.
 """
 
 from __future__ import annotations
@@ -30,8 +28,9 @@ from agents.specialized_agents import (
     PainSymptomsAgent,
     RecoveryProgressAgent,
     RehabilitationAgent,
-    WoundCareAgent,
 )
+from agents.wound_care_agent import WoundCareAgent
+from agents import rehab_agent as rehab_flow
 from triage.safety_triage import SafetyTriageEngine
 
 _FAILURES: list[str] = []
@@ -117,6 +116,31 @@ def run_all_agents_test() -> None:
                 postop_day=5,
                 user_message=query,
             )
+        if expected_agent_cls is RehabilitationAgent:
+            # Updated for the reworked RehabilitationAgent (PR #9): a question
+            # about a named exercise first asks the ONE safety question
+            # (no generation call), and the answer to it gets the reply,
+            # which makes the single ChatAgent call checked below.
+            safety_question = rehab_flow.QUESTIONS[rehab_flow.EXERCISE_SAFETY]
+            print(f"[{expected_agent_cls.__name__}] turn 1 reply = {result['reply']!r}")
+            _check(
+                safety_question in result["reply"] and len(calls) == 0,
+                f"{query!r} expected the safety question first with no generation call, "
+                f"got {len(calls)} call(s) and reply {result['reply']!r}",
+            )
+            fn, calls = _stub_answer_question()
+            with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+                result = LAMOrchestrator.process(
+                    patient_id="TEST-PT",
+                    surgery_type=surgery_type,
+                    affected_limb="Right",
+                    postop_day=5,
+                    user_message="no",
+                    chat_history=[
+                        {"role": "user", "content": query},
+                        {"role": "assistant", "content": result["reply"]},
+                    ],
+                )
 
         captured_domain_instruction = calls[0].get("domain_instruction") if calls else None
         print(f"[{expected_agent_cls.__name__}] \"{query}\"")
@@ -139,17 +163,29 @@ def run_all_agents_test() -> None:
             result["action"] == expected_action,
             f"{query!r} expected action {expected_action}, got {result['action']}",
         )
-        if expected_agent_cls is MedicationAgent:
+        if expected_agent_cls in {
+            RecoveryProgressAgent, PainSymptomsAgent, MedicationAgent,
+            WoundCareAgent, NutritionAgent, MentalWellbeingAgent,
+        }:
             _check(
                 len(calls) == 0,
-                f"{query!r} should be handled by the proactive engine before synthesis, got {len(calls)} call(s)",
+                f"{query!r} should use its deterministic domain handler, got {len(calls)} synthesis call(s)",
             )
         else:
             _check(
                 len(calls) == 1,
                 f"{query!r} expected exactly 1 response-generation call, got {len(calls)}",
             )
-        if expected_agent_cls is RecoveryProgressAgent:
+        if expected_agent_cls is RehabilitationAgent:
+            # The reworked agent appends the patient's answers and the
+            # weight-bearing rule, fenced as data, after DOMAIN_FOCUS.
+            _check(
+                captured_domain_instruction is not None
+                and captured_domain_instruction.startswith(expected_agent_cls.DOMAIN_FOCUS),
+                f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through "
+                f"(as a prefix), got {captured_domain_instruction!r}",
+            )
+        elif expected_agent_cls is RecoveryProgressAgent and captured_domain_instruction is not None:
             # RecoveryProgressAgent (Milestone Sec 2.5) genuinely enriches its
             # DOMAIN_FOCUS with retrieved-chunk milestone/day-window notes
             # (see agents/specialized_agents.py) -- it must still always
@@ -163,7 +199,10 @@ def run_all_agents_test() -> None:
                 f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through "
                 f"(as a prefix), got {captured_domain_instruction!r}",
             )
-        elif expected_agent_cls is not MedicationAgent:
+        elif expected_agent_cls not in {
+            RecoveryProgressAgent, PainSymptomsAgent, MedicationAgent,
+            WoundCareAgent, NutritionAgent, MentalWellbeingAgent,
+        }:
             _check(
                 captured_domain_instruction == expected_agent_cls.DOMAIN_FOCUS,
                 f"{query!r} expected {expected_agent_cls.__name__}.DOMAIN_FOCUS to be passed through, "
@@ -251,12 +290,52 @@ def run_procedure_correctness_test() -> None:
                f"REGRESSION: {surgery_type!r} silently resolved to TKA instead of GEN")
 
         fn, calls = _stub_answer_question()
-        with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
-            LAMOrchestrator.process(
-                patient_id="TEST-PT", surgery_type=surgery_type, affected_limb="Right",
+        dispatched: list[Dict[str, Any]] = []
+        real_dispatch = AgentRouter.dispatch.__func__
+
+        def _spy_dispatch(cls, **kwargs):
+            dispatched.append(kwargs)
+            return real_dispatch(cls, **kwargs)
+
+        # The TKA query is a Rehabilitation turn: own patient id, so its
+        # interview starts fresh.
+        patient_id = "TEST-PT-REHAB-TKA" if expected_procedure == "TKA" else "TEST-PT"
+        with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn), \
+             patch.object(AgentRouter, "dispatch", classmethod(_spy_dispatch)):
+            result = LAMOrchestrator.process(
+                patient_id=patient_id, surgery_type=surgery_type, affected_limb="Right",
                 postop_day=5, user_message=query,
             )
-        procedure_passed = calls[0].get("procedure") if calls else None
+        if expected_procedure == "TKA":
+            # Updated for the reworked RehabilitationAgent (PR #9): a general
+            # exercise question asks the safety question first, then one
+            # more question; the generation call (with the procedure) comes
+            # on the turn that answers the second question.
+            safety_question = rehab_flow.QUESTIONS[rehab_flow.EXERCISE_SAFETY]
+            _check(
+                safety_question in result["reply"] and len(calls) == 0,
+                f"{surgery_type!r}: expected the Rehabilitation safety question first with no generation "
+                f"call, got {len(calls)} call(s) and reply {result['reply']!r}",
+            )
+            history = [{"role": "user", "content": query}, {"role": "assistant", "content": result["reply"]}]
+            for answer in ("no", "yes"):
+                with patch("agents.chat_agent.ChatAgent.answer_question", side_effect=fn):
+                    turn = LAMOrchestrator.process(
+                        patient_id=patient_id, surgery_type=surgery_type, affected_limb="Right",
+                        postop_day=5, user_message=answer, chat_history=list(history),
+                    )
+                history += [{"role": "user", "content": answer}, {"role": "assistant", "content": turn["reply"]}]
+            procedure_passed = calls[0].get("procedure") if calls else None
+        elif expected_procedure == "THA":
+            # Updated for the reworked agents (PR #9): this query is not a
+            # Rehabilitation turn -- the classifier sends it to
+            # RecoveryProgressAgent (low-margin default), which answers
+            # deterministically (no surgery date -> no generation call). The
+            # procedure is checked where it reaches the agent: AgentRouter.dispatch.
+            print(f"    routed to = {result['target_agent']}, generation calls = {len(calls)}")
+            procedure_passed = dispatched[0].get("procedure") if dispatched else None
+        else:
+            procedure_passed = calls[0].get("procedure") if calls else None
         print(f"    dispatched procedure = {procedure_passed!r}")
         _check(
             procedure_passed == expected_procedure,

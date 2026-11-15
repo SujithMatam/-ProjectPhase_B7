@@ -1,0 +1,127 @@
+# short_single_symptom category (authored_v3). Guideline v1.1. Fields: LABEL SURGERY TAGS SCENARIOS TEXT
+RED	THA	-	DISLOCATION	sudden severe pain in my hip when I turned over in bed
+RED	THA	typo	DISLOCATION	heard a pop in my hip n now cant put weight on that leg
+RED	THA	hard_pos,indirect	DISLOCATION	operated leg looks shorter than the other one now
+RED	ANY	-	DVT_CALF	calf swollen
+RED	ANY	typo	DVT_CALF	calf hot n hard
+RED	ANY	-	DVT_CALF	pain in my calf when I walk, not near the scar
+RED	ANY	-	DVT_CALF,NORMAL_SWELLING	ankle still swollen even after leg up all night
+RED	ANY	carer	DVT_CALF	dad's whole leg has swollen up since yesterday
+RED	ANY	temp_in_text	HIGH_FEVER	temp 38.5
+RED	ANY	temp_in_text,question	HIGH_FEVER	101.3 F this evening, should I worry?
+RED	ANY	carer,indian_english,temp_in_text	HIGH_FEVER	mother having 102 fever since morning
+RED	ANY	indirect	SEPSIS_WOUND	thick yellow smelly stuff coming out of the wound
+RED	ANY	indian_english	SEPSIS_WOUND	pus is coming from the operation wound
+RED	ANY	-	SEPSIS_WOUND	redness spreading fast up from the scar
+RED	ANY	-	WOUND_OPEN	wound has split open
+RED	ANY	indian_english	NEUROVASCULAR	toes have become numb and cold, doctor sir
+RED	ANY	typo	NEUROVASCULAR	cant wiggle my toes since i woke up
+RED	ANY	indirect	NEUROVASCULAR	foot looks a bit blue
+RED	ANY	-	PE_CHEST	suddenly short of breath
+RED	ANY	-	PE_CHEST	chest hurts when I breathe in
+RED	ANY	-	PE_CHEST	coughed up blood this morning
+RED	ANY	hard_pos,indirect	PE_CHEST	nearly passed out in the bathroom
+RED	ANY	-	BLEEDING_ANTICOAG	dressing soaked through with blood
+RED	ANY	indirect	BLEEDING_ANTICOAG	poo is black and sticky like tar
+RED	ANY	indian_english	BLEEDING_ANTICOAG	blood coming in urine since morning
+RED	ANY	-	ALLERGIC_REACTION	lips swelling after the new tablet
+RED	ANY	-	COMPARTMENT	leg rock hard and painkillers not touching it
+RED	ANY	typo	MOOD_SLEEP	dont want to live anymore
+RED	ANY	carer,hard_pos	-	dad is confused today, not making sense
+YELLOW	TKA	-	NORMAL_SWELLING	knee swollen
+YELLOW	TKA	-	WOUND_REDNESS	knee feels warm
+YELLOW	THA	indian_english	WOUND_REDNESS	skin near hip scar is warm, kindly advise
+YELLOW	ANY	indian_english	WOUND_REDNESS	slight redness is there around stitches
+YELLOW	ANY	-	CLEAR_DRAINAGE	clear fluid leaking from the wound
+YELLOW	ANY	question	CLEAR_DRAINAGE	pinkish watery stuff on the dressing, normal?
+YELLOW	ANY	indian_english,question	CLEAR_DRAINAGE	water is coming from stitches, what to do
+YELLOW	ANY	typo	WOUND_IRRITATION	staples pullin
+YELLOW	ANY	-	WOUND_IRRITATION	one stitch looks puckered and sore
+YELLOW	ANY	-	WOUND_OPEN	tiny gap at the bottom end of the scar, dry
+YELLOW	ANY	-	MINOR_BLEEDING	blood patch on the dressing getting bigger
+YELLOW	ANY	hard_neg	MINOR_BLEEDING	nosebleed this morning, stopped now. on blood thinners
+YELLOW	ANY	typo,temp_in_text	LOW_FEVER	temp 37.8 rn
+YELLOW	ANY	temp_in_text	LOW_FEVER	38.4C last night
+YELLOW	ANY	temp_in_text	LOW_FEVER	running 100.4 F
+YELLOW	ANY	typo,temp_in_text	LOW_FEVER	temprature 101 since afternoon
+YELLOW	ANY	-	LOW_FEVER	feeling feverish
+YELLOW	ANY	indian_english	LOW_FEVER	having fever from 2 days
+YELLOW	ANY	temp_in_text,question	LOW_FEVER	thermometer says 100.0 F, is that a fever?
+YELLOW	ANY	hard_pos,indirect	LOW_FEVER	all shivery and hot-cold tonight
+YELLOW	ANY	indian_english	UNCONTROLLED_PAIN	pain is increasing day by day
+YELLOW	TKA	carer	UNCONTROLLED_PAIN	dad says painkillers not helping his knee
+YELLOW	ANY	typo	UNCONTROLLED_PAIN	cant sleep for the pain
+YELLOW	TKA	indian_english	UNCONTROLLED_PAIN	knee is paining too much since morning
+YELLOW	THA	-	UNCONTROLLED_PAIN	hip hurts
+YELLOW	TKA	-	UNCONTROLLED_PAIN,DISLOCATION	sudden sharp pain in my knee when I turned
+YELLOW	THA	-	UNCONTROLLED_PAIN	groin aching more than it was last week
+YELLOW	ANY	indian_english	MED_SIDE_EFFECT	getting giddiness
+YELLOW	ANY	indirect	MED_SIDE_EFFECT	room spins a bit when I stand up
+YELLOW	ANY	indian_english	MED_SIDE_EFFECT	feeling vomiting sensation after tablets
+YELLOW	ANY	typo	MED_SIDE_EFFECT	vomitted twice today
+YELLOW	ANY	hard_neg	MED_SIDE_EFFECT	was dizzy yesterday, gone now
+YELLOW	ANY	typo	CONSTIPATION	no poo for 4 days
+YELLOW	ANY	indian_english	CONSTIPATION	motion not passed since 3 days
+YELLOW	ANY	carer	CONSTIPATION	mum hasn't had a bowel movement in 5 days
+YELLOW	ANY	-	MED_SIDE_EFFECT,ALLERGIC_REACTION	itchy rash on both arms
+YELLOW	ANY	-	MED_SIDE_EFFECT,ALLERGIC_REACTION	red itchy spots on tummy since the new pills
+YELLOW	ANY	-	MISSED_DOSE	forgot my blood thinner last night
+YELLOW	ANY	indian_english,question	MISSED_DOSE	missed clexane injection today, what to do now
+YELLOW	ANY	-	MISSED_DOSE	threw up my blood thinner tablet
+YELLOW	TKA	-	IMPLANT_NOISE	knee clicks and it hurts
+YELLOW	THA	-	IMPLANT_NOISE	clunk in the hip and it feels loose
+YELLOW	TKA	indirect	IMPLANT_NOISE	knee feels like it might give way, clicking too
+YELLOW	ANY	-	NEUROVASCULAR	numb patch next to the scar is spreading
+YELLOW	ANY	-	NEUROVASCULAR	new tingling beside the incision
+YELLOW	ANY	indian_english	FALL_INJURY	had a fall in bathroom but walking normally only
+YELLOW	ANY	-	MOOD_SLEEP	not slept or eaten properly for 4 days, feel very low
+YELLOW	ANY	carer,indian_english	MOOD_SLEEP	papa very low, hardly eating since one week
+YELLOW	ANY	-	NORMAL_SWELLING,DVT_CALF	thigh swollen but goes down when I lie with leg up
+YELLOW	ANY	-	NORMAL_SWELLING	swelling worse this week than last, still settles overnight
+YELLOW	ANY	-	WOUND_IRRITATION	steri strips lifting, skin under them red
+YELLOW	TKA	hard_pos,typo	-	something feels wrong with my knee, cant explain
+GREEN	TKA	indian_english	STIFFNESS	knee is stiff in morning time
+GREEN	TKA	-	STIFFNESS	tight band feeling round the knee
+GREEN	ANY	typo	NORMAL_SWELLING	ankles puffy by evng, gone by morning
+GREEN	TKA	-	NORMAL_SWELLING,REHAB_EXERCISE	knee swells a bit after physio, settles with ice and leg up
+GREEN	ANY	-	MINOR_BLEEDING	bruise on my thigh fading to yellow
+GREEN	ANY	-	MINOR_BLEEDING	small bruise where I do the tummy injection
+GREEN	ANY	hard_neg	MINOR_BLEEDING	tiny spot of blood on the dressing, not spreading
+GREEN	ANY	hard_neg,negation	WOUND_IRRITATION	loose thread end sticking out of the scar, no redness
+GREEN	ANY	-	WOUND_IRRITATION	healed scar is so itchy
+GREEN	ANY	temp_in_text	LOW_FEVER	temp 37.2
+GREEN	ANY	temp_in_text	LOW_FEVER	37.7 this morning
+GREEN	ANY	typo,temp_in_text,question	LOW_FEVER	99.9F ok?
+GREEN	ANY	hard_neg,temp_in_text	LOW_FEVER	bit of fever, 37.5
+GREEN	ANY	indian_english,temp_in_text	LOW_FEVER	temperature is 36.9 degree only
+GREEN	ANY	temp_in_text	LOW_FEVER	98.6 F
+GREEN	TKA	negation	IMPLANT_NOISE	knee clicks sometimes, no pain
+GREEN	THA	negation	IMPLANT_NOISE	hip squeaks a little when I walk, doesn't hurt
+GREEN	ANY	-	NEUROVASCULAR	numb patch beside the scar, same as since the op
+GREEN	ANY	-	MOOD_SLEEP	feeling a bit low but managing
+GREEN	ANY	indian_english	MOOD_SLEEP	sleep is not coming properly but managing
+GREEN	ANY	-	REHAB_EXERCISE	little soreness after exercises, goes after rest
+GREEN	TKA	typo	STIFFNESS	cant straighten knee fully yet
+GREEN	ANY	-	REHAB_EXERCISE	thigh muscles ache after physio, gone by evening
+GREEN	ANY	-	MISSED_DOSE	missed my vitamin D today
+GREEN	ANY	-	MED_TIMING	took evening painkiller an hour late
+GREEN	ANY	indian_english	CONSTIPATION	finally motion passed today, feeling better
+GREEN	ANY	-	WOUND_REDNESS	scar line pink and fading
+GREEN	ANY	negation	CLEAR_DRAINAGE	wound dry, no oozing
+GREEN	ANY	-	WOUND_OPEN	scab came off, skin underneath closed
+GREEN	ANY	-	FOLLOWUP_ADMIN	staples out today, all good
+GREEN	ANY	-	ALLERGIC_REACTION	itchy where the tape was
+GREEN	ANY	carer	STIFFNESS	mum gets stiff after sitting a long time
+GREEN	THA	-	STIFFNESS	hip tight when I get up, eases after a few steps
+GREEN	TKA	hard_neg,negation	DVT_CALF	calf fine, just knee stiff
+GREEN	TKA	-	MINOR_BLEEDING	knee bruise turning green, getting smaller
+GREEN	ANY	-	MOOD_SLEEP	frustrated with how slow this is
+GREEN	ANY	hard_neg	CLEAR_DRAINAGE	nurse said the pink fluid is normal, still a little damp
+GREEN	ANY	hard_neg	WOUND_REDNESS	doctor saw the redness yesterday, said fine, no change
+GREEN	ANY	indian_english	UNCONTROLLED_PAIN	slight pain at night, crocin is helping
+GREEN	ANY	indian_english	-	pain is much less compared to last week
+GREEN	TKA	-	NORMAL_SWELLING	knee less swollen than yesterday
+GREEN	THA	-	MINOR_BLEEDING	small bruise next to hip scar
+GREEN	ANY	-	CONSTIPATION	bit gassy but went to toilet this morning
+GREEN	ANY	-	WOUND_OPEN	steri strips fell off, wound closed and dry
+GREEN	ANY	indian_english	MOOD_SLEEP	feeling little emotional today, otherwise ok

@@ -1,0 +1,60 @@
+RED	TKA	indirect	Bent my knee in physio and the scar just split down the middle
+RED	ANY	hard_pos,indirect	I can see something yellowish and lumpy deep inside the cut
+RED	ANY	-	Three staples popped out and the wound is gaping like a mouth
+RED	THA	-	Hip wound has come apart about 4cm along the top end
+RED	ANY	typo	wound opend up when i coughed, can see inside
+RED	ANY	carer	Took off Dad's dressing to change it and the incision is open, edges aren't touching at all
+RED	TKA	indian_english	Knee stitches have opened, wound is open like a cut, kindly tell what to do immediately
+RED	ANY	hard_pos,indirect	The edges of my scar have pulled away from each other and it's wet and raw in between
+RED	ANY	question	dehisced?? my scar has opened in the middle
+RED	ANY	multi_symptom	The wound opened last night and now there's a bad smell coming from it
+RED	THA	multi_symptom	Week 2 after hip replacement. Stood up from the toilet and felt the wound tear. It's open and bleeding a bit.
+RED	ANY	hard_pos	I can fit the tip of my little finger into the gap in my scar
+RED	TKA	carer,indian_english,multi_symptom	Sir, my father's knee wound has split open after he slipped in bathroom. Blood and water coming. What to do?
+RED	ANY	typo	glue came off n whole cut has opened
+RED	TKA	hard_pos,indirect	Looks like a zip that's come undone down the middle of my knee
+RED	ANY	typo	staples came out by themselves n its gaping, pls advise
+RED	TKA	hard_pos,indirect	the skin over my knee has peeled back and there's something white and shiny underneath
+RED	ANY	indian_english	Opening in wound is increasing day by day, now it is like the size of thumb
+RED	THA	multi_symptom,temp_in_text	hip incision opened a bit at the bottom, now 38.9 and shivering
+RED	ANY	indian_english	Wound got opened today morning while doing exercise. Very scared, please call back.
+RED	ANY	hard_pos,indirect	can see the deep stitches underneath because the top skin has come apart
+RED	ANY	carer	Mum's leg wound burst open when the nurse removed the clips, it's now a big open gash
+RED	ANY	hard_pos,indirect	the scar has a dark hole in it that goes in deeper than I expected
+RED	TKA	indian_english	Knee wound is open 3 cm and clear water is coming continuously
+RED	ANY	typo	wounds wide open
+RED	THA	-	The incision on my hip has separated along most of its length since the staples came out yesterday
+RED	ANY	typo	scar splt open in the shower, theres a gap n i can see pink stuff deep in
+RED	ANY	indian_english	Wound is open since 2 days, I thought it will close itself but it is becoming bigger
+RED	ANY	multi_symptom	The scar has opened and there's thick yellow pus at the bottom of the gap
+RED	TKA	hard_pos	When I bend the knee the cut gapes and I can see right into it; when I straighten it closes again
+RED	ANY	-	Steri-strips fell off and the wound underneath is open about an inch, raw and red
+RED	ANY	carer	My wife's wound has opened at one end and keeps getting wider each time she moves
+RED	ANY	question	Should I worry that my wound has opened and I can see fatty tissue?
+RED	THA	indirect	Something under my hip dressing gave way with a rip and now there's an open groove where the scar was
+RED	ANY	-	I think my sutures broke, the wound is wide and weeping
+RED	TKA	indian_english,typo	knee wound opend fully after staples removal, plz help urgent
+RED	ANY	hard_pos,indirect	My scar now looks like two separate edges with a red valley between them
+RED	ANY	-	Wound came apart
+RED	ANY	multi_symptom	Feeling unwell, wound has opened up and the edges are going black
+RED	THA	multi_symptom	Five days since my hip surgery, I sneezed really hard while sitting on the edge of the bed and felt a tearing at the wound. The dressing is now full of blood and the cut underneath is open.
+RED	ANY	carer,indian_english	My mother-in-law's operation wound has opened little by little, now it is open around 2 inch. Kindly advise.
+RED	TKA	hard_pos	The middle of my knee incision now has a gap deep enough to see red tissue at the bottom
+RED	ANY	hard_pos,indirect	a flap of skin at the edge of the wound has lifted up and there's raw flesh under it
+RED	ANY	typo	help wound gaping after stiches out
+RED	TKA	-	I knelt on the floor by accident and the scar split, it's open and stinging
+RED	ANY	-	Clips removed on Friday, by Sunday the whole lower half of the wound had come undone
+RED	ANY	hard_pos,indirect	there's a slit in my scar and it's opening wider like a buttonhole
+RED	ANY	indian_english	Last night wound gap came suddenly and now inside meat is visible, what to do
+YELLOW	ANY	hard_neg,negation	Tiny gap at the very bottom of the scar, couple of mm, dry, no pus
+YELLOW	TKA	hard_neg	One staple at the top of my knee came out on its own, wound under it is still closed but a little red
+YELLOW	ANY	hard_neg,negation	Small opening at one end where a stitch was, about the size of a grain of rice, no smell, no discharge
+YELLOW	ANY	indian_english,negation	Little gap is there at end of wound, no pus, no blood. Is it ok?
+YELLOW	THA	-	A steri-strip came off and there's a tiny split at the edge of the hip scar with a drop of clear fluid
+YELLOW	ANY	typo,negation	small gap end of wound, dry, no ooze, shud i get it checked
+GREEN	ANY	hard_neg	Little scab came off in the shower, skin underneath is pink and closed
+GREEN	ANY	question	What should I do if my wound ever opens up?
+GREEN	TKA	question	Can bending my knee too far split the incision?
+GREEN	ANY	hard_neg,negation	Scar is fully closed, no gaps, no leaking, the steri-strips just fell off by themselves
+GREEN	ANY	carer,hard_neg	The nurse took Dad's staples out today, wound stayed closed and she was happy with it
+GREEN	ANY	question,indian_english	After staples removal how many days before wound becomes strong? Kindly tell

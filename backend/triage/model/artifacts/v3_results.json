@@ -1,0 +1,4901 @@
+{
+ "seeds": {
+  "v2": 0,
+  "v3": 0
+ },
+ "weights": {
+  "v2": "m2_main_v2_it3_seed0",
+  "v3": "m2_main_v3_it3_seed0"
+ },
+ "thresholds": {
+  "v2": {
+   "t_red": 0.35381320118904114,
+   "t_yel": 0.36271947622299194,
+   "t_alert": 0.6844116449356079
+  },
+  "v3": {
+   "t_red": 0.4215783178806305,
+   "t_yel": 0.4046885669231415,
+   "t_alert": 0.6046685576438904
+  }
+ },
+ "sets": {
+  "test": {
+   "rules": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 20,
+    "red_recall": 0.19230769230769232,
+    "red_recall_ci": [
+     0.12808145148564615,
+     0.27845476692320786
+    ],
+    "red_precision": 0.6666666666666666,
+    "macro_f1": 0.3569316175719643,
+    "red_to_green": 74,
+    "red_to_yellow": 10,
+    "yellow_to_red": 5,
+    "green_to_red": 5,
+    "yellow_to_green": 48,
+    "red_calls_per_100": 11.278195488721805,
+    "emails_per_100": 11.278195488721805,
+    "red_rows_emailed": 20,
+    "non_red_emails": 10,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.05,
+      "email": 0.05
+     },
+     "YELLOW": {
+      "red": 0.08064516129032258,
+      "email": 0.08064516129032258
+     },
+     "RED": {
+      "red": 0.19230769230769232,
+      "email": 0.19230769230769232
+     }
+    },
+    "adj_red_calls_per_100": 6.477667493796527,
+    "adj_emails_per_100": 6.477667493796527,
+    "adj_email_precision": 0.1484389963608504,
+    "over_triage": 10
+   },
+   "v2": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 96,
+    "red_recall": 0.9230769230769231,
+    "red_recall_ci": [
+     0.8555044531758775,
+     0.9605082465119483
+    ],
+    "red_precision": 0.8,
+    "macro_f1": 0.8034320034320035,
+    "red_to_green": 0,
+    "red_to_yellow": 8,
+    "yellow_to_red": 18,
+    "green_to_red": 6,
+    "yellow_to_green": 3,
+    "red_calls_per_100": 45.11278195488722,
+    "emails_per_100": 31.954887218045112,
+    "red_rows_emailed": 79,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.06,
+      "email": 0.02
+     },
+     "YELLOW": {
+      "red": 0.2903225806451613,
+      "email": 0.06451612903225806
+     },
+     "RED": {
+      "red": 0.9230769230769231,
+      "email": 0.7596153846153846
+     }
+    },
+    "adj_red_calls_per_100": 16.073449131513648,
+    "adj_emails_per_100": 6.810980148883375,
+    "adj_email_precision": 0.5576402867213757,
+    "over_triage": 24
+   },
+   "v3": {
+    "n": 266,
+    "n_red": 104,
+    "n_yellow": 62,
+    "n_green": 100,
+    "red_tp": 93,
+    "red_recall": 0.8942307692307693,
+    "red_recall_ci": [
+     0.8204688152838764,
+     0.9399066548797794
+    ],
+    "red_precision": 0.8303571428571429,
+    "macro_f1": 0.8088677107959024,
+    "red_to_green": 0,
+    "red_to_yellow": 11,
+    "yellow_to_red": 15,
+    "green_to_red": 4,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 42.10526315789474,
+    "emails_per_100": 34.962406015037594,
+    "red_rows_emailed": 84,
+    "non_red_emails": 9,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.04,
+      "email": 0.02
+     },
+     "YELLOW": {
+      "red": 0.24193548387096775,
+      "email": 0.11290322580645161
+     },
+     "RED": {
+      "red": 0.8942307692307693,
+      "email": 0.8076923076923077
+     }
+    },
+    "adj_red_calls_per_100": 13.31954094292804,
+    "adj_emails_per_100": 8.26104218362283,
+    "adj_email_precision": 0.4888561816652648,
+    "over_triage": 19
+   },
+   "v3_seeds": {
+    "red_recall": [
+     0.901923076923077,
+     0.007195494974565246
+    ],
+    "red_tp": [
+     93.8,
+     0.7483314773547882
+    ],
+    "red_to_green": [
+     0.8,
+     0.7483314773547883
+    ],
+    "yellow_to_red": [
+     17.4,
+     1.3564659966250536
+    ],
+    "green_to_red": [
+     4.8,
+     0.7483314773547882
+    ],
+    "over_triage": [
+     22.2,
+     1.9390719429665315
+    ],
+    "emails_per_100": [
+     36.16541353383458,
+     0.8372577989218066
+    ],
+    "macro_f1": [
+     0.793319843165871,
+     0.008047040825797332
+    ]
+   },
+   "live_check": {
+    "skipped": "default loads M2:m2_main_v2_it3_seed0, not M2:m2_main_v3_it3_seed0"
+   }
+  },
+  "challenge": {
+   "rules": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 14,
+    "red_recall": 0.2413793103448276,
+    "red_recall_ci": [
+     0.1495887429887828,
+     0.36529980358343395
+    ],
+    "red_precision": 0.4375,
+    "macro_f1": 0.33258519340650305,
+    "red_to_green": 39,
+    "red_to_yellow": 5,
+    "yellow_to_red": 6,
+    "green_to_red": 12,
+    "yellow_to_green": 27,
+    "red_calls_per_100": 21.333333333333332,
+    "emails_per_100": 21.333333333333332,
+    "red_rows_emailed": 14,
+    "non_red_emails": 18,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.2222222222222222,
+      "email": 0.2222222222222222
+     },
+     "YELLOW": {
+      "red": 0.15789473684210525,
+      "email": 0.15789473684210525
+     },
+     "RED": {
+      "red": 0.2413793103448276,
+      "email": 0.2413793103448276
+     }
+    },
+    "adj_red_calls_per_100": 20.70982052833232,
+    "adj_emails_per_100": 20.70982052833232,
+    "adj_email_precision": 0.0582765335929893,
+    "over_triage": 18
+   },
+   "v2": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 57,
+    "red_recall": 0.9827586206896551,
+    "red_recall_ci": [
+     0.9085914181442059,
+     0.9969499615876563
+    ],
+    "red_precision": 0.7402597402597403,
+    "macro_f1": 0.7358404558404558,
+    "red_to_green": 0,
+    "red_to_yellow": 1,
+    "yellow_to_red": 17,
+    "green_to_red": 3,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 51.333333333333336,
+    "emails_per_100": 41.333333333333336,
+    "red_rows_emailed": 53,
+    "non_red_emails": 9,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.05555555555555555,
+      "email": 0.0
+     },
+     "YELLOW": {
+      "red": 0.4473684210526316,
+      "email": 0.23684210526315788
+     },
+     "RED": {
+      "red": 0.9827586206896551,
+      "email": 0.9137931034482759
+     }
+    },
+    "adj_red_calls_per_100": 19.986892518652954,
+    "adj_emails_per_100": 10.490018148820326,
+    "adj_email_precision": 0.4355536332179932,
+    "over_triage": 20
+   },
+   "v3": {
+    "n": 150,
+    "n_red": 58,
+    "n_yellow": 38,
+    "n_green": 54,
+    "red_tp": 55,
+    "red_recall": 0.9482758620689655,
+    "red_recall_ci": [
+     0.8586059871294194,
+     0.9822538654787383
+    ],
+    "red_precision": 0.8088235294117647,
+    "macro_f1": 0.7626551226551227,
+    "red_to_green": 0,
+    "red_to_yellow": 3,
+    "yellow_to_red": 12,
+    "green_to_red": 1,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 45.333333333333336,
+    "emails_per_100": 38.0,
+    "red_rows_emailed": 53,
+    "non_red_emails": 4,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.018518518518518517,
+      "email": 0.0
+     },
+     "YELLOW": {
+      "red": 0.3157894736842105,
+      "email": 0.10526315789473684
+     },
+     "RED": {
+      "red": 0.9482758620689655,
+      "email": 0.9137931034482759
+     }
+    },
+    "adj_red_calls_per_100": 13.932412448746387,
+    "adj_emails_per_100": 7.200544464609801,
+    "adj_email_precision": 0.6345305608065532,
+    "over_triage": 13
+   },
+   "v3_seeds": {
+    "red_recall": [
+     0.9551724137931036,
+     0.00844651635442477
+    ],
+    "red_tp": [
+     55.4,
+     0.4898979485566356
+    ],
+    "red_to_green": [
+     0.0,
+     0.0
+    ],
+    "yellow_to_red": [
+     14.0,
+     2.1908902300206643
+    ],
+    "green_to_red": [
+     2.0,
+     0.6324555320336759
+    ],
+    "over_triage": [
+     16.0,
+     2.5298221281347035
+    ],
+    "emails_per_100": [
+     37.86666666666666,
+     1.066666666666668
+    ],
+    "macro_f1": [
+     0.7601704762152901,
+     0.012868647766821546
+    ]
+   },
+   "live_check": {
+    "skipped": "default loads M2:m2_main_v2_it3_seed0, not M2:m2_main_v3_it3_seed0"
+   }
+  },
+  "challenge_v2": {
+   "rules": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 13,
+    "red_recall": 0.5,
+    "red_recall_ci": [
+     0.32060593402470916,
+     0.6793940659752908
+    ],
+    "red_precision": 0.38235294117647056,
+    "macro_f1": 0.44907644217107134,
+    "red_to_green": 7,
+    "red_to_yellow": 6,
+    "yellow_to_red": 10,
+    "green_to_red": 11,
+    "yellow_to_green": 12,
+    "red_calls_per_100": 37.77777777777778,
+    "emails_per_100": 37.77777777777778,
+    "red_rows_emailed": 13,
+    "non_red_emails": 21,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.34375,
+      "email": 0.34375
+     },
+     "YELLOW": {
+      "red": 0.3125,
+      "email": 0.3125
+     },
+     "RED": {
+      "red": 0.5,
+      "email": 0.5
+     }
+    },
+    "adj_red_calls_per_100": 34.375,
+    "adj_emails_per_100": 34.375,
+    "adj_email_precision": 0.07272727272727272,
+    "over_triage": 21
+   },
+   "v2": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 25,
+    "red_recall": 0.9615384615384616,
+    "red_recall_ci": [
+     0.8110722092608273,
+     0.9931780150820144
+    ],
+    "red_precision": 0.6756756756756757,
+    "macro_f1": 0.7417432470064048,
+    "red_to_green": 0,
+    "red_to_yellow": 1,
+    "yellow_to_red": 10,
+    "green_to_red": 2,
+    "yellow_to_green": 4,
+    "red_calls_per_100": 41.111111111111114,
+    "emails_per_100": 31.11111111111111,
+    "red_rows_emailed": 22,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.0625,
+      "email": 0.03125
+     },
+     "YELLOW": {
+      "red": 0.3125,
+      "email": 0.15625
+     },
+     "RED": {
+      "red": 0.9615384615384616,
+      "email": 0.8461538461538461
+     }
+    },
+    "adj_red_calls_per_100": 16.995192307692307,
+    "adj_emails_per_100": 10.32451923076923,
+    "adj_email_precision": 0.40977881257275905,
+    "over_triage": 12
+   },
+   "v3": {
+    "n": 90,
+    "n_red": 26,
+    "n_yellow": 32,
+    "n_green": 32,
+    "red_tp": 25,
+    "red_recall": 0.9615384615384616,
+    "red_recall_ci": [
+     0.8110722092608273,
+     0.9931780150820144
+    ],
+    "red_precision": 0.7352941176470589,
+    "macro_f1": 0.7547621252817142,
+    "red_to_green": 0,
+    "red_to_yellow": 1,
+    "yellow_to_red": 8,
+    "green_to_red": 1,
+    "yellow_to_green": 5,
+    "red_calls_per_100": 37.77777777777778,
+    "emails_per_100": 32.22222222222222,
+    "red_rows_emailed": 23,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.03125,
+      "email": 0.03125
+     },
+     "YELLOW": {
+      "red": 0.25,
+      "email": 0.15625
+     },
+     "RED": {
+      "red": 0.9615384615384616,
+      "email": 0.8846153846153846
+     }
+    },
+    "adj_red_calls_per_100": 13.245192307692308,
+    "adj_emails_per_100": 10.516826923076923,
+    "adj_email_precision": 0.4205714285714286,
+    "over_triage": 9
+   },
+   "v3_seeds": {
+    "red_recall": [
+     0.976923076923077,
+     0.018842228790639817
+    ],
+    "red_tp": [
+     25.4,
+     0.4898979485566356
+    ],
+    "red_to_green": [
+     0.0,
+     0.0
+    ],
+    "yellow_to_red": [
+     8.6,
+     1.0198039027185568
+    ],
+    "green_to_red": [
+     2.0,
+     0.8944271909999159
+    ],
+    "over_triage": [
+     10.6,
+     1.624807680927192
+    ],
+    "emails_per_100": [
+     34.222222222222214,
+     1.2957670877434007
+    ],
+    "macro_f1": [
+     0.7492161504663494,
+     0.012789387693903793
+    ]
+   },
+   "live_check": {
+    "skipped": "default loads M2:m2_main_v2_it3_seed0, not M2:m2_main_v3_it3_seed0"
+   }
+  },
+  "challenge_v3": {
+   "rules": {
+    "n": 91,
+    "n_red": 33,
+    "n_yellow": 33,
+    "n_green": 25,
+    "red_tp": 12,
+    "red_recall": 0.36363636363636365,
+    "red_recall_ci": [
+     0.22187178144210248,
+     0.5338382182894987
+    ],
+    "red_precision": 0.7058823529411765,
+    "macro_f1": 0.4303379224030037,
+    "red_to_green": 18,
+    "red_to_yellow": 3,
+    "yellow_to_red": 3,
+    "green_to_red": 2,
+    "yellow_to_green": 22,
+    "red_calls_per_100": 18.681318681318682,
+    "emails_per_100": 18.681318681318682,
+    "red_rows_emailed": 12,
+    "non_red_emails": 5,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.08,
+      "email": 0.08
+     },
+     "YELLOW": {
+      "red": 0.09090909090909091,
+      "email": 0.09090909090909091
+     },
+     "RED": {
+      "red": 0.36363636363636365,
+      "email": 0.36363636363636365
+     }
+    },
+    "adj_red_calls_per_100": 9.690909090909091,
+    "adj_emails_per_100": 9.690909090909091,
+    "adj_email_precision": 0.1876172607879925,
+    "over_triage": 5
+   },
+   "v2": {
+    "n": 91,
+    "n_red": 33,
+    "n_yellow": 33,
+    "n_green": 25,
+    "red_tp": 21,
+    "red_recall": 0.6363636363636364,
+    "red_recall_ci": [
+     0.46616178171050116,
+     0.7781282185578974
+    ],
+    "red_precision": 0.7241379310344828,
+    "macro_f1": 0.6963946869070208,
+    "red_to_green": 2,
+    "red_to_yellow": 10,
+    "yellow_to_red": 5,
+    "green_to_red": 3,
+    "yellow_to_green": 5,
+    "red_calls_per_100": 31.86813186813187,
+    "emails_per_100": 16.483516483516482,
+    "red_rows_emailed": 13,
+    "non_red_emails": 2,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.12,
+      "email": 0.04
+     },
+     "YELLOW": {
+      "red": 0.15151515151515152,
+      "email": 0.030303030303030304
+     },
+     "RED": {
+      "red": 0.6363636363636364,
+      "email": 0.3939393939393939
+     }
+    },
+    "adj_red_calls_per_100": 15.36969696969697,
+    "adj_emails_per_100": 5.527272727272727,
+    "adj_email_precision": 0.35635964912280704,
+    "over_triage": 8
+   },
+   "v3": {
+    "n": 91,
+    "n_red": 33,
+    "n_yellow": 33,
+    "n_green": 25,
+    "red_tp": 25,
+    "red_recall": 0.7575757575757576,
+    "red_recall_ci": [
+     0.589753800292784,
+     0.871682866880858
+    ],
+    "red_precision": 0.9259259259259259,
+    "macro_f1": 0.7785103785103785,
+    "red_to_green": 3,
+    "red_to_yellow": 5,
+    "yellow_to_red": 1,
+    "green_to_red": 1,
+    "yellow_to_green": 5,
+    "red_calls_per_100": 29.67032967032967,
+    "emails_per_100": 26.373626373626372,
+    "red_rows_emailed": 23,
+    "non_red_emails": 1,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.04,
+      "email": 0.04
+     },
+     "YELLOW": {
+      "red": 0.030303030303030304,
+      "email": 0.0
+     },
+     "RED": {
+      "red": 0.7575757575757576,
+      "email": 0.696969696969697
+     }
+    },
+    "adj_red_calls_per_100": 7.345454545454546,
+    "adj_emails_per_100": 6.284848484848485,
+    "adj_email_precision": 0.5544840887174542,
+    "over_triage": 2
+   },
+   "v3_seeds": {
+    "red_recall": [
+     0.8242424242424242,
+     0.04453617714151235
+    ],
+    "red_tp": [
+     27.2,
+     1.4696938456699067
+    ],
+    "red_to_green": [
+     2.4,
+     0.4898979485566356
+    ],
+    "yellow_to_red": [
+     1.6,
+     0.8
+    ],
+    "green_to_red": [
+     1.0,
+     0.0
+    ],
+    "over_triage": [
+     2.6,
+     0.8
+    ],
+    "emails_per_100": [
+     27.692307692307697,
+     0.8223422828074608
+    ],
+    "macro_f1": [
+     0.8112772651631266,
+     0.02288529680284191
+    ]
+   },
+   "live_check": {
+    "skipped": "default loads M2:m2_main_v2_it3_seed0, not M2:m2_main_v3_it3_seed0"
+   }
+  },
+  "integration": {
+   "rules": {
+    "n": 272,
+    "n_red": 22,
+    "n_yellow": 83,
+    "n_green": 167,
+    "red_tp": 17,
+    "red_recall": 0.7727272727272727,
+    "red_recall_ci": [
+     0.5656004665183513,
+     0.898769600787933
+    ],
+    "red_precision": 0.8947368421052632,
+    "macro_f1": 0.6951731472637396,
+    "red_to_green": 2,
+    "red_to_yellow": 3,
+    "yellow_to_red": 2,
+    "green_to_red": 0,
+    "yellow_to_green": 58,
+    "red_calls_per_100": 6.985294117647059,
+    "emails_per_100": 6.985294117647059,
+    "red_rows_emailed": 17,
+    "non_red_emails": 2,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.0,
+      "email": 0.0
+     },
+     "YELLOW": {
+      "red": 0.024096385542168676,
+      "email": 0.024096385542168676
+     },
+     "RED": {
+      "red": 0.7727272727272727,
+      "email": 0.7727272727272727
+     }
+    },
+    "adj_red_calls_per_100": 4.466046002190581,
+    "adj_emails_per_100": 4.466046002190581,
+    "adj_email_precision": 0.8651134273451869,
+    "over_triage": 2
+   },
+   "v2": {
+    "n": 272,
+    "n_red": 22,
+    "n_yellow": 83,
+    "n_green": 167,
+    "red_tp": 21,
+    "red_recall": 0.9545454545454546,
+    "red_recall_ci": [
+     0.7820195397089796,
+     0.991930572468161
+    ],
+    "red_precision": 0.21875,
+    "macro_f1": 0.46635054271156556,
+    "red_to_green": 1,
+    "red_to_yellow": 0,
+    "yellow_to_red": 59,
+    "green_to_red": 16,
+    "yellow_to_green": 5,
+    "red_calls_per_100": 35.294117647058826,
+    "emails_per_100": 21.691176470588236,
+    "red_rows_emailed": 21,
+    "non_red_emails": 38,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.09580838323353294,
+      "email": 0.03592814371257485
+     },
+     "YELLOW": {
+      "red": 0.7108433734939759,
+      "email": 0.3855421686746988
+     },
+     "RED": {
+      "red": 0.9545454545454546,
+      "email": 0.9545454545454546
+     }
+    },
+    "adj_red_calls_per_100": 29.250398436423975,
+    "adj_emails_per_100": 16.926251549474983,
+    "adj_email_precision": 0.2819718978402701,
+    "over_triage": 75
+   },
+   "v3": {
+    "n": 272,
+    "n_red": 22,
+    "n_yellow": 83,
+    "n_green": 167,
+    "red_tp": 21,
+    "red_recall": 0.9545454545454546,
+    "red_recall_ci": [
+     0.7820195397089796,
+     0.991930572468161
+    ],
+    "red_precision": 0.3442622950819672,
+    "macro_f1": 0.6159210756067749,
+    "red_to_green": 1,
+    "red_to_yellow": 0,
+    "yellow_to_red": 32,
+    "green_to_red": 8,
+    "yellow_to_green": 9,
+    "red_calls_per_100": 22.426470588235293,
+    "emails_per_100": 16.91176470588235,
+    "red_rows_emailed": 21,
+    "non_red_emails": 25,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.04790419161676647,
+      "email": 0.03592814371257485
+     },
+     "YELLOW": {
+      "red": 0.3855421686746988,
+      "email": 0.2289156626506024
+     },
+     "RED": {
+      "red": 0.9545454545454546,
+      "email": 0.9545454545454546
+     }
+    },
+    "adj_red_calls_per_100": 17.764574902768395,
+    "adj_emails_per_100": 13.010588898872571,
+    "adj_email_precision": 0.3668340695278484,
+    "over_triage": 40
+   },
+   "v3_seeds": {
+    "red_recall": [
+     0.9545454545454547,
+     1.1102230246251565e-16
+    ],
+    "red_tp": [
+     21.0,
+     0.0
+    ],
+    "red_to_green": [
+     1.0,
+     0.0
+    ],
+    "yellow_to_red": [
+     41.8,
+     5.192301994298868
+    ],
+    "green_to_red": [
+     10.0,
+     1.4142135623730951
+    ],
+    "over_triage": [
+     51.8,
+     6.337191807101943
+    ],
+    "emails_per_100": [
+     18.16176470588235,
+     0.8884592627643068
+    ],
+    "macro_f1": [
+     0.5649187421237472,
+     0.028005628577017924
+    ]
+   },
+   "live_check": {
+    "skipped": "default loads M2:m2_main_v2_it3_seed0, not M2:m2_main_v3_it3_seed0"
+   }
+  },
+  "unseen_test": {
+   "rules": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 6,
+    "red_recall": 0.05714285714285714,
+    "red_recall_ci": [
+     0.026449634282568767,
+     0.11909654861610877
+    ],
+    "red_precision": 0.5,
+    "macro_f1": 0.27299593830206076,
+    "red_to_green": 81,
+    "red_to_yellow": 18,
+    "yellow_to_red": 2,
+    "green_to_red": 4,
+    "yellow_to_green": 54,
+    "red_calls_per_100": 4.363636363636363,
+    "emails_per_100": 4.363636363636363,
+    "red_rows_emailed": 6,
+    "non_red_emails": 6,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.037037037037037035,
+      "email": 0.037037037037037035
+     },
+     "YELLOW": {
+      "red": 0.03225806451612903,
+      "email": 0.03225806451612903
+     },
+     "RED": {
+      "red": 0.05714285714285714,
+      "email": 0.05714285714285714
+     }
+    },
+    "adj_red_calls_per_100": 3.6847584912101037,
+    "adj_emails_per_100": 3.6847584912101037,
+    "adj_email_precision": 0.0775394877020705,
+    "over_triage": 6
+   },
+   "v2": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 100,
+    "red_recall": 0.9523809523809523,
+    "red_recall_ci": [
+     0.8933383335512599,
+     0.9794908344554671
+    ],
+    "red_precision": 0.7194244604316546,
+    "macro_f1": 0.7079004783922818,
+    "red_to_green": 1,
+    "red_to_yellow": 4,
+    "yellow_to_red": 32,
+    "green_to_red": 7,
+    "yellow_to_green": 2,
+    "red_calls_per_100": 50.54545454545455,
+    "emails_per_100": 32.0,
+    "red_rows_emailed": 71,
+    "non_red_emails": 17,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.06481481481481481,
+      "email": 0.009259259259259259
+     },
+     "YELLOW": {
+      "red": 0.5161290322580645,
+      "email": 0.25806451612903225
+     },
+     "RED": {
+      "red": 0.9523809523809523,
+      "email": 0.6761904761904762
+     }
+    },
+    "adj_red_calls_per_100": 22.20216760539341,
+    "adj_emails_per_100": 10.480713432326336,
+    "adj_email_precision": 0.32258799964173174,
+    "over_triage": 39
+   },
+   "v3": {
+    "n": 275,
+    "n_red": 105,
+    "n_yellow": 62,
+    "n_green": 108,
+    "red_tp": 92,
+    "red_recall": 0.8761904761904762,
+    "red_recall_ci": [
+     0.7996280026720612,
+     0.9261983580914277
+    ],
+    "red_precision": 0.7419354838709677,
+    "macro_f1": 0.6508962959981462,
+    "red_to_green": 1,
+    "red_to_yellow": 12,
+    "yellow_to_red": 28,
+    "green_to_red": 4,
+    "yellow_to_green": 2,
+    "red_calls_per_100": 45.09090909090909,
+    "emails_per_100": 29.818181818181817,
+    "red_rows_emailed": 68,
+    "non_red_emails": 14,
+    "per_class_rates": {
+     "GREEN": {
+      "red": 0.037037037037037035,
+      "email": 0.009259259259259259
+     },
+     "YELLOW": {
+      "red": 0.45161290322580644,
+      "email": 0.20967741935483872
+     },
+     "RED": {
+      "red": 0.8761904761904762,
+      "email": 0.6476190476190476
+     }
+    },
+    "adj_red_calls_per_100": 18.26386755419013,
+    "adj_emails_per_100": 9.128178870114354,
+    "adj_email_precision": 0.3547361729179911,
+    "over_triage": 32
+   }
+  }
+ },
+ "model_info": {
+  "model_used": "M2:m2_main_v2_it3_seed0",
+  "t_red": 0.35381320118904114,
+  "t_yel": 0.36271947622299194,
+  "t_alert": 0.6844116449356079,
+  "load_error": null,
+  "load_warning": null,
+  "selection_file": "selection_v2.json"
+ },
+ "unseen_seeds": {
+  "v2": 1,
+  "v3": 2
+ },
+ "rule": {
+  "c1_test_red_recall": {
+   "pass": false,
+   "v2_red_tp": 96,
+   "v3_red_tp": 93,
+   "n_red": 104
+  },
+  "c2_red_to_green": {
+   "pass": false,
+   "per_set": {
+    "test": true,
+    "challenge": true,
+    "challenge_v2": true,
+    "challenge_v3": false,
+    "integration": true,
+    "unseen_test": true
+   }
+  },
+  "c3_over_triage": {
+   "pass": true,
+   "per_set": {
+    "challenge_v3": true,
+    "integration": true
+   }
+  },
+  "ship_v3": false
+ },
+ "categories": {
+  "challenge_v3:short_single_symptom": {
+   "n": 37,
+   "R": 8,
+   "Y": 16,
+   "G": 13,
+   "v2_red_tp": 8,
+   "v3_red_tp": 5,
+   "v2_over": 8,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 1
+  },
+  "challenge_v3:red_in_routine_question": {
+   "n": 30,
+   "R": 20,
+   "Y": 5,
+   "G": 5,
+   "v2_red_tp": 9,
+   "v3_red_tp": 17,
+   "v2_over": 0,
+   "v3_over": 0,
+   "v2_r2g": 2,
+   "v3_r2g": 1
+  },
+  "challenge_v3:mixed": {
+   "n": 24,
+   "R": 5,
+   "Y": 12,
+   "G": 7,
+   "v2_red_tp": 4,
+   "v3_red_tp": 3,
+   "v2_over": 0,
+   "v3_over": 0,
+   "v2_r2g": 0,
+   "v3_r2g": 1
+  },
+  "challenge_v2:negation": {
+   "n": 30,
+   "R": 6,
+   "Y": 8,
+   "G": 16,
+   "v2_red_tp": 5,
+   "v3_red_tp": 6,
+   "v2_over": 2,
+   "v3_over": 3,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge_v2:wound_minimal_pair": {
+   "n": 36,
+   "R": 18,
+   "Y": 18,
+   "G": 0,
+   "v2_red_tp": 18,
+   "v3_red_tp": 17,
+   "v2_over": 8,
+   "v3_over": 5,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge_v2:routine_multi_topic": {
+   "n": 24,
+   "R": 2,
+   "Y": 6,
+   "G": 16,
+   "v2_red_tp": 2,
+   "v3_red_tp": 2,
+   "v2_over": 2,
+   "v3_over": 1,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:negation": {
+   "n": 20,
+   "R": 4,
+   "Y": 4,
+   "G": 12,
+   "v2_red_tp": 4,
+   "v3_red_tp": 4,
+   "v2_over": 1,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:keyword_free_red": {
+   "n": 20,
+   "R": 20,
+   "Y": 0,
+   "G": 0,
+   "v2_red_tp": 20,
+   "v3_red_tp": 19,
+   "v2_over": 0,
+   "v3_over": 0,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:indian_english": {
+   "n": 21,
+   "R": 7,
+   "Y": 7,
+   "G": 7,
+   "v2_red_tp": 6,
+   "v3_red_tp": 6,
+   "v2_over": 2,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:typo_or_slang": {
+   "n": 21,
+   "R": 8,
+   "Y": 7,
+   "G": 6,
+   "v2_red_tp": 8,
+   "v3_red_tp": 7,
+   "v2_over": 5,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:numeric_in_text": {
+   "n": 21,
+   "R": 7,
+   "Y": 7,
+   "G": 7,
+   "v2_red_tp": 7,
+   "v3_red_tp": 7,
+   "v2_over": 3,
+   "v3_over": 1,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:multi_symptom": {
+   "n": 20,
+   "R": 9,
+   "Y": 8,
+   "G": 3,
+   "v2_red_tp": 9,
+   "v3_red_tp": 9,
+   "v2_over": 3,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:benign_scary_word": {
+   "n": 20,
+   "R": 0,
+   "Y": 3,
+   "G": 17,
+   "v2_red_tp": 0,
+   "v3_red_tp": 0,
+   "v2_over": 3,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  },
+  "challenge:audit_regression": {
+   "n": 7,
+   "R": 3,
+   "Y": 2,
+   "G": 2,
+   "v2_red_tp": 3,
+   "v3_red_tp": 3,
+   "v2_over": 3,
+   "v3_over": 2,
+   "v2_r2g": 0,
+   "v3_r2g": 0
+  }
+ },
+ "examples": [
+  {
+   "set": "integration",
+   "id": "INT-227",
+   "text": "I have severe calf pain and swelling, can I still do my exercises?",
+   "label": "RED",
+   "v2": "GREEN",
+   "v2_p_red": 0.011224940419197083,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.016385214403271675,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-089",
+   "text": "My knee is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7213857769966125,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3489498496055603,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-073",
+   "text": "My knee pain suddenly got much worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7623265385627747,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5546826720237732,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-087",
+   "text": "My pain suddenly got much worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7389880418777466,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5529637336730957,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-124",
+   "text": "My knee is more swollen today and hurts.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8090735673904419,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5588683485984802,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-266",
+   "text": "My knee is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7395113706588745,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.359080970287323,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-267",
+   "text": "My hip is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7710251808166504,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.4407085180282593,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-268",
+   "text": "My ankle is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8439995050430298,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7222215533256531,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-098",
+   "text": "My hip has started aching today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6653565764427185,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.33603551983833313,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-271",
+   "text": "My knee is sore.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5704021453857422,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.1333436220884323,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-076",
+   "text": "My knee hurts.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7251878976821899,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2979825437068939,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-263",
+   "text": "My pain suddenly got worse today, and it's mostly behind the knee.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5438554286956787,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4002947509288788,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-261",
+   "text": "My knee is sore and a bit tender. It started suddenly, I feel it mostly behind the knee, it's been getting worse, and the knee feels stiff.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8635715842247009,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7141420245170593,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-105",
+   "text": "My knee pain is 6 out of 10, it started suddenly behind the knee and it is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8772870898246765,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.779991626739502,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-078",
+   "text": "My incision hurts and there is yellow fluid coming out.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.893586277961731,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8844261765480042,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-197",
+   "text": "My wound looks more red today and it's leaking some fluid.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7404873371124268,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6897489428520203,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-003",
+   "text": "My wound looks a bit red today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.47742730379104614,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.4295922815799713,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-055",
+   "text": "Since I didn't take my medicine yesterday, my knee wound is worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7557745575904846,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5482779741287231,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-056",
+   "text": "I am anxious, my knee hurts, and I need help with exercises",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.25168555974960327,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.07702282816171646,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-064",
+   "text": "I cannot keep fluids down and I am hardly urinating.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.78238445520401,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6738631129264832,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-066",
+   "text": "I feel hopeless and cannot function.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7530175447463989,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5270793437957764,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-065",
+   "text": "I feel scared to move my leg.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.6008538603782654,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.6318885684013367,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-013",
+   "text": "I have severe calf pain and swelling in my calf.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.792609453201294,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7506769299507141,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-090",
+   "text": "My calf is swollen.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.8579132556915283,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8147170543670654,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-001",
+   "text": "I have severe chest pain and can't breathe.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.9695735573768616,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.9653350114822388,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  }
+ ],
+ "challenge_v3_short": [
+  {
+   "set": "challenge_v3",
+   "id": "CH3-001",
+   "text": "Knee is stiff first thing in the morning.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.10452969372272491,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.0053606824949383736,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-002",
+   "text": "scar is itchy, all healed over",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4013812243938446,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.05992161110043526,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-003",
+   "text": "Little bruise on my tummy where the injections go.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.07451895624399185,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.012663768604397774,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-004",
+   "text": "Ankle puffs up by evening, gone by morning.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.02316313050687313,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.010010354220867157,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-005",
+   "text": "Temp is 37.2 today.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.08559702336788177,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.03827819600701332,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-006",
+   "text": "Hip clicks sometimes, doesn't hurt.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.007729907985776663,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.0031182081438601017,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-007",
+   "text": "Thigh feels tight like a band.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.06354615092277527,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.019412830471992493,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-008",
+   "text": "Bit achy after my physio session, settles with rest.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.013134143315255642,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.009217587299644947,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-009",
+   "text": "Numb patch next to the scar, same as since the op.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.008212578482925892,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.010594544000923634,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-010",
+   "text": "Feeling a bit low today but managing.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.017835300415754318,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.0060526044107973576,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-011",
+   "text": "Bruise on my thigh is turning yellow.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.8637191653251648,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7457151412963867,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-012",
+   "text": "Not sleeping great, but coping.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.0071539427153766155,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.006326830945909023,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-013",
+   "text": "tiny dot of blood on the dressing, not growing",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5480906367301941,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.08799906820058823,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-014",
+   "text": "My knee is puffy.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7739675045013428,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5993700623512268,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-015",
+   "text": "Hip looks swollen today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.46935850381851196,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.31016871333122253,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-016",
+   "text": "Running 38.1 on the thermometer since lunch.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.07773923128843307,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.08396987617015839,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "moderate_fever",
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-017",
+   "text": "Clear fluid leaking from the bottom of the cut.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.4847103953361511,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.299691379070282,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-018",
+   "text": "Stitches are pulling and sore.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.3476642668247223,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.06775926798582077,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-019",
+   "text": "Haven't managed to open my bowels since Monday and it's Friday now.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.11041493713855743,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.07025905698537827,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-020",
+   "text": "Feel sick after my painkillers.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.2974582314491272,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.10107003152370453,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-021",
+   "text": "Itchy rash on my chest since the new pills.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.05500344932079315,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.03223171830177307,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-022",
+   "text": "Pain gets a little worse every day.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.10177939385175705,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.02221650630235672,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-023",
+   "text": "Forgot yesterday's blood thinner injection.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.130865216255188,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.050874169915914536,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-024",
+   "text": "Knee clunks and feels like it might give way.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.24081681668758392,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.09695696830749512,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-025",
+   "text": "Edge of the scar is a bit red and warm.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.2829362750053406,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.21566031873226166,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-026",
+   "text": "Feeling feverish tonight.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5264407992362976,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3289216458797455,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-027",
+   "text": "Dizzy when I stand up.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.34325072169303894,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.21291093528270721,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-028",
+   "text": "Knee aches more today.",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.3456219434738159,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.03253982588648796,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-029",
+   "text": "Wound feels hot.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6101412773132324,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.24650858342647552,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-030",
+   "text": "Back of my calf is rock hard and burning.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.950958251953125,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.9764108061790466,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-031",
+   "text": "Toes have gone white and cold.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.8367400765419006,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8610147833824158,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-032",
+   "text": "Breathless just sitting still.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.397963285446167,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.1609453558921814,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-033",
+   "text": "Thermometer says 102.4F.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.11393513530492783,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.08812659978866577,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "high_fever"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-034",
+   "text": "Wound has burst open.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.8370644450187683,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8088189959526062,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-035",
+   "text": "Hip went pop, can't stand on it.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.9469441771507263,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.9362586736679077,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-036",
+   "text": "Peeing blood since this morning.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.5533738136291504,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.36502939462661743,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-037",
+   "text": "Coughed up blood just now.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.5751698017120361,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.37282976508140564,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  }
+ ],
+ "red_misses": [
+  {
+   "set": "test",
+   "id": "ALLERGIC_REACTION-013",
+   "text": "Wheezy and chest tight since the tramadol, never had asthma",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.05889797955751419,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.04115801677107811,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "BLEEDING_ANTICOAG-037",
+   "text": "My mother is passing blood with stool and she is on blood thinner after knee replacement. Kindly guide.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.2017679214477539,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.06912738084793091,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-012",
+   "text": "My father is shouting with pain in leg after knee surgery. Tramadol given 1 hour back but no relief. Leg is tight.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.08011937886476517,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.04403138533234596,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-058",
+   "text": "Is so much pain normal on day 2? Leg is very tight and stiff like wood and no medicine is working.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.05783567205071449,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.14354199171066284,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-059",
+   "text": "The pain is getting worse hour by hour and it's out of all proportion. I've had the other knee done and it was nothing like this.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.19719038903713226,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2107103317975998,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "CONSTIPATION-015",
+   "text": "Nearly passed out on the toilet while straining, my husband had to help me back to bed. Still nothing out after four days.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.3686717450618744,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.17731128633022308,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "DVT_CALF-054",
+   "text": "Swelling in my thigh is getting bigger by the day and it's painful to touch, even after resting with it up.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.4045394957065582,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3435649573802948,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "LOW_FEVER-040",
+   "text": "Mum's mild temp of 38.2 but she's muddled and forgetting things today",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.16445094347000122,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2137494832277298,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "moderate_fever",
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "SEPSIS_WOUND-014",
+   "text": "drew a pen line round the redness at lunch like the nurse said, it's gone past the line by two fingers already",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.4828607141971588,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3574948012828827,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "SRC-SEPSIS_WOUND-03",
+   "text": "The redness around the surgical cut has spread 4 inches with burning pain and fever.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.31571435928344727,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29458457231521606,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "test",
+   "id": "WOUND_OPEN-030",
+   "text": "When I bend the knee the cut gapes and I can see right into it; when I straighten it closes again",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.19388899207115173,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.1743047684431076,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge",
+   "id": "CH-023",
+   "text": "Every few steps I have to stop and lean on the wall to get air",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.5281480550765991,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.31603679060935974,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge",
+   "id": "CH-061",
+   "text": "Thoda chest mein dard hai and saans lene mein problem, since one hour",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.29495203495025635,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.23629878461360931,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge",
+   "id": "CH-071",
+   "text": "puss comin out n it stinks",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.6270459890365601,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3226456642150879,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v2",
+   "id": "CH2-030",
+   "text": "Not dizzy, but I've had black tarry poo twice since starting the blood thinner",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.28226539492607117,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.4561695456504822,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v2",
+   "id": "CH2-038",
+   "text": "The red patch next to the scar was coin-sized yesterday, now it's the size of my hand",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.43860307335853577,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3779340386390686,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-032",
+   "text": "Breathless just sitting still.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.397963285446167,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.1609453558921814,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-036",
+   "text": "Peeing blood since this morning.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.5533738136291504,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.36502939462661743,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-037",
+   "text": "Coughed up blood just now.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.5751698017120361,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.37282976508140564,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-039",
+   "text": "Is it fine to go to physio tomorrow even though my chest hurts when I take a deep breath?",
+   "label": "RED",
+   "v2": "GREEN",
+   "v2_p_red": 0.015707405284047127,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.1225113570690155,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-040",
+   "text": "What's a good iron-rich diet? I've had black sticky stools twice since starting the blood thinner.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.0690964013338089,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.32267799973487854,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-041",
+   "text": "How many laps of the corridor should I do? I got really breathless and nearly passed out on the first one.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.30374178290367126,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.8982762098312378,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-044",
+   "text": "Which foods help with nausea? I vomited and it looked like coffee grounds.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.3276771008968353,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.6279743313789368,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-046",
+   "text": "When do I start the stairs exercise? Also my foot has gone numb and cold since this afternoon.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.2594987452030182,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.6903082728385925,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-047",
+   "text": "Do I need to keep the pillow between my legs at night? I heard a pop when I turned and now my leg looks shorter.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.05085969716310501,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.532279908657074,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-050",
+   "text": "Should I still take my walk today? My calf hurts when I flex my foot and it's warmer than the other side.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.2600853145122528,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.7150947451591492,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-051",
+   "text": "My physio said 3 sets of 10, is that too much? The pain is unbearable, the leg feels tight as a drum and the tablets do nothing.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.06476547569036484,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.22491072118282318,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-054",
+   "text": "Can I sit in the recliner? My lips and tongue started swelling after the new antibiotic.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.3521353304386139,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.7357062697410583,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-055",
+   "text": "Is it okay to drive to my physio appointment? I fainted in the kitchen this morning.",
+   "label": "RED",
+   "v2": "GREEN",
+   "v2_p_red": 0.053259868174791336,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.43423864245414734,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-057",
+   "text": "shud i still do the quad sets? wound split open when i bent it, can see inside",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.24908612668514252,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.822787880897522,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-090",
+   "text": "Calf is sore and swollen, and my knee is stiff. Can I do my stretches?",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.14791147410869598,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.04983995109796524,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "challenge_v3",
+   "id": "CH3-091",
+   "text": "Mum's knee is swollen and she seems confused today. Kindly advise.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.3837270438671112,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.39588209986686707,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-227",
+   "text": "I have severe calf pain and swelling, can I still do my exercises?",
+   "label": "RED",
+   "v2": "GREEN",
+   "v2_p_red": 0.011224940419197083,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.016385214403271675,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-001",
+   "text": "lips swelling up after the new antibiotic",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.17307430505752563,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.04239194467663765,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-003",
+   "text": "Throat feels tight and I'm wheezing after my first dose of the new painkiller",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.29457250237464905,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.1656455248594284,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-006",
+   "text": "face puffin up after codeine, feels weird to swallow",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.3165253698825836,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.10776800662279129,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-013",
+   "text": "Wheezy and chest tight since the tramadol, never had asthma",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.02789093554019928,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.030696116387844086,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-014",
+   "text": "throat closin up i think, took antibiotic 30 min ago",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.3678523004055023,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.20455609261989594,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-017",
+   "text": "Itchy everywhere, lips fat, and feel dizzy since taking the first amoxicillin",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.10012967139482498,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.09221745282411575,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-023",
+   "text": "There's a whistling sound when I breathe out, began after the new medication",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.21140258014202118,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.1803450584411621,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-028",
+   "text": "Lumpy itchy welts head to toe since the new tablets yesterday",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.08315833657979965,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.060985226184129715,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-030",
+   "text": "Allergy reaction came after antibiotic, lips swollen, little breathless also. Kindly guide.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.2078740894794464,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.16365918517112732,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-032",
+   "text": "Is it normal for my throat to feel tight after the antibiotic?",
+   "label": "RED",
+   "v2": "GREEN",
+   "v2_p_red": 0.004375163000077009,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.005078371148556471,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-038",
+   "text": "puffy lips after antibiotic",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.16442878544330597,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.03798021748661995,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "FOLLOWUP_ADMIN-014",
+   "text": "Waiting for my wound check next week but the dressing has soaked right through with blood twice today.",
+   "label": "RED",
+   "v2": "YELLOW",
+   "v2_p_red": 0.03063395619392395,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.03618768975138664,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "unseen_test",
+   "id": "UNCONTROLLED_PAIN-007",
+   "text": "Since this afternoon my lower leg feels like it's about to burst and nothing I take makes any difference.",
+   "label": "RED",
+   "v2": "RED",
+   "v2_p_red": 0.21343635022640228,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.19064730405807495,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  }
+ ],
+ "integration_changed": [
+  {
+   "set": "integration",
+   "id": "INT-010",
+   "text": "I have some swelling today",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.4331718385219574,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2031717151403427,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-012",
+   "text": "It hurts today",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7193053364753723,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.33431074023246765,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-017",
+   "text": "Dizzy after the medicine this morning",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5745335221290588,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2550068795681,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-018",
+   "text": "I get dizzy after every dose",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.3764141798019409,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.24804756045341492,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-020",
+   "text": "I feel dizzy on tramadol",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6866230964660645,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.508399486541748,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-021",
+   "text": "Dizzy since I started the new course",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.4437985420227051,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3500312864780426,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-027",
+   "text": "Queasy in the mornings after my meds",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.07217276096343994,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.016858480870723724,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-028",
+   "text": "My incision is itching alot, is it normal?",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.03609120473265648,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.01085162628442049,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-029",
+   "text": "The skin along my incision line is very itchy",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5443947911262512,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29982367157936096,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-032",
+   "text": "I get dizzy when I stand up after physio",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.44403403997421265,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3567792475223541,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-034",
+   "text": "Very fatigued after walking to the gate and back",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.7647170424461365,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.546867847442627,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-035",
+   "text": "So drowsy in the afternoons these days",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.05517885461449623,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.01129683293402195,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-039",
+   "text": "I forgot to take my pill",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.40602362155914307,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.30115607380867004,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-041",
+   "text": "I accidentally took two tablets instead of one",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.730663001537323,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5889686346054077,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-042",
+   "text": "I have a rash after taking my medicine",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6047876477241516,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3565368056297302,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-044",
+   "text": "I stopped taking my blood thinner",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5809474587440491,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29919371008872986,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-055",
+   "text": "Since I didn't take my medicine yesterday, my knee wound is worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7557745575904846,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5482779741287231,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-065",
+   "text": "I feel scared to move my leg.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.6008538603782654,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.6318885684013367,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-066",
+   "text": "I feel hopeless and cannot function.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7530175447463989,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5270793437957764,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-069",
+   "text": "I am not suicidal and have no thoughts of self-harm.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.06171514838933945,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.023914530873298645,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-071",
+   "text": "Can you tell me a joke?",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.35027647018432617,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.4255388677120209,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-073",
+   "text": "My knee pain suddenly got much worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7623265385627747,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5546826720237732,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-076",
+   "text": "My knee hurts.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7251878976821899,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2979825437068939,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-084",
+   "text": "My knee pain is a 7 out of 10, it built up gradually, it's mostly behind the knee, it's been getting worse, and the joint feels stiff.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7508488297462463,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.45672279596328735,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-087",
+   "text": "My pain suddenly got much worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7389880418777466,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5529637336730957,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-088",
+   "text": "yes, it's swollen",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.427178293466568,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.252054899930954,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-089",
+   "text": "My knee is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7213857769966125,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3489498496055603,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-092",
+   "text": "My incision is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6140824556350708,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.375314861536026,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-097",
+   "text": "My hip hurts today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6813465356826782,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.35300213098526,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-098",
+   "text": "My hip has started aching today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6653565764427185,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.33603551983833313,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-103",
+   "text": "My hip pain started gradually and it's about the same as before.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.3867247700691223,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.11126621067523956,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-104",
+   "text": "My knee pain suddenly got worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.668030858039856,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3743312656879425,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-106",
+   "text": "its getting worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5288958549499512,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29849883913993835,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-108",
+   "text": "it's getting worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6164833307266235,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.34540247917175293,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-109",
+   "text": "my incision is more red today",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6489109396934509,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.39822080731391907,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-111",
+   "text": "I feel pain around the incision, near the staples.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.38815656304359436,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.20294153690338135,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-113",
+   "text": "My knee pain is 6 out of 10.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5887969732284546,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.14455723762512207,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-124",
+   "text": "My knee is more swollen today and hurts.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8090735673904419,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5588683485984802,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-129",
+   "text": "I am anxious about moving my operated leg.",
+   "label": "GREEN",
+   "v2": "GREEN",
+   "v2_p_red": 0.053243912756443024,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.05680973455309868,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-151",
+   "text": "I feel isolated and low because I can't do my usual routine.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.42311587929725647,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4080026149749756,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-158",
+   "text": "My leg hurts a lot after doing my exercises today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5330590009689331,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4099660813808441,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-164",
+   "text": "My shoulder has been hurting for a week.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6186754107475281,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.22867177426815033,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-171",
+   "text": "There is drainage and redness around my incision.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.36613503098487854,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.32233211398124695,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-178",
+   "text": "I'm not using the walker anymore.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.02785230241715908,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.01578768715262413,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-179",
+   "text": "I can bend to 80 degrees, my pain is 3/10, and I am walking independently.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4141634702682495,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.31887087225914,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-187",
+   "text": "I can bend my knee to around 80 degrees.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.0791270062327385,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.020250240340828896,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-190",
+   "text": "I can bend to 80 degrees.",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.15066872537136078,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.03172004222869873,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-198",
+   "text": "I can bend to about 85 degrees",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.19355462491512299,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.02435135655105114,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-199",
+   "text": "I'm using a cane",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.09095749258995056,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.03386540710926056,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-202",
+   "text": "I can bend to 90 degrees",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4232931137084961,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.061042215675115585,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-203",
+   "text": "I can bend to 85 degrees",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.3125721216201782,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.04369300603866577,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-204",
+   "text": "I can walk for half an hour",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.06638918817043304,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.011921393685042858,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-205",
+   "text": "walking more than ten minutes now",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.25963708758354187,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.04522556811571121,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-207",
+   "text": "I go up the stairs foot over foot",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5527707934379578,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.10954717546701431,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-214",
+   "text": "I can bend to 85 degrees and I did my exercises",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.1264110505580902,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.04089178517460823,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-215",
+   "text": "I'm using a stick",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.07302595674991608,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.034741051495075226,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-219",
+   "text": "I can bend to 95",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.35697120428085327,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.09404691308736801,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-248",
+   "text": "yes, heel slides give me a sharp pain",
+   "label": "YELLOW",
+   "v2": "YELLOW",
+   "v2_p_red": 0.08340155333280563,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.029010917991399765,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-262",
+   "text": "My knee hurts today. It came on gradually, I feel it mostly behind the knee, and it's about the same as before.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5207973718643188,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3651440739631653,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-263",
+   "text": "My pain suddenly got worse today, and it's mostly behind the knee.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5438554286956787,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4002947509288788,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-266",
+   "text": "My knee is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7395113706588745,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.359080970287323,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-267",
+   "text": "My hip is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7710251808166504,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.4407085180282593,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-269",
+   "text": "My knee hurts a bit.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4245814383029938,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.054246533662080765,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-271",
+   "text": "My knee is sore.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5704021453857422,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.1333436220884323,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  }
+ ],
+ "integration_over_red": [
+  {
+   "set": "integration",
+   "id": "INT-003",
+   "text": "My wound looks a bit red today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.47742730379104614,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.4295922815799713,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-010",
+   "text": "I have some swelling today",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.4331718385219574,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2031717151403427,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-011",
+   "text": "My knee really hurts",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8903939723968506,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.715347170829773,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-012",
+   "text": "It hurts today",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7193053364753723,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.33431074023246765,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-014",
+   "text": "Hi, I am Rishi and I feel dizzy",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7423263192176819,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.60903000831604,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-015",
+   "text": "I feel dizzy after my tablet",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7648026347160339,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6678460240364075,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-017",
+   "text": "Dizzy after the medicine this morning",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5745335221290588,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2550068795681,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-018",
+   "text": "I get dizzy after every dose",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.3764141798019409,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.24804756045341492,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-019",
+   "text": "I feel dizzy after my painkiller",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8380399346351624,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7202771902084351,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-020",
+   "text": "I feel dizzy on tramadol",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6866230964660645,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.508399486541748,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-021",
+   "text": "Dizzy since I started the new course",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.4437985420227051,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3500312864780426,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-025",
+   "text": "The blood thinner makes me light headed",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6208367943763733,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.43750157952308655,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-029",
+   "text": "The skin along my incision line is very itchy",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5443947911262512,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29982367157936096,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-032",
+   "text": "I get dizzy when I stand up after physio",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.44403403997421265,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3567792475223541,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-033",
+   "text": "Feeling light-headed when I get out of bed in the morning",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6717092990875244,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.4848920404911041,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-034",
+   "text": "Very fatigued after walking to the gate and back",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.7647170424461365,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.546867847442627,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-036",
+   "text": "Feeling queasy and dizzy this evening",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7150726318359375,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6434926986694336,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-039",
+   "text": "I forgot to take my pill",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.40602362155914307,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.30115607380867004,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-041",
+   "text": "I accidentally took two tablets instead of one",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.730663001537323,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5889686346054077,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-042",
+   "text": "I have a rash after taking my medicine",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6047876477241516,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3565368056297302,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-044",
+   "text": "I stopped taking my blood thinner",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5809474587440491,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29919371008872986,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-052",
+   "text": "It's been 2 hours and pain level is 5",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.8481541275978088,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6286259293556213,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-055",
+   "text": "Since I didn't take my medicine yesterday, my knee wound is worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7557745575904846,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5482779741287231,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-064",
+   "text": "I cannot keep fluids down and I am hardly urinating.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.78238445520401,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6738631129264832,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-065",
+   "text": "I feel scared to move my leg.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.6008538603782654,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.6318885684013367,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-066",
+   "text": "I feel hopeless and cannot function.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7530175447463989,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5270793437957764,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-071",
+   "text": "Can you tell me a joke?",
+   "label": "GREEN",
+   "v2": "YELLOW",
+   "v2_p_red": 0.35027647018432617,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.4255388677120209,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-073",
+   "text": "My knee pain suddenly got much worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7623265385627747,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5546826720237732,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-075",
+   "text": "My pain is 8 out of 10 and suddenly got worse.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.891029417514801,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8164558410644531,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-076",
+   "text": "My knee hurts.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7251878976821899,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.2979825437068939,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-082",
+   "text": "My knee is sore and a bit swollen. It started suddenly, I feel it mostly behind the knee, it's been getting worse, and the knee feels stiff.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8397906422615051,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6959710717201233,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-084",
+   "text": "My knee pain is a 7 out of 10, it built up gradually, it's mostly behind the knee, it's been getting worse, and the joint feels stiff.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7508488297462463,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.45672279596328735,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-087",
+   "text": "My pain suddenly got much worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7389880418777466,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5529637336730957,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-088",
+   "text": "yes, it's swollen",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.427178293466568,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.252054899930954,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-089",
+   "text": "My knee is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7213857769966125,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3489498496055603,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-092",
+   "text": "My incision is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6140824556350708,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.375314861536026,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-093",
+   "text": "My wound is red and swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8655552864074707,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7951406836509705,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-097",
+   "text": "My hip hurts today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6813465356826782,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.35300213098526,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-098",
+   "text": "My hip has started aching today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6653565764427185,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.33603551983833313,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-100",
+   "text": "My knee pain is a 6 out of 10, it came on suddenly.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8961959481239319,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8015278577804565,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-101",
+   "text": "My knee pain is a 3 out of 10, it came on suddenly, I mostly feel it behind the knee, and I already took my pain medication.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.8663533329963684,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8004723787307739,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-103",
+   "text": "My hip pain started gradually and it's about the same as before.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.3867247700691223,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.11126621067523956,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-104",
+   "text": "My knee pain suddenly got worse today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.668030858039856,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3743312656879425,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-105",
+   "text": "My knee pain is 6 out of 10, it started suddenly behind the knee and it is swollen.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8772870898246765,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.779991626739502,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-106",
+   "text": "its getting worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5288958549499512,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.29849883913993835,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-108",
+   "text": "it's getting worse",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6164833307266235,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.34540247917175293,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-109",
+   "text": "my incision is more red today",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6489109396934509,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.39822080731391907,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-110",
+   "text": "My knee pain is 6 out of 10, it started suddenly, mostly behind the knee, it's swollen, and it's getting worse.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.869316816329956,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7199146747589111,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-111",
+   "text": "I feel pain around the incision, near the staples.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.38815656304359436,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.20294153690338135,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-113",
+   "text": "My knee pain is 6 out of 10.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5887969732284546,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.14455723762512207,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-117",
+   "text": "7 out of 10, started suddenly",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.9572113752365112,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.9247088432312012,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-119",
+   "text": "My knee pain is 8 out of 10 and came on suddenly.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.9315398931503296,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8573692440986633,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-121",
+   "text": "it feels warm and I had chills last night",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.810348629951477,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7813169360160828,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-124",
+   "text": "My knee is more swollen today and hurts.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8090735673904419,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.5588683485984802,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-132",
+   "text": "The area around my joint feels really tender and inflamed.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5657520294189453,
+   "v2_email": false,
+   "v3": "RED",
+   "v3_p_red": 0.44015851616859436,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-134",
+   "text": "Why does my leg feel so stiff and achy this morning?",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.7415316104888916,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7323510050773621,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-151",
+   "text": "I feel isolated and low because I can't do my usual routine.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.42311587929725647,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4080026149749756,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-152",
+   "text": "I don't feel like doing anything today and my leg feels stiff.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.8815528154373169,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8811148405075073,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-158",
+   "text": "My leg hurts a lot after doing my exercises today.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5330590009689331,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4099660813808441,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-164",
+   "text": "My shoulder has been hurting for a week.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.6186754107475281,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.22867177426815033,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-171",
+   "text": "There is drainage and redness around my incision.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.36613503098487854,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.32233211398124695,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-179",
+   "text": "I can bend to 80 degrees, my pain is 3/10, and I am walking independently.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4141634702682495,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.31887087225914,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-188",
+   "text": "My wound is red and leaking.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8640747666358948,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.8315263986587524,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-197",
+   "text": "My wound looks more red today and it's leaking some fluid.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7404873371124268,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.6897489428520203,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-202",
+   "text": "I can bend to 90 degrees",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4232931137084961,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.061042215675115585,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-207",
+   "text": "I go up the stairs foot over foot",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5527707934379578,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.10954717546701431,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-212",
+   "text": "I started driving again and I'm back at work",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.8773149847984314,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.681894063949585,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-219",
+   "text": "I can bend to 95",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.35697120428085327,
+   "v2_email": false,
+   "v3": "GREEN",
+   "v3_p_red": 0.09404691308736801,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-261",
+   "text": "My knee is sore and a bit tender. It started suddenly, I feel it mostly behind the knee, it's been getting worse, and the knee feels stiff.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8635715842247009,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7141420245170593,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-262",
+   "text": "My knee hurts today. It came on gradually, I feel it mostly behind the knee, and it's about the same as before.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5207973718643188,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.3651440739631653,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-263",
+   "text": "My pain suddenly got worse today, and it's mostly behind the knee.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.5438554286956787,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.4002947509288788,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-266",
+   "text": "My knee is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7395113706588745,
+   "v2_email": true,
+   "v3": "YELLOW",
+   "v3_p_red": 0.359080970287323,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-267",
+   "text": "My hip is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.7710251808166504,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.4407085180282593,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-268",
+   "text": "My ankle is swollen and sore.",
+   "label": "YELLOW",
+   "v2": "RED",
+   "v2_p_red": 0.8439995050430298,
+   "v2_email": true,
+   "v3": "RED",
+   "v3_p_red": 0.7222215533256531,
+   "v3_email": true,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-269",
+   "text": "My knee hurts a bit.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.4245814383029938,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.054246533662080765,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  },
+  {
+   "set": "integration",
+   "id": "INT-271",
+   "text": "My knee is sore.",
+   "label": "GREEN",
+   "v2": "RED",
+   "v2_p_red": 0.5704021453857422,
+   "v2_email": false,
+   "v3": "YELLOW",
+   "v3_p_red": 0.1333436220884323,
+   "v3_email": false,
+   "v3_reason_codes": [
+    "classifier"
+   ]
+  }
+ ]
+}

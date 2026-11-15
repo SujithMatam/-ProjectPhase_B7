@@ -1,0 +1,51 @@
+YELLOW	TKA	-	One of the staples near the top of my knee is digging in and the skin round it looks raw.
+YELLOW	THA	-	The stitches on my hip feel tight and tug every time I take a step.
+GREEN	ANY	hard_neg,question	Scar is fully healed now but it itches like crazy some evenings. Any cream you recommend?
+YELLOW	ANY	indian_english	Stitches are pulling and itching a lot sir. Can I scratch slowly or apply powder?
+YELLOW	ANY	typo	staples r really itchy and one looks like its poking out a bit
+YELLOW	ANY	-	The steri-strips are curling up at the ends and the cut underneath looks a bit irritated.
+GREEN	ANY	question	Is it normal for steri-strips to fall off on their own?
+GREEN	ANY	hard_neg	A couple of strips came off in the shower on day 12, the line underneath is closed and dry.
+YELLOW	TKA	hard_pos,indirect	When I bend my knee it feels like the skin is being pinched shut by the clips.
+RED	ANY	multi_symptom	A stitch has popped and there's a gap with pus coming out.
+YELLOW	ANY	carer	Mum keeps picking at her staples because they itch, and one area looks angry now.
+YELLOW	ANY	-	Part of the scar has puckered in like a dimple next to the third stitch.
+GREEN	ANY	question	When will the stitches be taken out and does it hurt?
+YELLOW	THA	indian_english	After hip operation, at the place of stitches there is irritation and burning feeling. Please advise what to apply.
+YELLOW	ANY	multi_symptom	Itchy little rash where the dressing tape was, and the staples feel tight.
+YELLOW	ANY	hard_pos,indirect	Feels like my scar has been zipped up too tight, it catches whenever I move.
+YELLOW	TKA	typo	stich at the bottm of my knee is sticking out and rubbing on my trousers
+GREEN	ANY	hard_neg,negation	Staples out yesterday, no gaps, no pulling, just little dotted marks. All fine.
+RED	ANY	temp_in_text,multi_symptom	Stitches all inflamed, one is oozing yellow and temp is 38.6.
+YELLOW	ANY	temp_in_text	The wound edges are itchy and a bit raised, temperature 37.3, otherwise feeling well.
+YELLOW	ANY	question	A loose thread is hanging from the end of my incision. Should I cut it?
+YELLOW	TKA	carer,indian_english	Writing on behalf of my father, the staples on his knee are pricking him and he is not able to sleep properly. Kindly guide.
+GREEN	ANY	question	Can I put moisturiser on my scar once the stitches are out?
+YELLOW	THA	hard_pos	My trouser waistband rubs right on the top of my hip scar and it's become sore and chafed.
+YELLOW	ANY	-	Week 2, the clips feel like they're stretching my skin.
+RED	ANY	hard_pos,indirect	Took the strips off and the cut just fell open, it's gaping about a centimetre and I can see deep inside.
+YELLOW	ANY	multi_symptom	The skin round my sutures is pink and itchy and a tiny bit swollen.
+GREEN	TKA	hard_neg	Itching on my old knee scar, it's been healed for months, I think it's the dry winter air.
+YELLOW	ANY	indian_english,question	Tanka area is having khujli and some redness. Is it normal or infection?
+YELLOW	ANY	hard_pos,indirect	There's a tiny crater where one staple goes in, like the skin is being dragged apart round it.
+YELLOW	THA	negation	One end of my hip incision has a small gap between the strips, it's dry and not bleeding.
+GREEN	ANY	question	Should I keep the steri-strips dry or can they get wet?
+YELLOW	ANY	typo	itchy itchy itchy!! staples drivin me mad, skin around them looks irritated
+YELLOW	TKA	-	At my age the skin is thin, and the plaster strips have pulled up a little flap of skin by my knee wound.
+RED	ANY	multi_symptom	Stitches were pulling all week and now the whole wound is red and hot, and the redness is racing up my leg.
+YELLOW	ANY	question	Is it normal for staples to feel this tight? It's been ten days and they still pinch.
+GREEN	ANY	hard_neg	I thought a stitch was poking out but it was a bit of dried glue from the dressing, it came away fine.
+YELLOW	ANY	indian_english,question	Sir, one staple is looking like coming out from skin. Should I push it back or leave? Please tell.
+YELLOW	THA	carer	My wife says her hip stitches burn when she sits, and the skin around them looks a bit puckered.
+GREEN	ANY	question	Do dissolvable stitches need removing or do they go on their own?
+YELLOW	ANY	-	Sore little bumps along the line of the stitches.
+YELLOW	ANY	hard_pos	I get a sharp sting along the scar line whenever the dressing shifts.
+YELLOW	TKA	indian_english	Plaster strips are coming off on knee wound and the skin inside is looking white and wet. What to do now?
+GREEN	ANY	temp_in_text,hard_neg	Scar is healed and a bit itchy, temp 36.7, no other problems to report.
+YELLOW	ANY	-	Stitches really pulling today.
+YELLOW	ANY	typo,multi_symptom	clips catching on my nighty, skin red n itchy around 2 of them
+RED	THA	temp_in_text,multi_symptom	Hip stitches have been irritated for days and now I'm 101.5 F with chills.
+YELLOW	ANY	hard_pos,indirect	The skin looks gathered and bunched at one end of the cut, like a drawstring bag.
+YELLOW	THA	indian_english	Hip stitches are paining when I lie on that side, and skin is looking little bit pulled. Is it ok?
+YELLOW	ANY	indian_english,typo	staple wala area bahut itchy, i am controling but very difficult. any medicine?
+GREEN	TKA	indian_english,question	Doctor, staple removal is due on 14th day. Can I get it done at a local clinic near my home?

@@ -1,0 +1,152 @@
+# Challenge set source. Written by claude-opus-5-5 after the train/val/test splits were frozen.
+# CATEGORY<TAB>LABEL<TAB>SURGERY<TAB>TEXT   -- converted by build_challenge.py
+negation	GREEN	ANY	No fever, no redness, no discharge. Just want to know when the dressing comes off.
+negation	GREEN	ANY	calf isn't swollen or sore at all, I'm only asking about compression socks
+negation	GREEN	ANY	I'm not short of breath and there's no chest pain, but how often should I use the spirometer thing?
+negation	GREEN	TKA	Wound is dry, nothing leaking, not hot. Can I put cream on it yet?
+negation	GREEN	TKA	There's no numbness, I can wiggle all my toes. When can I start cycling?
+negation	YELLOW	ANY	No chest pain or breathing trouble, but my temperature is 38.0 tonight
+negation	RED	ANY	No fever at all, but my calf has gone hard and hot since this morning
+negation	GREEN	THA	Haven't fallen, no pain, just want a grab rail fitted. Who arranges that?
+negation	RED	ANY	Not bleeding from the wound, but I vomited something that looked like coffee grounds
+negation	GREEN	ANY	Never had any pus, scar looks great, can I go swimming at 8 weeks?
+negation	YELLOW	ANY	No pus and no smell, but there's a little clear fluid coming out of the bottom of the cut
+negation	GREEN	THA	My leg isn't any shorter and it isn't turned, I'm just nervous about getting into the car. Tips?
+negation	RED	ANY	I'm not in much pain but I can't feel my foot at all and it's cold
+negation	GREEN	ANY	not dizzy, not sick, tablets fine, just need a repeat prescription
+negation	YELLOW	ANY	No calf pain, no breathlessness, but I've missed two of my clexane injections
+negation	GREEN	ANY	No bleeding from gums or anywhere, is it ok to use a normal toothbrush on apixaban?
+negation	RED	ANY	No pain in the leg, no swelling, but I suddenly can't get my breath and my chest hurts
+negation	GREEN	ANY	I don't have a temperature and the wound isn't red. Is the itch just healing?
+negation	GREEN	ANY	there's no blood in my urine or stool, I've been checking like you said
+negation	YELLOW	TKA	No fever, but the skin along my incision has gone pink and warm since yesterday
+keyword_free_red	RED	ANY	Something is wrong with my foot, it's gone the colour of candle wax and won't do what I tell it
+keyword_free_red	RED	THA	I went to stand up and my hip just went, now my leg is lying at an odd angle
+keyword_free_red	RED	ANY	Every few steps I have to stop and lean on the wall to get air
+keyword_free_red	RED	ANY	Mum is not making sense today and she's burning up
+keyword_free_red	RED	TKA	the back of my leg below the knee feels like a hot brick
+keyword_free_red	RED	ANY	My lips have gone big since the new tablet and my voice sounds funny
+keyword_free_red	RED	ANY	I'm leaving red footprints, it keeps coming through the bandage
+keyword_free_red	RED	ANY	Toilet water went black this morning and I feel like I might pass out
+keyword_free_red	RED	ANY	My chest feels like someone is standing on it
+keyword_free_red	RED	ANY	the leg has gone tight like a sausage skin and nothing touches the pain
+keyword_free_red	RED	ANY	I keep shaking under three blankets and the cut smells bad
+keyword_free_red	RED	ANY	Dad collapsed in the kitchen and is breathing fast
+keyword_free_red	RED	TKA	can't put any weight through it since the twist, and it looks crooked
+keyword_free_red	RED	ANY	Feels like I'm breathing through a straw since I woke up
+keyword_free_red	RED	ANY	My foot is like ice and the toes have gone a dusky purple
+keyword_free_red	RED	ANY	the stitches have come apart and I can see something yellowish deep inside
+keyword_free_red	RED	ANY	He's very sleepy and I can't wake him properly after his evening tablets
+keyword_free_red	RED	ANY	Woke up and one calf is twice the size of the other
+keyword_free_red	RED	THA	There's a red line creeping up my thigh from the wound
+keyword_free_red	RED	THA	Turned over in bed, felt a clunk, and now I can't lift the leg off the mattress
+indian_english	RED	THA	Doctor, my father is having breathing problem since morning and chest is paining. Hip operation done 10 days back.
+indian_english	YELLOW	TKA	Having slight fever since 2 days, 37.9 only. Knee operation. What to do?
+indian_english	GREEN	THA	Can I sit in padmasana for meditation after hip replacement?
+indian_english	RED	ANY	My mother leg is swelled up like pillar and calf is very hot, kindly advise urgently
+indian_english	YELLOW	ANY	Motion not passed since 4 days, stomach is tight. Taking the pain tablets.
+indian_english	GREEN	ANY	When can I start going to office by auto rickshaw?
+indian_english	RED	ANY	Sir, wound is giving bad smell and white-yellow pus is coming, also shivering
+indian_english	YELLOW	ANY	Some water is coming from stitches line, dressing is getting wet. Please advise.
+indian_english	GREEN	ANY	Is it ok to eat curd rice at night after operation? Somebody told it will cause infection.
+indian_english	RED	THA	My husband fell in bathroom, now he cannot stand and leg is looking short
+indian_english	YELLOW	ANY	Giddiness is coming after taking the new tablet, otherwise fine
+indian_english	GREEN	TKA	What all exercises I should do in the morning time? Physio told but I forgot
+indian_english	RED	ANY	Toes have become blue colour and no feeling is there, what to do
+indian_english	YELLOW	TKA	Stitches area is little red and paining slightly more than yesterday
+indian_english	GREEN	ANY	Kindly tell me when the stitches will be cut, I am from outstation
+indian_english	RED	ANY	Ma'am, blood is coming in urine and I am feeling very weak, taking blood thinner
+indian_english	YELLOW	TKA	Knee pain is not reducing even after taking tablets, sleep is not coming in night
+indian_english	GREEN	TKA	Can I use western commode or Indian toilet is fine after knee replacement?
+indian_english	GREEN	ANY	Mother is feeling bit low and crying sometimes, is it normal after surgery?
+indian_english	YELLOW	ANY	Tablet I forgot to take yesterday night, the blood thinning one. Should I take two today?
+indian_english	RED	ANY	Thoda chest mein dard hai and saans lene mein problem, since one hour
+typo_or_slang	RED	ANY	cant breth properly n chest is tight
+typo_or_slang	YELLOW	ANY	temprature 38.2 n feelin rough
+typo_or_slang	GREEN	ANY	wen can i drive agen
+typo_or_slang	RED	ANY	calf swolen n red n hot, pls help
+typo_or_slang	YELLOW	ANY	bit of clear gunk oozin from the cut
+typo_or_slang	GREEN	ANY	hows long til i ditch the crutchs
+typo_or_slang	RED	ANY	foot gone numb n cold cnt move toes
+typo_or_slang	YELLOW	ANY	havnt pood in 4 days lol not fun
+typo_or_slang	GREEN	ANY	can i hav a beer on these meds
+typo_or_slang	RED	ANY	puss comin out n it stinks
+typo_or_slang	YELLOW	ANY	staples r itchin like mad n one looks a bit angry
+typo_or_slang	GREEN	TKA	knee feels tite in the mornin, normal?
+typo_or_slang	RED	THA	hip popped n now leg wont move at all
+typo_or_slang	YELLOW	ANY	feelin pukey every time i take the oxy
+typo_or_slang	GREEN	TKA	can i do squats yet or nah
+typo_or_slang	RED	ANY	bleedin wont stop frm the wound, soaked thru
+typo_or_slang	YELLOW	ANY	pain meds not doin nothin, still sore all nite
+typo_or_slang	GREEN	ANY	is it norm for scar to be a lil itchy now its healed
+typo_or_slang	RED	ANY	face n lips all puffy after new pill
+typo_or_slang	YELLOW	ANY	fell off the sofa lol, walkin fine but bit sore
+typo_or_slang	RED	ANY	spittin up blood n heart racin
+numeric_in_text	RED	ANY	Temp 38.5 this evening
+numeric_in_text	YELLOW	ANY	Temperature 38.4, feel okay otherwise
+numeric_in_text	GREEN	ANY	37.6 after my walk, is that a fever?
+numeric_in_text	RED	ANY	102.2F and shivering
+numeric_in_text	YELLOW	ANY	100.8 F tonight
+numeric_in_text	GREEN	ANY	My thermometer says 99.1, all fine?
+numeric_in_text	RED	ANY	Reading of 101.5 on the ear thermometer
+numeric_in_text	YELLOW	ANY	Day 4, temperature 37.8
+numeric_in_text	GREEN	ANY	Temperature 36.9, wound dry. Can I shower?
+numeric_in_text	RED	TKA	temp 38.9 and my knee is swollen and hot
+numeric_in_text	YELLOW	ANY	Was 37.5 this morning and 38.0 now
+numeric_in_text	GREEN	ANY	Pain is 3 out of 10 today, down from 6. Good progress?
+numeric_in_text	RED	ANY	Pain is 10/10, leg rock hard, the 50mg tramadol did nothing
+numeric_in_text	YELLOW	ANY	Pain has been 8/10 for three days despite paracetamol every 6 hours
+numeric_in_text	GREEN	TKA	I can bend my knee to 95 degrees at week 3. Is that good?
+numeric_in_text	RED	ANY	Heart rate 125 sitting still and I'm short of breath
+numeric_in_text	YELLOW	ANY	No bowel movement for 5 days
+numeric_in_text	GREEN	ANY	Weight went up 2 kg since surgery, should I diet?
+numeric_in_text	RED	ANY	My temperature is 39.4 and I'm confused
+numeric_in_text	YELLOW	ANY	Ankle swelling is 2 cm bigger than last week but goes down overnight
+numeric_in_text	GREEN	ANY	Walked 1500 steps today, can I aim for 3000 next week?
+multi_symptom	RED	ANY	Bit of a temperature, 37.9, and my calf is aching and tight
+multi_symptom	YELLOW	ANY	Constipated, nauseous and a bit dizzy on the new painkillers
+multi_symptom	RED	ANY	Wound is red, swollen, leaking, and I've got chills with 38.7
+multi_symptom	YELLOW	TKA	Knee warm, a little swollen and clicking more, no fever
+multi_symptom	RED	ANY	Feeling sick, sweaty, short of breath and my chest hurts on the left
+multi_symptom	YELLOW	ANY	Itchy rash on my arms and my stomach is upset since the antibiotics, face is fine
+multi_symptom	GREEN	TKA	Stiff in the morning, sore after physio, sleeping okay, eating well. All normal?
+multi_symptom	RED	ANY	Big bruise spreading, gums bleeding, and I feel faint
+multi_symptom	YELLOW	ANY	Scar is a bit pink, a staple is pulling and there's a small damp patch on the dressing
+multi_symptom	RED	ANY	Foot is tingling, pale and colder than the other one, and the pain is getting worse
+multi_symptom	YELLOW	ANY	Tired, off my food, sleeping badly for a week and just not coping
+multi_symptom	GREEN	TKA	Ankle swells a bit by night, knee clicks without pain, and I'm a bit bored. Normal stuff?
+multi_symptom	RED	THA	My hip hurts badly, the leg is rolled outward and I can't lift it
+multi_symptom	YELLOW	ANY	Feverish, tired and the cut looks a little redder today
+multi_symptom	RED	ANY	Headache after I banged my head when I fell, and I'm on rivaroxaban
+multi_symptom	GREEN	ANY	Bruise fading, swelling going down, walking further each day
+multi_symptom	RED	ANY	Vomiting, black stools and dizziness since yesterday
+multi_symptom	YELLOW	TKA	Pain not controlled at night and the knee is more swollen than last week, no calf pain
+multi_symptom	RED	ANY	Calf sore, breathless when I talk, and my heart is pounding
+multi_symptom	YELLOW	ANY	Missed my apixaban this morning and also feel a bit nauseous
+benign_scary_word	GREEN	ANY	My grandmother had a blood clot years ago. Does that change which exercises I should do?
+benign_scary_word	GREEN	THA	Watched a video about dislocation and now I'm scared. What positions should I avoid?
+benign_scary_word	GREEN	ANY	The nurse said the pink stain on my old dressing was normal, the new one has stayed clean
+benign_scary_word	GREEN	ANY	What does pus from an infected wound look like, so I know what to watch for?
+benign_scary_word	GREEN	ANY	The scan for a clot came back clear yesterday and the leg feels normal. Can I fly next month?
+benign_scary_word	GREEN	ANY	Is it normal to feel a bit breathless after climbing two flights? It settles in a minute
+benign_scary_word	GREEN	ANY	My surgeon mentioned compartment syndrome as a rare risk. What is it?
+benign_scary_word	GREEN	ANY	Had beetroot salad last night and my urine is pinkish today, that's the beetroot, right?
+benign_scary_word	GREEN	ANY	Got a fever of excitement today, walked to the shop on my own!
+benign_scary_word	GREEN	THA	My cousin's hip popped out after his op, how do I stop that happening to me?
+benign_scary_word	GREEN	ANY	Chest physio exercises: how many deep breaths per hour?
+benign_scary_word	GREEN	ANY	The ED doctor said my chest pain was a pulled muscle from the crutches and it has eased off now
+benign_scary_word	YELLOW	ANY	Tiny spot of blood on the pillow from a nosebleed, stopped in two minutes, I'm on aspirin
+benign_scary_word	GREEN	ANY	Is numbness near the scar something that can happen? Mine isn't numb, just asking
+benign_scary_word	GREEN	ANY	The injection bruises on my tummy from the blood thinner are small and fading
+benign_scary_word	GREEN	ANY	My heart races when I watch cricket, ha. Seriously though, when can I go to the stadium?
+benign_scary_word	GREEN	ANY	What should I do if the wound ever starts bleeding heavily?
+benign_scary_word	GREEN	TKA	Physio said the clunk I felt was the brace strap and the joint is fine. When is the next session?
+benign_scary_word	YELLOW	TKA	I thought my calf was swollen but measured both and they're the same. The knee is a bit warmer than yesterday though.
+benign_scary_word	GREEN	ANY	Killer workout at physio today, my legs are dead tired but in a good way
+audit_regression	GREEN	ANY	No chest pain, no chills
+audit_regression	GREEN	ANY	I don't have shortness of breath
+audit_regression	RED	ANY	I cannot breathe properly
+audit_regression	RED	ANY	I can’t breathe
+audit_regression	RED	ANY	fever of 39
+audit_regression	YELLOW	TKA	My knee is a little red and swollen
+audit_regression	YELLOW	ANY	fluid coming from my incision

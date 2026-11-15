@@ -1,0 +1,71 @@
+# DISLOCATION: THA pop, leg shorter/turned, cannot move or weight-bear, sudden severe groin pain; a few TKA deformity after giving way
+RED	THA	-	Bent down to pick up the remote and felt a clunk in my hip, now I can't move the leg at all
+RED	THA	hard_pos,indirect	My operated leg looks shorter than the other one and my foot is pointing out to the side
+RED	THA	indian_english	While getting up from Indian toilet something slipped in hip and now terrible pain, not able to stand. Please help.
+RED	THA	typo	hip popped getting outta car, cant stand on it
+GREEN	THA	question	How long do I have to avoid crossing my legs?
+RED	THA	carer	My mum twisted getting into bed and screamed, her leg is turned in and she won't let me move it
+RED	THA	-	Sudden horrific pain in the groin when I rolled over in bed, can't lift my leg now
+RED	THA	hard_pos,indirect	My knee is pointing inwards and I can't straighten my leg, it happened when I crossed my legs
+RED	THA	indian_english	Doctor sir, my hip made a sound and now leg is looking turned outside. Very much pain. What to do?
+GREEN	THA	hard_neg	My hip clicks sometimes when I walk but it doesn't hurt at all and I'm walking fine
+RED	TKA	multi_symptom	My knee gave way on the stairs and now it looks bent the wrong way and I can't straighten it
+RED	THA	-	Can't put any weight through my leg since I sat in the low chair at my sister's, it went with a horrible jolt
+RED	THA	hard_pos	Something's not right. My hip feels like it's out of place and the leg won't do what I tell it.
+RED	THA	typo	felt a clunk n now my leg is shorter???
+RED	THA	carer,indian_english	My mother sat cross-legged on floor for puja and now she is not able to straighten leg, very painful in hip.
+GREEN	THA	hard_neg,question	Can I bend past 90 degrees yet or am I still at risk of dislocating?
+RED	THA	typo	reached 4 my shoe, heard a pop, hip is agony
+RED	THA	question	Is it possible for the hip to come out? I leaned forward to tie my lace, felt a pop and now can't bear weight.
+RED	THA	hard_pos,indirect	My leg is stuck at a funny angle and any movement is horrendous
+RED	TKA	-	Knee went sideways when I turned and now it looks deformed, bulge on the outside
+GREEN	THA	hard_neg,indian_english,question	Is sitting cross-legged on floor safe now? 3 months after hip surgery, no pain, walking well.
+RED	THA	-	Groin pain came out of nowhere, severe, I'm on the floor and can't get up
+RED	THA	indian_english	Hip is paining very badly suddenly and I cannot move leg at all, it is feeling locked.
+RED	THA	multi_symptom	Heard a click, leg's rotated outwards, and my foot's tingling
+RED	THA	carer	Dad was getting out of the bath and something gave in his hip, the leg looks shorter and he's in agony
+GREEN	THA	question	What are the signs that my hip has dislocated?
+RED	THA	hard_pos	I can't move my hip at all now, it went when I swung my leg out of bed
+RED	THA	typo,indian_english	hip slipped while bending, leg is now short, bahut dard, pls reply
+RED	THA	-	Week 6 and was doing brilliantly till tonight, twisted to reach behind me and felt the hip go
+RED	THA	hard_pos,indirect	My foot's pointing a different way to the other one and I can't get comfortable at all
+GREEN	THA	hard_neg,negation	No pop, no pain, just wanted to check if I can sleep on my operated side yet
+RED	TKA	hard_pos,indirect	My new knee looks the wrong shape after it buckled and I can't bend or straighten it
+RED	THA	-	Leg turned in, shorter, can't weight bear.
+RED	THA	question	My hip feels like it's slipped out. Do I call an ambulance? I can't stand.
+RED	THA	indian_english	When I sat on low sofa something happened in hip joint. Now severe pain in groin and leg is not moving.
+YELLOW	THA	hard_neg	Hip clicks and has started to ache and feel a bit unstable when I walk, but I can bear weight fine
+RED	THA	carer	Grandad pivoted on the operated leg to turn round, heard a pop, now he's on the bed and won't move it at all
+RED	ANY	hard_pos	I just can't put my foot down. Was fine an hour ago.
+RED	THA	typo	think my hip disloacted, crazy pain, leg wont move
+RED	THA	-	Sharp pain deep in the groin after a sneeze, now I can't lift the leg off the bed
+GREEN	THA	hard_neg	I felt a little click when getting up from the chair, walked to the kitchen fine, no pain at all
+RED	THA	hard_pos,indirect	Lying on the bed, my operated foot is flopped out sideways and I can't bring it back up straight
+RED	THA	indian_english	Kindly advise urgently. Hip popped while getting in auto rickshaw, now not able to put leg on ground.
+RED	THA	multi_symptom	The ball has come out I think. Agony in the hip and groin, leg won't move, I feel sick
+RED	TKA	-	Knee buckled and I heard a crack, kneecap looks like it's off to the side
+GREEN	TKA	hard_neg	Knee makes a soft clicking noise when I bend it, painless, swelling normal
+RED	THA	carer,typo	my husband bent over to pick up the dog bowl n now hes stuck, cant move his leg, in so much pain
+RED	THA	hard_pos	Suddenly the hip just feels wrong and I can't take a step
+RED	THA	-	Turned over in my sleep without the pillow between my knees and woke to awful hip pain, can't move my leg
+RED	THA	indian_english,question	Leg is looking short compared to other leg from today morning and pain in hip. Is something gone wrong?
+GREEN	THA	carer,question	Is it safe for my dad to use a normal height toilet now, or does he still need the raised seat?
+RED	THA	indian_english	It clunked then locked. Not able to stand.
+RED	THA	hard_pos,indirect	My hip feels like it's come apart, I'm frightened to move
+RED	THA	temp_in_text,multi_symptom	No fever, 36.9, but my hip popped an hour ago and I can't put weight on it
+GREEN	THA	hard_neg,typo	scared i dislocated it but nope, just tight muscles. hip feels fine now. how long b4 i can drive
+RED	THA	-	Sat on the toilet without the raised seat, felt my hip shift, it's agony
+RED	THA	indian_english	Sir hip joint is feeling dislocated, I am not able to lift leg even little bit. Pain is severe.
+RED	THA	multi_symptom	Felt a pop doing my exercises, now sudden groin pain and the leg's twisted in
+YELLOW	TKA	hard_neg	Knee feels wobbly and clunks, with some swelling since last week, still walking on it
+RED	THA	hard_pos	The hip pain went from nothing to unbearable in a second when I stood up, and now I can't move
+RED	TKA	multi_symptom,indian_english	Knee suddenly gave way while walking, now it is swollen and looking bent, not able to straighten.
+GREEN	THA	question,indian_english	Can I use Indian style toilet after hip replacement or western only?
+RED	THA	typo	pop in hip, leg turned out, pls help asap
+RED	THA	carer	My wife was putting her socks on without the aid and cried out, now she can't put any weight on the leg
+GREEN	THA	hard_neg	Panicked when I felt a twinge getting out of the car but it went straight away and I'm walking normally
+RED	THA	hard_pos	One minute I was walking fine, next my hip gave out with a pain like a knife and I'm sat on the stairs unable to move
+GREEN	THA	question	Is a reacher worth buying or can I manage without one?
+RED	THA	question	My hip went clunk on the stairs and now it hurts to move at all. Do I need to go to hospital?
+RED	THA	-	Hip's dislocated again, same as last time. Leg's turned and short.
+GREEN	THA	hard_neg,temp_in_text,negation	Temp is 37.1, hip feels secure, no pain. When can I start swimming?

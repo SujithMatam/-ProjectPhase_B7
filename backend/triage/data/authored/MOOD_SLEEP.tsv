@@ -1,0 +1,46 @@
+GREEN	ANY	-	Bit weepy today. Fed up of being stuck indoors but I know it'll pass.
+GREEN	ANY	question	How long does it usually take to sleep properly again after a joint replacement?
+GREEN	ANY	indian_english	Not getting sleep in night, only 4-5 hours. Can I take sleeping tablet? Kindly advise.
+GREEN	ANY	typo	cant get comfy at nite, keep waking every 2 hrs. tips?
+GREEN	THA	question	Sleeping on my back is so hard. Any tricks for getting comfortable with a new hip?
+GREEN	ANY	carer	My dad is quite grumpy and low since the operation. He's eating and doing his exercises. Is that normal?
+GREEN	ANY	hard_neg,negation	Feeling down some days but not hopeless, nothing like that. Just bored. Ideas to keep busy?
+YELLOW	ANY	hard_pos	I haven't slept more than a couple of hours a night all week, I'm barely eating and I cry most of the day. I'm just not coping.
+YELLOW	ANY	carer,hard_pos	Mum has hardly eaten or slept for five days, won't get out of bed and just stares at the TV. She says she's fine but she isn't.
+YELLOW	ANY	indian_english,hard_pos	From one week I am not sleeping, not eating, feeling very very low and crying. Family is worried. What to do?
+YELLOW	TKA	hard_pos	Ten days now of feeling flat and anxious all the time, panicky at night, can't eat. The knee's fine, it's me that isn't.
+YELLOW	ANY	typo,hard_pos	honestly not coping, havent slept properly in 4 nights, havent showered, cant face anything
+RED	ANY	hard_pos	Some nights I think everyone would be better off without me. I've been looking at my tablets and thinking about it.
+RED	ANY	hard_pos,indian_english	I am feeling there is no point to live now. I am only burden on my children. Sometimes I think to end it.
+RED	THA	carer,hard_pos	My husband told me tonight he doesn't want to wake up any more. He's never said anything like that before. He's 3 weeks after his hip.
+RED	ANY	hard_pos	I keep having thoughts about hurting myself. I don't want to feel like this.
+GREEN	ANY	question	Is it normal to feel nervous about going out on my own after surgery?
+GREEN	ANY	question	Can the painkillers affect my mood?
+GREEN	ANY	indian_english,question	Feeling irritated on small small things after operation. Is it due to medicines? Otherwise all fine.
+GREEN	ANY	hard_neg	I had a wobble last week and felt really low, but talking to my sister helped and I'm sleeping again now.
+GREEN	ANY	question	Do the vivid dreams from the opioids stop when I come off them?
+GREEN	ANY	-	Frustrated I still need help with my socks. Silly thing to get upset about.
+GREEN	ANY	carer,question	My wife is worried she'll never walk properly again. How can I reassure her?
+GREEN	ANY	question	Is melatonin ok to take with my other tablets?
+GREEN	ANY	typo	feelin a bit down but managing, physio cheers me up lol
+GREEN	ANY	hard_neg,question	What are the signs that post-op low mood is turning into depression, so I know when to ask for help?
+GREEN	ANY	indian_english	Doctor sir, I am getting tension about recovery. Will I walk like before? My daughter's marriage is in 3 months.
+GREEN	TKA	question	Knee aches more at night and wakes me up. Should I time my painkiller for bedtime?
+GREEN	ANY	-	Napping in the afternoon then awake half the night. How do I break the cycle?
+GREEN	ANY	question	Is there someone I can talk to about feeling anxious? Not urgent.
+GREEN	ANY	hard_neg,negation	Not suicidal or anything like that, just really fed up and grumpy today. Normal at week 3?
+GREEN	ANY	question	Can I use a heat pad at night to help me drop off?
+GREEN	THA	carer,indian_english	My mother is getting fear to walk after hip operation, she is scared she will fall again. How to give her confidence?
+GREEN	ANY	question	I keep snapping at my family. Are mood swings after an anaesthetic a thing?
+GREEN	ANY	typo	y do i feel so tired all the time, sleeping 10 hrs and still knackered
+GREEN	ANY	hard_neg,negation	Had a panic in the night thinking about clots, but my calf is fine and my breathing is normal. How do I stop worrying?
+GREEN	ANY	question	How long before I feel like myself again?
+GREEN	ANY	indian_english,question	Can I watch TV late night or it will disturb sleep? I am not having any work now so time is not passing.
+GREEN	ANY	-	Lonely in the day while everyone's at work. Phoning friends helps.
+GREEN	ANY	question	Should I keep taking my antidepressant as usual after surgery?
+GREEN	ANY	carer	Dad is sleeping much more than usual but he's alert when awake and eating fine. Just recovery?
+GREEN	ANY	hard_neg	Had a rough couple of nights but last night I slept 7 hours. Feeling more hopeful.
+GREEN	ANY	indian_english,typo	feeling bore at home whole day, can i go office for half day atleast? mood is getting off
+GREEN	ANY	question	Any relaxation exercises for when I can't switch off at night?
+GREEN	ANY	-	sleep finally improving
+GREEN	ANY	hard_neg,question	A friend said people sometimes feel suicidal after big operations. Is that true, and who would I call if it ever happened?

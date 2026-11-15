@@ -1,0 +1,46 @@
+GREEN	TKA	question	How many sets of quad sets should I do, and how many times a day?
+GREEN	TKA	question	Bend is 85 degrees at 3 weeks. Is that on track?
+GREEN	TKA	question	When can I go on an exercise bike? Do I start with the seat high?
+GREEN	ANY	hard_neg	Thighs and buttock really sore the day after physio but it eases off by lunchtime. Is that just muscles?
+GREEN	THA	question	Are side-lying leg lifts ok for a hip, or are they against the precautions?
+GREEN	ANY	indian_english,question	Physio is coming home 3 days a week. Is it enough or should I do exercises daily also myself? Kindly advise.
+GREEN	ANY	typo	physio says push thru the pain a bit but how much is too much??
+GREEN	TKA	hard_neg,negation	Knee aches after my exercises but no swelling and no calf pain, and it calms down after ice. Should I cut back?
+GREEN	ANY	carer	My dad refuses to do his exercises because they hurt. How do I encourage him?
+GREEN	TKA	question	How do I do the straight leg raise without my knee bending halfway up?
+GREEN	THA	question	Is breaststroke allowed after a hip replacement? I heard the kick is bad.
+RED	TKA	hard_pos,multi_symptom	Was going to ask about my quad exercises but my calf is swollen, red and tender since this morning and it hurts when I pull my toes up
+YELLOW	TKA	hard_pos,typo	pain gets worse every day after exercises now, even the tablets dont help at night, week 4. should i stop?
+GREEN	ANY	question	Does walking count as exercise, or do I still need to do the leg exercises too?
+GREEN	TKA	indian_english,question	Can I do yoga after knee replacement? Which asanas are safe? Before operation I was doing daily.
+GREEN	TKA	question	Should I be able to fully straighten my knee by now? It lacks about 5 degrees at week 5.
+GREEN	ANY	hard_neg,question	What signs during exercise would mean I should stop and phone someone?
+GREEN	THA	question	Bridges make my hip ache a bit. Can I do fewer reps or skip them?
+GREEN	ANY	-	Did all three rounds today! Is it ok to add ankle weights next week?
+GREEN	ANY	question	How long should I keep doing the exercises for, months or years?
+GREEN	TKA	typo,question	can i use the cpm machine at home or is that just hospital
+GREEN	ANY	indian_english,question	Is stationary cycle at gym allowed after 6 weeks? Gym is near my house.
+GREEN	ANY	hard_neg,negation	Got a bit puffed doing the step-ups but it settled in a minute, no chest pain. Fine to keep going?
+YELLOW	TKA	hard_pos,multi_symptom	The knee clunks when I do the step exercise and since Tuesday it's more swollen and wobbly, like it might give way
+RED	ANY	hard_pos	Stopped my exercises halfway because I suddenly couldn't catch my breath and my chest hurts when I breathe in
+GREEN	TKA	question	What's a good bend goal before the 6 week check?
+GREEN	ANY	carer,indian_english	Mother is not doing exercise properly, only lying in bed whole day. Is it harmful? What we should do?
+GREEN	THA	question	Can I do clamshells yet or is that too much rotation?
+GREEN	ANY	-	Muscles feel weak and shaky on the step practice. Normal at week 2?
+GREEN	TKA	question	Should I massage the scar as part of my routine once it's healed?
+GREEN	ANY	typo	is it ok if i do the exersizes in bed rather than on the floor
+GREEN	TKA	hard_neg,question	Physio pushed my bend hard today and it's throbbing tonight. Same happened last week and it was fine by morning. Ice?
+GREEN	ANY	question	Can I go back to my aqua aerobics class? When?
+GREEN	ANY	indian_english	Doctor told 10 times each exercise, 3 times a day. I am doing 20 times. Is it ok or too much?
+GREEN	ANY	question	Is a recumbent bike better than an upright one in the first couple of months?
+GREEN	THA	question	When can I start on the cross trainer at the gym?
+GREEN	ANY	question	Exercises before or after the shower?
+GREEN	TKA	-	Knee bend went from 70 to 90 this week. Chuffed.
+GREEN	ANY	hard_neg	No pain during exercises any more, only a bit of ache in the evening. Can I add more walking?
+GREEN	ANY	indian_english,question	Is it ok to skip exercise for 2 days for family function? Many guests are at home.
+GREEN	THA	question	Is standing hip abduction with a resistance band ok at week 4?
+GREEN	ANY	carer,question	My wife's physio sessions have finished. Is there anything she should keep doing at home?
+GREEN	TKA	typo	knee bend stuck at 100 for 2 wks, wat else can i try
+YELLOW	ANY	temp_in_text	Skipped physio today, I feel off and my temp is 38.1. Should I still try the exercises at home?
+GREEN	ANY	question	Is it normal to feel exhausted after physio and need a nap?
+GREEN	TKA	hard_neg,temp_in_text	Temp 37.3 after my session, felt warm from the effort. Knee fine. Is that ok?

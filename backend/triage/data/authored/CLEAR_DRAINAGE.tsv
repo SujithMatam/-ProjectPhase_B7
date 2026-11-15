@@ -1,0 +1,59 @@
+YELLOW	TKA	-	Day 6 after my knee replacement and there's a wet straw-coloured patch on the dressing. No smell at all.
+YELLOW	THA	-	Hip dressing has a pink tinge coming through this morning, about the size of a coin.
+YELLOW	ANY	hard_pos,indirect	my bandage keeps feeling cold and damp against my skin even though I haven't showered
+YELLOW	ANY	indian_english	Sir, water type fluid is coming from the stitches since yesterday night. Kindly advise what to do.
+YELLOW	TKA	typo	knee wound leakin clear stuff again, changed the pad twice today
+GREEN	ANY	question	Is it normal for a wound to leak a little fluid in the first week?
+GREEN	ANY	hard_neg,negation	Peeked under the edge of the dressing: completely dry, no fluid, no redness. Just logging it.
+YELLOW	ANY	carer	Writing for my mum. Her dressing has a light pink stain that wasn't there at lunchtime. She feels fine otherwise.
+RED	TKA	multi_symptom	The fluid from my knee was clear before but since last night it's gone cloudy green and smells off.
+YELLOW	THA	temp_in_text,multi_symptom	Hip incision weeping a watery fluid and my temperature is 37.9. Otherwise I feel OK.
+RED	THA	temp_in_text,multi_symptom	Clear ooze from the hip wound and now 38.7 on the thermometer, shivering under two blankets.
+GREEN	ANY	hard_neg	The nurse said the old marks on my dressing were from theatre and the wound underneath is sealed and dry.
+YELLOW	ANY	hard_pos,indirect	There's a sticky shiny film along the bottom of my scar every morning.
+YELLOW	TKA	indian_english,carer,question	Doctor, my father's knee operation was 10 days back. Some pinkish water is coming on the gauze. Is it infection or normal?
+GREEN	ANY	question	How should I change the dressing if it does get a bit damp?
+YELLOW	ANY	-	Week 2 and the incision is still seeping. I honestly thought it would have stopped by now.
+YELLOW	THA	-	The top end of my hip scar beads up with clear liquid when I press beside it.
+RED	ANY	hard_pos,indirect	The whole pad is wet through and dripping onto the sheets, pinkish red and it keeps coming.
+YELLOW	ANY	typo,question	dresing is damp agn, clearish fluid, is that ok??
+GREEN	ANY	hard_neg,negation	No leaking, no smell, wound looks great. When can I stop covering it?
+YELLOW	TKA	multi_symptom	Little watery leak from the knee and it feels a bit warmer than the other side.
+YELLOW	ANY	indian_english	Madam, from morning the plaster is becoming wet with some light red water. Pain is ok only.
+YELLOW	THA	-	Slept on my good side and woke up with a damp outline on the hip dressing.
+GREEN	ANY	hard_neg	Earlier I said my wound was leaking but it was just shower water under the plaster. Skin is dry now.
+YELLOW	TKA	hard_pos,indirect	every time I bend my knee it feels wet under the bandage
+YELLOW	ANY	question	Is it bad that there's still some watery discharge three weeks after surgery?
+YELLOW	ANY	-	The stuff on the gauze is thin and clear, like the water from a popped blister.
+YELLOW	ANY	carer,question	My husband's wound has been dribbling clear fluid since he came home on Tuesday. Do we need to come in?
+GREEN	ANY	temp_in_text	Dressing dry, temp 37.2, just sore after walking.
+YELLOW	TKA	indian_english,temp_in_text,multi_symptom	knee wound is giving some water discharge and temperature is 100.4 F since evening, what to do now
+YELLOW	ANY	-	Pink fluid on dressing.
+GREEN	ANY	question	What colour of wound fluid should make me worry?
+YELLOW	THA	-	The old drain hole on my hip is still leaking clear liquid two days after they pulled the drain out.
+GREEN	ANY	hard_neg	Tiny spot of clear fluid on day 2 but it dried up, and the dressing has been spotless for a week since.
+YELLOW	ANY	typo,hard_pos,indirect	smthing keeps wetting my bandage, cant tell if its sweat or from the cut
+YELLOW	ANY	indian_english,question	Little bit watery discharge is there from wound edge. Should I apply any ointment? Please reply.
+RED	TKA	multi_symptom	Leaking more each day and now one end of the knee wound has come apart with yellow gunk sitting in the gap.
+GREEN	ANY	question	Once the incision stops draining, can I shower without a cover?
+YELLOW	THA	multi_symptom	My hip is quite puffy around the scar and there's a watery ooze from the middle of it.
+YELLOW	ANY	hard_pos	My dressing needs changing twice a day now, last week it was once every few days.
+YELLOW	TKA	carer,indian_english	Bhaiya, my mother's knee wound is leaking. We changed the dressing today morning and already it is wet.
+GREEN	ANY	hard_neg,negation	Scar still looks a bit shiny but it's dry, nothing on the gauze when I changed it.
+YELLOW	ANY	temp_in_text	Bit of pinkish discharge, temp 37.4, otherwise fine.
+RED	ANY	temp_in_text,multi_symptom	thermometer says 101.6F and the fluid from my wound has started to stink
+YELLOW	TKA	-	I am 81 and not very good with these things. The nurse's dressing on my knee has gone damp and a little pink.
+GREEN	THA	question	Should the hip wound be completely dry before I'm allowed in a bath?
+YELLOW	ANY	hard_pos,indirect	There's a faint stain on my pyjamas where the scar is, and the edge of the dressing looks wet.
+YELLOW	ANY	typo	clear fluid comin out by the bottom staple, abt 4 drops
+GREEN	ANY	hard_neg	Physio asked if my wound was leaking and it isn't. Can the dressing come off at two weeks?
+RED	ANY	hard_pos,indirect	the liquid coming out now is brownish and smells like meat gone off
+YELLOW	THA	indian_english,negation	Hip surgery done 8 days back, some yellowish water is oozing. No fever. Is it normal sir?
+YELLOW	ANY	-	Clear drops along the scar when I get up from the chair, I wipe them and they come back.
+YELLOW	ANY	multi_symptom	A little pink fluid and the dressing is itching like mad.
+YELLOW	ANY	carer	I'm her daughter. Mum's steri-strips are wet and peeling and there's a watery discharge under them.
+YELLOW	TKA	-	Bumped my knee on the coffee table in week 3 and since then there's a slow clear leak.
+YELLOW	ANY	indian_english,typo	some paani type liquid coming from wound, dressing geela ho gaya. pls tell
+YELLOW	THA	indian_english	From hip wound light pink discharge is coming whenever I walk to bathroom. Otherwise all fine only.
+GREEN	ANY	indian_english,question	Doctor, when can I remove the dressing and take head bath? Wound is dry.
+YELLOW	TKA	indian_english,multi_symptom	Knee is swelling little bit and some watery fluid is leaking from side of stitches. Kindly check.

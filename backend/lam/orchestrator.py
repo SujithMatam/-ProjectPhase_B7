@@ -15,6 +15,8 @@ Execution order:
      - genuine Wound context owns this turn -> WOUND_CARE
      - otherwise, narrow Recovery continuation check
        (check_recovery_continuation) -> RECOVERY_PROGRESS on match
+     - otherwise, narrow Rehabilitation continuation check
+       (check_rehab_continuation) -> REHABILITATION on match
      - otherwise, fresh IntentClassifier
 5. Agent/action routing
 6. Specialized agent execution
@@ -40,6 +42,20 @@ Important Recovery behaviour:
   "I don't know.", "Same as yesterday." while flexion is pending).
 - Recovery continuation never overrides RED safety, OUT_OF_SCOPE, an
   explicit/active Wound Care conversation, or a genuine topic switch.
+
+Important Rehabilitation behaviour:
+
+- Rehabilitation continuation uses check_rehab_continuation() (below),
+  modelled on check_recovery_continuation: it reads existing Rehabilitation
+  state via rehab_state.peek_state() ONLY (never creates state) and
+  matches ONLY when a real pending_field exists and the message is a
+  yes/no, a weight-bearing-shaped answer, or short enough to be an answer
+  (e.g. "no", "not yet", "no, nothing hurts", "partial weight bearing",
+  "the evenings are too sore to face them" while the safety, done-today,
+  weight-bearing or barrier question is pending).
+- It runs AFTER the Wound, Pain and Recovery checks and never overrides
+  RED safety, OUT_OF_SCOPE, a question, or an explicit switch to another
+  domain (medication, daily activity, ...).
 """
 
 from __future__ import annotations
@@ -49,7 +65,13 @@ from typing import Optional, List, Dict
 
 from triage.safety_triage import SafetyTriageEngine
 from agents.agent_router import AgentRouter
+from agents.emergency_agent import MENTAL_HEALTH_CRISIS_TEMPLATE
 from agents.recovery_integration import check_recovery_continuation
+from agents import pain_logic
+from agents import pain_state
+from agents import rehab_agent
+from agents import rehab_state
+from agents.patient_memory import normalize_weight_bearing_status
 from doctor_alert import doctor_alert_notifier
 from agents.report_agent import ReportGenerationAgent
 
@@ -406,6 +428,134 @@ def _has_active_wound_followup(
         marker in last_message
         for marker in _WOUND_FOLLOWUP_MARKERS
     )
+def _has_active_pain_followup(
+    patient_id: str,
+    chat_history: Optional[List[Dict[str, str]]],
+    user_message: str,
+) -> bool:
+
+    if not (user_message or "").strip():
+        return False
+
+    last_asked_field = pain_logic.previous_pending_field(
+        chat_history
+    )
+
+    if last_asked_field is None:
+        return False
+
+    state = pain_state.peek_state(patient_id)
+
+    if state is None or state.pending_field != last_asked_field:
+        return False
+
+    return True
+
+
+# ============================================================================
+# REHABILITATION CONTINUATION
+#
+# Modelled exactly on agents.recovery_integration.check_recovery_continuation:
+# the ONLY Rehabilitation continuation entry point for the orchestrator.
+# True only when an EXISTING Rehabilitation session (rehab_state.peek_state,
+# never created here, None once stale) has a real pending_field -- the
+# agent's safety, done-today, weight-bearing or barrier question -- and the
+# message plausibly answers it:
+#
+#   - a yes/no ("no", "not yet", "yes, heel slides give me a sharp pain",
+#     "no sharp pain and no swelling", "I don't know"),
+#   - a weight-bearing-shaped answer ("partial weight bearing", "as
+#     tolerated", "NWB", "none"),
+#   - or a message short enough to be an answer ("hmm, let me think about
+#     that", "the evenings are too sore to face them").
+#
+# A question ("Can I shower tomorrow?") or an explicit switch to another
+# domain ("I need my tablets") is never a continuation, so fresh intent
+# classification runs for it exactly as before. Never uses "Rehabilitation
+# was the last active agent" as a signal; never mutates state.
+# ============================================================================
+
+_REHAB_SHORT_ANSWER_MAX_WORDS = 8
+
+# Leading yes/no shapes the Rehabilitation questions get ("not yet", "no,
+# nothing hurts", "yes, heel slides give me a sharp pain"); the bare forms
+# ("i did", "i haven't", "none", ...) come from pain_logic's answer lists.
+_REHAB_YES_NO_PATTERN = re.compile(
+    r"^(?:yes|yeah|yep|yup|no|nope|nah|none|nothing|never|not really|not quite|not yet|"
+    r"not today|haven'?t yet|all done|done)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_rehab_yes_no_answer(
+    lower: str,
+) -> bool:
+
+    return bool(
+        _REHAB_YES_NO_PATTERN.match(lower)
+        or pain_logic._is_affirmative_answer(lower)
+        or pain_logic._is_negative_answer(lower)
+        or pain_logic._is_uncertain_answer(lower)
+    )
+
+
+def _is_weight_bearing_shaped_answer(
+    lower: str,
+) -> bool:
+
+    if any(cue in lower for cue in rehab_agent._WEIGHT_CUES):
+        return True
+
+    short = lower.strip(" .!")
+
+    if any(
+        short == answer or short.startswith(answer + " ")
+        for answer in rehab_agent._WB_SHORT_ANSWERS
+    ):
+        return True
+
+    return normalize_weight_bearing_status(lower) is not None
+
+
+def check_rehab_continuation(
+    *,
+    patient_id: str,
+    user_message: str,
+) -> bool:
+
+    state = rehab_state.peek_state(patient_id)
+
+    if state is None or state.pending_field is None:
+        return False
+
+    lower = _normalise(user_message)
+
+    if not lower:
+        return False
+
+    # A question is never an answer: it goes to fresh classification (the
+    # same way "Can I climb stairs?" leaves an active Wound conversation).
+    if pain_logic._is_offtopic_question(lower):
+        return False
+
+    if _is_rehab_yes_no_answer(lower):
+        return True
+
+    if _is_weight_bearing_shaped_answer(lower):
+        return True
+
+    # An explicit switch to a non-Rehabilitation domain ("I need my
+    # tablets") is a topic switch, not a short answer; a Rehabilitation
+    # term in the message ("I did my exercises", "heel slides hurt") is
+    # the agent's own vocabulary and stays eligible.
+    if (
+        _has_explicit_different_domain(lower)
+        and rehab_agent.detect_topic(lower) is None
+        and not any(cue in lower for cue in rehab_agent._GENERAL_CUES)
+    ):
+        return False
+
+    return len(lower.split()) <= _REHAB_SHORT_ANSWER_MAX_WORDS
 
 
 _INTAKE_FOLLOWUP_MARKERS = (
@@ -639,6 +789,28 @@ def _prepare_triage_text(
 
 
 # ============================================================================
+# TRIAGE SEVERITY COMPARISON
+#
+# Used ONLY to pick which of two ALREADY-COMPUTED SafetyTriageEngine results
+# (raw-turn vs. cumulative-Pain-text) is more severe -- this performs no
+# triage classification of its own and adds no new clinical rule. Ranks
+# directly off SafetyTriageEngine's own `status_code` (RED=3, YELLOW=2,
+# GREEN=1 -- see triage/safety_triage.py), so it can never disagree with the
+# engine's own notion of severity ordering.
+# ============================================================================
+
+def _more_severe_triage(
+    a: dict,
+    b: dict,
+) -> dict:
+
+    a_rank = a.get("status_code", 0)
+    b_rank = b.get("status_code", 0)
+
+    return b if b_rank > a_rank else a
+
+
+# ============================================================================
 # ORCHESTRATOR
 # ============================================================================
 
@@ -686,9 +858,176 @@ class LAMOrchestrator:
 
         # ============================================================
         # STEP 1
+        # DETERMINE GENUINE WOUND / PAIN CONTEXT
+        #
+        # Computed BEFORE safety triage so Step 2's cumulative Pain
+        # safety check below can reuse this same, already-proven, narrow
+        # "is this turn genuinely part of an active Pain conversation"
+        # signal used for routing, rather than re-implementing a second,
+        # possibly-divergent copy of it just for safety purposes. These
+        # booleans are pure functions of `history` / `user_message` /
+        # `patient_id` (peek-only, never create state), so computing them
+        # before safety triage has run has no ordering dependency.
+        #
+        # IMPORTANT:
+        #
+        # This is checked BEFORE ScopeValidator and BEFORE the Recovery
+        # continuation check.
+        #
+        # Otherwise:
+        #
+        # "less warm"
+        #
+        # could be rejected as an isolated out-of-scope sentence.
+        #
+        # CRITICAL: a bare short answer ("yes", "same", "yesterday", ...)
+        # by itself must NOT establish Wound context. Only an explicit
+        # wound-related message, or a reply to an ACTUALLY active Wound
+        # Care follow-up question, does. This is what keeps a pending
+        # Recovery flexion answer such as "Same as yesterday." eligible
+        # for Recovery continuation (Step 4 below) when there is no
+        # active Wound conversation -- see _looks_like_short_wound_answer's
+        # docstring for why short_wound_answer is excluded here.
+        # ============================================================
+
+        active_wound_followup = _has_active_wound_followup(history)
+        explicit_wound_message = _contains_wound_term(user_message)
+        short_wound_answer = _looks_like_short_wound_answer(user_message)
+        explicit_different_domain = _has_explicit_different_domain(user_message)
+
+        detected_intents = IntentClassifier.detect_applicable_intents(
+            query=user_message,
+            context=context,
+        )
+
+        # An explicit different-domain topic switch (medication, rehab,
+        # daily activity, nutrition, mental wellbeing, recovery) must not
+        # let a STALE Wound/Pain marker in the chat history smuggle an
+        # unrelated agent into applicable_intents. detect_applicable_
+        # intents() retains Wound ownership for a terse in-conversation
+        # reply by scanning the WHOLE chat history for wound/incision
+        # wording -- but that scan cannot tell a genuine Wound follow-up
+        # apart from, e.g., Pain's own location question offering "around
+        # the incision" as one of its answer options. When the CURRENT
+        # message itself contains no wound term (explicit_wound_message
+        # is False) but an explicit different-domain term, any Wound
+        # intent here can only have come from that history scan, never
+        # from this turn's own wording, so it is dropped here -- the one
+        # place both signals are already available -- rather than
+        # weakening the shared detect_applicable_intents() heuristic
+        # other callers still rely on for genuine terse Wound follow-ups.
+        if (
+            explicit_different_domain
+            and not explicit_wound_message
+            and IntentLabel.WOUND_CARE in detected_intents
+        ):
+            detected_intents = tuple(
+                intent for intent in detected_intents
+                if intent != IntentLabel.WOUND_CARE
+            )
+
+                # Stronger two-signal Pain ownership check.
+        genuine_pain_followup = _has_active_pain_followup(
+            patient_id,
+            history,
+            user_message,
+        )
+
+        # Explicit wound messages still win -- even when the same message
+        # also carries pain wording (e.g. "My incision hurts and there is
+        # yellow fluid coming out."), so the len(detected_intents) == 1
+        # gate below must NOT apply to the explicit_wound_message signal,
+        # only to the softer active_wound_followup text-overlap signal.
+        # A generic Wound follow-up text match must still not steal a
+        # question that the Pain agent actually owns.
+        wound_context = (
+            explicit_wound_message
+            or (
+                active_wound_followup
+                and not genuine_pain_followup
+                and len(detected_intents) == 1
+            )
+        )
+
+        pain_context = (
+            genuine_pain_followup
+            and not explicit_different_domain
+            and not explicit_wound_message
+        )
+
+        print(
+            "[LAM][WOUND CONTEXT] "
+            f"active_followup={active_wound_followup} "
+            f"explicit_wound={explicit_wound_message} "
+            f"short_answer={short_wound_answer} "
+            f"different_domain={explicit_different_domain} "
+            f"wound_context={wound_context}"
+        )
+
+        print(
+            "[LAM][PAIN CONTEXT] "
+            f"active_followup={genuine_pain_followup} "
+            f"different_domain={explicit_different_domain} "
+            f"pain_context={pain_context}"
+        )
+
+
+        # ============================================================
+        # STEP 2
         # DETERMINISTIC SAFETY TRIAGE
         #
-        # This ALWAYS runs first.
+        # This ALWAYS runs before any agent dispatch or intent handling.
+        #
+        # MULTI-TURN CUMULATIVE SAFETY:
+        #
+        # SafetyTriageEngine's co-occurrence / compound-escalation rules
+        # (e.g. "calf" + "swollen"/"pain" -> RED) are matched against ONE
+        # string. When a conversation collects the same facts across
+        # several turns ("suddenly" -> "8" -> "my calf" -> "yes, it's
+        # swollen"), each turn's raw text alone never contains the full
+        # combination, so the same clinical picture that would be RED as
+        # one message could otherwise only ever reach YELLOW here.
+        #
+        # Fix: when this turn is genuinely part of an ACTIVE Pain
+        # conversation (`pain_context` above -- the same narrow
+        # pending-question/recent-assistant-question ownership signal
+        # already used for routing), ALSO evaluate SafetyTriageEngine on
+        # a synthesized text built from the accumulated Pain facts
+        # (pain_logic.build_cumulative_triage_text -- pure text
+        # synthesis, no triage logic of its own), and take the MORE
+        # SEVERE of the raw-turn result and the cumulative result.
+        #
+        # SafetyTriageEngine.evaluate() remains the ONLY authority that
+        # decides GREEN/YELLOW/RED -- this adds a second INPUT for it to
+        # evaluate, never a second decision-maker, never a duplicated or
+        # approximated rule. If the cumulative result is RED, it flows
+        # through the exact same RED branch (and therefore the exact
+        # same doctor-alert path) immediately below -- there is no
+        # second RED response path.
+        #
+        # `pain_context` already requires "not explicit_different_domain"
+        # and "not explicit_wound_message" -- exactly what keeps a stale
+        # Pain session from being cumulative-triaged against an unrelated
+        # later message: a stale pending Pain field followed by "Can I
+        # climb stairs?" has explicit_different_domain=True, so
+        # pain_context is False and this block does not run at all --
+        # only the raw "Can I climb stairs?" text is evaluated.
+        #
+        # pain_score / swelling_description (the existing structured API
+        # fields) are genuine patient-reported facts too, so they are
+        # passed into build_cumulative_triage_text() straight from this
+        # request's own arguments. A turn that omits them does not lose
+        # them either: pain_state.py caches the last value of each for as
+        # long as the active Pain assessment lasts (see
+        # PainSessionState.cached_structured_facts), read below as a
+        # fallback baseline -- bounded to the SAME active-assessment
+        # history boundary as `history` (active_history_start /
+        # start_new_assessment()), so it can never carry a value forward
+        # from a COMPLETED or ABANDONED earlier assessment into a later,
+        # unrelated one. temperature_c is deliberately NOT passed here:
+        # it already has its own direct, per-turn path straight into
+        # SafetyTriageEngine.evaluate() below, so folding it in here too
+        # would only risk double-applying the same threshold.
         # ============================================================
 
         triage_input = _prepare_triage_text(
@@ -708,6 +1047,82 @@ class LAMOrchestrator:
             f"level={triage.get('triage_level')} "
             f"escalated={triage.get('is_escalated')}"
         )
+
+        if pain_context:
+
+            # Read-only peek at this patient's session. peek_state() never
+            # creates state and already returns None for a stale/expired
+            # session, so a long-abandoned session can never contribute a
+            # stale cached fact here.
+            pain_session = pain_state.peek_state(patient_id)
+
+            # STRICT CONTINUATION CHECK -- `pain_context` above already
+            # guarantees the bridging routing signal agrees this turn
+            # stays with Pain, but that alone is not enough to trust the
+            # PEEKED session's active-history boundary/cached facts here:
+            # it can still be True after an ABANDONED interview followed
+            # by an off-topic detour and a genuinely NEW Pain complaint.
+            # Recomputing the STRICTER check here (literally the most
+            # recent assistant message, no bridging) keeps this
+            # cumulative reconstruction in sync with what
+            # PainSymptomsAgent.handle() will actually do with this turn
+            # (Step 6, below), so a stale/abandoned session's facts are
+            # never combined with THIS turn's own message here either.
+            is_continuation = (
+                pain_session is not None
+                and pain_logic.is_active_assessment_continuation(
+                    history, pain_session.pending_field,
+                )
+            )
+
+            if is_continuation:
+                # ACTIVE-ASSESSMENT HISTORY BOUNDARY -- reconstruct
+                # against the SAME boundary PainSymptomsAgent.handle()
+                # itself uses (pain_state.py's active_history_start),
+                # never the full, potentially cross-assessment `history`.
+                # This is what stops a COMPLETED or ABANDONED older Pain
+                # assessment's facts from being re-triaged as though they
+                # were part of THIS active assessment.
+                active_history_start = pain_session.active_history_start
+                scoped_history_for_pain = (
+                    history[active_history_start:]
+                    if active_history_start is not None
+                    else history
+                )
+                cached_pain_facts = pain_session.cached_structured_facts()
+            else:
+                # This turn will itself be treated as the START of a
+                # FRESH Pain assessment once dispatched -- no prior
+                # history and no supplemental structured-fact cache
+                # belongs to it yet.
+                scoped_history_for_pain = []
+                cached_pain_facts = {}
+
+            cumulative_triage_text = pain_logic.build_cumulative_triage_text(
+                scoped_history_for_pain, user_message,
+                pain_score=pain_score,
+                swelling_description=swelling_description,
+                cached_facts=cached_pain_facts,
+            )
+
+            if cumulative_triage_text:
+
+                cumulative_triage = SafetyTriageEngine.evaluate(
+                    symptoms=cumulative_triage_text,
+                    post_op_day=postop_day,
+                    temperature_c=None,
+                )
+
+                print(
+                    "[LAM][CUMULATIVE TRIAGE] "
+                    f"text={cumulative_triage_text!r} "
+                    f"level={cumulative_triage.get('triage_level')} "
+                    f"escalated={cumulative_triage.get('is_escalated')}"
+                )
+
+                triage = _more_severe_triage(
+                    triage, cumulative_triage,
+                )
 
 
         # ============================================================
@@ -739,6 +1154,12 @@ class LAMOrchestrator:
             # entry point hands the SMTP send off to a bounded thread
             # pool and returns immediately (see doctor_alert.py). Any
             # failure to even schedule it is caught and logged here too.
+            #
+            # This is also the SAME path a cumulative-Pain-triage RED
+            # (Step 2 above) flows through -- `triage` at this point may
+            # be either the raw-turn result or the cumulative result,
+            # whichever was more severe, but there is only ever this one
+            # RED branch and only ever this one notification call site.
             # ========================================================
 
             try:
@@ -753,14 +1174,17 @@ class LAMOrchestrator:
             except Exception as exc:
                 print(f"[DOCTOR ALERT] notification scheduling failed: {exc}")
 
-            reply_text = (
-                "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
-                "Your reported symptoms require urgent medical "
-                f"evaluation: **{reason_text}**.\n\n"
-                f"{triage.get('action_protocol', '')}\n\n"
-                "Please contact your hospital emergency line or "
-                "visit the nearest emergency department right away."
-            )
+            if triage.get("category") == "mental_health_crisis":
+                reply_text = MENTAL_HEALTH_CRISIS_TEMPLATE
+            else:
+                reply_text = (
+                    "🚨 **CRITICAL EMERGENCY ALERT**\n\n"
+                    "Your reported symptoms require urgent medical "
+                    f"evaluation: **{reason_text}**.\n\n"
+                    f"{triage.get('action_protocol', '')}\n\n"
+                    "Please contact your hospital emergency line or "
+                    "visit the nearest emergency department right away."
+                )
 
             return LAMResult(
                 reply=reply_text,
@@ -773,55 +1197,6 @@ class LAMOrchestrator:
                 action=ActionType.ESCALATE.value,
                 scope_status=ScopeStatus.NOT_EVALUATED.value,
             ).to_dict()
-
-
-        # ============================================================
-        # STEP 2
-        # DETERMINE GENUINE WOUND CONTEXT
-        #
-        # IMPORTANT:
-        #
-        # This is checked BEFORE ScopeValidator and BEFORE the Recovery
-        # continuation check.
-        #
-        # Otherwise:
-        #
-        # "less warm"
-        #
-        # could be rejected as an isolated out-of-scope sentence.
-        #
-        # CRITICAL: a bare short answer ("yes", "same", "yesterday", ...)
-        # by itself must NOT establish Wound context. Only an explicit
-        # wound-related message, or a reply to an ACTUALLY active Wound
-        # Care follow-up question, does. This is what keeps a pending
-        # Recovery flexion answer such as "Same as yesterday." eligible
-        # for Recovery continuation (Step 4 below) when there is no
-        # active Wound conversation -- see _looks_like_short_wound_answer's
-        # docstring for why short_wound_answer is excluded here.
-        # ============================================================
-
-        active_wound_followup = _has_active_wound_followup(history)
-        explicit_wound_message = _contains_wound_term(user_message)
-        short_wound_answer = _looks_like_short_wound_answer(user_message)
-        explicit_different_domain = _has_explicit_different_domain(user_message)
-        detected_intents = IntentClassifier.detect_applicable_intents(
-            query=user_message,
-            context=context,
-        )
-
-        wound_context = (
-            (active_wound_followup or explicit_wound_message)
-            and len(detected_intents) == 1
-        )
-
-        print(
-            "[LAM][WOUND CONTEXT] "
-            f"active_followup={active_wound_followup} "
-            f"explicit_wound={explicit_wound_message} "
-            f"short_answer={short_wound_answer} "
-            f"different_domain={explicit_different_domain} "
-            f"wound_context={wound_context}"
-        )
 
 
         # ============================================================
@@ -846,11 +1221,13 @@ class LAMOrchestrator:
         # Safety triage has already run.
         # ============================================================
 
-        if wound_context:
+        if wound_context or pain_context:
 
             scope_status = ScopeStatus.IN_SCOPE
             scope_reason = (
                 "Active or explicit Wound Care conversation"
+                if wound_context
+                else "Active Pain & Symptoms follow-up"
             )
 
             print(
@@ -858,6 +1235,7 @@ class LAMOrchestrator:
                 f"status={scope_status.value} "
                 f"reason={scope_reason}"
             )
+
 
         else:
 
@@ -925,7 +1303,16 @@ class LAMOrchestrator:
         #      agent" as a signal, and never bypasses fresh classification
         #      for an unrelated topic (wound, medication, etc.) even while
         #      a Recovery field is pending.
-        #   3. Otherwise, fresh IntentClassifier.
+        #   3. Otherwise, the narrow Rehabilitation continuation check --
+        #      matches ONLY when an existing Rehabilitation session (found
+        #      via rehab_state.peek_state(), never created here) has a real
+        #      pending_field and this message is a yes/no, a weight-
+        #      bearing-shaped answer, or short enough to be an answer. See
+        #      check_rehab_continuation() above for the full contract.
+        #      Same guarantees as the Recovery check: never "Rehab was the
+        #      last agent", never a question or an explicit other-domain
+        #      switch.
+        #   4. Otherwise, fresh IntentClassifier.
         #
         # This ordering is what keeps both directions safe:
         #   - "My wound is red and leaking." while a Recovery flexion
@@ -951,6 +1338,17 @@ class LAMOrchestrator:
                 "intent=wound_care "
                 "path=wound_context_priority"
             )
+        elif pain_context:
+
+            intent_label = IntentLabel.PAIN_SYMPTOMS
+            applicable_intents = (intent_label,)
+
+            print(
+                "[LAM][INTENT] "
+                f"query={user_message!r} "
+                "intent=pain_symptoms "
+                "path=pain_context_followup"
+            )
 
         else:
 
@@ -972,55 +1370,66 @@ class LAMOrchestrator:
                     "IntakeContextAgent without fresh intent classification."
                 )
 
-            else:
+            elif check_recovery_continuation(
+                patient_id=patient_id,
+                surgery_date_raw=surgery_date,
+                procedure=resolved_procedure,
+                user_message=user_message,
+            ):
 
-                is_recovery_continuation = check_recovery_continuation(
-                    patient_id=patient_id,
-                    surgery_date_raw=surgery_date,
-                    procedure=resolved_procedure,
-                    user_message=user_message,
+                intent_label = IntentLabel.RECOVERY_PROGRESS
+                applicable_intents = (intent_label,)
+
+                print(
+                    "[LAM][CONTINUATION] "
+                    f"query={user_message!r} "
+                    "matched a pending Recovery field -- routing directly to "
+                    "RecoveryProgressAgent without fresh intent classification."
                 )
 
-                if is_recovery_continuation:
+            elif check_rehab_continuation(
+                patient_id=patient_id,
+                user_message=user_message,
+            ):
 
-                    intent_label = IntentLabel.RECOVERY_PROGRESS
-                    applicable_intents = (intent_label,)
+                intent_label = IntentLabel.REHABILITATION
+                applicable_intents = (intent_label,)
 
-                    print(
-                        "[LAM][CONTINUATION] "
-                        f"query={user_message!r} "
-                        "matched a pending Recovery field -- routing directly to "
-                        "RecoveryProgressAgent without fresh intent classification."
+                print(
+                    "[LAM][CONTINUATION] "
+                    f"query={user_message!r} "
+                    "matched a pending Rehabilitation field -- routing directly to "
+                    "RehabilitationAgent without fresh intent classification."
+                )
+
+            else:
+
+                classification = (
+                    IntentClassifier.classify_detailed(
+                        query=user_message,
+                        context=context,
                     )
+                )
 
-                else:
+                intent_label = classification.intent
+                applicable_intents = detected_intents
+                if intent_label not in applicable_intents:
+                    applicable_intents = (intent_label,) + applicable_intents
 
-                    classification = (
-                        IntentClassifier.classify_detailed(
-                            query=user_message,
-                            context=context,
-                        )
-                    )
-
-                    intent_label = classification.intent
-                    applicable_intents = detected_intents
-                    if intent_label not in applicable_intents:
-                        applicable_intents = (intent_label,) + applicable_intents
-
-                    # IMPORTANT DEBUG OUTPUT.
-                    #
-                    # This lets you immediately see whether the problem is:
-                    # classifier -> router -> agent -> response.
-                    print(
-                        "[LAM][INTENT] "
-                        f"query={user_message!r} "
-                        f"intent={intent_label.value} "
-                        f"path={classification.decision_path} "
-                        f"top1={getattr(classification.top1_intent, 'value', None)} "
-                        f"score={classification.top1_score:.3f} "
-                        f"top2={getattr(classification.top2_intent, 'value', None)} "
-                        f"margin={classification.margin:.3f}"
-                    )
+                # IMPORTANT DEBUG OUTPUT.
+                #
+                # This lets you immediately see whether the problem is:
+                # classifier -> router -> agent -> response.
+                print(
+                    "[LAM][INTENT] "
+                    f"query={user_message!r} "
+                    f"intent={intent_label.value} "
+                    f"path={classification.decision_path} "
+                    f"top1={getattr(classification.top1_intent, 'value', None)} "
+                    f"score={classification.top1_score:.3f} "
+                    f"top2={getattr(classification.top2_intent, 'value', None)} "
+                    f"margin={classification.margin:.3f}"
+                )
 
 
         # ============================================================

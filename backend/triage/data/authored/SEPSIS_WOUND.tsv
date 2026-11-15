@@ -1,0 +1,70 @@
+RED	TKA	indirect	there's thick yellow stuff coming out the bottom of my knee scar and it stinks
+RED	ANY	hard_pos,indirect	dressing smells like something has gone off, even after I changed it this morning
+RED	ANY	temp_in_text,multi_symptom	wound is red and hot and my temp is 38.7 tonight
+RED	THA	indian_english	Doctor sir, from hip stitches some white thick discharge is coming since yesterday, kindly advise urgently
+RED	TKA	typo,hard_pos	red patch round my knee cut was the size of a coin this morning now its half way down my shin
+RED	ANY	carer,multi_symptom	My dad's incision is weeping greenish fluid and he's been shivering under three blankets all afternoon
+RED	ANY	hard_pos,indirect	the skin around the cut has gone dark red and shiny and the red bit is creeping further every few hours
+RED	TKA	temp_in_text	knee wound oozing cloudy fluid, 101.8F
+RED	THA	indirect	Week 3 after hip replacement. There's a boil-like lump on the scar that burst and smelled awful.
+RED	ANY	indian_english,temp_in_text,multi_symptom	having fever 102 since 2 days and the wound area is very red and paining, what to do
+RED	ANY	typo	pus on my dresing again today, 2nd time
+RED	ANY	hard_pos,multi_symptom	teeth chattering, can't get warm, and the incision is more swollen and angry looking than yesterday
+RED	TKA	carer,indirect	Mum's knee bandage has a yellow-green stain and a smell we noticed from across the room
+RED	ANY	hard_pos	drew a pen line round the redness at lunch like the nurse said, it's gone past the line by two fingers already
+RED	THA	indian_english	Pus is coming from top end of hip incision, 12 days post op. Please advice.
+RED	ANY	temp_in_text	Fever of 39 and my scar is throbbing
+RED	ANY	-	I squeezed the wound gently and creamy stuff came out
+RED	ANY	hard_pos,indirect	the dressing pad looks like it's soaked in custard
+RED	TKA	indian_english	Knee operation done 10 days back. Now the stitch line is having yellow pus and bad odour. Please tell what to do.
+RED	ANY	multi_symptom	I feel awful, shaking, sweaty, and the redness on my leg has spread up toward my thigh
+RED	THA	temp_in_text	temp 38.5 exactly and hip wound red and tender
+RED	ANY	hard_pos,indirect	smells sweet and rotten when I take the dressing off
+RED	ANY	typo,temp_in_text	wound leakin brownish stuff n thermometer said 38.9
+RED	TKA	multi_symptom	Six weeks out from my knee replacement and doing so well, then yesterday the scar went red, hot and swollen and today it's leaking yellow gunk. I honestly thought I was past all this.
+RED	THA	carer,temp_in_text,multi_symptom	My husband had his hip done 2 weeks ago. Tonight he's 38.6, confused, and the wound looks puffy.
+RED	ANY	hard_pos,indirect	there's a red streak running up from the wound towards my groin
+RED	TKA	indian_english,carer,multi_symptom	My mother had knee replacement. Her wound is giving very bad smell and she is having shivering. Kindly guide.
+RED	ANY	multi_symptom	Rigors last night and the incision is leaking
+RED	ANY	-	green discharge, help
+RED	TKA	hard_pos,indirect	My whole knee has gone the colour of a tomato and it's spreading down past my ankle
+RED	ANY	temp_in_text,multi_symptom	temperature 101.5 F, chills, incision tender and pink
+RED	THA	question	Is it ok that my hip wound has a small amount of pus? Otherwise I feel fine.
+RED	ANY	indirect	probably nothing but the wound smells funny today and there's a yellow crust that keeps coming back wet
+RED	ANY	indian_english,typo	sir pls help, pus coming from wound and bahut dard since morning
+RED	ANY	hard_pos	the redness was a thin pink line yesterday, today it's a hand-width angry band
+RED	TKA	temp_in_text	knee hot, wound red, 38.8C on the ear thermometer
+RED	ANY	multi_symptom	Shivering fits on and off all day and the scar has a red ring around it that's grown since breakfast
+RED	ANY	indian_english	There is one small hole in the scar which is continuously draining thick yellow liquid
+RED	THA	carer	Grandad's hip dressing has leaked through and it smells like rotten meat. He won't let us call anyone.
+RED	ANY	hard_pos,indirect,multi_symptom	I feel like I have the flu, shaking under the duvet, and my wound is sore and puffy
+RED	ANY	typo	redness spreadin fast round my scar, wat do i do
+RED	ANY	temp_in_text,indian_english	Temperature is 103 F and stitches area is swollen, red. Doctor is not picking phone.
+RED	ANY	indirect	Wound is weeping something that looks like pea soup
+RED	TKA	multi_symptom,hard_pos	knee is twice the size of the other one, red to mid-thigh, I'm sweating buckets and feel really ill
+RED	ANY	-	The district nurse swabbed it on Monday for pus, now it's worse and the smell is back
+RED	ANY	temp_in_text,typo	39.2 and incison hot
+RED	THA	hard_pos	The bottom of my hip scar has gone a dusky purple-red and the colour is moving outward fast
+RED	ANY	indian_english	Wound is having foul smell from today morning only. Should I come to hospital?
+RED	TKA	carer,temp_in_text,multi_symptom	Dad's temp is 101.6, he's shaky, and the knee wound is oozing
+RED	ANY	indian_english	Already taking antibiotics for wound since 3 days but red area is increasing and now pus also coming.
+RED	ANY	hard_pos	can smell my own wound through the bandage
+RED	ANY	typo,multi_symptom	stinky wound + chills
+RED	ANY	typo,multi_symptom	nausea, shakin, wound seeping yellow, i just feel wrong
+RED	TKA	hard_pos,indirect	Lump at the top of my knee scar went soft and white in the middle and burst
+RED	ANY	indian_english	Since 3 days wound is red and today morning red colour has gone till the ankle, very worried
+YELLOW	ANY	hard_neg,negation	a bit of pink around the staples but no pus, no smell, no fever
+YELLOW	TKA	-	Incision is slightly warm and the edges look pinker than last week. Not spreading.
+YELLOW	ANY	hard_neg,negation,temp_in_text	no pus, smell is fine, but temp is 38.1 and the scar is a bit red
+YELLOW	ANY	indian_english,negation	Small redness near stitches, no pus, no fever. Is it infection? Kindly check.
+YELLOW	ANY	hard_neg	I was worried it was infected but the nurse said the pink fluid is just normal drainage; still a little damp today
+GREEN	ANY	question	what does a wound infection actually look like so I know what to watch for?
+GREEN	ANY	hard_neg,negation	Checked my wound tonight: no redness, no pus, no smell, dry and closed. Just wanted to log it.
+GREEN	TKA	hard_neg	Had a wound infection scare last week, swab came back clear and my knee scar is healed and dry now
+GREEN	ANY	question	If pus ever came out of the scar, would I go to A&E or ring the ward?
+GREEN	TKA	question,indian_english	what are the signs of infection after knee replacement, kindly explain
+GREEN	THA	hard_neg,temp_in_text,indian_english	hip wound is looking good, no discharge, temperature is 36.9 only
+GREEN	ANY	hard_neg,negation,typo	no smell no pus no fevr, just itchy scar now its healed
+GREEN	ANY	question	Can I put antiseptic cream on the scar or will it cause an infection?
+GREEN	ANY	hard_neg,carer	Mum finished her antibiotics for the wound infection, district nurse signed her off, scar is flat and pale
+GREEN	ANY	question	How long am I at risk of a joint infection after surgery?

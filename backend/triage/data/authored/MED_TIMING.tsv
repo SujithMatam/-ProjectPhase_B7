@@ -1,0 +1,48 @@
+# MED_TIMING: when to take painkillers, combining paracetamol/ibuprofen, how long on blood thinners, stopping opioids. Lead label GREEN.
+GREEN	ANY	question	How many hours do I need to leave between paracetamol doses?
+GREEN	ANY	hard_neg,question	How long do I stay on the blood thinner to stop clots forming?
+GREEN	ANY	question	Is it fine to take the morning tablets with tea instead of water?
+GREEN	ANY	question,indian_english	Paracetamol 650 I am taking three times a day. Can I make it four times? Kindly advise.
+GREEN	ANY	question	When should I start cutting down the tramadol? I'm three weeks out now.
+GREEN	ANY	question	Can I have a glass of wine with my apixaban?
+GREEN	ANY	typo,question	how long after eating shud i take the pantoprazole
+GREEN	ANY	hard_neg,negation	No bleeding, no bruises, all good. Just need to know if I take rivaroxaban with food.
+GREEN	ANY	hard_neg,question	Is it safe to take ibuprofen while I'm on aspirin for clots?
+GREEN	TKA	question	My knee pain is much better. Do I need to finish the whole box of tramadol or can I stop?
+GREEN	ANY	question,indian_english	Blood thinner injection is to be taken at what time daily, morning or night?
+GREEN	ANY	question	Can I crush the paracetamol? I struggle to swallow the big tablets.
+GREEN	ANY	carer,question	Mum's on paracetamol, tramadol and apixaban. Is there a chart for what time each one goes?
+GREEN	ANY	hard_neg,question	What happens if someone takes too much paracetamol? I'm careful, I just want to know the limit.
+GREEN	ANY	question	Do I take the laxative at night or in the morning?
+GREEN	THA	question	The surgeon said stop the aspirin at six weeks after my hip. Is that six weeks from the op or from discharge?
+YELLOW	ANY	-	I've been taking paracetamol every 4 hours and the pain still isn't controlled. What else can I take?
+GREEN	ANY	typo,question	can i take my clot injection at 8pm insted of 6pm from now on
+GREEN	ANY	question	Is it OK to take co-codamol on top of the paracetamol?
+GREEN	ANY	indian_english,question	Pain is reduced now, can I stop the tablets slowly or suddenly? What is the correct way?
+GREEN	ANY	question	Should I take my pain relief before bed even if I'm not sore, so I sleep through?
+RED	ANY	multi_symptom	Took the aspirin and the ibuprofen together all week even though the leaflet said not to, and now I'm vomiting blood.
+GREEN	ANY	hard_neg,negation	Stomach is fine, no heartburn, but should I still take the pantoprazole while I'm on anti-inflammatories?
+GREEN	TKA	question	Do the injections finish at 14 days for a knee? My neighbour with a new hip had them for 35.
+GREEN	ANY	question	Is grapefruit juice a problem with any of my post-op tablets?
+YELLOW	ANY	-	Started taking the tramadol at the times you said but I get dizzy every time. Should I change when I take it?
+GREEN	ANY	question,indian_english	Sir can I take the gas tablet and pain tablet at same time or keep some gap?
+GREEN	ANY	question	Can the morning and evening oxycodone be taken 10 hours apart instead of 12 to fit my day?
+GREEN	ANY	question,typo	whats the max paracetamol in 24hrs, i weigh 52kg
+GREEN	ANY	hard_neg	Pain is only bad at night now. Can I drop the daytime doses and just keep the bedtime one?
+RED	ANY	carer,hard_pos	Dad took his paracetamol on time but also cold-and-flu powders all day, and now he's confused and drowsy.
+GREEN	ANY	hard_neg,question	Do I need to come off the blood thinner before my dental check-up next month?
+GREEN	ANY	question	When is it safe to go back to my usual ibuprofen for my back?
+YELLOW	ANY	-	Missed my apixaban this morning because I wasn't sure of the time. What now?
+GREEN	ANY	question	If I wake at 3am in pain, can I take the next paracetamol early or do I have to wait?
+GREEN	ANY	carer,indian_english,question	Writing for my father. He is taking pain tablet and blood thinner. Can he take his sugar tablets at the same time?
+GREEN	ANY	-	Weaning off oxycodone, down to one a day and feeling good. When can I stop completely?
+GREEN	ANY	hard_neg,question	Is there a best time of day to do the injection so the bruising is less?
+GREEN	ANY	question,indian_english	What is the reason for giving pantoprazole with every pain tablet?
+YELLOW	ANY	-	Had to double up the oxycodone last night because the pain was so bad. Is that ok to keep doing?
+GREEN	ANY	question	Can I take an antihistamine for hay fever with my painkillers?
+GREEN	THA	question	On average, how long do people keep taking pain tablets after a hip replacement?
+RED	ANY	multi_symptom	I've been timing my rivaroxaban perfectly but today my calf is red, hot and really painful, nothing to do with the scar.
+GREEN	ANY	typo,hard_neg	no side effects at all so far, just wondering if i shud take tramadol with or w/o food
+GREEN	ANY	question,indian_english	After 6 weeks, aspirin should be stopped by myself or doctor will tell?
+GREEN	ANY	question	Paracetamol with or without food?
+YELLOW	ANY	-	The painkillers wear off two hours before the next dose is due and I'm in agony waiting.

@@ -1,0 +1,429 @@
+{
+ "test": {
+  "rules": {
+   "n": 266,
+   "n_red": 104,
+   "red_tp": 20,
+   "red_recall": 0.19230769230769232,
+   "red_recall_ci": [
+    0.12808145148564615,
+    0.27845476692320786
+   ],
+   "red_precision": 0.6666666666666666,
+   "macro_f1": 0.3569316175719643,
+   "red_to_green": 74,
+   "red_to_yellow": 10,
+   "green_to_red": 5,
+   "yellow_to_red": 5,
+   "red_calls_per_100": 11.278195488721805,
+   "emails": 30,
+   "emails_per_100": 11.278195488721805,
+   "red_rows_emailed": 20,
+   "email_recall": 0.19230769230769232,
+   "email_precision": 0.6666666666666666,
+   "non_red_emails": 10,
+   "suppressed": 0,
+   "suppressed_true_red": 0
+  },
+  "classifier_only": {
+   "n": 266,
+   "n_red": 104,
+   "red_tp": 96,
+   "red_recall": 0.9230769230769231,
+   "red_recall_ci": [
+    0.8555044531758775,
+    0.9605082465119483
+   ],
+   "red_precision": 0.7058823529411765,
+   "macro_f1": 0.6778314546430488,
+   "red_to_green": 2,
+   "red_to_yellow": 6,
+   "green_to_red": 6,
+   "yellow_to_red": 34,
+   "red_calls_per_100": 51.12781954887218,
+   "emails": 136,
+   "emails_per_100": 51.12781954887218,
+   "red_rows_emailed": 96,
+   "email_recall": 0.9230769230769231,
+   "email_precision": 0.7058823529411765,
+   "non_red_emails": 40,
+   "suppressed": 0,
+   "suppressed_true_red": 0
+  },
+  "hybrid": {
+   "n": 266,
+   "n_red": 104,
+   "red_tp": 100,
+   "red_recall": 0.9615384615384616,
+   "red_recall_ci": [
+    0.9052524856261187,
+    0.9849431867606003
+   ],
+   "red_precision": 0.7142857142857143,
+   "macro_f1": 0.7028536733454765,
+   "red_to_green": 0,
+   "red_to_yellow": 4,
+   "green_to_red": 6,
+   "yellow_to_red": 34,
+   "red_calls_per_100": 52.63157894736842,
+   "emails": 94,
+   "emails_per_100": 35.338345864661655,
+   "red_rows_emailed": 83,
+   "email_recall": 0.7980769230769231,
+   "email_precision": 0.8829787234042553,
+   "non_red_emails": 11,
+   "suppressed": 46,
+   "suppressed_true_red": 17
+  }
+ },
+ "challenge": {
+  "rules": {
+   "n": 150,
+   "n_red": 58,
+   "red_tp": 14,
+   "red_recall": 0.2413793103448276,
+   "red_recall_ci": [
+    0.1495887429887828,
+    0.36529980358343395
+   ],
+   "red_precision": 0.4375,
+   "macro_f1": 0.33258519340650305,
+   "red_to_green": 39,
+   "red_to_yellow": 5,
+   "green_to_red": 12,
+   "yellow_to_red": 6,
+   "red_calls_per_100": 21.333333333333332,
+   "emails": 32,
+   "emails_per_100": 21.333333333333332,
+   "red_rows_emailed": 14,
+   "email_recall": 0.2413793103448276,
+   "email_precision": 0.4375,
+   "non_red_emails": 18,
+   "suppressed": 0,
+   "suppressed_true_red": 0
+  },
+  "classifier_only": {
+   "n": 150,
+   "n_red": 58,
+   "red_tp": 56,
+   "red_recall": 0.9655172413793104,
+   "red_recall_ci": [
+    0.8827085444155522,
+    0.9904920717544576
+   ],
+   "red_precision": 0.6363636363636364,
+   "macro_f1": 0.6179381247874399,
+   "red_to_green": 0,
+   "red_to_yellow": 2,
+   "green_to_red": 6,
+   "yellow_to_red": 26,
+   "red_calls_per_100": 58.666666666666664,
+   "emails": 88,
+   "emails_per_100": 58.666666666666664,
+   "red_rows_emailed": 56,
+   "email_recall": 0.9655172413793104,
+   "email_precision": 0.6363636363636364,
+   "non_red_emails": 32,
+   "suppressed": 0,
+   "suppressed_true_red": 0
+  },
+  "hybrid": {
+   "n": 150,
+   "n_red": 58,
+   "red_tp": 58,
+   "red_recall": 1.0,
+   "red_recall_ci": [
+    0.9378821432937142,
+    0.9999999999999999
+   ],
+   "red_precision": 0.6444444444444445,
+   "macro_f1": 0.6269611351578565,
+   "red_to_green": 0,
+   "red_to_yellow": 0,
+   "green_to_red": 6,
+   "yellow_to_red": 26,
+   "red_calls_per_100": 60.0,
+   "emails": 66,
+   "emails_per_100": 44.0,
+   "red_rows_emailed": 54,
+   "email_recall": 0.9310344827586207,
+   "email_precision": 0.8181818181818182,
+   "non_red_emails": 12,
+   "suppressed": 24,
+   "suppressed_true_red": 4
+  }
+ },
+ "unseen_test": {
+  "rules": {
+   "n": 275,
+   "n_red": 105,
+   "red_tp": 6,
+   "red_recall": 0.05714285714285714,
+   "red_recall_ci": [
+    0.026449634282568767,
+    0.11909654861610877
+   ],
+   "red_precision": 0.5,
+   "macro_f1": 0.27299593830206076,
+   "red_to_green": 81,
+   "red_to_yellow": 18,
+   "green_to_red": 4,
+   "yellow_to_red": 2,
+   "red_calls_per_100": 4.363636363636363,
+   "emails": 12,
+   "emails_per_100": 4.363636363636363,
+   "red_rows_emailed": 6,
+   "email_recall": 0.05714285714285714,
+   "email_precision": 0.5,
+   "non_red_emails": 6,
+   "suppressed": 0,
+   "suppressed_true_red": 0
+  },
+  "classifier_only": {
+   "n": 275,
+   "n_red": 105,
+   "red_tp": 89,
+   "red_recall": 0.8476190476190476,
+   "red_recall_ci": [
+    0.7667269508803727,
+    0.9039733571669017
+   ],
+   "red_precision": 0.6357142857142857,
+   "macro_f1": 0.6038885824600111,
+   "red_to_green": 6,
+   "red_to_yellow": 10,
+   "green_to_red": 13,
+   "yellow_to_red": 38,
+   "red_calls_per_100": 50.90909090909091,
+   "emails": 140,
+   "emails_per_100": 50.90909090909091,
+   "red_rows_emailed": 89,
+   "email_recall": 0.8476190476190476,
+   "email_precision": 0.6357142857142857,
+   "non_red_emails": 51,
+   "suppressed": 0,
+   "suppressed_true_red": 0
+  },
+  "hybrid": {
+   "n": 275,
+   "n_red": 105,
+   "red_tp": 102,
+   "red_recall": 0.9714285714285714,
+   "red_recall_ci": [
+    0.9193437087803026,
+    0.9902361610372342
+   ],
+   "red_precision": 0.6666666666666666,
+   "macro_f1": 0.6404177433247201,
+   "red_to_green": 1,
+   "red_to_yellow": 2,
+   "green_to_red": 13,
+   "yellow_to_red": 38,
+   "red_calls_per_100": 55.63636363636363,
+   "emails": 101,
+   "emails_per_100": 36.72727272727273,
+   "red_rows_emailed": 80,
+   "email_recall": 0.7619047619047619,
+   "email_precision": 0.7920792079207921,
+   "non_red_emails": 21,
+   "suppressed": 52,
+   "suppressed_true_red": 22
+  }
+ },
+ "unseen_test_per_scenario_red": {
+  "ALLERGIC_REACTION": {
+   "n": 40,
+   "rules": 1,
+   "clf": 38,
+   "hybrid": 38
+  },
+  "FOLLOWUP_ADMIN": {
+   "n": 3,
+   "rules": 0,
+   "clf": 2,
+   "hybrid": 2
+  },
+  "HIGH_FEVER": {
+   "n": 50,
+   "rules": 1,
+   "clf": 38,
+   "hybrid": 50
+  },
+  "MOOD_SLEEP": {
+   "n": 4,
+   "rules": 1,
+   "clf": 3,
+   "hybrid": 4
+  },
+  "UNCONTROLLED_PAIN": {
+   "n": 8,
+   "rules": 3,
+   "clf": 8,
+   "hybrid": 8
+  }
+ },
+ "audit_rows": [
+  {
+   "id": "CH-144",
+   "text": "No chest pain, no chills",
+   "label": "GREEN",
+   "rules": "RED",
+   "rules_email": true,
+   "hybrid": "YELLOW",
+   "reasons": [
+    "classifier"
+   ],
+   "p_red": 0.08189636468887329,
+   "email": false,
+   "flags": []
+  },
+  {
+   "id": "CH-145",
+   "text": "I don't have shortness of breath",
+   "label": "GREEN",
+   "rules": "RED",
+   "rules_email": true,
+   "hybrid": "RED",
+   "reasons": [
+    "classifier"
+   ],
+   "p_red": 0.7439947724342346,
+   "email": true,
+   "flags": []
+  },
+  {
+   "id": "CH-146",
+   "text": "I cannot breathe properly",
+   "label": "RED",
+   "rules": "GREEN",
+   "rules_email": false,
+   "hybrid": "RED",
+   "reasons": [
+    "classifier"
+   ],
+   "p_red": 0.9192711710929871,
+   "email": true,
+   "flags": []
+  },
+  {
+   "id": "CH-147",
+   "text": "I can\u2019t breathe",
+   "label": "RED",
+   "rules": "GREEN",
+   "rules_email": false,
+   "hybrid": "RED",
+   "reasons": [
+    "classifier"
+   ],
+   "p_red": 0.9663057923316956,
+   "email": true,
+   "flags": []
+  },
+  {
+   "id": "CH-148",
+   "text": "fever of 39",
+   "label": "RED",
+   "rules": "GREEN",
+   "rules_email": false,
+   "hybrid": "RED",
+   "reasons": [
+    "high_fever",
+    "classifier"
+   ],
+   "p_red": 0.6953672766685486,
+   "email": true,
+   "flags": []
+  },
+  {
+   "id": "CH-149",
+   "text": "My knee is a little red and swollen",
+   "label": "YELLOW",
+   "rules": "RED",
+   "rules_email": true,
+   "hybrid": "RED",
+   "reasons": [
+    "classifier"
+   ],
+   "p_red": 0.9204654693603516,
+   "email": true,
+   "flags": []
+  },
+  {
+   "id": "CH-150",
+   "text": "fluid coming from my incision",
+   "label": "YELLOW",
+   "rules": "GREEN",
+   "rules_email": false,
+   "hybrid": "RED",
+   "reasons": [
+    "classifier"
+   ],
+   "p_red": 0.6691245436668396,
+   "email": true,
+   "flags": []
+  }
+ ],
+ "hybrid_red_misses": [
+  {
+   "set": "test",
+   "id": "ALLERGIC_REACTION-013",
+   "text": "Wheezy and chest tight since the tramadol, never had asthma",
+   "hybrid": "YELLOW",
+   "p_red": 0.101
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-012",
+   "text": "My father is shouting with pain in leg after knee surgery. Tramadol given 1 hour back but no relief. Leg is tight.",
+   "hybrid": "YELLOW",
+   "p_red": 0.123
+  },
+  {
+   "set": "test",
+   "id": "COMPARTMENT-058",
+   "text": "Is so much pain normal on day 2? Leg is very tight and stiff like wood and no medicine is working.",
+   "hybrid": "YELLOW",
+   "p_red": 0.041
+  },
+  {
+   "set": "test",
+   "id": "WOUND_OPEN-030",
+   "text": "When I bend the knee the cut gapes and I can see right into it; when I straighten it closes again",
+   "hybrid": "YELLOW",
+   "p_red": 0.096
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-013",
+   "text": "Wheezy and chest tight since the tramadol, never had asthma",
+   "hybrid": "YELLOW",
+   "p_red": 0.036
+  },
+  {
+   "set": "unseen_test",
+   "id": "ALLERGIC_REACTION-032",
+   "text": "Is it normal for my throat to feel tight after the antibiotic?",
+   "hybrid": "GREEN",
+   "p_red": 0.007
+  },
+  {
+   "set": "unseen_test",
+   "id": "FOLLOWUP_ADMIN-014",
+   "text": "Waiting for my wound check next week but the dressing has soaked right through with blood twice today.",
+   "hybrid": "YELLOW",
+   "p_red": 0.015
+  }
+ ],
+ "model_info": {
+  "model_used": "M2:m2_main_it3_seed4",
+  "t_red": 0.21700508892536163,
+  "t_yel": 0.2371876835823059,
+  "t_alert": 0.6369696855545044,
+  "load_error": null
+ },
+ "unseen_thresholds": {
+  "t_red": 0.0973334088921547,
+  "t_yel": 0.1720932424068451,
+  "t_alert": 0.6043161749839783
+ }
+}

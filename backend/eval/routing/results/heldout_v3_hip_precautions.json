@@ -1,0 +1,747 @@
+{
+  "meta": {
+    "label": "heldout_v3_hip_precautions",
+    "case_set": "heldout_v3",
+    "commit": "4286cd5",
+    "date": "2026-11-12",
+    "semantic_first": false,
+    "orchestrator": true,
+    "cases": 12,
+    "classifier_seconds": 20.0,
+    "orchestrator_seconds": 0.3,
+    "thresholds": {
+      "SEMANTIC_MIN_SCORE": 0.35,
+      "SEMANTIC_MIN_MARGIN": 0.04
+    }
+  },
+  "summary": {
+    "per_agent": {
+      "rehabilitation": {
+        "classifier": {
+          "n": 3,
+          "correct": 2
+        },
+        "classifier_clear": {
+          "n": 0,
+          "correct": 0
+        },
+        "classifier_openings": {
+          "n": 3,
+          "correct": 2
+        },
+        "orchestrator": {
+          "n": 3,
+          "correct": 2
+        },
+        "orchestrator_strict": {
+          "n": 3,
+          "correct": 2
+        },
+        "orchestrator_openings": {
+          "n": 3,
+          "correct": 2
+        }
+      },
+      "daily_activity": {
+        "classifier": {
+          "n": 9,
+          "correct": 7
+        },
+        "classifier_clear": {
+          "n": 0,
+          "correct": 0
+        },
+        "classifier_openings": {
+          "n": 9,
+          "correct": 7
+        },
+        "orchestrator": {
+          "n": 9,
+          "correct": 7
+        },
+        "orchestrator_strict": {
+          "n": 9,
+          "correct": 7
+        },
+        "orchestrator_openings": {
+          "n": 9,
+          "correct": 7
+        }
+      }
+    },
+    "overall": {
+      "classifier": {
+        "n": 12,
+        "correct": 9
+      },
+      "classifier_clear": {
+        "n": 0,
+        "correct": 0
+      },
+      "classifier_openings": {
+        "n": 12,
+        "correct": 9
+      },
+      "orchestrator": {
+        "n": 12,
+        "correct": 9
+      },
+      "orchestrator_strict": {
+        "n": 12,
+        "correct": 9
+      },
+      "orchestrator_openings": {
+        "n": 12,
+        "correct": 9
+      },
+      "orchestrator_special": {
+        "n": 0,
+        "correct": 0
+      },
+      "multi_agent_turns": 0,
+      "pre_empted": {}
+    },
+    "miss_groups": {
+      "overbroad keyword": [
+        "V001"
+      ],
+      "semantic prototype pull": [
+        "V011"
+      ],
+      "semantic threshold": [
+        "V003"
+      ]
+    },
+    "decision_paths": {
+      "deterministic": 6,
+      "fallback_low_margin": 1,
+      "semantic": 5
+    }
+  },
+  "rows": [
+    {
+      "id": "V001",
+      "text": "Which hip movements are banned for the first few weeks after my hip replacement?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "deterministic",
+        "top1_intent": "recovery_progress",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "recovery_progress",
+          "keywords": [
+            "weeks"
+          ],
+          "rule_position": 7
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": false,
+      "classifier_rule": "overbroad keyword: recovery_progress matched weeks",
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": false,
+      "orchestrator_correct_strict": false
+    },
+    {
+      "id": "V002",
+      "text": "Is it safe to sit on the low sofa in our hall or is it too low for my new hip?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "sit"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V003",
+      "text": "Doctor said don't cross the legs, till when I have to follow that?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "recovery_progress",
+        "decision_path": "fallback_low_margin",
+        "top1_intent": "mental_wellbeing",
+        "top1_score": 0.5138,
+        "top2_intent": "daily_activity",
+        "top2_score": 0.4783,
+        "margin": 0.0355,
+        "matched_prototype": "I feel anxious about moving my operated leg."
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": false,
+      "classifier_rule": "semantic threshold (margin 0.04 < 0.04) -> no keyword -> default recovery_progress",
+      "orchestrator": {
+        "intent": "recovery_progress",
+        "routed_intents": [
+          "recovery_progress"
+        ],
+        "target_agent": "RecoveryProgressAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": false,
+      "orchestrator_correct_strict": false
+    },
+    {
+      "id": "V004",
+      "text": "How do I tie my shoe laces without bending too much at the hip?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "rehabilitation",
+        "decision_path": "semantic",
+        "top1_intent": "rehabilitation",
+        "top1_score": 0.5376,
+        "top2_intent": "daily_activity",
+        "top2_score": 0.41,
+        "margin": 0.1276,
+        "matched_prototype": "How can I get more bend and straightening in the operated joint?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "rehabilitation",
+        "routed_intents": [
+          "rehabilitation"
+        ],
+        "target_agent": "RehabilitationAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V005",
+      "text": "Can I lie on my side at night, and should I keep a pillow between the knees?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "semantic",
+        "top1_intent": "daily_activity",
+        "top1_score": 0.526,
+        "top2_intent": "medication",
+        "top2_score": 0.348,
+        "margin": 0.178,
+        "matched_prototype": "What is the best sleeping position after surgery?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V006",
+      "text": "My in-laws' house has only an Indian-style toilet, can I squat on it with the new hip?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "toilet"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V007",
+      "text": "Sitting cross-legged on the floor for meals, is that allowed after hip surgery?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "sitting"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V008",
+      "text": "What positions should my hip not go into while it heals?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "semantic",
+        "top1_intent": "daily_activity",
+        "top1_score": 0.6333,
+        "top2_intent": "rehabilitation",
+        "top2_score": 0.5017,
+        "margin": 0.1316,
+        "matched_prototype": "Which hip precautions should I follow in everyday life?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V009",
+      "text": "Is twisting my body while standing at the kitchen counter risky for the new hip?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "standing"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V010",
+      "text": "How low can a chair be before it is unsafe for my operated hip?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "deterministic",
+        "top1_intent": "daily_activity",
+        "top1_score": 1.0,
+        "top2_intent": null,
+        "top2_score": 0.0,
+        "margin": 1.0,
+        "matched_prototype": null
+      },
+      "keyword_hits": [
+        {
+          "intent": "daily_activity",
+          "keywords": [
+            "chair"
+          ],
+          "rule_position": 4
+        }
+      ],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    },
+    {
+      "id": "V011",
+      "text": "Can I put on my socks myself or should I use a sock aid?",
+      "expected": "daily_activity",
+      "acceptable": [
+        "daily_activity",
+        "rehabilitation"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:hip_precautions",
+      "surgery": "THA",
+      "classifier": {
+        "intent": "wound_care",
+        "decision_path": "semantic",
+        "top1_intent": "wound_care",
+        "top1_score": 0.3546,
+        "top2_intent": "rehabilitation",
+        "top2_score": 0.2644,
+        "margin": 0.0902,
+        "matched_prototype": "Can I change my wound dressing today?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": false,
+      "classifier_rule": "semantic prototype pull: wound_care 0.35 via 'Can I change my wound dressing today?', margin 0.09",
+      "orchestrator": {
+        "intent": "wound_care",
+        "routed_intents": [
+          "wound_care"
+        ],
+        "target_agent": "WoundCareAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": false,
+      "orchestrator_correct_strict": false
+    },
+    {
+      "id": "V012",
+      "text": "After my knee replacement, are there positions I must avoid, like kneeling or keeping a pillow under the knee?",
+      "expected": "rehabilitation",
+      "acceptable": [
+        "rehabilitation",
+        "daily_activity"
+      ],
+      "confidence": "debatable",
+      "kind": "opening",
+      "source": "heldout_v3:knee_precautions",
+      "surgery": "TKA",
+      "classifier": {
+        "intent": "daily_activity",
+        "decision_path": "semantic",
+        "top1_intent": "daily_activity",
+        "top1_score": 0.6277,
+        "top2_intent": "rehabilitation",
+        "top2_score": 0.4413,
+        "margin": 0.1864,
+        "matched_prototype": "Are there postures or movements I must stay away from after the operation?"
+      },
+      "keyword_hits": [],
+      "intake_signals": {
+        "greeting": false,
+        "introduction_patterns": [],
+        "intake_cues": [],
+        "question": true,
+        "symptom": false,
+        "intake_statement": false
+      },
+      "classifier_correct": true,
+      "classifier_rule": null,
+      "orchestrator": {
+        "intent": "daily_activity",
+        "routed_intents": [
+          "daily_activity"
+        ],
+        "target_agent": "DailyActivityAgent",
+        "triage_level": "GREEN",
+        "engine": "benchmark stub",
+        "pre_empted": null,
+        "multi_agent": false,
+        "error": null
+      },
+      "orchestrator_correct": true,
+      "orchestrator_correct_strict": true
+    }
+  ]
+}
