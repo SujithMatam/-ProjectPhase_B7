@@ -29,6 +29,8 @@ import sqlite3
 
 # NEW: admin PDF report-extraction feature
 from admin_report_routes import router as admin_report_router
+from wound_image_routes import router as wound_image_router
+from voice_routes import router as voice_router
 
 app = FastAPI(
     title="OrthoSync Agentic AI Backend",
@@ -47,6 +49,8 @@ app.add_middleware(
 
 # NEW: mounts POST /api/admin/extract-report
 app.include_router(admin_report_router)
+app.include_router(wound_image_router)
+app.include_router(voice_router)
 
 
 @app.on_event("startup")
@@ -105,6 +109,8 @@ class ChatRequest(BaseModel):
     weight_bearing_status: Optional[WeightBearingStatus] = Field(default=None, example="WBAT")
     current_rom: Optional[str] = Field(default=None, example="Flexion to about 80 degrees")
     exercise_history: Optional[str] = Field(default=None, example="Completed heel slides and quad sets today; missed yesterday's session")
+    # Optional multimodal wound photo analysis (WoundCareAgent fusion)
+    photo_analysis: Optional[Dict[str, Any]] = Field(default=None)
 
     @field_validator("patient_id")
     @classmethod
@@ -202,6 +208,30 @@ def health_check():
             "ReportGenerationAgent",
         ]
     }
+
+
+class PatientRegisterRequest(BaseModel):
+    patient_id: str
+    email: str
+    full_name: str
+    password: str
+    phone_number: Optional[str] = ""
+    surgery_type: Optional[str] = "Total Knee Arthroplasty (TKA)"
+    affected_limb: Optional[str] = "Right"
+    surgery_date: Optional[str] = None
+    postop_day: Optional[int] = 1
+
+
+@app.post("/api/patient-register", status_code=201)
+def patient_register_endpoint(payload: PatientRegisterRequest):
+    try:
+        data = payload.dict()
+        patient = create_patient(data)
+        return {"status": "success", "patient": patient}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=409, detail="Patient already registered")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @app.post("/api/patient-login")
@@ -305,6 +335,7 @@ def chat(payload: ChatRequest):
             weight_bearing_status=payload.weight_bearing_status,
             current_rom=payload.current_rom,
             exercise_history=payload.exercise_history,
+            photo_analysis=payload.photo_analysis,
         )
         return result
     except Exception as e:

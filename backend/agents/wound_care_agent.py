@@ -38,6 +38,12 @@ from typing import Any, Dict, List, Optional, Tuple
 from agents.base_clinical_agent import BaseClinicalAgent
 from agents.chat_agent import ChatAgent
 from lam.schemas import TargetAgent
+from patient_database import (
+    save_wound_assessment,
+    get_recent_wound_assessments,
+    record_triage_event,
+)
+from doctor_alert import doctor_alert_notifier
 
 
 # ============================================================================
@@ -117,6 +123,10 @@ _OTHER_DOMAIN_TERMS = (
 # ============================================================================
 
 _QUESTIONS: Dict[str, str] = {
+    "dressing_status": (
+        "Since you are in early recovery, is your surgical dressing or bandage "
+        "still clean, dry, and intact, or is there any fluid staining or strike-through soaking through it?"
+    ),
     "onset": (
         "When did you first notice the change in the wound?"
     ),
@@ -161,6 +171,10 @@ _QUESTIONS: Dict[str, str] = {
 # ============================================================================
 
 _ALT_QUESTIONS: Dict[str, str] = {
+    "dressing_status": (
+        "That's okay! Just check the outside of the bandage: is it completely dry "
+        "and firmly sticking, or is there any wetness, leaking, or staining?"
+    ),
     "onset": (
         "No worries, even a rough idea is fine. Would you say it was "
         "today, yesterday, or a few days ago?"
@@ -297,6 +311,7 @@ def _alt_field_from_question(
     normalised = _normalise(text)
 
     markers: Dict[str, str] = {
+        "dressing_status": "outside of the bandage",
         "onset": "even a rough idea is fine",
         "progression": "does it feel any different now at all",
         "appearance": "compare it to how it looked",
@@ -319,6 +334,16 @@ def _primary_field_from_question(
 ) -> Optional[str]:
 
     normalised = _normalise(text)
+
+    # Dressing status
+    if (
+        "surgical dressing" in normalised
+        or "clean, dry, and intact" in normalised
+        or "strike-through" in normalised
+        or "strikethrough" in normalised
+        or "dressing or bandage still clean" in normalised
+    ):
+        return "dressing_status"
 
     # Onset
     if (
@@ -555,6 +580,20 @@ def _extract_direct_information(
 
     result: Dict[str, str] = {}
 
+    # Dressing status
+    if any(
+        term in normalised
+        for term in (
+            "dressing",
+            "bandage",
+            "strike-through",
+            "strikethrough",
+            "gauze",
+            "tape",
+        )
+    ):
+        result["dressing_status"] = text.strip()
+
     # Pain
     if any(
         term in normalised
@@ -690,6 +729,20 @@ def _extract_direct_information(
         )
     ):
         result["separation"] = text.strip()
+    elif any(
+        term in normalised
+        for term in (
+            "covered by dressing",
+            "under the dressing",
+            "under the bandage",
+            "dressing is on",
+            "bandage is on",
+            "can't see incision",
+            "cannot see incision",
+            "cant see incision",
+        )
+    ):
+        result["separation"] = "Covered by intact dressing"
 
     # Fever
     if any(
@@ -932,6 +985,69 @@ def _field_is_negative(
 
 
 # ============================================================================
+# DRAINAGE CLASSIFICATION
+# ============================================================================
+
+def classify_drainage_type(text: str) -> Tuple[str, str]:
+    """
+    Classify wound drainage characteristics into clinical categories:
+      - 'none': Dry, no leakage
+      - 'serous': Clear, straw-colored, thin (normal healing exudate)
+      - 'serosanguineous': Pink, blood-tinged watery fluid (common early post-op)
+      - 'sanguineous': Active red blood, bloody
+      - 'purulent': Yellow, green, milky, thick, foul-smelling, pus (SSI indicator)
+      - 'unknown': Fluid mentioned but character unspecified
+    Returns: (category, description)
+    """
+    if not text:
+        return "none", "No drainage reported"
+
+    normalised = _normalise(text)
+    if _is_negative_answer(normalised) or any(
+        term in normalised for term in (
+            "no fluid", "no drainage", "no discharge", "dry",
+            "not leaking", "none", "no leak", "nothing leaking"
+        )
+    ):
+        return "none", "No drainage observed (dry incision)"
+
+    def _has_any(terms: Tuple[str, ...]) -> bool:
+        return any(bool(re.search(r"\b" + re.escape(t) + r"\b", normalised)) for t in terms)
+
+    # Purulent: Cardinal sign of Surgical Site Infection (SSI)
+    if _has_any((
+        "pus", "yellow", "green", "cloudy", "milky", "foul", "smelly",
+        "stinky", "odor", "odour", "bad smell", "thick discharge", "opaque"
+    )):
+        return "purulent", "Purulent drainage (thick/yellow/green/foul odor - suspected surgical site infection)"
+
+    # Serosanguineous: Pink, blood-tinged watery
+    if _has_any((
+        "pink", "blood-tinged", "blood tinged", "pinkish", "watery blood"
+    )):
+        return "serosanguineous", "Serosanguineous drainage (thin, pink, blood-tinged fluid)"
+
+    # Sanguineous: Active blood
+    if _has_any((
+        "blood", "bloody", "red fluid", "bleeding"
+    )):
+        return "sanguineous", "Sanguineous drainage (fresh or dark red blood)"
+
+    # Serous: Normal clear/pale yellow
+    if _has_any((
+        "clear", "straw", "watery", "pale yellow", "thin fluid", "amber"
+    )):
+        return "serous", "Serous drainage (clear or straw-colored normal post-op fluid)"
+
+    if _has_any((
+        "fluid", "drainage", "discharge", "leaking", "oozing", "leak", "wet"
+    )):
+        return "unknown", "Unspecified fluid drainage"
+
+    return "none", "No drainage reported"
+
+
+# ============================================================================
 # QUESTION SELECTION
 # ============================================================================
 
@@ -947,31 +1063,42 @@ _QUESTION_ORDER: Tuple[str, ...] = (
 )
 
 
+def _get_question_order(postop_day: Optional[int] = None) -> Tuple[str, ...]:
+    if postop_day is not None and postop_day <= 3:
+        return (
+            "dressing_status",
+            "onset",
+            "progression",
+            "appearance",
+            "warmth",
+            "drainage",
+            "separation",
+            "pain",
+            "fever",
+        )
+    return (
+        "onset",
+        "progression",
+        "appearance",
+        "warmth",
+        "drainage",
+        "separation",
+        "pain",
+        "fever",
+    )
+
+
 def _next_question(
     assessment: Dict[str, str],
     needs_alt: Optional[set] = None,
+    postop_day: Optional[int] = None,
 ) -> Optional[Tuple[str, str]]:
     """
     Adaptive wound assessment.
 
     We intentionally collect the core wound findings before concluding.
-
-    Required for a normal wound assessment:
-
-        onset
-        progression
-        appearance
-        warmth
-        drainage
-        separation
-
-    Pain and fever are collected when they were not already supplied.
-
-    This prevents the agent from concluding immediately after:
-
-        onset + progression + appearance
-
-    which was the previous bug.
+    If postop_day <= 3, dressing status (intact vs strike-through) is assessed
+    before inspecting or asking about bare incision separation.
 
     If `needs_alt` contains a field (the patient answered "I don't
     know" to its normal question), the SIMPLIFIED question from
@@ -979,8 +1106,9 @@ def _next_question(
     """
 
     needs_alt = needs_alt or set()
+    order = _get_question_order(postop_day)
 
-    for field in _QUESTION_ORDER:
+    for field in order:
 
         if field not in assessment:
 
@@ -1004,35 +1132,23 @@ def _next_question(
 
 def _should_conclude(
     assessment: Dict[str, str],
+    postop_day: Optional[int] = None,
 ) -> bool:
     """
     Only conclude once the important wound fields have been assessed.
-
-    This is intentionally stricter than the previous implementation.
-
-    The agent must have:
-
-        onset
-        progression
-        appearance
-        warmth
-        drainage
-        separation
-
-    before it hands the case to RAG + Qwen.
-
-    Pain and fever are optional if they were not relevant to the
-    patient's initial complaint.
+    For early post-op (postop_day <= 3), dressing_status is also required.
     """
 
-    required_wound_fields = (
+    required_wound_fields = [
         "onset",
         "progression",
         "appearance",
         "warmth",
         "drainage",
         "separation",
-    )
+    ]
+    if postop_day is not None and postop_day <= 3:
+        required_wound_fields.insert(0, "dressing_status")
 
     return all(
         field in assessment
@@ -1046,9 +1162,20 @@ def _should_conclude(
 
 def _acknowledgement(
     assessment: Dict[str, str],
+    has_photo: bool = False,
+    photo_summary: str = "",
 ) -> str:
 
+    prefix = ""
+    if has_photo:
+        if photo_summary:
+            prefix = f"{photo_summary} 🩹 "
+        else:
+            prefix = "I've reviewed your uploaded incision photo. 🩹 "
+
     if not assessment:
+        if prefix:
+            return prefix + "Let's go through a few quick questions to assess how the area is doing."
         return (
             "I understand. 🩹 Let's go through this together "
             "step by step."
@@ -1065,19 +1192,21 @@ def _acknowledgement(
         or "less warm" in latest
         or "improving" in latest
     ):
-        return (
+        body = (
             "Thanks, that's helpful. It's good to know that "
             "you've noticed some improvement."
         )
+        return f"{prefix}{body}" if prefix else body
 
     if (
         _is_worsening(latest)
         and not _is_improving(latest)
     ):
-        return (
+        body = (
             "Thanks for telling me. Since you've noticed a "
             "change, I'd like to check a little more carefully."
         )
+        return f"{prefix}{body}" if prefix else body
 
     if any(
         term in latest
@@ -1089,19 +1218,22 @@ def _acknowledgement(
             "pus",
         )
     ):
-        return (
+        body = (
             "Thanks, that's useful information. "
             "Let's clarify that a little further."
         )
+        return f"{prefix}{body}" if prefix else body
 
     if _is_negative_answer(latest):
-        return (
+        body = (
             "Thanks, that's helpful to know."
         )
+        return f"{prefix}{body}" if prefix else body
 
-    return (
+    body = (
         "Thanks, that helps me understand what you're noticing."
     )
+    return f"{prefix}{body}" if prefix else body
 
 
 # ============================================================================
@@ -1112,6 +1244,8 @@ def _followup_response(
     question: str,
     assessment: Dict[str, str],
     precomputed_triage: Optional[Dict[str, Any]],
+    has_photo: bool = False,
+    photo_summary: str = "",
 ) -> Dict[str, Any]:
 
     triage_level = "GREEN"
@@ -1132,7 +1266,7 @@ def _followup_response(
         )
 
     reply = (
-        _acknowledgement(assessment)
+        _acknowledgement(assessment, has_photo=has_photo, photo_summary=photo_summary)
         + "\n\n"
         + question
     )
@@ -1174,27 +1308,235 @@ def _is_unhelpful_llm_reply(
 # SAFE DETERMINISTIC CONCLUSION
 # ============================================================================
 
-def _deterministic_conclusion(
+# ============================================================================
+# MULTIMODAL PHOTO ANALYSIS EXTRACTION
+# ============================================================================
+
+def _extract_photo_analysis(
+    photo_analysis: Optional[Dict[str, Any]],
+    chat_history: Optional[List[Dict[str, str]]],
+    user_message: str,
+) -> Optional[Dict[str, Any]]:
+    """
+    Extracts wound image CV analysis either from the direct API payload
+    or by scanning recent conversation history / photo cards.
+    """
+    if photo_analysis and isinstance(photo_analysis, dict):
+        return photo_analysis
+
+    # Check user_message and chat_history for photo analysis outputs
+    all_texts: List[str] = [user_message]
+    for item in reversed(chat_history or []):
+        if isinstance(item, dict):
+            all_texts.append(str(item.get("content", "")))
+
+    for text in all_texts:
+        norm = text.lower()
+        if "elevated_redness_detected" in norm or ("noticeable redness" in norm and ("photo" in norm or "image" in norm)):
+            score = 0.08
+            score_match = re.search(r"redness[_\s]score[:=\s]+([0-9.]+)", norm)
+            if score_match:
+                try:
+                    score = float(score_match.group(1))
+                except ValueError:
+                    pass
+            return {
+                "visual_flag": "elevated_redness_detected",
+                "redness_score": score,
+                "redness_intensity": 0.50,
+            }
+        if "no_strong_indicators" in norm or ("don't see any strong signs of redness" in norm and ("photo" in norm or "image" in norm)):
+            return {
+                "visual_flag": "no_strong_indicators",
+                "redness_score": 0.01,
+                "redness_intensity": 0.10,
+            }
+
+    return None
+
+
+# ============================================================================
+# LONGITUDINAL COMPARISON
+# ============================================================================
+
+def _build_longitudinal_comparison(
+    patient_id: str,
+    current_assessment: Dict[str, str],
+    current_postop_day: int,
+) -> str:
+    """
+    Compares current wound assessment with prior visits recorded in SQLite
+    to identify recovery trends (improving vs worsening vs stable).
+    """
+    try:
+        past_records = get_recent_wound_assessments(patient_id, limit=3)
+    except Exception as exc:
+        print(f"[WOUND] Error retrieving prior assessments: {exc}")
+        return ""
+
+    if not past_records:
+        return ""
+
+    prior = past_records[0]
+    prior_day = prior.get("postop_day")
+    prior_app = str(prior.get("appearance", "")).lower()
+    prior_drain = str(prior.get("drainage", "")).lower()
+    prior_pain = str(prior.get("pain", "")).lower()
+
+    curr_app = str(current_assessment.get("appearance", "")).lower()
+    curr_drain = str(current_assessment.get("drainage", "")).lower()
+    curr_pain = str(current_assessment.get("pain", "")).lower()
+
+    comparison_points: List[str] = []
+
+    # Redness comparison
+    if "less red" in curr_app or ("red" in prior_app and ("normal" in curr_app or "not red" in curr_app or "less" in curr_app or "improving" in curr_app)):
+        comparison_points.append("Incision redness has improved compared to your previous visit")
+    elif "more red" in curr_app or ("elevated" in curr_app and "elevated" not in prior_app):
+        comparison_points.append("Increased redness noted compared to your previous visit")
+
+    # Drainage comparison
+    curr_drain_type, _ = classify_drainage_type(curr_drain)
+    prior_drain_type = prior.get("drainage_type") or classify_drainage_type(prior_drain)[0]
+    if prior_drain_type in ("serous", "serosanguineous", "purulent", "sanguineous") and curr_drain_type == "none":
+        comparison_points.append("Previous fluid drainage has now resolved")
+    elif prior_drain_type == "none" and curr_drain_type in ("purulent", "sanguineous"):
+        comparison_points.append(f"New {curr_drain_type} drainage developed since your previous visit")
+    elif curr_drain_type == "purulent":
+        comparison_points.append("Ongoing or new purulent drainage detected")
+
+    # Pain comparison
+    if _is_improving(curr_pain) or ("pain" in prior_pain and ("better" in curr_pain or "no pain" in curr_pain or "0" in curr_pain)):
+        comparison_points.append("Incision site discomfort has decreased")
+    elif _is_worsening(curr_pain):
+        comparison_points.append("Incision pain or tenderness has increased compared to prior report")
+
+    day_label = f"Day {prior_day}" if prior_day else "prior check-in"
+    if not comparison_points:
+        return f"\n\n**Recovery Trend:** Your wound findings remain consistent with {day_label}."
+
+    bullets = "\n".join(f"• {pt}." for pt in comparison_points)
+    return f"\n\n**Recovery Trend (vs. {day_label}):**\n{bullets}"
+
+
+# ============================================================================
+# PERSISTENCE & PHYSICIAN ALERT LINKAGE
+# ============================================================================
+
+def _finalize_assessment_persistence(
+    patient_id: str,
+    postop_day: int,
     assessment: Dict[str, str],
     precomputed_triage: Optional[Dict[str, Any]],
-) -> Dict[str, Any]:
-
+    photo_analysis: Optional[Dict[str, Any]],
+    summary_text: str,
+) -> Tuple[str, bool, str]:
+    """
+    Saves assessment to SQLite, escalates triage if purulent/infected,
+    creates triage event record, and fires doctor alert if RED.
+    """
     triage_level = "GREEN"
     is_escalated = False
 
     if precomputed_triage:
+        triage_level = precomputed_triage.get("triage_level", "GREEN")
+        is_escalated = bool(precomputed_triage.get("is_escalated", False))
 
-        triage_level = precomputed_triage.get(
-            "triage_level",
-            "GREEN",
-        )
+    drainage_text = assessment.get("drainage", "")
+    drainage_type, _ = classify_drainage_type(drainage_text)
 
-        is_escalated = bool(
-            precomputed_triage.get(
-                "is_escalated",
-                False,
+    # SSI Escalation check
+    fever_val = _normalise(assessment.get("fever", ""))
+    has_fever = bool(fever_val and not _is_negative_answer(fever_val) and "no fever" not in fever_val and "not feverish" not in fever_val)
+
+    if drainage_type == "purulent":
+        if has_fever or _is_worsening(assessment.get("pain", "")):
+            triage_level = "RED"
+            is_escalated = True
+        elif triage_level == "GREEN":
+            triage_level = "YELLOW"
+            is_escalated = True
+
+    # Photo analysis values
+    redness_score = None
+    visual_flag = None
+    if photo_analysis:
+        redness_score = photo_analysis.get("redness_score")
+        visual_flag = photo_analysis.get("visual_flag")
+
+    # Longitudinal comparison
+    trend_text = _build_longitudinal_comparison(
+        patient_id=patient_id,
+        current_assessment=assessment,
+        current_postop_day=postop_day,
+    )
+
+    # Persist to SQLite
+    record = {
+        "postop_day": postop_day,
+        "onset": assessment.get("onset"),
+        "progression": assessment.get("progression"),
+        "appearance": assessment.get("appearance"),
+        "warmth": assessment.get("warmth"),
+        "drainage": assessment.get("drainage"),
+        "drainage_type": drainage_type,
+        "separation": assessment.get("separation"),
+        "pain": assessment.get("pain"),
+        "fever": assessment.get("fever"),
+        "dressing_status": assessment.get("dressing_status"),
+        "redness_score": redness_score,
+        "visual_flag": visual_flag,
+        "triage_level": triage_level,
+        "summary": summary_text,
+    }
+    try:
+        save_wound_assessment(patient_id, record)
+        print(f"[WOUND] Saved wound assessment for {patient_id} (Day {postop_day}, triage={triage_level}, drainage={drainage_type})")
+    except Exception as exc:
+        print(f"[WOUND] Failed to persist wound assessment: {exc}")
+
+    # Record triage event if escalated or purulent
+    if triage_level in ("RED", "YELLOW") or drainage_type == "purulent":
+        try:
+            record_triage_event(
+                patient_id=patient_id,
+                level=triage_level,
+                symptom=f"Wound assessment: drainage={drainage_type}, appearance={assessment.get('appearance', 'unspecified')}",
+                action="Emergency surgical site review advised" if triage_level == "RED" else "Clinical nurse wound review required",
             )
-        )
+        except Exception as exc:
+            print(f"[WOUND] Failed to record triage event: {exc}")
+
+    # Doctor alert linkage if RED
+    if triage_level == "RED":
+        try:
+            doctor_alert_notifier.notify_red_triage_background(
+                patient_id=patient_id,
+                user_message=f"Critical wound finding: drainage={drainage_type}, appearance={assessment.get('appearance', '')}",
+                triage={
+                    "triage_level": "RED",
+                    "reasons": [f"Purulent drainage / wound infection risk ({drainage_type})"],
+                    "action_protocol": "Immediate physician review required.",
+                },
+                postop_day=postop_day,
+            )
+        except Exception as exc:
+            print(f"[WOUND] Failed to notify doctor alert: {exc}")
+
+    return triage_level, is_escalated, trend_text
+
+
+# ============================================================================
+# SAFE DETERMINISTIC CONCLUSION
+# ============================================================================
+
+def _deterministic_conclusion(
+    patient_id: str,
+    postop_day: int,
+    assessment: Dict[str, str],
+    precomputed_triage: Optional[Dict[str, Any]],
+    photo_analysis: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
 
     progression = _normalise(
         assessment.get("progression", "")
@@ -1240,7 +1582,7 @@ def _deterministic_conclusion(
     )
 
     closed = (
-        "closed" in separation
+        ("closed" in separation or "covered by intact dressing" in separation)
         and not any(
             term in separation
             for term in (
@@ -1282,7 +1624,7 @@ def _deterministic_conclusion(
 
     if closed:
         summary_bits.append(
-            "the incision is still closed"
+            "the incision remains closed and protected"
         )
 
     if no_fever:
@@ -1296,24 +1638,31 @@ def _deterministic_conclusion(
         else "the wound findings you described"
     )
 
-    if triage_level == "RED":
+    # Persistence, SQLite storage, triage escalation, and doctor alert
+    triage_level, is_escalated, trend_text = _finalize_assessment_persistence(
+        patient_id=patient_id,
+        postop_day=postop_day,
+        assessment=assessment,
+        precomputed_triage=precomputed_triage,
+        photo_analysis=photo_analysis,
+        summary_text=summary,
+    )
 
+    drainage_type, _ = classify_drainage_type(drainage)
+
+    if triage_level == "RED":
         action = (
             "Because the safety triage result is RED, follow the "
             "emergency escalation instruction provided by the "
             "system and seek urgent clinical help."
         )
-
     elif triage_level == "YELLOW":
-
         action = (
             "Because the safety triage result is YELLOW, follow the "
             "clinical advice provided by your surgical team and "
             "contact them if the concern persists or worsens."
         )
-
     else:
-
         action = (
             "For now, continue following the wound-care instructions "
             "given by your surgical team. Monitor the incision for "
@@ -1324,9 +1673,7 @@ def _deterministic_conclusion(
         )
 
     pain_sentence = ""
-
     if pain and pain.strip().lower() != "unknown":
-
         if _is_improving(pain):
             pain_sentence = (
                 " You also described improvement in the discomfort."
@@ -1336,13 +1683,14 @@ def _deterministic_conclusion(
                 " You also reported pain or tenderness around the area."
             )
 
-    # ============================================================
-    # UNKNOWN / UNCERTAIN FIELDS
-    #
-    # A field left as "unknown" must never be silently treated as
-    # neutral -- explicitly call it out so the patient (or whoever is
-    # reading this) knows something still needs checking.
-    # ============================================================
+    ssi_warning = ""
+    if drainage_type == "purulent":
+        ssi_warning = (
+            "\n\n⚠️ **CLINICAL NOTICE: Suspected Infection Signs (Purulent Drainage)**\n"
+            "You reported drainage that appears thick, cloudy, yellow/green, or with an odor. "
+            "In postoperative joint recovery, this can indicate a surgical site infection. "
+            "Please notify your surgeon's clinic promptly for an urgent in-person evaluation."
+        )
 
     unknown_fields = [
         field
@@ -1351,14 +1699,11 @@ def _deterministic_conclusion(
     ]
 
     uncertainty_sentence = ""
-
     if unknown_fields:
-
         readable_fields = ", ".join(
             field.replace("_", " ")
             for field in unknown_fields
         )
-
         uncertainty_sentence = (
             "\n\nYou weren't able to tell about the following: "
             f"{readable_fields}. Since that's not clear from what you "
@@ -1370,8 +1715,10 @@ def _deterministic_conclusion(
     reply = (
         "Thanks for going through that with me. "
         f"Based on what you've told me, {summary}."
-        f"{pain_sentence}\n\n"
+        f"{pain_sentence}"
+        f"{ssi_warning}\n\n"
         f"{action}"
+        f"{trend_text}"
         f"{uncertainty_sentence}\n\n"
         "This is a preliminary assessment based on the information "
         "you provided and cannot confirm how the incision is healing."
@@ -1447,6 +1794,8 @@ class WoundCareAgent(BaseClinicalAgent):
         chat_history: Optional[List[Dict[str, str]]] = None,
         surgery_date: Optional[str] = None,
         precomputed_triage: Optional[Dict[str, Any]] = None,
+        photo_analysis: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
     ) -> Dict[str, Any]:
 
         history = chat_history or []
@@ -1473,13 +1822,13 @@ class WoundCareAgent(BaseClinicalAgent):
             )
 
         # ============================================================
-        # Confirm wound conversation
+        # Multimodal Photo Extraction & Fusion
         # ============================================================
 
-        if not _is_wound_conversation(
-            user_message,
-            history,
-        ):
+        photo = _extract_photo_analysis(photo_analysis, history, user_message)
+
+        # Confirm wound conversation (photo presence confirms wound domain)
+        if not _is_wound_conversation(user_message, history) and not photo:
 
             return ChatAgent.answer_question(
                 patient_id=patient_id,
@@ -1503,26 +1852,38 @@ class WoundCareAgent(BaseClinicalAgent):
             user_message,
         )
 
+        # Auto-seed appearance from photo if not already explicitly stated
+        photo_summary_phrase = ""
+        if photo:
+            flag = photo.get("visual_flag")
+            score = photo.get("redness_score", 0.0)
+            if flag == "elevated_redness_detected":
+                if "appearance" not in assessment:
+                    assessment["appearance"] = f"Elevated redness detected on uploaded photo (redness score: {score:.2f})"
+                photo_summary_phrase = f"I reviewed your uploaded photo, which showed noticeable redness around the area (score: {score:.2f})."
+            elif flag == "no_strong_indicators":
+                if "appearance" not in assessment:
+                    assessment["appearance"] = "Photo analyzed: no strong signs of elevated redness detected"
+                photo_summary_phrase = "I reviewed your uploaded photo, which did not show strong signs of redness."
+
         print(
             "[WOUND] "
-            f"assessment={assessment} needs_alt={needs_alt}"
+            f"assessment={assessment} needs_alt={needs_alt} photo={bool(photo)}"
         )
 
         # ============================================================
         # Continue assessment until ALL CORE WOUND FIELDS exist
-        #
-        # If the patient was uncertain about a field, needs_alt makes
-        # _next_question ask the SIMPLIFIED version instead of moving
-        # on or repeating the same question.
         # ============================================================
 
         if not _should_conclude(
-            assessment
+            assessment,
+            postop_day=postop_day,
         ):
 
             next_question = _next_question(
                 assessment,
                 needs_alt,
+                postop_day=postop_day,
             )
 
             if next_question:
@@ -1533,16 +1894,12 @@ class WoundCareAgent(BaseClinicalAgent):
                     question=question,
                     assessment=assessment,
                     precomputed_triage=precomputed_triage,
+                    has_photo=bool(photo),
+                    photo_summary=photo_summary_phrase,
                 )
 
         # ============================================================
         # FINAL CONCLUSION
-        #
-        # Fields the patient was never able to answer (still "I don't
-        # know" after the simplified question) show as "not sure"
-        # rather than their raw internal marker, so both the LLM prompt
-        # and the deterministic fallback treat them as explicitly
-        # unresolved instead of a normal finding.
         # ============================================================
 
         assessment_summary = "\n".join(
@@ -1555,108 +1912,37 @@ class WoundCareAgent(BaseClinicalAgent):
             for value in assessment.values()
         )
 
-        # ============================================================
-        # FINAL CONCLUSION INSTRUCTION
-        #
-        # The assessment is complete.
-        # The LLM is still used so that the existing RAG + Qwen
-        # pipeline remains intact.
-        #
-        # The important change is that the FINAL response is explicitly
-        # instructed to answer from the completed patient assessment
-        # rather than falling back to generic information about one
-        # symptom.
-        # ============================================================
-
+        # RAG + Qwen conclusion
         conclusion_instruction = (
             f"{cls.DOMAIN_FOCUS}\n\n"
-
             "IMPORTANT: The conversational wound assessment is COMPLETE.\n"
             "This is the FINAL response to the patient.\n\n"
-
             "Use BOTH the complete previous conversation history and the "
             "structured wound assessment below. The patient's reported "
             "findings are the primary context for the answer.\n\n"
-
             "Do NOT restart the assessment.\n"
             "Do NOT ask another routine wound-care question.\n"
             "Do NOT ask the patient to provide information that is already "
             "present in the assessment.\n"
-            "Do NOT respond with a generic explanation about only one "
-            "symptom.\n"
+            "Do NOT respond with a generic explanation about only one symptom.\n"
             "Do NOT ignore improvement reported by the patient.\n\n"
-
             "Patient-reported wound assessment:\n"
             f"{assessment_summary}\n\n"
-
-            "Generate a patient-specific final response.\n\n"
-
-            "The response must:\n"
+            "Generate a patient-specific final response.\n"
             "1. Briefly acknowledge what the patient reported.\n"
-            "2. Summarise the important wound findings that were actually "
-            "reported.\n"
+            "2. Summarise the important wound findings that were actually reported.\n"
             "3. Explicitly mention improvement or worsening when present.\n"
-            "4. Give a clear preliminary interpretation based on the "
-            "reported findings.\n"
+            "4. Give a clear preliminary interpretation based on the reported findings.\n"
             "5. Give practical next steps.\n"
             "6. Explain what changes should be monitored.\n"
             "7. Explain when the patient should contact the surgical team.\n\n"
-
-            "Use the retrieved orthopedic knowledge from the existing RAG "
-            "pipeline for specific clinical guidance. Apply that knowledge "
-            "to the patient's actual findings instead of replacing the "
-            "assessment with generic wound-care education.\n\n"
-
-            "For example, if the assessment says that pain is improving, "
-            "redness is decreasing, warmth is decreasing, there is no "
-            "drainage, and the incision is closed, explicitly acknowledge "
-            "those findings together in the final answer. Do not respond "
-            "only with general information about drainage, pain, redness, "
-            "or postoperative wounds.\n\n"
-
-            "Write in plain, everyday language a patient without a medical "
-            "background would understand. Avoid clinical jargon where a "
-            "simpler word works, and briefly explain any medical term you "
-            "do need to use.\n\n"
-
             + (
-                "IMPORTANT: One or more fields in the assessment are "
-                "marked 'not sure' -- the patient was genuinely unable "
-                "to tell, even after being offered an easier way to "
-                "check. Do NOT treat 'not sure' as a normal or "
-                "reassuring finding and do NOT silently ignore it. "
-                "Explicitly say which finding(s) are unclear, and "
-                "recommend the patient ask someone to look at the area "
-                "for them or check with their surgical team, so nothing "
-                "gets missed.\n\n"
-                if has_unknown_fields
-                else ""
+                "IMPORTANT: One or more fields in the assessment are marked 'not sure'. "
+                "Explicitly say which finding(s) are unclear and recommend surgical team check.\n\n"
+                if has_unknown_fields else ""
             )
-
-            + "Do not independently perform emergency triage.\n"
-            "The deterministic SafetyTriageEngine result is authoritative.\n"
-            "Do not invent medical thresholds, treatment instructions, "
-            "doses, or timelines.\n\n"
-
-            "The assessment is complete. Give the final patient-facing "
-            "answer now."
+            + "The assessment is complete. Give the final patient-facing answer now."
         )
-
-        # ============================================================
-        # EXISTING RAG + QWEN CONCLUSION
-        #
-        # FIX: final_wound_assessment and wound_assessment_summary were
-        # previously NOT passed here. That meant ChatAgent.answer_question()
-        # always treated this as a normal chat turn:
-        #   - _query_llama() built the generic "2-3 sentence answer" prompt
-        #     instead of the dedicated final-wound-assessment prompt.
-        #   - If that generic LLM reply was empty/unhelpful, the fallback
-        #     dropped into _generate_smart_reply(), which returns the
-        #     static "Based on your Day X protocol..." RAG-dump text --
-        #     the exact generic answer being reported. Passing these two
-        #     fields routes both the prompt AND the fallback through the
-        #     dedicated final-wound-assessment path instead.
-        # ============================================================
 
         llm_result = ChatAgent.answer_question(
             patient_id=patient_id,
@@ -1667,17 +1953,8 @@ class WoundCareAgent(BaseClinicalAgent):
                 "FINAL WOUND-CARE RESPONSE.\n\n"
                 "The multi-turn wound assessment is COMPLETE.\n"
                 "Do not ask another question.\n\n"
-
-                "Use the previous conversation and the completed "
-                "patient-specific assessment below as the main context "
-                "for your answer:\n\n"
-
                 f"{assessment_summary}\n\n"
-
-                "Generate a concise, patient-specific final conclusion. "
-                "Explicitly reflect the patient's actual findings, "
-                "including improvement or worsening. Do not replace "
-                "these findings with generic wound-care information."
+                "Generate a concise, patient-specific final conclusion."
             ),
             chat_history=history,
             procedure=procedure,
@@ -1688,40 +1965,38 @@ class WoundCareAgent(BaseClinicalAgent):
             wound_assessment_summary=assessment_summary,
         )
 
-        # ============================================================
-        # CHECK THE LLM RESPONSE
-        # ============================================================
+        llm_reply = str(llm_result.get("reply", "")).strip()
 
-        llm_reply = str(
-            llm_result.get(
-                "reply",
-                "",
+        if llm_reply and not _is_unhelpful_llm_reply(llm_reply):
+            # Finalize persistence, triage escalation, and doctor alert
+            triage_level, is_escalated, trend_text = _finalize_assessment_persistence(
+                patient_id=patient_id,
+                postop_day=postop_day,
+                assessment=assessment,
+                precomputed_triage=precomputed_triage,
+                photo_analysis=photo,
+                summary_text=llm_reply[:200],
             )
-        ).strip()
+            drainage_type, _ = classify_drainage_type(assessment.get("drainage", ""))
+            if drainage_type == "purulent" and "infection" not in llm_reply.lower():
+                llm_reply += (
+                    "\n\n⚠️ **CLINICAL NOTICE: Suspected Infection Signs (Purulent Drainage)**\n"
+                    "You reported drainage that appears thick, cloudy, yellow/green, or with an odor. "
+                    "In postoperative joint recovery, this can indicate a surgical site infection. "
+                    "Please notify your surgeon's clinic promptly for an urgent in-person evaluation."
+                )
+            if trend_text and trend_text not in llm_reply:
+                llm_reply += trend_text
 
-        # ============================================================
-        # IMPORTANT:
-        #
-        # A generic response is not acceptable after a completed
-        # wound assessment.
-        #
-        # If Qwen returns a useful patient-specific response, preserve
-        # the existing RAG + Qwen result.
-        #
-        # Otherwise use the deterministic conclusion, which explicitly
-        # summarises the patient's actual wound findings.
-        # ============================================================
-
-        if (
-            llm_reply
-            and not _is_unhelpful_llm_reply(
-                llm_reply
-            )
-        ):
-
+            llm_result["reply"] = llm_reply
+            llm_result["triage_level"] = triage_level
+            llm_result["is_escalated"] = is_escalated
             return llm_result
 
         return _deterministic_conclusion(
+            patient_id=patient_id,
+            postop_day=postop_day,
             assessment=assessment,
             precomputed_triage=precomputed_triage,
+            photo_analysis=photo,
         )

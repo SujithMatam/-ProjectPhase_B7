@@ -106,6 +106,7 @@ class AgentRouter:
         weight_bearing_status: Optional[WeightBearingStatus] = None,
         current_rom: Optional[str] = None,
         exercise_history: Optional[str] = None,
+        photo_analysis: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
 
         agent_cls = _AGENT_BY_INTENT.get(
@@ -186,6 +187,25 @@ class AgentRouter:
         if agent_cls is WoundCareAgent:
 
             return WoundCareAgent.handle(
+                patient_id=patient_id,
+                surgery_type=surgery_type,
+                affected_limb=affected_limb,
+                postop_day=postop_day,
+                user_message=user_message,
+                procedure=procedure,
+                chat_history=chat_history,
+                surgery_date=surgery_date,
+                precomputed_triage=precomputed_triage,
+                photo_analysis=photo_analysis,
+            )
+
+        # ------------------------------------------------------------
+        # Intake & Context Agent (Multi-turn interactive intake)
+        # ------------------------------------------------------------
+
+        if agent_cls is IntakeContextAgent:
+
+            return IntakeContextAgent.handle(
                 patient_id=patient_id,
                 surgery_type=surgery_type,
                 affected_limb=affected_limb,

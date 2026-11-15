@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS patients (
     age INTEGER,
     gender TEXT,
     allergies TEXT,
+    email TEXT,
+    phone_number TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -77,7 +79,29 @@ CREATE TABLE IF NOT EXISTS source_reports (
 CREATE TABLE IF NOT EXISTS patient_credentials (
     patient_id TEXT PRIMARY KEY REFERENCES patients(patient_id) ON DELETE CASCADE,
     username TEXT NOT NULL,
+    email TEXT,
     password_hash TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS wound_assessments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id TEXT NOT NULL REFERENCES patients(patient_id) ON DELETE CASCADE,
+    postop_day INTEGER,
+    date TEXT NOT NULL DEFAULT (date('now')),
+    timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    onset TEXT,
+    progression TEXT,
+    appearance TEXT,
+    warmth TEXT,
+    drainage TEXT,
+    drainage_type TEXT,
+    separation TEXT,
+    pain TEXT,
+    fever TEXT,
+    dressing_status TEXT,
+    redness_score REAL,
+    visual_flag TEXT,
+    triage_level TEXT,
+    summary TEXT
 );
 CREATE TABLE IF NOT EXISTS symptom_assessments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -161,12 +185,44 @@ def _ensure_symptom_assessment_columns(connection: sqlite3.Connection) -> None:
 def initialize_database(path: Optional[str] = None) -> None:
     with connection_scope(path) as connection:
         connection.executescript(SCHEMA)
+        # Migrate existing tables if columns are missing
+        for col in ["email", "phone_number"]:
+            try:
+                connection.execute(f"ALTER TABLE patients ADD COLUMN {col} TEXT")
+            except sqlite3.OperationalError:
+                pass
+        for col in ["email"]:
+            try:
+                connection.execute(f"ALTER TABLE patient_credentials ADD COLUMN {col} TEXT")
+            except sqlite3.OperationalError:
+                pass
+
         _ensure_symptom_assessment_columns(connection)
         connection.execute(
             """INSERT OR IGNORE INTO patient_credentials
                (patient_id, username, password_hash)
                SELECT patient_id, patient_id, LOWER(patient_id) FROM patients"""
         )
+        # Ensure demo account credentials and emails are populated if patients exist
+        try:
+            for pid, uname, em, pw, ph in [
+                ('PT-B7-8921', 'Rishi Priyan V N', 'b7@amrita.edu', 'password123', '+91 98765 43210'),
+                ('PT-B7-8922', 'Sujith Matam', 'sujith@amrita.edu', 'password123', '+91 98765 43211'),
+            ]:
+                has_patient = connection.execute("SELECT 1 FROM patients WHERE patient_id = ?", (pid,)).fetchone()
+                if has_patient:
+                    connection.execute(
+                        """INSERT OR REPLACE INTO patient_credentials
+                           (patient_id, username, email, password_hash)
+                           VALUES (?, ?, ?, ?)""",
+                        (pid, uname, em, pw)
+                    )
+                    connection.execute(
+                        "UPDATE patients SET email = ?, phone_number = ? WHERE patient_id = ? AND (email IS NULL OR email = '')",
+                        (em, ph, pid)
+                    )
+        except Exception:
+            pass
 
 
 def _insert_children(connection: sqlite3.Connection, patient: Dict[str, Any]) -> None:
@@ -189,10 +245,10 @@ def _insert_children(connection: sqlite3.Connection, patient: Dict[str, Any]) ->
                 exercise_completed, swelling, triage)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (patient_id, metric.get("day"), metric.get("date"),
-             metric.get("pain_score"), metric.get("rom_flexion"),
-             metric.get("rom_extension"), int(bool(metric.get("exercise_completed")))
-             if metric.get("exercise_completed") is not None else None,
-             metric.get("swelling"), metric.get("triage")),
+              metric.get("pain_score"), metric.get("rom_flexion"),
+              metric.get("rom_extension"), int(bool(metric.get("exercise_completed")))
+              if metric.get("exercise_completed") is not None else None,
+              metric.get("swelling"), metric.get("triage")),
         )
     for event in patient.get("triage_events", []):
         connection.execute(
@@ -212,12 +268,31 @@ def create_patient(patient: Dict[str, Any], path: Optional[str] = None) -> Dict[
         raise ValueError("patient_id is required")
     record = dict(patient)
     record["patient_id"] = required
+    email = str(record.get("email") or "").strip().lower() or None
+    phone_number = str(record.get("phone_number") or "").strip() or None
+    password = str(record.get("password") or record.get("password_hash") or "").strip()
+
+    demo_defaults = {
+        'PT-B7-8921': {'email': 'b7@amrita.edu', 'password': 'password123', 'phone': '+91 98765 43210'},
+        'PT-B7-8922': {'email': 'sujith@amrita.edu', 'password': 'password123', 'phone': '+91 98765 43211'},
+    }
+    if required in demo_defaults:
+        if not email:
+            email = demo_defaults[required]['email']
+        if not phone_number:
+            phone_number = demo_defaults[required]['phone']
+        if not password:
+            password = demo_defaults[required]['password']
+
+    if not password:
+        password = required.lower()
+
     with connection_scope(path) as connection:
         connection.execute(
-            """INSERT INTO patients (patient_id, full_name, age, gender, allergies)
-               VALUES (?, ?, ?, ?, ?)""",
+            """INSERT INTO patients (patient_id, full_name, age, gender, allergies, email, phone_number)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (required, record.get("full_name") or "Unnamed patient", record.get("age"),
-             record.get("gender"), record.get("allergies")),
+             record.get("gender"), record.get("allergies"), email, phone_number),
         )
         connection.execute(
             """INSERT INTO surgeries
@@ -232,8 +307,8 @@ def create_patient(patient: Dict[str, Any], path: Optional[str] = None) -> Dict[
         username = str(record.get("username") or record.get("full_name") or required).strip()
         connection.execute(
             """INSERT OR REPLACE INTO patient_credentials
-               (patient_id, username, password_hash) VALUES (?, ?, ?)""",
-            (required, username, required.lower()),
+               (patient_id, username, email, password_hash) VALUES (?, ?, ?, ?)""",
+            (required, username, email, password),
         )
     return get_patient(required, path)  # type: ignore[return-value]
 
@@ -243,15 +318,24 @@ def authenticate_patient(
     password: str,
     path: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
-    """Authenticate by patient ID or extracted full name."""
+    """Authenticate by patient ID, username, or email."""
     clean_identifier = str(identifier or "").strip().casefold()
+    clean_password = str(password or "").strip()
     with connection_scope(path) as connection:
         row = connection.execute(
             """SELECT patient_id FROM patient_credentials
-               WHERE (LOWER(patient_id) = ? OR LOWER(username) = ?)
-                 AND password_hash = ?""",
-            (clean_identifier, clean_identifier, str(password or "").strip()),
+               WHERE (LOWER(patient_id) = ? OR LOWER(username) = ? OR LOWER(COALESCE(email, '')) = ?)
+                 AND (password_hash = ? OR LOWER(password_hash) = LOWER(?))""",
+            (clean_identifier, clean_identifier, clean_identifier, clean_password, clean_password),
         ).fetchone()
+        if not row:
+            row = connection.execute(
+                """SELECT p.patient_id FROM patients p
+                   JOIN patient_credentials pc ON p.patient_id = pc.patient_id
+                   WHERE LOWER(COALESCE(p.email, '')) = ?
+                     AND (pc.password_hash = ? OR LOWER(pc.password_hash) = LOWER(?))""",
+                (clean_identifier, clean_password, clean_password),
+            ).fetchone()
     return get_patient(row["patient_id"], path) if row else None
 
 
@@ -275,6 +359,10 @@ def get_patient(patient_id: str, path: Optional[str] = None) -> Optional[Dict[st
         result = dict(row)
         result.pop("created_at", None)
         result.pop("updated_at", None)
+        cred = connection.execute("SELECT email, username FROM patient_credentials WHERE patient_id = ?", (patient_id,)).fetchone()
+        if cred:
+            if not result.get("email") and cred["email"]:
+                result["email"] = cred["email"]
         if surgery:
             result.update({k: surgery[k] for k in (
                 "surgery_type", "affected_limb", "surgery_date", "postop_day",
@@ -345,6 +433,79 @@ def save_source_report(patient_id: Optional[str], filename: str, extraction: Dic
              extraction.get("raw_text_preview"), json.dumps(extraction)),
         )
 
+
+def save_wound_assessment(
+    patient_id: str,
+    record: Dict[str, Any],
+    path: Optional[str] = None,
+) -> int:
+    """Save completed wound assessment to SQLite."""
+    initialize_database(path)
+    with connection_scope(path) as connection:
+        cursor = connection.execute(
+            """INSERT INTO wound_assessments
+               (patient_id, postop_day, onset, progression, appearance, warmth,
+                drainage, drainage_type, separation, pain, fever, dressing_status,
+                redness_score, visual_flag, triage_level, summary)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                patient_id,
+                record.get("postop_day"),
+                record.get("onset"),
+                record.get("progression"),
+                record.get("appearance"),
+                record.get("warmth"),
+                record.get("drainage"),
+                record.get("drainage_type"),
+                record.get("separation"),
+                record.get("pain"),
+                record.get("fever"),
+                record.get("dressing_status"),
+                record.get("redness_score"),
+                record.get("visual_flag"),
+                record.get("triage_level", "GREEN"),
+                record.get("summary"),
+            ),
+        )
+        return cursor.lastrowid
+
+
+def get_recent_wound_assessments(
+    patient_id: str,
+    limit: int = 3,
+    path: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Retrieve recent completed wound assessments for longitudinal comparison."""
+    initialize_database(path)
+    with connection_scope(path) as connection:
+        rows = connection.execute(
+            """SELECT * FROM wound_assessments
+               WHERE patient_id = ?
+               ORDER BY id DESC LIMIT ?""",
+            (patient_id, limit),
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+
+def record_triage_event(
+    patient_id: str,
+    level: str,
+    symptom: str,
+    action: str,
+    timestamp: Optional[str] = None,
+    path: Optional[str] = None,
+) -> None:
+    """Record a clinical triage alert event in SQLite."""
+    from datetime import datetime
+    initialize_database(path)
+    clean_id = (patient_id or "").strip().upper()
+    ts = timestamp or datetime.now().strftime("%Y-%m-%d %H:%M")
+    with connection_scope(path) as connection:
+        connection.execute(
+            """INSERT INTO triage_events (patient_id, timestamp, level, symptom, action)
+               VALUES (?, ?, ?, ?, ?)""",
+            (clean_id, ts, level, symptom, action),
+        )
 
 _SYMPTOM_ASSESSMENT_FIELDS = (
     "postop_day", "pain_score", "pain_severity_category", "onset", "location",

@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional
 
 from patient_database import (
     initialize_database, get_patient, list_patient_ids, seed_patients,
+    get_recent_wound_assessments,
 )
 
 try:
@@ -228,6 +229,18 @@ class ReportGenerationAgent:
             f"Exercise adherence is high at {exercise_compliance_pct}%. Continue home exercise progression."
         ]
 
+        # Wound assessments
+        recent_wounds = get_recent_wound_assessments(patient_id, limit=3)
+        if recent_wounds:
+            latest_w = recent_wounds[0]
+            w_day = latest_w.get("postop_day", patient.get("postop_day"))
+            if latest_w.get("drainage_type") == "purulent":
+                actionable_insights.insert(0, f"CRITICAL: Purulent wound drainage reported on Day {w_day}. Urgent surgical site review required.")
+            elif latest_w.get("visual_flag") == "elevated_redness_detected":
+                actionable_insights.append(f"Wound monitoring: Elevated redness flagged on Day {w_day} photo/check-in. Serial incision monitoring advised.")
+            elif "better" in str(latest_w.get("progression", "")).lower() or "less red" in str(latest_w.get("appearance", "")).lower():
+                actionable_insights.append(f"Incision healing favorably with decreasing redness and clean/dry dressing on Day {w_day}.")
+
         return {
             "patient_id": patient["patient_id"],
             "full_name": patient["full_name"],
@@ -258,6 +271,11 @@ class ReportGenerationAgent:
                 "overall_adherence_pct": overall_med_adherence,
                 "active_prescriptions": meds,
                 "daily_schedule": cls.get_daily_medication_schedule(patient_id),
+            },
+            "wound_care": {
+                "recent_assessments": recent_wounds,
+                "latest_status": recent_wounds[0].get("summary", "No recent wound assessment") if recent_wounds else "Pending assessment",
+                "dressing_status": recent_wounds[0].get("dressing_status", "Intact") if recent_wounds else "Unknown",
             },
             "safety_triage": {
                 "status": safety_status,
